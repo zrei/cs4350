@@ -1,111 +1,172 @@
 using System;
 using System.Collections.Generic;
 
-// if trap in future? wwww
+// can add more tile types like trap or cliff in the future
+// if calculations become exceedingly class dependent it should be given to the class
+// to calculate
 public enum TileType
 {
     NORMAL
 }
 
-// this is under the assumption that you can't cross over the line
-public struct Tile
+/// <summary>
+/// Struct packaging data on a single tile
+/// </summary>
+public struct TileData
 {
-    public TileType m_TileType;
-    public bool m_IsOccupied;
+    public readonly TileType m_TileType;
+    // this follows the assumption that units cannot cross over the line, otherwise this requires information on the alliance
+    public readonly bool m_IsOccupied;
+
+    public TileData(TileType tileType, bool isOccupied)
+    {
+        m_TileType = tileType;
+        m_IsOccupied = isOccupied;
+    }
+}
+
+/// <summary>
+/// Struct packaging data on all tiles in a map
+/// (This is currently handling only one half of a battle - i.e. only
+/// the player or enemy side)
+/// </summary>
+public class MapData 
+{
+    public const int NUM_ROWS = 5;
+    public const int NUM_COLS = 5;
+
+    private TileData[,] tileMap = new TileData[NUM_ROWS, NUM_COLS];
+
+    public MapData(MapData map)
+    {
+        tileMap = map.tileMap;
+    }
+
+    public MapData(TileData[,] tiles)
+    {
+        if (tiles.GetLength(0) != NUM_ROWS || tiles.GetLength(1) != NUM_COLS)
+        {
+            Logger.Log(this.GetType().Name, $"Tiles has {tiles.GetLength(0)} rows and {tiles.GetLength(1)} cols", LogLevel.ERROR);
+            return;
+        }
+        tileMap = tiles;
+    }
+
+    public void UpdateTile(CoordPair coordPair, TileData tile)
+    {
+        tileMap[coordPair.m_Row, coordPair.m_Col] = tile;
+    }
+
+    public TileData RetrieveTile(CoordPair coordPair)
+    {
+        return tileMap[coordPair.m_Row, coordPair.m_Col];
+    }
+
+    public static bool WithinBounds(CoordPair point)
+    {
+        return point.m_Row >= 0 && point.m_Row < NUM_ROWS && point.m_Col >= 0 && point.m_Col < NUM_COLS;
+    }
 }
 
 public struct CoordPair
 {
-    public int row;
-    public int col;
+    public readonly int m_Row;
+    public readonly int m_Col;
+
+    public CoordPair(int row, int col)
+    {
+        m_Row = row;
+        m_Col = col;
+    }
 
     public CoordPair MoveRight()
     {
-        return new CoordPair(row, col + 1);
+        return new CoordPair(m_Row, m_Col + 1);
     }
 
     public CoordPair MoveUp()
     {
-        return new CoordPair(row - 1, col);
+        return new CoordPair(m_Row - 1, m_Col);
     }
 
     public CoordPair MoveDown()
     {
-        return new CoordPair(row + 1, col);
+        return new CoordPair(m_Row + 1, m_Col);
     }
 
     public CoordPair MoveLeft()
     {
-        return new CoordPair(row, col - 1);
+        return new CoordPair(m_Row, m_Col - 1);
     }
 
-    public CoordPair(int row, int col)
+    public override string ToString()
     {
-        this.row = row;
-        this.col = col;
+        return $"({m_Row}, {m_Col})";
     }
 }
 
-// not gonna link it to MonoBehaviour... yet.
+/// <summary>
+/// To help with constructing shortest path
+/// </summary>
+public class PathNode
+{
+    public readonly CoordPair m_Coordinates;
+    public readonly PathNode m_Parent;
+
+    public bool HasParent => m_Parent != null;
+
+    public PathNode(CoordPair coordinates, PathNode parent)
+    {
+        m_Coordinates = coordinates;
+        m_Parent = parent;
+    }
+}
+
+/// <summary>
+/// Static class that helps with finding traversable tiles and finding the shortest
+/// path to a tile
+/// </summary>
 public static class Pathfinder
 {
-    private const int NUM_ROWS = 5;
-    private const int NUM_COLS = 5;
-
-    private static Tile[,] Map;
-
-    public static void InitialiseMap(Tile[,] map)
+    public static HashSet<PathNode> ReachablePoints(MapData map, CoordPair startPoint, int movementRange, bool canSwapSquares, params TileType[] traversableTiles)
     {
-        Map = map;
-    }
-
-    public static void UpdateMap(CoordPair point, Tile newTile)
-    {
-        Map[point.row, point.col] = newTile;
-    }
-
-    // if you like need me to return the entire thing then like sure i guess?
-    public static HashSet<CoordPair> ReachableMap(CoordPair startPoint, int movementRange, bool canSwapSquares, params TileType[] traversableTiles)
-    {
-        HashSet<CoordPair> canTraverse = new HashSet<CoordPair>();
-        Queue<(CoordPair, int)> q = new Queue<(CoordPair, int)>();
-        q.Enqueue((startPoint, movementRange));
+        HashSet<PathNode> canTraverse = new HashSet<PathNode>();
+        HashSet<CoordPair> checkedTiles = new HashSet<CoordPair>();
+        Queue<(PathNode, int)> q = new Queue<(PathNode, int)>();
+        q.Enqueue((new PathNode(startPoint, null), movementRange));
 
         while (q.Count > 0)
         {
-            (CoordPair point, int remainingMovement) = q.Dequeue();
-            if (canTraverse.Contains(point))
+            (PathNode point, int remainingMovement) = q.Dequeue();
+            CoordPair coordinates = point.m_Coordinates;
+            if (checkedTiles.Contains(coordinates))
                 continue;
+            checkedTiles.Add(coordinates);
             if (remainingMovement < 0)
                 continue;
-            if (!WithinBounds(point))
+            if (!MapData.WithinBounds(coordinates))
                 continue;
-            if (!IsTraversableTile(point, canSwapSquares, traversableTiles))
+            if (!IsTraversableTile(map, coordinates, traversableTiles))
                 continue;
-            canTraverse.Add(point);
 
-            q.Enqueue((point.MoveLeft(), remainingMovement - 1));
-            q.Enqueue((point.MoveRight(), remainingMovement - 1));
-            q.Enqueue((point.MoveDown(), remainingMovement - 1));
-            q.Enqueue((point.MoveUp(), remainingMovement - 1));
+            if (!map.RetrieveTile(coordinates).m_IsOccupied || canSwapSquares)
+                canTraverse.Add(point);
+
+            q.Enqueue((new PathNode(coordinates.MoveLeft(), point), remainingMovement - 1));
+            q.Enqueue((new PathNode(coordinates.MoveRight(), point), remainingMovement - 1));
+            q.Enqueue((new PathNode(coordinates.MoveDown(), point), remainingMovement - 1));
+            q.Enqueue((new PathNode(coordinates.MoveUp(), point), remainingMovement - 1));
         }
 
         return canTraverse;
     }
 
-    private static bool IsTraversableTile(CoordPair point, bool canSwapSquares, params TileType[] traversableTiles)
+    private static bool IsTraversableTile(MapData map, CoordPair point, params TileType[] traversableTiles)
     {
-        Tile tile = Map[point.row, point.col];
-        if (tile.m_IsOccupied && !canSwapSquares)
-            return false;
-        else if (!Array.Exists(traversableTiles, x => x == tile.m_TileType))
+        TileData tile = map.RetrieveTile(point);
+        if (!Array.Exists(traversableTiles, x => x == tile.m_TileType))
             return false;
 
         return true;
-    }
-
-    private static bool WithinBounds(CoordPair point)
-    {
-        return point.row >= 0 && point.row < NUM_ROWS && point.col >= 0 && point.col < NUM_COLS;
     }
 }
