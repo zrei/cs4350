@@ -9,7 +9,7 @@ public class MapLogic : MonoBehaviour
     
     private TileData[,] m_TileData = new TileData[MapData.NUM_ROWS, MapData.NUM_COLS];
 
-    public void Start()
+    private void Start()
     {
         InitialiseTileData();
         InitialiseTileVisuals();
@@ -28,7 +28,6 @@ public class MapLogic : MonoBehaviour
 
         if (ptr != null)
             TracePath(ptr);
-        
     }
 
     private void InitialiseTileData()
