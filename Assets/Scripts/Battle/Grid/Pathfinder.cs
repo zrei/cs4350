@@ -68,10 +68,11 @@ public class MapData
     }
 }
 
+[System.Serializable]
 public struct CoordPair
 {
-    public readonly int m_Row;
-    public readonly int m_Col;
+    public int m_Row;
+    public int m_Col;
 
     public CoordPair(int row, int col)
     {

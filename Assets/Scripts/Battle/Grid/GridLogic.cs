@@ -1,19 +1,25 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
-public class MapLogic : MonoBehaviour
+public class GridLogic : MonoBehaviour
 {
     [SerializeField] private Transform m_GridParent;
+    [SerializeField] private GridType m_GridType;
 
-    private TileVisual[,] m_TileVisuals = new TileVisual[MapData.NUM_ROWS, MapData.NUM_COLS];
+    private TileLogic[,] m_TileVisuals = new TileLogic[MapData.NUM_ROWS, MapData.NUM_COLS];
     
     private TileData[,] m_TileData = new TileData[MapData.NUM_ROWS, MapData.NUM_COLS];
+
+    private const float SPAWN_HEIGHT_OFFSET = 1.0f;
+    private const float CHECKPOINT_MOVE_TIME = 0.5f;
 
     private void Start()
     {
         InitialiseTileData();
         InitialiseTileVisuals();
 
+        /*
         // TODO: THis is all test code
         TileType[] traversableTiles = new TileType[1];
         traversableTiles[0] = TileType.NORMAL;
@@ -28,6 +34,7 @@ public class MapLogic : MonoBehaviour
 
         if (ptr != null)
             TracePath(ptr);
+        */
     }
 
     private void InitialiseTileData()
@@ -48,8 +55,11 @@ public class MapLogic : MonoBehaviour
             Transform row = m_GridParent.GetChild(r);
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                Transform tile = row.GetChild(c);
-                m_TileVisuals[r, c] = tile.GetComponent<TileVisual>();
+                Transform tileTrf = row.GetChild(c);
+                TileLogic tile = tileTrf.GetComponent<TileLogic>();
+                tile.Initialise(m_GridType, new CoordPair(r, c));
+                m_TileVisuals[r, c] = tile;
+                Debug.Log("Initialise tile position: " + tileTrf.position);
             }
         }
     }
@@ -64,7 +74,7 @@ public class MapLogic : MonoBehaviour
         }
     }
 
-    private void ResetMap()
+    public void ResetMap()
     {
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
@@ -87,5 +97,35 @@ public class MapLogic : MonoBehaviour
             pointer = pointer.m_Parent;
         }
         Debug.Log("Finish path!");
+    }
+
+    public Unit PlaceUnit(UnitPlacement unitPlacement)
+    {
+        // probably needs some... actual rotation? haha. if it's already rotated i guess not
+        Unit spawnedUnit = Instantiate(unitPlacement.m_Unit, GetTilePosition(unitPlacement.m_Coodinates), Quaternion.identity);
+        Logger.Log(this.GetType().Name, spawnedUnit.gameObject.name, "Spawned unit position: " + spawnedUnit.transform.position, spawnedUnit.gameObject, LogLevel.LOG);
+        return spawnedUnit;
+    }
+
+    public void MoveUnit(Unit unit, CoordPair start, CoordPair end)
+    {
+        unit.transform.position = GetTilePosition(end);
+        //List<Vector3> checkpointPositions = new List<Vector3>();
+        //StartCoroutine(MoveUnitThroughCheckpoints(unit, checkpointPositions));
+    }
+
+    private Vector3 GetTilePosition(CoordPair coordPair)
+    {
+        return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
+    }
+
+    private IEnumerator MoveUnitThroughCheckpoints(Unit unit, List<Vector3> positionsToMoveThrough)
+    {
+        for (int i = 0; i < positionsToMoveThrough.Count; ++i)
+        {
+            // rotate unit
+            // unit.gameObject.transform.LookAt()
+            yield return null;
+        }
     }
 }

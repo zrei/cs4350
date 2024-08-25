@@ -8,12 +8,23 @@ public enum TileState
     NONE
 }
 
-public class TileVisual : MonoBehaviour
+[RequireComponent(typeof(Collider))]
+public class TileLogic : MonoBehaviour
 {
     [SerializeField] TextMeshPro m_TraverseText;
     [SerializeField] TextMeshPro m_PathText;
 
     private TileState m_CurrState = TileState.NONE;
+
+    public GridType GridType {get; private set;}
+    public Unit ContainedUnit {get; private set;}
+    public CoordPair Coordinates {get; private set;}
+
+    public void Initialise(GridType gridType, CoordPair coordinates)
+    {
+        GridType = gridType;
+        Coordinates = coordinates;
+    }
 
     public void ResetTile()
     {
@@ -42,5 +53,10 @@ public class TileVisual : MonoBehaviour
     public void TogglePath(bool isPartOfPath)
     {
         m_PathText.gameObject.SetActive(isPartOfPath);
+    }
+
+    public void SetUnit(Unit unit)
+    {
+        ContainedUnit = unit;
     }
 }
