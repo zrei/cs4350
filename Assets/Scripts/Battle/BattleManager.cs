@@ -75,7 +75,7 @@ public class BattleManager : MonoBehaviour
 
     private void StartTurn()
     {
-        m_MapLogic.ResetMap();
+        //m_MapLogic.ResetMap();
         Unit unit = m_UnitTurns[0];
         m_UnitTurns.RemoveAt(0);
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)

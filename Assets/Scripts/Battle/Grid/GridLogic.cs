@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
+using UnityEngine.Tilemaps;
 
 public class GridLogic : MonoBehaviour
 {
@@ -14,27 +16,35 @@ public class GridLogic : MonoBehaviour
     private const float SPAWN_HEIGHT_OFFSET = 1.0f;
     private const float CHECKPOINT_MOVE_TIME = 0.5f;
 
+    private Dictionary<CoordPair, PathNode> m_TileToPath;
     private void Start()
     {
         InitialiseTileData();
         InitialiseTileVisuals();
 
-        /*
+        m_TileToPath = new Dictionary<CoordPair, PathNode>();
+        
+        
         // TODO: THis is all test code
         TileType[] traversableTiles = new TileType[1];
         traversableTiles[0] = TileType.NORMAL;
-        HashSet<PathNode> reachablePoints = Pathfinder.ReachablePoints(new MapData(m_TileData), new CoordPair(0, 0), 3, true, traversableTiles);
+        HashSet<PathNode> reachablePoints = Pathfinder.ReachablePoints(new MapData(m_TileData), new CoordPair(1, 1), 3, true, traversableTiles);
+
+        foreach (PathNode pathNode in reachablePoints)
+        {
+            m_TileToPath.Add(pathNode.m_Coordinates, pathNode);
+        }
         ColorMap(reachablePoints);
 
-        PathNode ptr = null;
+        /*PathNode ptr = null;
         foreach (PathNode node in reachablePoints)
         {
             ptr = node;
         }
 
         if (ptr != null)
-            TracePath(ptr);
-        */
+            TracePath(ptr);*/
+        
     }
 
     private void InitialiseTileData()
@@ -85,18 +95,21 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    private void TracePath(PathNode end)
+    public Stack<Vector3> TracePath(PathNode end)
     {
+        Stack<Vector3> pathPoints = new Stack<Vector3>();
         Debug.Log("End of path! Start!");
         PathNode pointer = end;
         while (pointer != null)
         {
             Debug.Log(pointer.m_Coordinates);
+            pathPoints.Push(GetTilePosition(pointer.m_Coordinates));
             CoordPair coordinates = pointer.m_Coordinates;
             m_TileVisuals[coordinates.m_Row, coordinates.m_Col].TogglePath(true);
             pointer = pointer.m_Parent;
         }
         Debug.Log("Finish path!");
+        return pathPoints;
     }
 
     public Unit PlaceUnit(UnitPlacement unitPlacement)
@@ -109,9 +122,10 @@ public class GridLogic : MonoBehaviour
 
     public void MoveUnit(Unit unit, CoordPair start, CoordPair end)
     {
-        unit.transform.position = GetTilePosition(end);
-        //List<Vector3> checkpointPositions = new List<Vector3>();
-        //StartCoroutine(MoveUnitThroughCheckpoints(unit, checkpointPositions));
+        Stack<Vector3> checkpointPositions = TracePath(m_TileToPath[end]);
+        //unit.transform.position = GetTilePosition(end);
+        
+        StartCoroutine(MoveUnitThroughCheckpoints(unit, checkpointPositions));
     }
 
     private Vector3 GetTilePosition(CoordPair coordPair)
@@ -119,13 +133,26 @@ public class GridLogic : MonoBehaviour
         return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
     }
 
-    private IEnumerator MoveUnitThroughCheckpoints(Unit unit, List<Vector3> positionsToMoveThrough)
+    private IEnumerator MoveUnitThroughCheckpoints(Unit unit, Stack<Vector3> positionsToMoveThrough)
     {
-        for (int i = 0; i < positionsToMoveThrough.Count; ++i)
+        while (positionsToMoveThrough.Count > 0)
         {
-            // rotate unit
-            // unit.gameObject.transform.LookAt()
-            yield return null;
+            float time = 0f;
+            Vector3 currPos = unit.transform.position;
+            Vector3 nextPos = positionsToMoveThrough.Pop();
+            if (currPos == nextPos)
+                continue;
+            while (time < CHECKPOINT_MOVE_TIME)
+            {
+                time += Time.deltaTime;
+                float l = time / CHECKPOINT_MOVE_TIME;
+                float x = Mathf.Lerp(currPos.x, nextPos.x, l);
+                float y = Mathf.Lerp(currPos.y, nextPos.y, l);
+                float z = Mathf.Lerp(currPos.z, nextPos.z, l);
+                unit.transform.position = new Vector3(x, y, z);
+                yield return null;
+            }
+            unit.transform.position = nextPos;
         }
     }
 }

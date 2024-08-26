@@ -104,6 +104,11 @@ public struct CoordPair
     {
         return $"({m_Row}, {m_Col})";
     }
+
+    public override int GetHashCode()
+    {
+        return m_Row.GetHashCode() ^ m_Col.GetHashCode();
+    }
 }
 
 /// <summary>
