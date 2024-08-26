@@ -13,6 +13,7 @@ public class TileLogic : MonoBehaviour
 {
     [SerializeField] TextMeshPro m_TraverseText;
     [SerializeField] TextMeshPro m_PathText;
+    [SerializeField] TextMeshPro m_TargetText;
 
     private TileState m_CurrState = TileState.NONE;
 
@@ -31,6 +32,7 @@ public class TileLogic : MonoBehaviour
         m_CurrState = TileState.NONE;
         ToggleState(m_CurrState);
         TogglePath(false);
+        ToggleTarget(false);
     }
 
     public void SetTileState(TileState state)
@@ -53,6 +55,11 @@ public class TileLogic : MonoBehaviour
     public void TogglePath(bool isPartOfPath)
     {
         m_PathText.gameObject.SetActive(isPartOfPath);
+    }
+
+    public void ToggleTarget(bool isTarget)
+    {
+        m_TargetText.gameObject.SetActive(isTarget);
     }
 
     public void SetUnit(Unit unit)

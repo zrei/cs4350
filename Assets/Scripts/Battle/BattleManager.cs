@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,6 +44,12 @@ public class BattleManager : MonoBehaviour
         m_Units = new HashSet<Unit>();
 
         InitialiseBattle(m_TestBattle, m_TestPlacement);
+        StartCoroutine(TestStart());
+    }
+
+    private IEnumerator TestStart()
+    {
+        yield return new WaitForEndOfFrame();
         StartTurn();
     }
 
@@ -75,12 +82,12 @@ public class BattleManager : MonoBehaviour
 
     private void StartTurn()
     {
-        //m_MapLogic.ResetMap();
+        m_MapLogic.ResetMap();
         Unit unit = m_UnitTurns[0];
         m_UnitTurns.RemoveAt(0);
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
-            m_PlayerTurnManager.PerformTurn((PlayerUnit) unit);
+            m_PlayerTurnManager.BeginTurn((PlayerUnit) unit);
         }
         else
         {

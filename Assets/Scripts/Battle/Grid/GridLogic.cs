@@ -14,27 +14,13 @@ public class GridLogic : MonoBehaviour
     private TileData[,] m_TileData = new TileData[MapData.NUM_ROWS, MapData.NUM_COLS];
 
     private const float SPAWN_HEIGHT_OFFSET = 1.0f;
-    private const float CHECKPOINT_MOVE_TIME = 0.5f;
 
-    private Dictionary<CoordPair, PathNode> m_TileToPath;
+    public MapData MapData => new MapData(m_TileData);
+
     private void Start()
     {
         InitialiseTileData();
         InitialiseTileVisuals();
-
-        m_TileToPath = new Dictionary<CoordPair, PathNode>();
-        
-        
-        // TODO: THis is all test code
-        TileType[] traversableTiles = new TileType[1];
-        traversableTiles[0] = TileType.NORMAL;
-        HashSet<PathNode> reachablePoints = Pathfinder.ReachablePoints(new MapData(m_TileData), new CoordPair(1, 1), 3, true, traversableTiles);
-
-        foreach (PathNode pathNode in reachablePoints)
-        {
-            m_TileToPath.Add(pathNode.m_Coordinates, pathNode);
-        }
-        ColorMap(reachablePoints);
 
         /*PathNode ptr = null;
         foreach (PathNode node in reachablePoints)
@@ -74,9 +60,9 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    private void ColorMap(HashSet<PathNode> reachablePoints)
+    public void ColorMap(HashSet<PathNode> reachablePoints)
     {
-        ResetMap();
+        ResetPath();
         foreach (PathNode pathNode in reachablePoints)
         {
             CoordPair coordinates = pathNode.m_Coordinates;
@@ -95,8 +81,31 @@ public class GridLogic : MonoBehaviour
         }
     }
 
+    public void ResetPath()
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                m_TileVisuals[r, c].TogglePath(false);
+            }
+        }
+    }
+
+    public void ResetTarget()
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                m_TileVisuals[r, c].ToggleTarget(false);
+            }
+        }
+    }
+
     public Stack<Vector3> TracePath(PathNode end)
     {
+        ResetPath();
         Stack<Vector3> pathPoints = new Stack<Vector3>();
         Debug.Log("End of path! Start!");
         PathNode pointer = end;
@@ -120,39 +129,17 @@ public class GridLogic : MonoBehaviour
         return spawnedUnit;
     }
 
-    public void MoveUnit(Unit unit, CoordPair start, CoordPair end)
-    {
-        Stack<Vector3> checkpointPositions = TracePath(m_TileToPath[end]);
-        //unit.transform.position = GetTilePosition(end);
-        
-        StartCoroutine(MoveUnitThroughCheckpoints(unit, checkpointPositions));
-    }
-
     private Vector3 GetTilePosition(CoordPair coordPair)
     {
         return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
     }
 
-    private IEnumerator MoveUnitThroughCheckpoints(Unit unit, Stack<Vector3> positionsToMoveThrough)
+    public void SetTarget(List<CoordPair> targetSquares)
     {
-        while (positionsToMoveThrough.Count > 0)
+        ResetTarget();
+        foreach (CoordPair coordPair in targetSquares)
         {
-            float time = 0f;
-            Vector3 currPos = unit.transform.position;
-            Vector3 nextPos = positionsToMoveThrough.Pop();
-            if (currPos == nextPos)
-                continue;
-            while (time < CHECKPOINT_MOVE_TIME)
-            {
-                time += Time.deltaTime;
-                float l = time / CHECKPOINT_MOVE_TIME;
-                float x = Mathf.Lerp(currPos.x, nextPos.x, l);
-                float y = Mathf.Lerp(currPos.y, nextPos.y, l);
-                float z = Mathf.Lerp(currPos.z, nextPos.z, l);
-                unit.transform.position = new Vector3(x, y, z);
-                yield return null;
-            }
-            unit.transform.position = nextPos;
+            m_TileVisuals[coordPair.m_Row, coordPair.m_Col].ToggleTarget(true);
         }
     }
 }
