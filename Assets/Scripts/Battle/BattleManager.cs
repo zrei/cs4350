@@ -47,6 +47,16 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(TestStart());
     }
 
+    private void Awake()
+    {
+        GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
+    }
+
     private IEnumerator TestStart()
     {
         yield return new WaitForEndOfFrame();
@@ -62,6 +72,7 @@ public class BattleManager : MonoBehaviour
             Unit unit = m_MapLogic.PlaceUnit(GridType.ENEMY, unitPlacement);
             m_UnitTurns.Add(unit);
             m_Units.Add(unit);
+            unit.Initialise(unitPlacement.m_Stats);
         }
 
         foreach (UnitPlacement unitPlacement in playerUnits)
@@ -69,6 +80,7 @@ public class BattleManager : MonoBehaviour
             Unit unit = m_MapLogic.PlaceUnit(GridType.PLAYER, unitPlacement);
             m_UnitTurns.Add(unit);
             m_Units.Add(unit);
+            unit.Initialise(unitPlacement.m_Stats);
         }
 
         m_UnitTurns.Sort(UnitSpeedComparer);
@@ -76,7 +88,7 @@ public class BattleManager : MonoBehaviour
 
     private int UnitSpeedComparer(Unit unit1, Unit unit2)
     {
-        return unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
+        return unit2.Stat.m_Speed.CompareTo(unit1.Stat.m_Speed);//unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
     }
     #endregion
 
@@ -101,6 +113,7 @@ public class BattleManager : MonoBehaviour
         {
             FillTurns();
         }
+        StartTurn();
     }
 
     private void FillTurns()
@@ -114,6 +127,16 @@ public class BattleManager : MonoBehaviour
 
     private void OnCompleteTurn()
     {
+        Logger.Log(this.GetType().Name, "Finish turn", LogLevel.LOG);
         EndTurn();
+    }
+
+    private void OnUnitDeath(Unit unit)
+    {
+        m_Units.Remove(unit);
+        if (m_UnitTurns.Contains(unit))
+        {
+            m_UnitTurns.Remove(unit);
+        }
     }
 }

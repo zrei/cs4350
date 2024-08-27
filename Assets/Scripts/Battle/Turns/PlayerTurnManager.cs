@@ -17,6 +17,7 @@ public class PlayerTurnManager : TurnManager
     private PlayerUnit m_CurrUnit;
     private CoordPair m_CurrTile;
     private CoordPair m_CurrTargetTile;
+    private List<CoordPair> m_AttackPoints = null;
 
     /// <summary>
     /// Maps coordinates to nodes that track paths
@@ -26,6 +27,7 @@ public class PlayerTurnManager : TurnManager
 
     private HashSet<PlayerTurnState> m_RemainingActions;
     private HashSet<PathNode> m_ReachablePoints;
+    private bool m_BlockInputs = false;
 
     private void Start()
     {
@@ -39,7 +41,7 @@ public class PlayerTurnManager : TurnManager
     /// <param name="playerUnit"></param>
     public void BeginTurn(PlayerUnit playerUnit)
     {
-        Logger.Log(this.GetType().Name, "Start turn with: " + playerUnit.name, LogLevel.LOG);
+        Logger.Log(this.GetType().Name, "Start player turn with: " + playerUnit.name, LogLevel.LOG);
         
         m_CurrUnit = playerUnit;
         m_MapLogic.TryRetrieveTile(new Ray(m_CurrUnit.transform.position, -m_CurrUnit.transform.up), out m_CurrTile, out GridType _);
@@ -69,11 +71,12 @@ public class PlayerTurnManager : TurnManager
         m_WithinTurn = true;
         m_CurrState = PlayerTurnState.SELECTING_MOVEMENT_SQUARE;
         m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
+        Logger.Log(this.GetType().Name, "Current phase: " + m_CurrState.ToString(), LogLevel.LOG);
     }
 
     private void Update()
     {
-        if (!m_WithinTurn)
+        if (!m_WithinTurn || m_BlockInputs)
             return;
 
         //Debug.Log("WHEEE!");
@@ -101,13 +104,15 @@ public class PlayerTurnManager : TurnManager
                 break;
             case PlayerTurnState.SELECTING_ATTACK_TARGET:
                 // must hit last row: row 4
-                if (hitGrid && gridType == GridType.ENEMY && m_CurrTargetTile.m_Row == 4)
+                if (hitGrid && gridType == GridType.ENEMY && m_CurrTargetTile.m_Row == 4 && m_MapLogic.IsTileOccupied(GridType.ENEMY, m_CurrTargetTile))
                 {
-                    m_MapLogic.SetTarget(GridType.ENEMY, new() {m_CurrTargetTile, m_CurrTargetTile.MoveUp()});
+                    m_AttackPoints = new() {m_CurrTargetTile, m_CurrTargetTile.MoveUp()};
+                    m_MapLogic.SetTarget(GridType.ENEMY, m_AttackPoints);
                 }
                 else
                 {
                     m_MapLogic.ResetTarget();
+                    m_AttackPoints = null;
                 }
                 break;
         }
@@ -116,8 +121,15 @@ public class PlayerTurnManager : TurnManager
         {
             if (m_CurrState == PlayerTurnState.SELECTING_MOVEMENT_SQUARE && m_CurrPath != null)
             {
-                m_CurrUnit.Move(m_CurrPath);
+                Logger.Log(this.GetType().Name, "Begin moving from " + m_CurrTile + " to " + m_CurrTargetTile, LogLevel.LOG);
+                m_BlockInputs = true;
+                m_CurrUnit.Move(m_CurrPath, () => TransitionAction(m_CurrState));
                 m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrTile, m_CurrTargetTile);
+            }
+            else if (m_CurrState == PlayerTurnState.SELECTING_ATTACK_TARGET && m_AttackPoints != null)
+            {
+                m_MapLogic.Attack(GridType.ENEMY, m_AttackPoints, 10f);
+                Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
                 TransitionAction(m_CurrState);
             }
         }
@@ -143,6 +155,7 @@ public class PlayerTurnManager : TurnManager
 
     private void TransitionAction(PlayerTurnState currAction)
     {
+        m_BlockInputs = false;
         m_RemainingActions.Remove(currAction);
 
         if (m_RemainingActions.Count > 0)
@@ -165,5 +178,7 @@ public class PlayerTurnManager : TurnManager
                 m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
                 break;
         }
+
+        Logger.Log(this.GetType().Name, "Current phase: " + currAction.ToString(), LogLevel.LOG);
     }
 }

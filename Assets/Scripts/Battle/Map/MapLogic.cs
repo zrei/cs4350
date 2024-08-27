@@ -106,4 +106,14 @@ public class MapLogic : MonoBehaviour
     {
         RetrieveGrid(gridType).MoveUnit(start, end);
     }
+
+    public bool IsTileOccupied(GridType gridType, CoordPair tile)
+    {
+        return RetrieveGrid(gridType).IsTileOccupied(tile);
+    }
+
+    public void Attack(GridType gridType, List<CoordPair> attackPoints, float damage)
+    {
+        RetrieveGrid(gridType).Attack(attackPoints, damage);
+    }
 }

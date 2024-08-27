@@ -42,17 +42,24 @@ public abstract class Unit : MonoBehaviour, IHealth
 
     }
 
+    /*
     void IHealth.TakeDamage(float damage)
     {
 
     }
+    */
 
-    public void Move(Stack<Vector3> positionsToMoveThrough)
+    public void TakeDamage(float damage)
     {
-        StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough));
+        m_Health -= damage;
     }
 
-    private IEnumerator MoveThroughCheckpoints(Stack<Vector3> positionsToMoveThrough)
+    public void Move(Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
+    {
+        StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, onCompleteMovement));
+    }
+
+    private IEnumerator MoveThroughCheckpoints(Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
         while (positionsToMoveThrough.Count > 0)
         {
@@ -73,13 +80,15 @@ public abstract class Unit : MonoBehaviour, IHealth
             }
             transform.position = nextPos;
         }
+        onCompleteMovement?.Invoke();
     }
 
     /// <summary>
     /// Initialise stats, position, etc.
     /// </summary>
-    protected virtual void Initialise()
+    public virtual void Initialise(Stats stats)
     {
-
+        m_Stats = stats;
+        m_Health = stats.m_Health;
     }
 }

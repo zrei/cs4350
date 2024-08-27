@@ -1,8 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
-using System;
-using UnityEngine.Tilemaps;
 
 public class GridLogic : MonoBehaviour
 {
@@ -39,7 +36,7 @@ public class GridLogic : MonoBehaviour
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                m_TileData[r, c] = new TileData(TileType.NORMAL, (r + c) % 2 == 0);
+                m_TileData[r, c] = new TileData(TileType.NORMAL, false);
             }
         }
     }
@@ -107,17 +104,14 @@ public class GridLogic : MonoBehaviour
     {
         ResetPath();
         Stack<Vector3> pathPoints = new Stack<Vector3>();
-        Debug.Log("End of path! Start!");
         PathNode pointer = end;
         while (pointer != null)
         {
-            Debug.Log(pointer.m_Coordinates);
             pathPoints.Push(GetTilePosition(pointer.m_Coordinates));
             CoordPair coordinates = pointer.m_Coordinates;
             m_TileVisuals[coordinates.m_Row, coordinates.m_Col].TogglePath(true);
             pointer = pointer.m_Parent;
         }
-        Debug.Log("Finish path!");
         return pathPoints;
     }
 
@@ -127,13 +121,17 @@ public class GridLogic : MonoBehaviour
         Unit spawnedUnit = Instantiate(unitPlacement.m_Unit, GetTilePosition(unitPlacement.m_Coodinates), Quaternion.identity);
         Logger.Log(this.GetType().Name, spawnedUnit.gameObject.name, "Spawned unit position: " + spawnedUnit.transform.position, spawnedUnit.gameObject, LogLevel.LOG);
         m_TileData[unitPlacement.m_Coodinates.m_Row, unitPlacement.m_Coodinates.m_Col].m_IsOccupied = true;
+        m_TileData[unitPlacement.m_Coodinates.m_Row, unitPlacement.m_Coodinates.m_Col].m_CurrUnit = spawnedUnit;
         return spawnedUnit;
     }
 
     public void MoveUnit(CoordPair start, CoordPair end)
     {
+        Unit movedUnit = m_TileData[start.m_Row, start.m_Col].m_CurrUnit;
         m_TileData[start.m_Row, start.m_Col].m_IsOccupied = false;
+        m_TileData[start.m_Row, start.m_Col].m_CurrUnit = null;
         m_TileData[end.m_Row, end.m_Col].m_IsOccupied = true;
+        m_TileData[end.m_Row, end.m_Col].m_CurrUnit = movedUnit;
     }
 
     private Vector3 GetTilePosition(CoordPair coordPair)
@@ -147,6 +145,33 @@ public class GridLogic : MonoBehaviour
         foreach (CoordPair coordPair in targetSquares)
         {
             m_TileVisuals[coordPair.m_Row, coordPair.m_Col].ToggleTarget(true);
+        }
+    }
+
+    public bool IsTileOccupied(CoordPair tile)
+    {
+        return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
+    }
+
+    public void Attack(List<CoordPair> attackPoints, float damage)
+    {
+        foreach (CoordPair coordPair in attackPoints)
+        {
+            if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied)
+            {
+                m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit.TakeDamage(damage);
+            }
+        }
+
+        foreach (CoordPair coordPair in attackPoints)
+        {
+            if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied && m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit.IsDead)
+            {
+                Unit unit = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
+                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(unit);
+                Destroy(unit.gameObject);
+                m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit = null;
+            }
         }
     }
 }

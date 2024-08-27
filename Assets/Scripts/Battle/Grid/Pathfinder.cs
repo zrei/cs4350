@@ -17,11 +17,13 @@ public class TileData
     public TileType m_TileType;
     // this follows the assumption that units cannot cross over the line, otherwise this requires information on the alliance
     public bool m_IsOccupied;
+    public Unit m_CurrUnit;
 
     public TileData(TileType tileType, bool isOccupied)
     {
         m_TileType = tileType;
         m_IsOccupied = isOccupied;
+        m_CurrUnit = null;
     }
 }
 
