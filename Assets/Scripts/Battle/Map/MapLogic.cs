@@ -101,4 +101,9 @@ public class MapLogic : MonoBehaviour
     {
         RetrieveGrid(gridType).SetTarget(targets);
     }
+
+    public void MoveUnit(GridType gridType, CoordPair start, CoordPair end)
+    {
+        RetrieveGrid(gridType).MoveUnit(start, end);
+    }
 }

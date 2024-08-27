@@ -12,11 +12,11 @@ public enum TileType
 /// <summary>
 /// Struct packaging data on a single tile
 /// </summary>
-public struct TileData
+public class TileData
 {
-    public readonly TileType m_TileType;
+    public TileType m_TileType;
     // this follows the assumption that units cannot cross over the line, otherwise this requires information on the alliance
-    public readonly bool m_IsOccupied;
+    public bool m_IsOccupied;
 
     public TileData(TileType tileType, bool isOccupied)
     {

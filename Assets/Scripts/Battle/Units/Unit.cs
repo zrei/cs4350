@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This is used to store what their stats SHOULD be
+/// </summary>
 [System.Serializable]
 public struct Stats
 {
@@ -17,12 +20,13 @@ public enum UnitAllegiance
     NONE
 }
 
+// TODO: Store position here so we don't have to keep raycasting :|
 public abstract class Unit : MonoBehaviour, IHealth
 {
     private float m_Health;
     public bool IsDead => m_Health <= 0;
-    private Stats m_stats;
-    public Stats Stat => m_stats;
+    private Stats m_Stats;
+    public Stats Stat => m_Stats;
 
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
 
@@ -69,5 +73,13 @@ public abstract class Unit : MonoBehaviour, IHealth
             }
             transform.position = nextPos;
         }
+    }
+
+    /// <summary>
+    /// Initialise stats, position, etc.
+    /// </summary>
+    protected virtual void Initialise()
+    {
+
     }
 }

@@ -16,6 +16,7 @@ public class PlayerTurnManager : TurnManager
     private bool m_WithinTurn = false;
     private PlayerUnit m_CurrUnit;
     private CoordPair m_CurrTile;
+    private CoordPair m_CurrTargetTile;
 
     /// <summary>
     /// Maps coordinates to nodes that track paths
@@ -49,6 +50,7 @@ public class PlayerTurnManager : TurnManager
         TileType[] traversableTiles = new TileType[1];
         traversableTiles[0] = TileType.NORMAL;
         // TODO: Fill in with actual unit data
+        // TODO: POSSIBLY have the grid logic itself call this to color the map but return the reachable points? hm... need to update the tile data :|
         m_ReachablePoints = Pathfinder.ReachablePoints(m_MapLogic.RetrieveMapData(GridType.PLAYER), m_CurrTile, 3, true, traversableTiles);
 
         m_TileToPath.Clear();
@@ -82,14 +84,14 @@ public class PlayerTurnManager : TurnManager
         }
 
         Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane);
-            bool hitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out CoordPair coordPair, out GridType gridType);
+        bool hitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetTile, out GridType gridType);
 
         switch (m_CurrState)
         {
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
-                if (hitGrid && gridType == GridType.PLAYER && m_TileToPath.ContainsKey(coordPair))
+                if (hitGrid && gridType == GridType.PLAYER && m_TileToPath.ContainsKey(m_CurrTargetTile))
                 {
-                    m_CurrPath = m_MapLogic.TracePath(GridType.PLAYER, m_TileToPath[coordPair]);
+                    m_CurrPath = m_MapLogic.TracePath(GridType.PLAYER, m_TileToPath[m_CurrTargetTile]);
                 }
                 else
                 {
@@ -99,9 +101,9 @@ public class PlayerTurnManager : TurnManager
                 break;
             case PlayerTurnState.SELECTING_ATTACK_TARGET:
                 // must hit last row: row 4
-                if (hitGrid && gridType == GridType.ENEMY && coordPair.m_Row == 4)
+                if (hitGrid && gridType == GridType.ENEMY && m_CurrTargetTile.m_Row == 4)
                 {
-                    m_MapLogic.SetTarget(GridType.ENEMY, new() {coordPair, coordPair.MoveUp()});
+                    m_MapLogic.SetTarget(GridType.ENEMY, new() {m_CurrTargetTile, m_CurrTargetTile.MoveUp()});
                 }
                 else
                 {
@@ -115,6 +117,7 @@ public class PlayerTurnManager : TurnManager
             if (m_CurrState == PlayerTurnState.SELECTING_MOVEMENT_SQUARE && m_CurrPath != null)
             {
                 m_CurrUnit.Move(m_CurrPath);
+                m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrTile, m_CurrTargetTile);
                 TransitionAction(m_CurrState);
             }
         }

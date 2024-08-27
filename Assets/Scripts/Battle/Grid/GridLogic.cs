@@ -126,7 +126,14 @@ public class GridLogic : MonoBehaviour
         // probably needs some... actual rotation? haha. if it's already rotated i guess not
         Unit spawnedUnit = Instantiate(unitPlacement.m_Unit, GetTilePosition(unitPlacement.m_Coodinates), Quaternion.identity);
         Logger.Log(this.GetType().Name, spawnedUnit.gameObject.name, "Spawned unit position: " + spawnedUnit.transform.position, spawnedUnit.gameObject, LogLevel.LOG);
+        m_TileData[unitPlacement.m_Coodinates.m_Row, unitPlacement.m_Coodinates.m_Col].m_IsOccupied = true;
         return spawnedUnit;
+    }
+
+    public void MoveUnit(CoordPair start, CoordPair end)
+    {
+        m_TileData[start.m_Row, start.m_Col].m_IsOccupied = false;
+        m_TileData[end.m_Row, end.m_Col].m_IsOccupied = true;
     }
 
     private Vector3 GetTilePosition(CoordPair coordPair)
