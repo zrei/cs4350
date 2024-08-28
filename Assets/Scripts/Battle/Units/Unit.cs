@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// This is used to store what their stats SHOULD be
+/// This is used to store what their stats SHOULD be,
+/// accounting for base stats + growths so far.
+/// It DOES NOT account for any transient stat changes
+/// due to buffs/debuffs.
+/// TODO: Should account for class stats? Or just leave it
+/// as separate
 /// </summary>
 [System.Serializable]
 public struct Stats
@@ -11,6 +16,8 @@ public struct Stats
     public float m_Health;
     public float m_Attack;
     public float m_Speed;
+    public int m_MovementRange;
+    public TileType[] m_TraversableTileTypes;
 }
 
 public enum UnitAllegiance
@@ -23,14 +30,19 @@ public enum UnitAllegiance
 // TODO: Store position here so we don't have to keep raycasting :|
 public abstract class Unit : MonoBehaviour, IHealth
 {
+    // current health
     private float m_Health;
     public bool IsDead => m_Health <= 0;
+
     private Stats m_Stats;
     public Stats Stat => m_Stats;
 
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
 
     private const float CHECKPOINT_MOVE_TIME = 0.5f;
+
+    private CoordPair m_CurrPosition;
+    public CoordPair CurrPosition => m_CurrPosition;
 
     void IHealth.Heal(float healAmount)
     {
@@ -54,9 +66,10 @@ public abstract class Unit : MonoBehaviour, IHealth
         m_Health -= damage;
     }
 
-    public void Move(Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
+    public void Move(CoordPair endPosition, Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
         StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, onCompleteMovement));
+        m_CurrPosition = endPosition;
     }
 
     private IEnumerator MoveThroughCheckpoints(Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)

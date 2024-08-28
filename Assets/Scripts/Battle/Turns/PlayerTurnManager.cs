@@ -10,31 +10,54 @@ public enum PlayerTurnState
 
 public class PlayerTurnManager : TurnManager
 {
-    private PlayerTurnState m_CurrState = PlayerTurnState.SELECTING_MOVEMENT_SQUARE;
-    // handle units
-
-    private bool m_WithinTurn = false;
+    #region Current State
+    /// <summary>
+    /// Currently controlled player unit
+    /// </summary>
     private PlayerUnit m_CurrUnit;
+    private PlayerTurnState m_CurrState = PlayerTurnState.SELECTING_MOVEMENT_SQUARE;
+    /// <summary>
+    /// Whether it's currently the player's turn
+    /// </summary>
+    private bool m_WithinTurn = false;
+    /// <summary>
+    /// Block any input
+    /// </summary>
+    private bool m_BlockInputs = false;
+    #endregion
+
+    // handle units
     private CoordPair m_CurrTile;
     private CoordPair m_CurrTargetTile;
     private List<CoordPair> m_AttackPoints = null;
 
     /// <summary>
-    /// Maps coordinates to nodes that track paths
+    /// Maps coordinates to nodes that track paths that end at those coordinates
     /// </summary>
     private Dictionary<CoordPair, PathNode> m_TileToPath;
+    /// <summary>
+    /// Positions that make up the current path
+    /// </summary>
     private Stack<Vector3> m_CurrPath;
-
-    private HashSet<PlayerTurnState> m_RemainingActions;
+    /// <summary>
+    /// All reachable path nodes
+    /// </summary>
     private HashSet<PathNode> m_ReachablePoints;
-    private bool m_BlockInputs = false;
 
+    /// <summary>
+    /// Remaining actions that can still be taken by the player
+    /// </summary>
+    private HashSet<PlayerTurnState> m_RemainingActions;
+
+    #region Initialisation
     private void Start()
     {
         m_TileToPath = new Dictionary<CoordPair, PathNode>();
         m_RemainingActions = new HashSet<PlayerTurnState>();
     }
+    #endregion
 
+    #region Start Turn
     /// <summary>
     /// Begin the turn involving the given player unit. Pre-calculates moveable squares.
     /// </summary>
@@ -73,7 +96,9 @@ public class PlayerTurnManager : TurnManager
         m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
         Logger.Log(this.GetType().Name, "Current phase: " + m_CurrState.ToString(), LogLevel.LOG);
     }
+    #endregion
 
+    #region Inputs
     private void Update()
     {
         if (!m_WithinTurn || m_BlockInputs)
@@ -146,13 +171,9 @@ public class PlayerTurnManager : TurnManager
             }
         }
     }
+    #endregion
 
-    private void EndTurn()
-    {
-        m_WithinTurn = false;
-        m_CompleteTurnEvent?.Invoke();
-    }
-
+    #region Switch Action
     private void TransitionAction(PlayerTurnState currAction)
     {
         m_BlockInputs = false;
@@ -181,4 +202,13 @@ public class PlayerTurnManager : TurnManager
 
         Logger.Log(this.GetType().Name, "Current phase: " + currAction.ToString(), LogLevel.LOG);
     }
+    #endregion
+
+    #region End Turn
+    private void EndTurn()
+    {
+        m_WithinTurn = false;
+        m_CompleteTurnEvent?.Invoke();
+    }
+    #endregion
 }
