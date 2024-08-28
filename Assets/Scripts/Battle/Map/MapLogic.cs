@@ -14,16 +14,24 @@ public class MapLogic : MonoBehaviour
     [SerializeField] private GridLogic m_PlayerGrid;
     [SerializeField] private GridLogic m_EnemyGrid;
 
+    #region Units
     public Unit PlaceUnit(GridType gridType, UnitPlacement unit)
     {
         return RetrieveGrid(gridType).PlaceUnit(unit);
     }
+
+    public void MoveUnit(GridType gridType, CoordPair start, CoordPair end)
+    {
+        RetrieveGrid(gridType).MoveUnit(start, end);
+    }
+    #endregion
 
     /*public void MoveUnit(GridType gridType, Unit unit, CoordPair start, CoordPair end)
     {
         RetrieveGrid(gridType).MoveUnit(unit, start, end);
     }*/
 
+    #region Graphics
     public void ResetMap()
     {
         m_PlayerGrid.ResetMap();
@@ -42,14 +50,31 @@ public class MapLogic : MonoBehaviour
         m_EnemyGrid.ResetTarget();
     }
 
-    private GridLogic RetrieveGrid(GridType gridType)
+    public void ColorMap(GridType gridType, HashSet<PathNode> reachableNodes)
     {
-        return gridType switch
-        {
-            GridType.ENEMY => m_EnemyGrid,
-            GridType.PLAYER => m_PlayerGrid,
-            _ => null
-        };
+        RetrieveGrid(gridType).ColorMap(reachableNodes);
+    }
+
+    public Stack<Vector3> TracePath(GridType gridType, PathNode end)
+    {
+        return RetrieveGrid(gridType).TracePath(end);
+    }
+
+    public void SetTarget(GridType gridType, List<CoordPair> targets)
+    {
+        RetrieveGrid(gridType).SetTarget(targets);
+    }
+    #endregion
+
+    #region Helper
+    public MapData RetrieveMapData(GridType gridType)
+    {
+        return RetrieveGrid(gridType).MapData;
+    }
+
+    public bool IsTileOccupied(GridType gridType, CoordPair tile)
+    {
+        return RetrieveGrid(gridType).IsTileOccupied(tile);
     }
 
     /// <summary>
@@ -82,38 +107,21 @@ public class MapLogic : MonoBehaviour
         return false;
     }
 
-    public void ColorMap(GridType gridType, HashSet<PathNode> reachableNodes)
+    private GridLogic RetrieveGrid(GridType gridType)
     {
-        RetrieveGrid(gridType).ColorMap(reachableNodes);
+        return gridType switch
+        {
+            GridType.ENEMY => m_EnemyGrid,
+            GridType.PLAYER => m_PlayerGrid,
+            _ => null
+        };
     }
+    #endregion
 
-    public MapData RetrieveMapData(GridType gridType)
-    {
-        return RetrieveGrid(gridType).MapData;
-    }
-
-    public Stack<Vector3> TracePath(GridType gridType, PathNode end)
-    {
-        return RetrieveGrid(gridType).TracePath(end);
-    }
-
-    public void SetTarget(GridType gridType, List<CoordPair> targets)
-    {
-        RetrieveGrid(gridType).SetTarget(targets);
-    }
-
-    public void MoveUnit(GridType gridType, CoordPair start, CoordPair end)
-    {
-        RetrieveGrid(gridType).MoveUnit(start, end);
-    }
-
-    public bool IsTileOccupied(GridType gridType, CoordPair tile)
-    {
-        return RetrieveGrid(gridType).IsTileOccupied(tile);
-    }
-
+    #region Attacks
     public void Attack(GridType gridType, List<CoordPair> attackPoints, float damage)
     {
         RetrieveGrid(gridType).Attack(attackPoints, damage);
     }
+    #endregion
 }

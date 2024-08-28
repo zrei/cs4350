@@ -21,12 +21,15 @@ public class TileLogic : MonoBehaviour
     public Unit ContainedUnit {get; private set;}
     public CoordPair Coordinates {get; private set;}
 
+    #region Initialisation
     public void Initialise(GridType gridType, CoordPair coordinates)
     {
         GridType = gridType;
         Coordinates = coordinates;
     }
+    #endregion
 
+    #region State
     public void ResetTile()
     {
         m_CurrState = TileState.NONE;
@@ -41,6 +44,13 @@ public class TileLogic : MonoBehaviour
         ToggleState(m_CurrState);
     }
 
+    public void SetUnit(Unit unit)
+    {
+        ContainedUnit = unit;
+    }
+    #endregion
+
+    #region Graphics
     private void ToggleState(TileState state)
     {
         m_TraverseText.text = state switch
@@ -61,9 +71,5 @@ public class TileLogic : MonoBehaviour
     {
         m_TargetText.gameObject.SetActive(isTarget);
     }
-
-    public void SetUnit(Unit unit)
-    {
-        ContainedUnit = unit;
-    }
+    #endregion
 }

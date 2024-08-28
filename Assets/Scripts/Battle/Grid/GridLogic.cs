@@ -14,20 +14,11 @@ public class GridLogic : MonoBehaviour
 
     public MapData MapData => new MapData(m_TileData);
 
+    #region Initialisation
     private void Start()
     {
         InitialiseTileData();
-        InitialiseTileVisuals();
-
-        /*PathNode ptr = null;
-        foreach (PathNode node in reachablePoints)
-        {
-            ptr = node;
-        }
-
-        if (ptr != null)
-            TracePath(ptr);*/
-        
+        InitialiseTileVisuals();  
     }
 
     private void InitialiseTileData()
@@ -56,7 +47,9 @@ public class GridLogic : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Graphics
     public void ColorMap(HashSet<PathNode> reachablePoints)
     {
         ResetPath();
@@ -100,6 +93,17 @@ public class GridLogic : MonoBehaviour
         }
     }
 
+    public void SetTarget(List<CoordPair> targetSquares)
+    {
+        ResetTarget();
+        foreach (CoordPair coordPair in targetSquares)
+        {
+            m_TileVisuals[coordPair.m_Row, coordPair.m_Col].ToggleTarget(true);
+        }
+    }
+    #endregion
+
+    #region Path
     public Stack<Vector3> TracePath(PathNode end)
     {
         ResetPath();
@@ -114,7 +118,9 @@ public class GridLogic : MonoBehaviour
         }
         return pathPoints;
     }
+    #endregion
 
+    #region Unit
     public Unit PlaceUnit(UnitPlacement unitPlacement)
     {
         // probably needs some... actual rotation? haha. if it's already rotated i guess not
@@ -133,26 +139,21 @@ public class GridLogic : MonoBehaviour
         m_TileData[end.m_Row, end.m_Col].m_IsOccupied = true;
         m_TileData[end.m_Row, end.m_Col].m_CurrUnit = movedUnit;
     }
+    #endregion
 
+    #region Helper
     private Vector3 GetTilePosition(CoordPair coordPair)
     {
         return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
-    }
-
-    public void SetTarget(List<CoordPair> targetSquares)
-    {
-        ResetTarget();
-        foreach (CoordPair coordPair in targetSquares)
-        {
-            m_TileVisuals[coordPair.m_Row, coordPair.m_Col].ToggleTarget(true);
-        }
     }
 
     public bool IsTileOccupied(CoordPair tile)
     {
         return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
     }
+    #endregion
 
+    #region Attack
     public void Attack(List<CoordPair> attackPoints, float damage)
     {
         foreach (CoordPair coordPair in attackPoints)
@@ -174,4 +175,5 @@ public class GridLogic : MonoBehaviour
             }
         }
     }
+    #endregion
 }

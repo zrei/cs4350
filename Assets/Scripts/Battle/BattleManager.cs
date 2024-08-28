@@ -85,13 +85,9 @@ public class BattleManager : MonoBehaviour
 
         m_UnitTurns.Sort(UnitSpeedComparer);
     }
-
-    private int UnitSpeedComparer(Unit unit1, Unit unit2)
-    {
-        return unit2.Stat.m_Speed.CompareTo(unit1.Stat.m_Speed);//unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
-    }
     #endregion
 
+    #region Turns
     private void StartTurn()
     {
         m_MapLogic.ResetMap();
@@ -124,7 +120,9 @@ public class BattleManager : MonoBehaviour
         }
         m_UnitTurns.Sort(UnitSpeedComparer);
     }
+    #endregion
 
+    #region Callbacks
     private void OnCompleteTurn()
     {
         Logger.Log(this.GetType().Name, "Finish turn", LogLevel.LOG);
@@ -139,4 +137,12 @@ public class BattleManager : MonoBehaviour
             m_UnitTurns.Remove(unit);
         }
     }
+    #endregion
+
+    #region Helper
+    private int UnitSpeedComparer(Unit unit1, Unit unit2)
+    {
+        return unit2.Stat.m_Speed.CompareTo(unit1.Stat.m_Speed);//unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
+    }
+    #endregion
 }

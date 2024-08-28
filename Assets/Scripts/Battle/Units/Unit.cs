@@ -44,6 +44,20 @@ public abstract class Unit : MonoBehaviour, IHealth
     private CoordPair m_CurrPosition;
     public CoordPair CurrPosition => m_CurrPosition;
 
+    #region Initialisation
+    /// <summary>
+    /// Initialise stats, position, etc.
+    /// Called when the unit is first spawned onto the battlefield
+    /// </summary>
+    public virtual void Initialise(Stats stats, CoordPair initialPosition)
+    {
+        m_Stats = stats;
+        m_Health = stats.m_Health;
+        m_CurrPosition = initialPosition;
+    }
+    #endregion
+
+    #region Health and Damage
     void IHealth.Heal(float healAmount)
     {
 
@@ -65,7 +79,9 @@ public abstract class Unit : MonoBehaviour, IHealth
     {
         m_Health -= damage;
     }
+    #endregion
 
+    #region Movement
     public void Move(CoordPair endPosition, Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
         StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, onCompleteMovement));
@@ -95,13 +111,5 @@ public abstract class Unit : MonoBehaviour, IHealth
         }
         onCompleteMovement?.Invoke();
     }
-
-    /// <summary>
-    /// Initialise stats, position, etc.
-    /// </summary>
-    public virtual void Initialise(Stats stats)
-    {
-        m_Stats = stats;
-        m_Health = stats.m_Health;
-    }
+    #endregion
 }
