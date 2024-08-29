@@ -72,7 +72,7 @@ public class BattleManager : MonoBehaviour
             Unit unit = m_MapLogic.PlaceUnit(GridType.ENEMY, unitPlacement);
             m_UnitTurns.Add(unit);
             m_Units.Add(unit);
-            unit.Initialise(unitPlacement.m_Stats);
+            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Coodinates);
         }
 
         foreach (UnitPlacement unitPlacement in playerUnits)
@@ -80,7 +80,7 @@ public class BattleManager : MonoBehaviour
             Unit unit = m_MapLogic.PlaceUnit(GridType.PLAYER, unitPlacement);
             m_UnitTurns.Add(unit);
             m_Units.Add(unit);
-            unit.Initialise(unitPlacement.m_Stats);
+            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Coodinates);
         }
 
         m_UnitTurns.Sort(UnitSpeedComparer);

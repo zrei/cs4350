@@ -20,9 +20,9 @@ public class MapLogic : MonoBehaviour
         return RetrieveGrid(gridType).PlaceUnit(unit);
     }
 
-    public void MoveUnit(GridType gridType, CoordPair start, CoordPair end)
+    public void MoveUnit(GridType gridType, Unit unit, CoordPair end, PathNode endPathNode, VoidEvent onCompleteMovement)
     {
-        RetrieveGrid(gridType).MoveUnit(start, end);
+        RetrieveGrid(gridType).MoveUnit(unit, end, endPathNode, onCompleteMovement);
     }
     #endregion
 
@@ -122,6 +122,13 @@ public class MapLogic : MonoBehaviour
     public void Attack(GridType gridType, List<CoordPair> attackPoints, float damage)
     {
         RetrieveGrid(gridType).Attack(attackPoints, damage);
+    }
+    #endregion
+
+    #region Unit Movement
+    public HashSet<PathNode> CalculateReachablePoints(GridType gridType, Unit unit)
+    {
+        return RetrieveGrid(gridType).CalculateReachablePoints(unit);
     }
     #endregion
 }

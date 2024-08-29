@@ -27,7 +27,6 @@ public class PlayerTurnManager : TurnManager
     #endregion
 
     // handle units
-    private CoordPair m_CurrTile;
     private CoordPair m_CurrTargetTile;
     private List<CoordPair> m_AttackPoints = null;
 
@@ -35,10 +34,7 @@ public class PlayerTurnManager : TurnManager
     /// Maps coordinates to nodes that track paths that end at those coordinates
     /// </summary>
     private Dictionary<CoordPair, PathNode> m_TileToPath;
-    /// <summary>
-    /// Positions that make up the current path
-    /// </summary>
-    private Stack<Vector3> m_CurrPath;
+
     /// <summary>
     /// All reachable path nodes
     /// </summary>
@@ -67,16 +63,9 @@ public class PlayerTurnManager : TurnManager
         Logger.Log(this.GetType().Name, "Start player turn with: " + playerUnit.name, LogLevel.LOG);
         
         m_CurrUnit = playerUnit;
-        m_MapLogic.TryRetrieveTile(new Ray(m_CurrUnit.transform.position, -m_CurrUnit.transform.up), out m_CurrTile, out GridType _);
-        Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrTile, LogLevel.LOG);
-        
-
-        // TODO: Get traversable tiles for unit
-        TileType[] traversableTiles = new TileType[1];
-        traversableTiles[0] = TileType.NORMAL;
-        // TODO: Fill in with actual unit data
-        // TODO: POSSIBLY have the grid logic itself call this to color the map but return the reachable points? hm... need to update the tile data :|
-        m_ReachablePoints = Pathfinder.ReachablePoints(m_MapLogic.RetrieveMapData(GridType.PLAYER), m_CurrTile, 3, true, traversableTiles);
+        Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
+    
+        m_ReachablePoints = m_MapLogic.CalculateReachablePoints(GridType.PLAYER, m_CurrUnit);
 
         m_TileToPath.Clear();
         foreach (PathNode pathNode in m_ReachablePoints)
@@ -119,12 +108,11 @@ public class PlayerTurnManager : TurnManager
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 if (hitGrid && gridType == GridType.PLAYER && m_TileToPath.ContainsKey(m_CurrTargetTile))
                 {
-                    m_CurrPath = m_MapLogic.TracePath(GridType.PLAYER, m_TileToPath[m_CurrTargetTile]);
+                    m_MapLogic.TracePath(GridType.PLAYER, m_TileToPath[m_CurrTargetTile]);
                 }
                 else
                 {
                     m_MapLogic.ResetPath();
-                    m_CurrPath = null;
                 }
                 break;
             case PlayerTurnState.SELECTING_ATTACK_TARGET:
@@ -144,12 +132,11 @@ public class PlayerTurnManager : TurnManager
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (m_CurrState == PlayerTurnState.SELECTING_MOVEMENT_SQUARE && m_CurrPath != null)
+            if (m_CurrState == PlayerTurnState.SELECTING_MOVEMENT_SQUARE && m_TileToPath.ContainsKey(m_CurrTargetTile))
             {
-                Logger.Log(this.GetType().Name, "Begin moving from " + m_CurrTile + " to " + m_CurrTargetTile, LogLevel.LOG);
+                Logger.Log(this.GetType().Name, "Begin moving from " + m_CurrUnit.CurrPosition + " to " + m_CurrTargetTile, LogLevel.LOG);
                 m_BlockInputs = true;
-                m_CurrUnit.Move(m_CurrPath, () => TransitionAction(m_CurrState));
-                m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrTile, m_CurrTargetTile);
+                m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrUnit, m_CurrTargetTile, m_TileToPath[m_CurrTargetTile], () => TransitionAction(m_CurrState));
             }
             else if (m_CurrState == PlayerTurnState.SELECTING_ATTACK_TARGET && m_AttackPoints != null)
             {

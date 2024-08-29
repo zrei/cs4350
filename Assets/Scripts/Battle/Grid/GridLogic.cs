@@ -104,19 +104,27 @@ public class GridLogic : MonoBehaviour
     #endregion
 
     #region Path
-    public Stack<Vector3> TracePath(PathNode end)
+    public Stack<Vector3> TracePath(PathNode end, bool showGraphic = true)
     {
-        ResetPath();
+        if (showGraphic)
+            ResetPath();
+        
         Stack<Vector3> pathPoints = new Stack<Vector3>();
         PathNode pointer = end;
         while (pointer != null)
         {
             pathPoints.Push(GetTilePosition(pointer.m_Coordinates));
             CoordPair coordinates = pointer.m_Coordinates;
-            m_TileVisuals[coordinates.m_Row, coordinates.m_Col].TogglePath(true);
+            if (showGraphic)
+                m_TileVisuals[coordinates.m_Row, coordinates.m_Col].TogglePath(true);
             pointer = pointer.m_Parent;
         }
         return pathPoints;
+    }
+
+    public HashSet<PathNode> CalculateReachablePoints(Unit unit)
+    {
+        return Pathfinder.ReachablePoints(new MapData(m_TileData), unit.CurrPosition, unit.Stat.m_MovementRange, unit.Stat.m_CanSwapTiles, unit.Stat.m_TraversableTileTypes);
     }
     #endregion
 
@@ -131,13 +139,23 @@ public class GridLogic : MonoBehaviour
         return spawnedUnit;
     }
 
-    public void MoveUnit(CoordPair start, CoordPair end)
+    public void MoveUnit(Unit unit, CoordPair end, PathNode endPathNode, VoidEvent onCompleteMovement)
     {
-        Unit movedUnit = m_TileData[start.m_Row, start.m_Col].m_CurrUnit;
-        m_TileData[start.m_Row, start.m_Col].m_IsOccupied = false;
-        m_TileData[start.m_Row, start.m_Col].m_CurrUnit = null;
+        CoordPair start = unit.CurrPosition;
+
+        if (m_TileData[start.m_Row, start.m_Col].m_CurrUnit != unit)
+        {
+            Logger.Log(this.GetType().Name, "Unit stored in the tile data is not the same as unit to be moved", LogLevel.ERROR);
+        }
+
+        Stack<Vector3> movementCheckpoints = TracePath(endPathNode, false);
+        
+        m_TileData[start.m_Row, start.m_Col].m_CurrUnit = m_TileData[end.m_Row, end.m_Col].m_CurrUnit;
+        m_TileData[start.m_Row, start.m_Col].m_IsOccupied = m_TileData[start.m_Row, start.m_Col].m_CurrUnit != null;
         m_TileData[end.m_Row, end.m_Col].m_IsOccupied = true;
-        m_TileData[end.m_Row, end.m_Col].m_CurrUnit = movedUnit;
+        m_TileData[end.m_Row, end.m_Col].m_CurrUnit = unit;
+
+        unit.Move(end, movementCheckpoints, onCompleteMovement);
     }
     #endregion
 

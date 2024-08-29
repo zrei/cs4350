@@ -18,6 +18,7 @@ public struct Stats
     public float m_Speed;
     public int m_MovementRange;
     public TileType[] m_TraversableTileTypes;
+    public bool m_CanSwapTiles;
 }
 
 public enum UnitAllegiance
