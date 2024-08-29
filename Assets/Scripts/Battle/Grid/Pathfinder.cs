@@ -12,16 +12,18 @@ public enum TileType
 /// <summary>
 /// Struct packaging data on a single tile
 /// </summary>
-public struct TileData
+public class TileData
 {
-    public readonly TileType m_TileType;
+    public TileType m_TileType;
     // this follows the assumption that units cannot cross over the line, otherwise this requires information on the alliance
-    public readonly bool m_IsOccupied;
+    public bool m_IsOccupied;
+    public Unit m_CurrUnit;
 
     public TileData(TileType tileType, bool isOccupied)
     {
         m_TileType = tileType;
         m_IsOccupied = isOccupied;
+        m_CurrUnit = null;
     }
 }
 
@@ -68,10 +70,11 @@ public class MapData
     }
 }
 
+[System.Serializable]
 public struct CoordPair
 {
-    public readonly int m_Row;
-    public readonly int m_Col;
+    public int m_Row;
+    public int m_Col;
 
     public CoordPair(int row, int col)
     {
@@ -102,6 +105,11 @@ public struct CoordPair
     public override string ToString()
     {
         return $"({m_Row}, {m_Col})";
+    }
+
+    public override int GetHashCode()
+    {
+        return m_Row.GetHashCode() ^ m_Col.GetHashCode();
     }
 }
 
