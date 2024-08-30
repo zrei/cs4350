@@ -7,7 +7,9 @@ public enum GridType
     PLAYER
 }
 
-// manage both grids and pass function calls down through a facade
+/// <summary>
+/// Acts as a facade to the GridLogic of both sides
+/// </summary>
 public class MapLogic : MonoBehaviour
 {
     [Header("Grid")]
@@ -20,9 +22,9 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).PlaceUnit(unit, coord);
     }
 
-    public void MoveUnit(GridType gridType, Unit unit, CoordPair end, PathNode endPathNode, VoidEvent onCompleteMovement)
+    public void MoveUnit(GridType gridType, Unit unit, PathNode endPathNode, VoidEvent onCompleteMovement)
     {
-        RetrieveGrid(gridType).MoveUnit(unit, end, endPathNode, onCompleteMovement);
+        RetrieveGrid(gridType).MoveUnit(unit, endPathNode, onCompleteMovement);
     }
     #endregion
 
@@ -52,26 +54,21 @@ public class MapLogic : MonoBehaviour
 
     public void ColorMap(GridType gridType, HashSet<PathNode> reachableNodes)
     {
-        RetrieveGrid(gridType).ColorMap(reachableNodes);
+        RetrieveGrid(gridType).ColorReachablePoints(reachableNodes);
     }
 
-    public Stack<Vector3> TracePath(GridType gridType, PathNode end)
+    public void ColorPath(GridType gridType, PathNode end)
     {
-        return RetrieveGrid(gridType).TracePath(end);
+        RetrieveGrid(gridType).ColorPath(end);
     }
 
     public void SetTarget(GridType gridType, List<CoordPair> targets)
     {
-        RetrieveGrid(gridType).SetTarget(targets);
+        RetrieveGrid(gridType).ColorTarget(targets);
     }
     #endregion
 
     #region Helper
-    public MapData RetrieveMapData(GridType gridType)
-    {
-        return RetrieveGrid(gridType).MapData;
-    }
-
     public bool IsTileOccupied(GridType gridType, CoordPair tile)
     {
         return RetrieveGrid(gridType).IsTileOccupied(tile);

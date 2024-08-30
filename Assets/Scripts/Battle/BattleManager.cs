@@ -63,29 +63,41 @@ public class BattleManager : MonoBehaviour
         StartTurn();
     }
 
+    /// <summary>
+    /// Initialise battle with the decided upon player units and the pre-placed enemy units
+    /// </summary>
+    /// <param name="battleSO"></param>
+    /// <param name="playerUnits"></param>
     public void InitialiseBattle(BattleSO battleSO, List<UnitPlacement> playerUnits)
     {
         m_UnitTurns.Clear();
         m_Units.Clear();
         foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
-            Unit unit = Instantiate(unitPlacement.m_Unit);
-            m_MapLogic.PlaceUnit(GridType.ENEMY, unit, unitPlacement.m_Coodinates);
-            m_UnitTurns.Add(unit);
-            m_Units.Add(unit);
-            unit.Initialise(unitPlacement.m_Stats);
+            InstantiateUnit(unitPlacement, GridType.ENEMY);
         }
 
         foreach (UnitPlacement unitPlacement in playerUnits)
         {
-            Unit unit = Instantiate(unitPlacement.m_Unit);
-            m_MapLogic.PlaceUnit(GridType.PLAYER, unit, unitPlacement.m_Coodinates);
-            m_UnitTurns.Add(unit);
-            m_Units.Add(unit);
-            unit.Initialise(unitPlacement.m_Stats);
+            InstantiateUnit(unitPlacement, GridType.PLAYER);
         }
 
         m_UnitTurns.Sort(UnitSpeedComparer);
+    }
+
+    /// <summary>
+    /// Instantiate the visual representation of the unit, placing it on the grid
+    /// and initialising the unit
+    /// </summary>
+    /// <param name="unitPlacement"></param>
+    /// <param name="gridType"></param>
+    private void InstantiateUnit(UnitPlacement unitPlacement, GridType gridType)
+    {
+        Unit unit = Instantiate(unitPlacement.m_Unit);
+        m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
+        m_UnitTurns.Add(unit);
+        m_Units.Add(unit);
+        unit.Initialise(unitPlacement.m_Stats);
     }
     #endregion
 

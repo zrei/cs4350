@@ -40,16 +40,18 @@ public class PlayerTurnManager : TurnManager
     /// </summary>
     private HashSet<PathNode> m_ReachablePoints;
 
+    /*
     /// <summary>
     /// Remaining actions that can still be taken by the player
     /// </summary>
     private HashSet<PlayerTurnState> m_RemainingActions;
+    */
 
     #region Initialisation
     private void Start()
     {
         m_TileToPath = new Dictionary<CoordPair, PathNode>();
-        m_RemainingActions = new HashSet<PlayerTurnState>();
+        //m_RemainingActions = new HashSet<PlayerTurnState>();
     }
     #endregion
 
@@ -73,12 +75,14 @@ public class PlayerTurnManager : TurnManager
             m_TileToPath.Add(pathNode.m_Coordinates, pathNode);
         }
 
-        m_RemainingActions.Clear();
+        // m_RemainingActions.Clear();
 
+        /*
         foreach (PlayerTurnState action in Enum.GetValues(typeof(PlayerTurnState)))
         {
             m_RemainingActions.Add(action);
         }
+        */
 
         m_WithinTurn = true;
         m_CurrState = PlayerTurnState.SELECTING_MOVEMENT_SQUARE;
@@ -108,7 +112,7 @@ public class PlayerTurnManager : TurnManager
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 if (hitGrid && gridType == GridType.PLAYER && m_TileToPath.ContainsKey(m_CurrTargetTile))
                 {
-                    m_MapLogic.TracePath(GridType.PLAYER, m_TileToPath[m_CurrTargetTile]);
+                    m_MapLogic.ColorPath(GridType.PLAYER, m_TileToPath[m_CurrTargetTile]);
                 }
                 else
                 {
@@ -136,13 +140,13 @@ public class PlayerTurnManager : TurnManager
             {
                 Logger.Log(this.GetType().Name, "Begin moving from " + m_CurrUnit.CurrPosition + " to " + m_CurrTargetTile, LogLevel.LOG);
                 m_BlockInputs = true;
-                m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrUnit, m_CurrTargetTile, m_TileToPath[m_CurrTargetTile], () => TransitionAction(m_CurrState));
+                m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrUnit, m_TileToPath[m_CurrTargetTile], EndTurn);
             }
             else if (m_CurrState == PlayerTurnState.SELECTING_ATTACK_TARGET && m_AttackPoints != null)
             {
                 m_MapLogic.Attack(GridType.ENEMY, m_AttackPoints, 10f);
                 Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
-                TransitionAction(m_CurrState);
+                EndTurn();
             }
         }
 
@@ -150,17 +154,15 @@ public class PlayerTurnManager : TurnManager
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             PlayerTurnState nextState = (PlayerTurnState) (((int) m_CurrState + 1) % Enum.GetValues(typeof(PlayerTurnState)).Length);
-            if (m_RemainingActions.Contains(nextState))
-            {
-                m_CurrState = nextState;
-                m_MapLogic.ResetMap();
-                TransitToAction(m_CurrState);
-            }
+            m_CurrState = nextState;
+            m_MapLogic.ResetMap();
+            TransitToAction(m_CurrState);
         }
     }
     #endregion
 
     #region Switch Action
+    /*
     private void TransitionAction(PlayerTurnState currAction)
     {
         m_BlockInputs = false;
@@ -177,6 +179,7 @@ public class PlayerTurnManager : TurnManager
             EndTurn();
         }
     }
+    */
 
     private void TransitToAction(PlayerTurnState currAction)
     {

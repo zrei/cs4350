@@ -57,6 +57,14 @@ public abstract class Unit : MonoBehaviour, IHealth
     }
     #endregion
 
+    #region Placement
+    public virtual void PlaceUnit(CoordPair coordinates, Vector3 worldPosition)
+    {
+        m_CurrPosition = coordinates;
+        transform.position = worldPosition;
+    }
+    #endregion
+
     #region Health and Damage
     void IHealth.Heal(float healAmount)
     {
