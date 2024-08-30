@@ -50,11 +50,18 @@ public abstract class Unit : MonoBehaviour, IHealth
     /// Initialise stats, position, etc.
     /// Called when the unit is first spawned onto the battlefield
     /// </summary>
-    public virtual void Initialise(Stats stats, CoordPair initialPosition)
+    public virtual void Initialise(Stats stats)
     {
         m_Stats = stats;
         m_Health = stats.m_Health;
-        m_CurrPosition = initialPosition;
+    }
+    #endregion
+
+    #region Placement
+    public virtual void PlaceUnit(CoordPair coordinates, Vector3 worldPosition)
+    {
+        m_CurrPosition = coordinates;
+        transform.position = worldPosition;
     }
     #endregion
 
