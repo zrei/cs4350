@@ -129,14 +129,13 @@ public class GridLogic : MonoBehaviour
     #endregion
 
     #region Unit
-    public Unit PlaceUnit(UnitPlacement unitPlacement)
+    public void PlaceUnit(Unit unit, CoordPair coordinates)
     {
-        // probably needs some... actual rotation? haha. if it's already rotated i guess not
-        Unit spawnedUnit = Instantiate(unitPlacement.m_Unit, GetTilePosition(unitPlacement.m_Coodinates), Quaternion.identity);
-        Logger.Log(this.GetType().Name, spawnedUnit.gameObject.name, "Spawned unit position: " + spawnedUnit.transform.position, spawnedUnit.gameObject, LogLevel.LOG);
-        m_TileData[unitPlacement.m_Coodinates.m_Row, unitPlacement.m_Coodinates.m_Col].m_IsOccupied = true;
-        m_TileData[unitPlacement.m_Coodinates.m_Row, unitPlacement.m_Coodinates.m_Col].m_CurrUnit = spawnedUnit;
-        return spawnedUnit;
+        unit.transform.parent = transform;
+        unit.transform.position = GetTilePosition(coordinates);
+        Logger.Log(this.GetType().Name, unit.gameObject.name, $"Placed unit at tile {coordinates} with world position {unit.transform.position}", unit.gameObject, LogLevel.LOG);
+        m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = true;
+        m_TileData[coordinates.m_Row, coordinates.m_Col].m_CurrUnit = unit;
     }
 
     public void MoveUnit(Unit unit, CoordPair end, PathNode endPathNode, VoidEvent onCompleteMovement)
@@ -156,6 +155,25 @@ public class GridLogic : MonoBehaviour
         m_TileData[end.m_Row, end.m_Col].m_CurrUnit = unit;
 
         unit.Move(end, movementCheckpoints, onCompleteMovement);
+    }
+
+    public void SwapTiles(CoordPair tile1, CoordPair tile2)
+    {
+        Unit tile1Unit = m_TileData[tile1.m_Row, tile1.m_Col].m_CurrUnit;
+        m_TileData[tile1.m_Row, tile1.m_Col].m_CurrUnit = m_TileData[tile2.m_Row, tile2.m_Col].m_CurrUnit;
+        m_TileData[tile1.m_Row, tile1.m_Col].m_IsOccupied = m_TileData[tile1.m_Row, tile1.m_Col].m_CurrUnit != null;
+        m_TileData[tile2.m_Row, tile2.m_Col].m_CurrUnit = tile1Unit;
+        m_TileData[tile2.m_Row, tile2.m_Col].m_IsOccupied = tile1Unit != null;
+
+        if (m_TileData[tile1.m_Row, tile1.m_Col].m_IsOccupied)
+        {
+            m_TileData[tile1.m_Row, tile1.m_Col].m_CurrUnit.transform.position = GetTilePosition(tile1);
+        }
+
+        if (m_TileData[tile2.m_Row, tile2.m_Col].m_IsOccupied)
+        {
+            m_TileData[tile2.m_Row, tile2.m_Col].m_CurrUnit.transform.position = GetTilePosition(tile2);
+        }
     }
     #endregion
 

@@ -15,9 +15,9 @@ public class MapLogic : MonoBehaviour
     [SerializeField] private GridLogic m_EnemyGrid;
 
     #region Units
-    public Unit PlaceUnit(GridType gridType, UnitPlacement unit)
+    public void PlaceUnit(GridType gridType, Unit unit, CoordPair coord)
     {
-        return RetrieveGrid(gridType).PlaceUnit(unit);
+        RetrieveGrid(gridType).PlaceUnit(unit, coord);
     }
 
     public void MoveUnit(GridType gridType, Unit unit, CoordPair end, PathNode endPathNode, VoidEvent onCompleteMovement)

@@ -69,18 +69,20 @@ public class BattleManager : MonoBehaviour
         m_Units.Clear();
         foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
-            Unit unit = m_MapLogic.PlaceUnit(GridType.ENEMY, unitPlacement);
+            Unit unit = Instantiate(unitPlacement.m_Unit);
+            m_MapLogic.PlaceUnit(GridType.ENEMY, unit, unitPlacement.m_Coodinates);
             m_UnitTurns.Add(unit);
             m_Units.Add(unit);
-            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Coodinates);
+            unit.Initialise(unitPlacement.m_Stats);
         }
 
         foreach (UnitPlacement unitPlacement in playerUnits)
         {
-            Unit unit = m_MapLogic.PlaceUnit(GridType.PLAYER, unitPlacement);
+            Unit unit = Instantiate(unitPlacement.m_Unit);
+            m_MapLogic.PlaceUnit(GridType.PLAYER, unit, unitPlacement.m_Coodinates);
             m_UnitTurns.Add(unit);
             m_Units.Add(unit);
-            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Coodinates);
+            unit.Initialise(unitPlacement.m_Stats);
         }
 
         m_UnitTurns.Sort(UnitSpeedComparer);
