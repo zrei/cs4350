@@ -1,11 +1,117 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public enum BattleTurn
 {
     PLAYER,
     ENEMY
+}
+
+public class TurnCalc
+{
+    private const float DISTANCE_THRESHOLD = 50f;
+    private const float TICK_AMOUNT = 1f;
+
+    private class TurnWrapper
+    {
+        public float m_TimeRemaining;
+        public Unit m_Unit;
+
+        public TurnWrapper(float timeRemaining, Unit unit)
+        {
+            m_TimeRemaining = timeRemaining;
+            m_Unit = unit;
+        }
+
+        public override string ToString()
+        {
+            return $"Unit {m_Unit.name} with time {m_TimeRemaining} remaining to act";
+        }
+    }
+
+    private List<TurnWrapper> m_Turns = new List<TurnWrapper>();
+
+    public void Tick()
+    {
+        if (m_Turns.Count <= 0)
+            return;
+
+        float tick = Mathf.Min(TICK_AMOUNT, m_Turns[0].m_TimeRemaining);
+        foreach (TurnWrapper turnWrapper in m_Turns)
+        {
+            turnWrapper.m_TimeRemaining -= tick;
+        }
+    }
+
+    public bool TryGetReadyUnit(out Unit readyUnit)
+    {
+        if (m_Turns.Count <= 0)
+        {
+            readyUnit = null;
+            return false;
+        }
+
+        if (m_Turns[0].m_TimeRemaining == 0)
+        {
+            readyUnit = m_Turns[0].m_Unit;
+            m_Turns.RemoveAt(0);
+            return true;
+        }
+        else
+        {
+            readyUnit = null;
+            return false;
+        }
+    }
+
+    public void RemoveUnitFromTurns(Unit unit)
+    {
+        int idx = -1;
+        for (int i = 0; i < m_Turns.Count; ++i)
+        {
+            if (m_Turns[i].m_Unit == unit)
+            {
+                idx = i;
+                break;
+            }
+        }
+
+        if (idx >= 0)
+            m_Turns.RemoveAt(idx);
+    }
+
+    public void AddUnit(Unit unit)
+    {
+        m_Turns.Add(new TurnWrapper(DISTANCE_THRESHOLD / unit.Stat.m_Speed, unit));
+    }
+
+    public void OrderTurns()
+    {
+        m_Turns.Sort(UnitSpeedComparer);
+    }
+
+    public void ClearTurns()
+    {
+        m_Turns.Clear();
+    }
+
+    // TODO: Decide on timebreaker for units with the same time remaining
+    private int UnitSpeedComparer(TurnWrapper unit1, TurnWrapper unit2)
+    {
+        return unit1.m_TimeRemaining.CompareTo(unit2.m_TimeRemaining); //unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
+    }
+
+    public override string ToString()
+    {
+        StringBuilder stringBuilder = new StringBuilder("Current state of the turn order:\n");
+        foreach (TurnWrapper turnWrapper in m_Turns)
+        {
+            stringBuilder.Append(turnWrapper + "\n");
+        }
+        return stringBuilder.ToString();
+    }
 }
 
 // may or may not become a singleton
@@ -15,7 +121,8 @@ public class BattleManager : MonoBehaviour
 {
     #region Test
     [SerializeField] private BattleSO m_TestBattle;
-    [SerializeField] private List<UnitPlacement> m_TestPlacement;
+    [SerializeField] private List<Unit> m_TestPlacement;
+    [SerializeField] private List<Stats> m_TestStats;
     #endregion
 
     [SerializeField] private MapLogic m_MapLogic;
@@ -28,10 +135,9 @@ public class BattleManager : MonoBehaviour
     private PlayerTurnManager m_PlayerTurnManager;
     private EnemyTurnManager m_EnemyTurnManager;
 
-    // units
-    private HashSet<Unit> m_Units;
     // unit queue
-    private List<Unit> m_UnitTurns;
+    private TurnCalc m_TurnCalc = new TurnCalc();
+    private bool m_BattleTick = false;
 
     #region Initialisation
     private void Start()
@@ -40,10 +146,8 @@ public class BattleManager : MonoBehaviour
         m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
-        m_UnitTurns = new List<Unit>();
-        m_Units = new HashSet<Unit>();
 
-        InitialiseBattle(m_TestBattle, m_TestPlacement);
+        InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats);
         StartCoroutine(TestStart());
     }
 
@@ -60,7 +164,7 @@ public class BattleManager : MonoBehaviour
     private IEnumerator TestStart()
     {
         yield return new WaitForEndOfFrame();
-        StartTurn();
+        m_BattleTick = true;
     }
 
     /// <summary>
@@ -68,21 +172,24 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnits"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<UnitPlacement> playerUnits)
+    public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats)
     {
-        m_UnitTurns.Clear();
-        m_Units.Clear();
+        m_TurnCalc.ClearTurns();
+
         foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
             InstantiateUnit(unitPlacement, GridType.ENEMY);
         }
 
-        foreach (UnitPlacement unitPlacement in playerUnits)
+        if (playerUnits.Count > battleSO.m_PlayerStartingTiles.Count)
+            Logger.Log(this.GetType().Name, "There are more player units than there are tiles to put them!", LogLevel.ERROR);
+
+        for (int i = 0; i < playerUnits.Count; ++i)
         {
-            InstantiateUnit(unitPlacement, GridType.PLAYER);
+            InstantiateUnit(new UnitPlacement {m_Coodinates = battleSO.m_PlayerStartingTiles[i], m_Unit = playerUnits[i], m_Stats = playerStats[i]}, GridType.PLAYER);
         }
 
-        m_UnitTurns.Sort(UnitSpeedComparer);
+        m_TurnCalc.OrderTurns();
     }
 
     /// <summary>
@@ -94,19 +201,16 @@ public class BattleManager : MonoBehaviour
     private void InstantiateUnit(UnitPlacement unitPlacement, GridType gridType)
     {
         Unit unit = Instantiate(unitPlacement.m_Unit);
-        m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
-        m_UnitTurns.Add(unit);
-        m_Units.Add(unit);
         unit.Initialise(unitPlacement.m_Stats);
+        m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
+        m_TurnCalc.AddUnit(unit);
     }
     #endregion
 
     #region Turns
-    private void StartTurn()
+    private void StartTurn(Unit unit)
     {
         m_MapLogic.ResetMap();
-        Unit unit = m_UnitTurns[0];
-        m_UnitTurns.RemoveAt(0);
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
             m_PlayerTurnManager.BeginTurn((PlayerUnit) unit);
@@ -116,47 +220,41 @@ public class BattleManager : MonoBehaviour
             m_EnemyTurnManager.PerformTurn((EnemyUnit) unit);
         }
     }
-
-    private void EndTurn()
-    {
-        if (m_UnitTurns.Count == 0)
-        {
-            FillTurns();
-        }
-        StartTurn();
-    }
-
-    private void FillTurns()
-    {
-        foreach (Unit unit in m_Units)
-        {
-            m_UnitTurns.Add(unit);
-        }
-        m_UnitTurns.Sort(UnitSpeedComparer);
-    }
     #endregion
 
     #region Callbacks
-    private void OnCompleteTurn()
+    private void OnCompleteTurn(Unit unit)
     {
         Logger.Log(this.GetType().Name, "Finish turn", LogLevel.LOG);
-        EndTurn();
+        
+        m_TurnCalc.AddUnit(unit);
+        m_TurnCalc.OrderTurns();
+        m_BattleTick = true;
     }
 
     private void OnUnitDeath(Unit unit)
     {
-        m_Units.Remove(unit);
-        if (m_UnitTurns.Contains(unit))
-        {
-            m_UnitTurns.Remove(unit);
-        }
+        m_TurnCalc.RemoveUnitFromTurns(unit);
     }
     #endregion
 
     #region Helper
-    private int UnitSpeedComparer(Unit unit1, Unit unit2)
-    {
-        return unit2.Stat.m_Speed.CompareTo(unit1.Stat.m_Speed);//unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
-    }
+    
     #endregion
+
+    private void Update()
+    {
+        if (!m_BattleTick)
+            return;
+
+        if (m_TurnCalc.TryGetReadyUnit(out Unit readyUnit))
+        {
+            m_BattleTick = false;
+            StartTurn(readyUnit);
+            return;
+        }
+
+        m_TurnCalc.Tick();
+        Logger.Log(this.GetType().Name, m_TurnCalc.ToString(), LogLevel.LOG);
+    }
 }

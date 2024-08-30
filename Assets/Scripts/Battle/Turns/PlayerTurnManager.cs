@@ -85,6 +85,7 @@ public class PlayerTurnManager : TurnManager
         */
 
         m_WithinTurn = true;
+        m_BlockInputs = false;
         m_CurrState = PlayerTurnState.SELECTING_MOVEMENT_SQUARE;
         m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
         Logger.Log(this.GetType().Name, "Current phase: " + m_CurrState.ToString(), LogLevel.LOG);
@@ -198,7 +199,7 @@ public class PlayerTurnManager : TurnManager
     private void EndTurn()
     {
         m_WithinTurn = false;
-        m_CompleteTurnEvent?.Invoke();
+        m_CompleteTurnEvent?.Invoke(m_CurrUnit);
     }
     #endregion
 }

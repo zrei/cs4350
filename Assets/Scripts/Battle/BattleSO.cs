@@ -17,5 +17,5 @@ public class BattleSO : ScriptableObject
     /// <summary>
     /// List of coordinates that the player units start in
     /// </summary>
-    public List<CoordPair> m_PlayerStartingCoordinates;
+    public List<CoordPair> m_PlayerStartingTiles;
 }
