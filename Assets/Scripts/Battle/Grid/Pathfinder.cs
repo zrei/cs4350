@@ -122,6 +122,16 @@ public struct CoordPair
     {
         return m_Row.GetHashCode() ^ m_Col.GetHashCode();
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is CoordPair)
+        {
+            CoordPair cast = (CoordPair) obj;
+            return cast.m_Row == m_Row && cast.m_Col == m_Col;
+        }
+        return false;
+    }
 }
 
 /// <summary>

@@ -26,6 +26,11 @@ public class MapLogic : MonoBehaviour
     {
         RetrieveGrid(gridType).MoveUnit(unit, endPathNode, onCompleteMovement);
     }
+
+    public void SwapTiles(GridType gridType, CoordPair tile1, CoordPair tile2)
+    {
+        RetrieveGrid(gridType).SwapTiles(tile1, tile2);
+    }
     #endregion
 
     /*public void MoveUnit(GridType gridType, Unit unit, CoordPair start, CoordPair end)
