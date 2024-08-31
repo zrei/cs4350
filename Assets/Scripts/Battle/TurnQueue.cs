@@ -96,7 +96,7 @@ public class TurnQueue
         float tick = Mathf.Min(TICK_AMOUNT, m_Turns[0].m_TimeRemaining);
         foreach (TurnWrapper turnWrapper in m_Turns)
         {
-            turnWrapper.m_TimeRemaining -= tick;
+            turnWrapper.TickTime(tick);
         }
     }
 
