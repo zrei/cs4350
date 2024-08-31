@@ -5,6 +5,7 @@ using UnityEngine;
 // may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
+[RequireComponent(typeof(PlayerUnitSetup))]
 public class BattleManager : MonoBehaviour
 {
     #region Test
@@ -19,7 +20,11 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
+    [Header("References")]
     [SerializeField] private MapLogic m_MapLogic;
+
+    // for initial battlefield setup
+    private PlayerUnitSetup m_PlayerUnitSetup;
 
     // turn managers for the player and enemy
     private PlayerTurnManager m_PlayerTurnManager;
@@ -29,17 +34,25 @@ public class BattleManager : MonoBehaviour
     private TurnQueue m_TurnQueue = new TurnQueue();
     private bool m_BattleTick = false;
 
+    // camera
+    private Camera m_BattleCamera;
+
     #region Initialisation
     private void Start()
     {
         m_PlayerTurnManager = GetComponent<PlayerTurnManager>();
         m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
+        m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
+
+        // TODO: Handle this separately if need be
+        m_BattleCamera = Camera.main;
+
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
+        m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
 
         // TODO: This is test code
         InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats);
-        StartCoroutine(TestStart());
     }
 
     private void Awake()
@@ -61,6 +74,7 @@ public class BattleManager : MonoBehaviour
     public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats)
     {
         m_TurnQueue.Clear();
+        m_MapLogic.ResetMap();
 
         foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
@@ -76,6 +90,7 @@ public class BattleManager : MonoBehaviour
         }
 
         m_TurnQueue.OrderTurnQueue();
+        m_PlayerUnitSetup.BeginSetup(battleSO.m_PlayerStartingTiles);
     }
 
     /// <summary>
@@ -126,6 +141,11 @@ public class BattleManager : MonoBehaviour
     private void OnUnitDeath(Unit unit)
     {
         m_TurnQueue.RemoveUnit(unit);
+    }
+
+    private void OnCompleteSetup()
+    {
+        StartCoroutine(TestStart());
     }
     #endregion
 
