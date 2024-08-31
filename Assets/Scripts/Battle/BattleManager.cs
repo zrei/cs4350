@@ -33,7 +33,11 @@ public class BattleManager : MonoBehaviour
 
     // turn queue
     private TurnQueue m_TurnQueue = new TurnQueue();
+    private HashSet<Unit> m_EnemyUnits = new HashSet<Unit>();
+    private HashSet<Unit> m_PlayerUnits = new HashSet<Unit>();
+
     private bool m_BattleTick = false;
+    private bool m_WithinBattle = false;
 
     // camera
     private Camera m_BattleCamera;
@@ -77,6 +81,9 @@ public class BattleManager : MonoBehaviour
     public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats)
     {
         m_TurnQueue.Clear();
+        m_EnemyUnits.Clear();
+        m_PlayerUnits.Clear();
+
         m_MapLogic.ResetMap();
 
         foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
@@ -108,6 +115,10 @@ public class BattleManager : MonoBehaviour
         unit.Initialise(unitPlacement.m_Stats);
         m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
         m_TurnQueue.AddUnit(unit);
+        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
+            m_PlayerUnits.Add(unit);
+        else
+            m_EnemyUnits.Add(unit);
     }
     #endregion
 
@@ -135,15 +146,43 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
+    #region BattleOutcome
+    private void CompleteBattle(bool playerWin)
+    {
+        m_WithinBattle = false;
+        Logger.Log(this.GetType().Name, $"Player has won: {playerWin}", LogLevel.LOG);
+    }
+    #endregion
+
     #region Callbacks
     private void OnCompleteTurn(Unit unit)
     {
         EndTurn(unit);
     }
 
+    // this might be responsible for actually destroying the g9ame object/ returning it to pool or whatever
+    // to be consistent
     private void OnUnitDeath(Unit unit)
     {
         m_TurnQueue.RemoveUnit(unit);
+        Destroy(unit.gameObject);
+
+        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
+        {
+            m_PlayerUnits.Remove(unit);
+            if (m_PlayerUnits.Count <= 0)
+            {
+                CompleteBattle(false);
+            }
+        }
+        else
+        {
+            m_EnemyUnits.Remove(unit);
+            if (m_EnemyUnits.Count <= 0)
+            {
+                CompleteBattle(true);
+            }
+        }
     }
 
     private void OnCompleteSetup()
@@ -156,7 +195,8 @@ public class BattleManager : MonoBehaviour
     private void Update()
     {
         m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -Input.GetAxis("Horizontal") * CAMERA_ROTATION_SPEED * Time.deltaTime);
-        if (!m_BattleTick)
+        
+        if (!m_BattleTick || !m_WithinBattle)
             return;
 
         if (m_TurnQueue.TryGetReadyUnit(out Unit readyUnit))

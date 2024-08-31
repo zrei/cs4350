@@ -45,6 +45,8 @@ public abstract class Unit : MonoBehaviour, IHealth
     private CoordPair m_CurrPosition;
     public CoordPair CurrPosition => m_CurrPosition;
 
+    protected StatusManager m_StatusManager = new StatusManager();
+
     #region Initialisation
     /// <summary>
     /// Initialise stats, position, etc.
@@ -118,6 +120,13 @@ public abstract class Unit : MonoBehaviour, IHealth
             transform.position = nextPos;
         }
         onCompleteMovement?.Invoke();
+    }
+    #endregion
+
+    #region Tick
+    public void Tick()
+    {
+        m_StatusManager.Tick(this);
     }
     #endregion
 }

@@ -68,6 +68,15 @@ public class PlayerTurnManager : TurnManager
         Logger.Log(this.GetType().Name, "Start player turn with: " + playerUnit.name, LogLevel.LOG);
         
         m_CurrUnit = playerUnit;
+        m_CurrUnit.Tick();
+
+        if (m_CurrUnit.IsDead)
+        {
+            GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
+            return;
+        }
+            
+
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
     
         m_ReachablePoints = m_MapLogic.CalculateReachablePoints(GridType.PLAYER, m_CurrUnit);

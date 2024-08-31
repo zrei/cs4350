@@ -215,6 +215,7 @@ public class GridLogic : MonoBehaviour
     public void Attack(Unit attacker, AttackSO attack, CoordPair targetTile)
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
+        List<Unit> deadUnits = new List<Unit>();
 
         foreach (CoordPair coordPair in targetTiles)
         {
@@ -225,19 +226,17 @@ public class GridLogic : MonoBehaviour
             {
                 Unit target = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
                 target.TakeDamage(DamageCalc.CalculateDamage(attacker, target, attack));
+                if (target.IsDead)
+                    deadUnits.Add(target);
             }
         }
 
-        foreach (CoordPair coordPair in targetTiles)
+        foreach (Unit deadUnit in deadUnits)
         {
-            if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied && m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit.IsDead)
-            {
-                Unit deadUnit = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
-                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
-                Destroy(deadUnit.gameObject);
-                m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit = null;
-                m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied = false;
-            }
+            CoordPair coordinates = deadUnit.CurrPosition;
+            m_TileData[coordinates.m_Row, coordinates.m_Col].m_CurrUnit = null;
+            m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = false;
+            GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
         }
     }
     #endregion
