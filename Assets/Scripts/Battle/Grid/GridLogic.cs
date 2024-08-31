@@ -10,13 +10,13 @@ public class GridLogic : MonoBehaviour
     [SerializeField] private Transform m_GridParent;
     [SerializeField] private GridType m_GridType;
 
-    private TileLogic[,] m_TileVisuals = new TileLogic[MapData.NUM_ROWS, MapData.NUM_COLS];
-    
+    #region Tiles
+    private TileVisual[,] m_TileVisuals = new TileVisual[MapData.NUM_ROWS, MapData.NUM_COLS];
     private TileData[,] m_TileData = new TileData[MapData.NUM_ROWS, MapData.NUM_COLS];
+    private MapData MapData => new MapData(m_TileData);
+    #endregion
 
     private const float SPAWN_HEIGHT_OFFSET = 1.0f;
-
-    private MapData MapData => new MapData(m_TileData);
 
     #region Initialisation
     private void Start()
@@ -44,7 +44,7 @@ public class GridLogic : MonoBehaviour
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 Transform tileTrf = row.GetChild(c);
-                TileLogic tile = tileTrf.GetComponent<TileLogic>();
+                TileVisual tile = tileTrf.GetComponent<TileVisual>();
                 tile.Initialise(m_GridType, new CoordPair(r, c));
                 m_TileVisuals[r, c] = tile;
             }
@@ -96,12 +96,17 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    public void ColorTarget(List<CoordPair> targetSquares)
+    public void ColorTarget(AttackSO attack, CoordPair targetTile)
     {
         ResetTarget();
-        foreach (CoordPair coordPair in targetSquares)
+
+        List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
+
+        foreach (CoordPair target in targetTiles)
         {
-            m_TileVisuals[coordPair.m_Row, coordPair.m_Col].ToggleTarget(true);
+            if (!MapData.WithinBounds(target))
+                continue;
+            m_TileVisuals[target.m_Row, target.m_Col].ToggleTarget(true);
         }
     }
 
@@ -165,6 +170,7 @@ public class GridLogic : MonoBehaviour
         m_TileData[end.m_Row, end.m_Col].m_IsOccupied = true;
         m_TileData[end.m_Row, end.m_Col].m_CurrUnit = unit;
 
+        // TODO: Handle actually VISUALLY swapping the other unit. When should it happen?
         unit.Move(end, movementCheckpoints, onCompleteMovement);
     }
 
@@ -201,23 +207,34 @@ public class GridLogic : MonoBehaviour
     #endregion
 
     #region Attack
-    public void Attack(List<CoordPair> attackPoints, float damage)
+    /// <summary>
+    /// Deals damage to all 
+    /// </summary>
+    /// <param name="attackPoints"></param>
+    /// <param name="damage"></param>
+    public void Attack(Unit attacker, AttackSO attack, CoordPair targetTile)
     {
-        foreach (CoordPair coordPair in attackPoints)
+        List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
+
+        foreach (CoordPair coordPair in targetTiles)
         {
+            if (!MapData.WithinBounds(coordPair))
+                continue;
+            
             if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied)
             {
-                m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit.TakeDamage(damage);
+                Unit target = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
+                target.TakeDamage(DamageCalc.CalculateDamage(attacker, target, attack));
             }
         }
 
-        foreach (CoordPair coordPair in attackPoints)
+        foreach (CoordPair coordPair in targetTiles)
         {
             if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied && m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit.IsDead)
             {
-                Unit unit = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
-                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(unit);
-                Destroy(unit.gameObject);
+                Unit deadUnit = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
+                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
+                Destroy(deadUnit.gameObject);
                 m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit = null;
                 m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied = false;
             }

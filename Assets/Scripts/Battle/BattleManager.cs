@@ -1,118 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-
-public enum BattleTurn
-{
-    PLAYER,
-    ENEMY
-}
-
-public class TurnCalc
-{
-    private const float DISTANCE_THRESHOLD = 50f;
-    private const float TICK_AMOUNT = 1f;
-
-    private class TurnWrapper
-    {
-        public float m_TimeRemaining;
-        public Unit m_Unit;
-
-        public TurnWrapper(float timeRemaining, Unit unit)
-        {
-            m_TimeRemaining = timeRemaining;
-            m_Unit = unit;
-        }
-
-        public override string ToString()
-        {
-            return $"Unit {m_Unit.name} with time {m_TimeRemaining} remaining to act";
-        }
-    }
-
-    private List<TurnWrapper> m_Turns = new List<TurnWrapper>();
-
-    public void Tick()
-    {
-        if (m_Turns.Count <= 0)
-            return;
-
-        float tick = Mathf.Min(TICK_AMOUNT, m_Turns[0].m_TimeRemaining);
-        foreach (TurnWrapper turnWrapper in m_Turns)
-        {
-            turnWrapper.m_TimeRemaining -= tick;
-        }
-    }
-
-    public bool TryGetReadyUnit(out Unit readyUnit)
-    {
-        if (m_Turns.Count <= 0)
-        {
-            readyUnit = null;
-            return false;
-        }
-
-        if (m_Turns[0].m_TimeRemaining == 0)
-        {
-            readyUnit = m_Turns[0].m_Unit;
-            m_Turns.RemoveAt(0);
-            return true;
-        }
-        else
-        {
-            readyUnit = null;
-            return false;
-        }
-    }
-
-    public void RemoveUnitFromTurns(Unit unit)
-    {
-        int idx = -1;
-        for (int i = 0; i < m_Turns.Count; ++i)
-        {
-            if (m_Turns[i].m_Unit == unit)
-            {
-                idx = i;
-                break;
-            }
-        }
-
-        if (idx >= 0)
-            m_Turns.RemoveAt(idx);
-    }
-
-    public void AddUnit(Unit unit)
-    {
-        m_Turns.Add(new TurnWrapper(DISTANCE_THRESHOLD / unit.Stat.m_Speed, unit));
-    }
-
-    public void OrderTurns()
-    {
-        m_Turns.Sort(UnitSpeedComparer);
-    }
-
-    public void ClearTurns()
-    {
-        m_Turns.Clear();
-    }
-
-    // TODO: Decide on timebreaker for units with the same time remaining
-    private int UnitSpeedComparer(TurnWrapper unit1, TurnWrapper unit2)
-    {
-        return unit1.m_TimeRemaining.CompareTo(unit2.m_TimeRemaining); //unit1.Stat.m_Speed.CompareTo(unit2.Stat.m_Speed);
-    }
-
-    public override string ToString()
-    {
-        StringBuilder stringBuilder = new StringBuilder("Current state of the turn order:\n");
-        foreach (TurnWrapper turnWrapper in m_Turns)
-        {
-            stringBuilder.Append(turnWrapper + "\n");
-        }
-        return stringBuilder.ToString();
-    }
-}
 
 // may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
@@ -123,20 +11,22 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleSO m_TestBattle;
     [SerializeField] private List<Unit> m_TestPlacement;
     [SerializeField] private List<Stats> m_TestStats;
+
+    private IEnumerator TestStart()
+    {
+        yield return new WaitForEndOfFrame();
+        m_BattleTick = true;
+    }
     #endregion
 
     [SerializeField] private MapLogic m_MapLogic;
-
-    // the current phase based on the turn
-    private BattleTurn m_CurrPhase = BattleTurn.PLAYER;
-    public BattleTurn CurrPhase => m_CurrPhase;
 
     // turn managers for the player and enemy
     private PlayerTurnManager m_PlayerTurnManager;
     private EnemyTurnManager m_EnemyTurnManager;
 
-    // unit queue
-    private TurnCalc m_TurnCalc = new TurnCalc();
+    // turn queue
+    private TurnQueue m_TurnQueue = new TurnQueue();
     private bool m_BattleTick = false;
 
     #region Initialisation
@@ -147,6 +37,7 @@ public class BattleManager : MonoBehaviour
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
 
+        // TODO: This is test code
         InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats);
         StartCoroutine(TestStart());
     }
@@ -161,20 +52,15 @@ public class BattleManager : MonoBehaviour
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
     }
 
-    private IEnumerator TestStart()
-    {
-        yield return new WaitForEndOfFrame();
-        m_BattleTick = true;
-    }
-
     /// <summary>
     /// Initialise battle with the decided upon player units and the pre-placed enemy units
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnits"></param>
+    // TODO: Bundle the players in a better way OR intialise them in the level FIRST
     public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats)
     {
-        m_TurnCalc.ClearTurns();
+        m_TurnQueue.Clear();
 
         foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
@@ -189,7 +75,7 @@ public class BattleManager : MonoBehaviour
             InstantiateUnit(new UnitPlacement {m_Coodinates = battleSO.m_PlayerStartingTiles[i], m_Unit = playerUnits[i], m_Stats = playerStats[i]}, GridType.PLAYER);
         }
 
-        m_TurnCalc.OrderTurns();
+        m_TurnQueue.OrderTurnQueue();
     }
 
     /// <summary>
@@ -203,7 +89,7 @@ public class BattleManager : MonoBehaviour
         Unit unit = Instantiate(unitPlacement.m_Unit);
         unit.Initialise(unitPlacement.m_Stats);
         m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
-        m_TurnCalc.AddUnit(unit);
+        m_TurnQueue.AddUnit(unit);
     }
     #endregion
 
@@ -220,41 +106,44 @@ public class BattleManager : MonoBehaviour
             m_EnemyTurnManager.PerformTurn((EnemyUnit) unit);
         }
     }
+
+    private void EndTurn(Unit unit)
+    {
+        Logger.Log(this.GetType().Name, "Finish turn", LogLevel.LOG);
+        
+        m_TurnQueue.AddUnit(unit);
+        m_TurnQueue.OrderTurnQueue();
+        m_BattleTick = true;
+    }
     #endregion
 
     #region Callbacks
     private void OnCompleteTurn(Unit unit)
     {
-        Logger.Log(this.GetType().Name, "Finish turn", LogLevel.LOG);
-        
-        m_TurnCalc.AddUnit(unit);
-        m_TurnCalc.OrderTurns();
-        m_BattleTick = true;
+        EndTurn(unit);
     }
 
     private void OnUnitDeath(Unit unit)
     {
-        m_TurnCalc.RemoveUnitFromTurns(unit);
+        m_TurnQueue.RemoveUnit(unit);
     }
     #endregion
 
-    #region Helper
-    
-    #endregion
-
+    #region Tick Queue
     private void Update()
     {
         if (!m_BattleTick)
             return;
 
-        if (m_TurnCalc.TryGetReadyUnit(out Unit readyUnit))
+        if (m_TurnQueue.TryGetReadyUnit(out Unit readyUnit))
         {
             m_BattleTick = false;
             StartTurn(readyUnit);
             return;
         }
 
-        m_TurnCalc.Tick();
-        Logger.Log(this.GetType().Name, m_TurnCalc.ToString(), LogLevel.LOG);
+        m_TurnQueue.Tick();
+        Logger.Log(this.GetType().Name, m_TurnQueue.ToString(), LogLevel.LOG);
     }
+    #endregion
 }

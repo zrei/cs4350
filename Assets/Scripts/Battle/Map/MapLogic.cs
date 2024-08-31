@@ -62,9 +62,9 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).ColorPath(end);
     }
 
-    public void SetTarget(GridType gridType, List<CoordPair> targets)
+    public void SetTarget(GridType gridType, AttackSO attack, CoordPair target)
     {
-        RetrieveGrid(gridType).ColorTarget(targets);
+        RetrieveGrid(gridType).ColorTarget(attack, target);
     }
     #endregion
 
@@ -89,7 +89,7 @@ public class MapLogic : MonoBehaviour
         //Debug.DrawRay(ray.origin, ray.direction * 100, Color.white, 100f, false); 
         foreach (RaycastHit raycastHit in raycastHits)
         {
-            TileLogic tile = raycastHit.collider.gameObject.GetComponent<TileLogic>();
+            TileVisual tile = raycastHit.collider.gameObject.GetComponent<TileVisual>();
             
             if (!tile)
                 continue;
@@ -116,9 +116,9 @@ public class MapLogic : MonoBehaviour
     #endregion
 
     #region Attacks
-    public void Attack(GridType gridType, List<CoordPair> attackPoints, float damage)
+    public void Attack(GridType gridType, Unit attacker, AttackSO attack, CoordPair targetTile)
     {
-        RetrieveGrid(gridType).Attack(attackPoints, damage);
+        RetrieveGrid(gridType).Attack(attacker, attack, targetTile);
     }
     #endregion
 
