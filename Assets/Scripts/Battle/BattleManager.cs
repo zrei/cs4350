@@ -22,6 +22,7 @@ public class BattleManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private MapLogic m_MapLogic;
+    [SerializeField] private Transform m_CameraLookAtPoint;
 
     // for initial battlefield setup
     private PlayerUnitSetup m_PlayerUnitSetup;
@@ -36,6 +37,7 @@ public class BattleManager : MonoBehaviour
 
     // camera
     private Camera m_BattleCamera;
+    private const float CAMERA_ROTATION_SPEED = 50f;
 
     #region Initialisation
     private void Start()
@@ -46,6 +48,7 @@ public class BattleManager : MonoBehaviour
 
         // TODO: Handle this separately if need be
         m_BattleCamera = Camera.main;
+        m_BattleCamera.transform.LookAt(m_CameraLookAtPoint);
 
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
@@ -152,6 +155,7 @@ public class BattleManager : MonoBehaviour
     #region Tick Queue
     private void Update()
     {
+        m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -Input.GetAxis("Horizontal") * CAMERA_ROTATION_SPEED * Time.deltaTime);
         if (!m_BattleTick)
             return;
 
