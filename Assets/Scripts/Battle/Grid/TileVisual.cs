@@ -8,8 +8,11 @@ public enum TileState
     NONE
 }
 
+/// <summary>
+/// Manages the visuals of the tile, e.g. highlighting the tile
+/// </summary>
 [RequireComponent(typeof(Collider))]
-public class TileLogic : MonoBehaviour
+public class TileVisual : MonoBehaviour
 {
     [SerializeField] TextMeshPro m_TraverseText;
     [SerializeField] TextMeshPro m_PathText;

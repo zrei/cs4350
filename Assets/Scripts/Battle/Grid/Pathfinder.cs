@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 // can add more tile types like trap or cliff in the future
 // if calculations become exceedingly class dependent it should be given to the class
@@ -10,7 +11,7 @@ public enum TileType
 }
 
 /// <summary>
-/// Struct packaging data on a single tile
+/// Class packaging data on a single tile
 /// </summary>
 public class TileData
 {
@@ -100,6 +101,16 @@ public struct CoordPair
     public CoordPair MoveLeft()
     {
         return new CoordPair(m_Row, m_Col - 1);
+    }
+
+    public CoordPair Offset(CoordPair offset)
+    {
+        return new CoordPair(m_Row + offset.m_Row, m_Col + offset.m_Col);
+    }
+
+    public int GetDistanceToPoint(CoordPair otherPoint)
+    {
+        return Mathf.Abs(otherPoint.m_Row - m_Row) + Mathf.Abs(otherPoint.m_Col - m_Col);
     }
 
     public override string ToString()
