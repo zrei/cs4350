@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Input;
 
 // may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
@@ -55,6 +56,7 @@ public class BattleManager : MonoBehaviour
         // TODO: Handle this separately if need be
         m_BattleCamera = Camera.main;
         m_BattleCamera.transform.LookAt(m_CameraLookAtPoint);
+        InputManager.Instance.RotateCamera.OnHoldEvent += OnRotateCamera;
 
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
@@ -194,13 +196,18 @@ public class BattleManager : MonoBehaviour
         Logger.Log(this.GetType().Name, "Begin battle", LogLevel.LOG);
         StartCoroutine(TestStart());
     }
+
+    private void OnRotateCamera(IInput input)
+    {
+        var inputVector = input.GetValue<Vector2>();
+        var hAxis = inputVector.x;
+        m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -hAxis * CAMERA_ROTATION_SPEED * Time.deltaTime);
+    }
     #endregion
 
     #region Tick Queue
     private void Update()
     {
-        m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -Input.GetAxis("Horizontal") * CAMERA_ROTATION_SPEED * Time.deltaTime);
-        
         if (!m_BattleTick || !m_WithinBattle)
             return;
 
