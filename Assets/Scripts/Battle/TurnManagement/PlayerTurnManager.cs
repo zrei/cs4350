@@ -66,6 +66,7 @@ public class PlayerTurnManager : TurnManager
     public void BeginTurn(PlayerUnit playerUnit)
     {
         Logger.Log(this.GetType().Name, "Start player turn with: " + playerUnit.name, LogLevel.LOG);
+        GlobalEvents.Battle.PlayerTurnStartEvent?.Invoke();
         
         m_CurrUnit = playerUnit;
         m_CurrUnit.Tick();
@@ -75,7 +76,6 @@ public class PlayerTurnManager : TurnManager
             GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
             return;
         }
-            
 
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
     
@@ -253,6 +253,7 @@ public class PlayerTurnManager : TurnManager
         }
 
         Logger.Log(this.GetType().Name, "Current phase: " + m_CurrState.ToString(), LogLevel.LOG);
+        GlobalEvents.Battle.PlayerPhaseUpdateEvent?.Invoke(m_CurrState);
     }
     #endregion
 

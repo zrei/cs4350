@@ -116,5 +116,12 @@ public class TurnQueue
         }
         return stringBuilder.ToString();
     }
+
+    public List<Unit> GetTurnOrder()
+    {
+        List<Unit> units = new() {};
+        m_Turns.ForEach(x => units.Add(x.m_Unit));
+        return units;
+    }
     #endregion
 }

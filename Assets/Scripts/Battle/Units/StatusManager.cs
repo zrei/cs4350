@@ -38,7 +38,7 @@ public abstract class StatusEffect
 
 public class StatusManager 
 {
-    private List<StatusEffect> m_StatusEffects;
+    private List<StatusEffect> m_StatusEffects = new List<StatusEffect>();
 
     // haven't accounted for. add this much stack
     public void AddEffect(StatusEffect statusEffect)
