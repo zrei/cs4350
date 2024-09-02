@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public delegate void IntEvent(int _);
@@ -13,6 +14,15 @@ public static class GlobalEvents {
 
     public static class Battle {
         public delegate void UnitEvent(Unit _);
+        public delegate void TurnOrderEvent(List<Unit> _);
+        public delegate void PhaseEvent(PlayerTurnState _);
+        public delegate void UnitAllegianceEvent(UnitAllegiance unitAllegiance);
         public static UnitEvent UnitDefeatedEvent;
+        public static TurnOrderEvent TurnOrderUpdatedEvent;
+        public static PhaseEvent PlayerPhaseUpdateEvent;
+        public static VoidEvent PlayerUnitSetupStartEvent;
+        public static VoidEvent PlayerTurnStartEvent;
+        public static VoidEvent EnemyTurnStartEvent;
+        public static UnitAllegianceEvent BattleEndEvent;
     }
 }

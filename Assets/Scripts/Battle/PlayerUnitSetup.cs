@@ -23,6 +23,7 @@ public class PlayerUnitSetup : MonoBehaviour
         Logger.Log(this.GetType().Name, "Begin player unit set up", LogLevel.LOG);
         m_PlayerSquares = playerBeginningSquares;
         m_IsSettingUp = true;
+        GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
     }
 
     private void Update()

@@ -16,6 +16,8 @@ public class BattleManager : MonoBehaviour
     private IEnumerator TestStart()
     {
         yield return new WaitForEndOfFrame();
+        GlobalEvents.Battle.TurnOrderUpdatedEvent?.Invoke(m_TurnQueue.GetTurnOrder());
+        m_WithinBattle = true;
         m_BattleTick = true;
     }
     #endregion
@@ -142,15 +144,17 @@ public class BattleManager : MonoBehaviour
         
         m_TurnQueue.AddUnit(unit);
         m_TurnQueue.OrderTurnQueue();
+        GlobalEvents.Battle.TurnOrderUpdatedEvent?.Invoke(m_TurnQueue.GetTurnOrder());
         m_BattleTick = true;
     }
     #endregion
 
     #region BattleOutcome
-    private void CompleteBattle(bool playerWin)
+    private void CompleteBattle(UnitAllegiance victoriousSide)
     {
         m_WithinBattle = false;
-        Logger.Log(this.GetType().Name, $"Player has won: {playerWin}", LogLevel.LOG);
+        Logger.Log(this.GetType().Name, $"Side that has won: {victoriousSide}", LogLevel.LOG);
+        GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide);
     }
     #endregion
 
@@ -172,7 +176,7 @@ public class BattleManager : MonoBehaviour
             m_PlayerUnits.Remove(unit);
             if (m_PlayerUnits.Count <= 0)
             {
-                CompleteBattle(false);
+                CompleteBattle(UnitAllegiance.ENEMY);
             }
         }
         else
@@ -180,13 +184,14 @@ public class BattleManager : MonoBehaviour
             m_EnemyUnits.Remove(unit);
             if (m_EnemyUnits.Count <= 0)
             {
-                CompleteBattle(true);
+                CompleteBattle(UnitAllegiance.PLAYER);
             }
         }
     }
 
     private void OnCompleteSetup()
     {
+        Logger.Log(this.GetType().Name, "Begin battle", LogLevel.LOG);
         StartCoroutine(TestStart());
     }
     #endregion
