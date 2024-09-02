@@ -123,7 +123,7 @@ namespace Game.Input
 
         public IInput SwitchAction => GetInput("SwitchAction");
         public IInput EndTurn => GetInput("EndTurn");
-        public IInput RotateCamera => GetInput("RotateCamera");
+        public IInput PrimaryAxis => GetInput("PrimaryAxis");
         public IInput PointerPosition => GetInput("PointerPosition");
         public IInput PointerSelect => GetInput("PointerSelect");
 
