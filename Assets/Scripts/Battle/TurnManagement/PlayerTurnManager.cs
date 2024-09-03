@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Input;
 
 public enum PlayerTurnState
 {
@@ -67,7 +68,7 @@ public class PlayerTurnManager : TurnManager
     {
         Logger.Log(this.GetType().Name, "Start player turn with: " + playerUnit.name, LogLevel.LOG);
         GlobalEvents.Battle.PlayerTurnStartEvent?.Invoke();
-        
+
         m_CurrUnit = playerUnit;
         m_CurrUnit.Tick();
 
@@ -78,7 +79,7 @@ public class PlayerTurnManager : TurnManager
         }
 
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
-    
+
         m_ReachablePoints = m_MapLogic.CalculateReachablePoints(GridType.PLAYER, m_CurrUnit);
 
         m_TileToPath.Clear();
@@ -96,40 +97,42 @@ public class PlayerTurnManager : TurnManager
         */
 
         m_WithinTurn = true;
-        
+
         TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
+
+        InputManager.Instance.EndTurn.OnPressEvent += OnEndTurn;
+        InputManager.Instance.SwitchAction.OnPressEvent += OnSwitchAction;
+        InputManager.Instance.PointerPosition.OnChangeEvent += OnPointerPosition;
+        InputManager.Instance.PointerSelect.OnPressEvent += OnPointerSelect;
     }
     #endregion
 
     #region Inputs
-    private void Update()
+    private void OnEndTurn(IInput input)
     {
-        if (!m_WithinTurn)
-            return;
+        EndTurn();
+    }
 
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            EndTurn();
-        }
+    private void OnSwitchAction(IInput input)
+    {
+        SwitchAction();
+    }
 
-        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane);
+    private void OnPointerPosition(IInput input)
+    {
+        var inputVector = input.GetValue<Vector2>();
+        Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
         m_HasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetTile, out m_CurrTileSide);
 
         UpdateState();
+    }
 
-        if (Input.GetMouseButtonDown(0))
+    private void OnPointerSelect(IInput input)
+    {
+        if (TryPerformAction())
         {
-            if (TryPerformAction())
-            {
-                m_WithinTurn = false;
-                return;
-            }
-        }
-
-        // switch action type
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            SwitchAction();
+            m_WithinTurn = false;
+            return;
         }
     }
     #endregion
@@ -262,6 +265,11 @@ public class PlayerTurnManager : TurnManager
     {
         m_WithinTurn = false;
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
+
+        InputManager.Instance.EndTurn.OnPressEvent -= OnEndTurn;
+        InputManager.Instance.SwitchAction.OnPressEvent -= OnSwitchAction;
+        InputManager.Instance.PointerPosition.OnChangeEvent -= OnPointerPosition;
+        InputManager.Instance.PointerSelect.OnPressEvent -= OnPointerSelect;
     }
     #endregion
 }
