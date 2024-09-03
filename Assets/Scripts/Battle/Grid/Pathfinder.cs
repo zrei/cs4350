@@ -168,6 +168,7 @@ public static class Pathfinder
         {
             (PathNode point, int remainingMovement) = q.Dequeue();
             CoordPair coordinates = point.m_Coordinates;
+            Debug.Log(coordinates);
             if (checkedTiles.Contains(coordinates))
                 continue;
             checkedTiles.Add(coordinates);
@@ -178,8 +179,11 @@ public static class Pathfinder
             if (!IsTraversableTile(map, coordinates, traversableTiles))
                 continue;
 
-            if (!map.RetrieveTile(coordinates).m_IsOccupied || canSwapSquares)
+            if (!coordinates.Equals(startPoint) && (!map.RetrieveTile(coordinates).m_IsOccupied || canSwapSquares))
                 canTraverse.Add(point);
+
+            if (!coordinates.Equals(startPoint) && map.RetrieveTile(coordinates).m_IsOccupied && !GlobalSettings.AllowCrossingOverOccupiedSquares)
+                continue;
 
             q.Enqueue((new PathNode(coordinates.MoveLeft(), point), remainingMovement - 1));
             q.Enqueue((new PathNode(coordinates.MoveRight(), point), remainingMovement - 1));

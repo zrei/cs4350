@@ -1,3 +1,5 @@
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class ObjectPooler : MonoBehaviour
@@ -21,7 +23,7 @@ public class ObjectPooler : MonoBehaviour
     /// </summary>
     /// <param name="parent"></param>
     /// <returns></returns>
-    public GameObject RetrievePooledObject(Transform parent)
+    public GameObject RetrievePooledObject(Transform parent, bool setActive = true)
     {
         Transform pooledTransform = InstantiatePooledObject();
         pooledTransform.parent = parent;
@@ -30,19 +32,32 @@ public class ObjectPooler : MonoBehaviour
         pooledTransform.rotation = Quaternion.identity;
 
         GameObject pooledObject = pooledTransform.gameObject;
-        pooledObject.SetActive(false);
+        pooledObject.SetActive(setActive);
         return pooledObject;
     }
 
     /// <summary>
-    /// Retrieve a pooled game object through a component on the pooled object.
+    /// Try to retrieve a component from a pooled game object.
+    /// If the retrieval fails, the game object is returned to the pool
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="parent"></param>
     /// <returns></returns>
-    public T RetrievePooledObject<T>(Transform parent)
+    public bool TryRetrievePooledObject<T>(Transform parent, out T component, bool setActive = true)
     {
-        return RetrievePooledObject(parent).GetComponent<T>();
+        GameObject obj = RetrievePooledObject(parent, setActive);
+        component = obj.GetComponentInChildren<T>();
+
+        if (component == null)
+        {
+            ReturnToPool(obj.transform);
+            Logger.Log(this.GetType().Name, gameObject.name, $"Failure to find component of type {typeof(T)}", gameObject, LogLevel.ERROR);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     private Transform InstantiatePooledObject()
