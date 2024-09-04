@@ -168,7 +168,7 @@ public static class Pathfinder
         {
             (PathNode point, int remainingMovement) = q.Dequeue();
             CoordPair coordinates = point.m_Coordinates;
-            Debug.Log(coordinates);
+
             if (checkedTiles.Contains(coordinates))
                 continue;
             checkedTiles.Add(coordinates);
