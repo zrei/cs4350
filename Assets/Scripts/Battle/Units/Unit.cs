@@ -14,7 +14,11 @@ using UnityEngine;
 public struct Stats
 {
     public float m_Health;
-    public float m_Attack;
+    public float m_Mana;
+    public float m_PhysicalAttack;
+    public float m_MagicAttack;
+    public float m_PhysicalDefence;
+    public float m_MagicDefence;
     public float m_Speed;
     public int m_MovementRange;
     public TileType[] m_TraversableTileTypes;
@@ -35,6 +39,7 @@ public abstract class Unit : MonoBehaviour, IHealth
     private float m_Health;
     public bool IsDead => m_Health <= 0;
 
+    // note that this should already have accounted for the class boost
     private Stats m_Stats;
     public Stats Stat => m_Stats;
 
@@ -129,4 +134,14 @@ public abstract class Unit : MonoBehaviour, IHealth
         m_StatusManager.Tick(this);
     }
     #endregion
+
+    public IEnumerable<Token> GetAttackTokens()
+    {
+        return m_StatusManager.GetAttackTokens();
+    }
+
+    public IEnumerable<Token> GetTokens(TokenType tokenType)
+    {
+        return m_StatusManager.GetTokens(tokenType);
+    }
 }

@@ -1,5 +1,6 @@
 // going to keep mods separate from status effects for now...
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum StatusEffectType
@@ -39,11 +40,17 @@ public abstract class StatusEffect
 public class StatusManager 
 {
     private List<StatusEffect> m_StatusEffects = new List<StatusEffect>();
+    private List<Token> m_Tokens;
 
     // haven't accounted for. add this much stack
     public void AddEffect(StatusEffect statusEffect)
     {
         m_StatusEffects.Add(statusEffect);
+    }
+
+    public void AddToken(Token token)
+    {
+        m_Tokens.Add(token);
     }
 
     public void Tick(Unit unit)
@@ -60,5 +67,25 @@ public class StatusManager
         {
             m_StatusEffects.Remove(statusEffect);
         }
+    }
+
+    public IEnumerable<Token> GetAttackTokens()
+    {
+        return m_Tokens.Where(x => x.m_TokenData.AffectDamageCalcs);
+    }
+
+    public IEnumerable<Token> GetStatusTokens()
+    {
+        return m_Tokens.Where(x => x.m_TokenData.m_TokenType == TokenType.INFLICT_STATUS);
+    }
+
+    public IEnumerable<Token> GetTokens(TokenType tokenType)
+    {
+        return m_Tokens.Where(x => x.m_TokenData.m_TokenType == tokenType);
+    }
+
+    public void ClearTokens()
+    {
+        m_Tokens.Clear();
     }
 }
