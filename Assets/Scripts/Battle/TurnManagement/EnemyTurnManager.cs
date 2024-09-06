@@ -7,7 +7,7 @@ public class EnemyTurnManager : TurnManager
 {
     #region Test
     [Header("Test data")]
-    [SerializeField] private AttackSO[] m_TestAttacks;
+    [SerializeField] private ActiveSkillSO[] m_TestAttacks;
     [SerializeField] private int m_AttackRow;
     private int m_AttackIndex = 0;
     private bool m_AttackedLastTurn = false;
@@ -28,8 +28,8 @@ public class EnemyTurnManager : TurnManager
 
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
 
-        AttackSO attackSO = m_TestAttacks[m_AttackIndex];
-        List<PathNode> moveableTiles = m_MapLogic.CalculateReachablePoints(GridType.ENEMY, m_CurrUnit).ToList();
+        ActiveSkillSO attackSO = m_TestAttacks[m_AttackIndex];
+        List<PathNode> moveableTiles = m_MapLogic.CalculateReachablePoints(GridType.ENEMY, m_CurrUnit, m_CurrUnit.Stat.m_MovementRange).ToList();
 
         if (!m_AttackedLastTurn)
         {

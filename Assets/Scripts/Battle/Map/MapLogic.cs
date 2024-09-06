@@ -67,7 +67,7 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).ColorPath(end);
     }
 
-    public void SetTarget(GridType gridType, AttackSO attack, CoordPair target)
+    public void SetTarget(GridType gridType, ActiveSkillSO attack, CoordPair target)
     {
         RetrieveGrid(gridType).ColorTarget(attack, target);
     }
@@ -121,16 +121,16 @@ public class MapLogic : MonoBehaviour
     #endregion
 
     #region Attacks
-    public void Attack(GridType gridType, Unit attacker, AttackSO attack, CoordPair targetTile)
+    public void Attack(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
     {
         RetrieveGrid(gridType).Attack(attacker, attack, targetTile);
     }
     #endregion
 
     #region Unit Movement
-    public HashSet<PathNode> CalculateReachablePoints(GridType gridType, Unit unit)
+    public HashSet<PathNode> CalculateReachablePoints(GridType gridType, Unit unit, int remainingMovementRange)
     {
-        return RetrieveGrid(gridType).CalculateReachablePoints(unit);
+        return RetrieveGrid(gridType).CalculateReachablePoints(unit, remainingMovementRange);
     }
     #endregion
 }

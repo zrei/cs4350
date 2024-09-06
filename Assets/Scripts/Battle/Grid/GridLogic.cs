@@ -96,7 +96,7 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    public void ColorTarget(AttackSO attack, CoordPair targetTile)
+    public void ColorTarget(ActiveSkillSO attack, CoordPair targetTile)
     {
         ResetTarget();
 
@@ -137,9 +137,9 @@ public class GridLogic : MonoBehaviour
         return pathPoints;
     }
 
-    public HashSet<PathNode> CalculateReachablePoints(Unit unit)
+    public HashSet<PathNode> CalculateReachablePoints(Unit unit, int remainingMovementRange)
     {
-        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, unit.Stat.m_MovementRange, unit.Stat.m_CanSwapTiles, unit.Stat.m_TraversableTileTypes);
+        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.Stat.m_CanSwapTiles, unit.Stat.m_TraversableTileTypes);
     }
     #endregion
 
@@ -212,7 +212,7 @@ public class GridLogic : MonoBehaviour
     /// </summary>
     /// <param name="attackPoints"></param>
     /// <param name="damage"></param>
-    public void Attack(Unit attacker, AttackSO attack, CoordPair targetTile)
+    public void Attack(Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
         List<Unit> deadUnits = new List<Unit>();
