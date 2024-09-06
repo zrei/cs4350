@@ -2,9 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // TODO: May want to create a hierarchy with this as an abstract class and then all variants of attacks as childs
-[CreateAssetMenu(fileName = "AttackSO", menuName = "ScriptableObject/AttackSO")]
-public class AttackSO : ScriptableObject
+[CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkillSO")]
+public class ActiveSkillSO : ScriptableObject
 {
+    [Header("Details")]
+    public string m_Name;
+    public Sprite m_Icon;
+
     [Header("Attack Config")]
     [Tooltip("Whether this attack can only target a specific row")]
     public bool m_LockTargetRow;
