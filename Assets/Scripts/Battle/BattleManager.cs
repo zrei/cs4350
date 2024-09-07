@@ -171,7 +171,9 @@ public class BattleManager : MonoBehaviour
     private void OnUnitDeath(Unit unit)
     {
         m_TurnQueue.RemoveUnit(unit);
-        Destroy(unit.gameObject);
+        // TODO: move this somewhere else
+        unit.Die();
+        // Destroy(unit.gameObject);
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {

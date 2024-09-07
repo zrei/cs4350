@@ -6,4 +6,6 @@ public interface IHealth
 
     // might not be needed?
     public void SetHealth(float health);
+
+    public void Die();
 }

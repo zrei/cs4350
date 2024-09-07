@@ -5,6 +5,8 @@ using Game.Input;
 
 public enum PlayerTurnState
 {
+    SELECTING_ACTION,
+    INSPECT,
     SELECTING_MOVEMENT_SQUARE,
     SELECTING_ATTACK_TARGET
 }
@@ -44,6 +46,7 @@ public class PlayerTurnManager : TurnManager
     /// </summary>
     private HashSet<PathNode> m_ReachablePoints;
 
+    private int m_TotalMovementRange;
     /// <summary>
     /// Number of movement squares remaining
     /// </summary>
@@ -77,6 +80,8 @@ public class PlayerTurnManager : TurnManager
         m_CurrUnit = playerUnit;
         m_CurrUnit.Tick();
 
+        GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
+
         if (m_CurrUnit.IsDead)
         {
             GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
@@ -85,7 +90,9 @@ public class PlayerTurnManager : TurnManager
 
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
 
+        m_TotalMovementRange = m_CurrUnit.Stat.m_MovementRange;
         m_MovementRangeRemaining = m_CurrUnit.Stat.m_MovementRange;
+        GlobalEvents.Battle.MovementRemainingUpdateEvent?.Invoke(m_MovementRangeRemaining, m_TotalMovementRange);
 
         FillTraversablePoints();
 
@@ -175,6 +182,11 @@ public class PlayerTurnManager : TurnManager
             m_MapLogic.ResetTarget();
         }
     }
+
+    private void UpdateInspectState()
+    {
+        
+    }
     #endregion
 
     #region Perform Action
@@ -184,6 +196,8 @@ public class PlayerTurnManager : TurnManager
         {
             PlayerTurnState.SELECTING_ATTACK_TARGET => TryPerformAttack(),
             PlayerTurnState.SELECTING_MOVEMENT_SQUARE => TryPerformMove(),
+            PlayerTurnState.INSPECT => TryInspect(),
+            PlayerTurnState.SELECTING_ACTION => TrySelectAction(),
             _ => false
         };
     }
@@ -195,7 +209,11 @@ public class PlayerTurnManager : TurnManager
             Logger.Log(this.GetType().Name, "Begin moving from " + m_CurrUnit.CurrPosition + " to " + m_CurrTargetTile, LogLevel.LOG);
             PathNode destination = m_TileToPath[m_CurrTargetTile];
             int movedDistance = destination.m_Coordinates.GetDistanceToPoint(m_CurrUnit.CurrPosition);
-            m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrUnit, destination, () => OnCompleteMove(movedDistance));
+            m_MovementRangeRemaining -= movedDistance;
+
+            GlobalEvents.Battle.MovementRemainingUpdateEvent?.Invoke(m_MovementRangeRemaining, m_TotalMovementRange);
+
+            m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrUnit, destination, OnCompleteMove);
             return true;
         }
         else
@@ -219,13 +237,21 @@ public class PlayerTurnManager : TurnManager
         }
         
     }
+
+    private bool TrySelectAction()
+    {
+        return true;
+    }
+
+    private bool TryInspect()
+    {
+        return true;
+    }
     #endregion
 
     #region Moving
-    private void OnCompleteMove(int movedSquares)
+    private void OnCompleteMove()
     {
-        m_MovementRangeRemaining -= movedSquares;
-
         Logger.Log(this.GetType().Name, $"Remaining movement: {m_MovementRangeRemaining}", LogLevel.LOG);
 
         if (m_MovementRangeRemaining <= 0)

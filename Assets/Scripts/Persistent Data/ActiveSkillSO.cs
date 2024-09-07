@@ -1,12 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum AttackType
+{
+    PHYSICAL,
+    MAGICAL,
+    SUPPORT
+}
 // TODO: May want to create a hierarchy with this as an abstract class and then all variants of attacks as childs
 [CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkillSO")]
 public class ActiveSkillSO : ScriptableObject
 {
+    public AttackType m_AttackType;
+ 
     [Header("Details")]
-    public string m_Name;
+    public string m_SkillName;
     public Sprite m_Icon;
 
     [Header("Attack Config")]
