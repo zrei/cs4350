@@ -9,7 +9,7 @@ public enum StatusEffectType
     STUN,
 }
 
-// might move some data to an SO later :?
+// status effects are 
 public abstract class StatusEffect
 {
     public virtual StatusEffectType StatusEffectType => StatusEffectType.POISON;
@@ -37,10 +37,18 @@ public abstract class StatusEffect
     protected abstract void ApplyAffect(Unit unit);
 }
 
+public class PoisonStatusEffect : StatusEffect
+{
+    protected override void ApplyAffect(Unit unit)
+    {
+        unit.TakeDamage(2);
+    }
+}
+
 public class StatusManager 
 {
     private List<StatusEffect> m_StatusEffects = new List<StatusEffect>();
-    private List<Token> m_Tokens;
+    private List<Token> m_Tokens = new List<Token>();
 
     // haven't accounted for. add this much stack
     public void AddEffect(StatusEffect statusEffect)
@@ -69,23 +77,28 @@ public class StatusManager
         }
     }
 
-    public IEnumerable<Token> GetAttackTokens()
-    {
-        return m_Tokens.Where(x => x.m_TokenData.AffectDamageCalcs);
-    }
-
-    public IEnumerable<Token> GetStatusTokens()
-    {
-        return m_Tokens.Where(x => x.m_TokenData.m_TokenType == TokenType.INFLICT_STATUS);
-    }
-
     public IEnumerable<Token> GetTokens(TokenType tokenType)
     {
         return m_Tokens.Where(x => x.m_TokenData.m_TokenType == tokenType);
     }
 
+    public IEnumerable<Token> GetTokens(ConsumeType consumeType)
+    {
+        return m_Tokens.Where(x => x.m_TokenData.m_Consumption == consumeType);
+    }
+
+    public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
+    {
+        return m_Tokens.Where(x => x.m_TokenData.m_Consumption == consumeType && x.m_TokenData.m_TokenType == tokenType);
+    }
+
     public void ClearTokens()
     {
         m_Tokens.Clear();
+    }
+
+    public void ClearTokens(ConsumeType consumeType)
+    {
+        m_Tokens = m_Tokens.Where(x => x.m_TokenData.m_Consumption != consumeType).ToList();
     }
 }

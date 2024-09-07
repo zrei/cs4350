@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 /// <summary>
@@ -25,6 +26,13 @@ public struct Stats
     public bool m_CanSwapTiles;
 }
 
+/*
+public struct AnimationState
+{
+    public string 
+}
+*/
+
 public enum UnitAllegiance
 {
     PLAYER,
@@ -35,6 +43,8 @@ public enum UnitAllegiance
 // TODO: Store position here so we don't have to keep raycasting :|
 public abstract class Unit : MonoBehaviour, IHealth
 {
+    [SerializeField] Animator m_Animator;
+
     // current health
     private float m_Health;
     public bool IsDead => m_Health <= 0;
@@ -83,15 +93,10 @@ public abstract class Unit : MonoBehaviour, IHealth
 
     }
 
-    /*
-    void IHealth.TakeDamage(float damage)
-    {
-
-    }
-    */
-
+    // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
+        m_Animator.SetBool("IsHurt", true);
         m_Health -= damage;
     }
     #endregion
@@ -99,19 +104,58 @@ public abstract class Unit : MonoBehaviour, IHealth
     #region Movement
     public void Move(CoordPair endPosition, Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
-        StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, onCompleteMovement));
+        m_Animator.SetBool("MoveForward", true);
+        StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, FinishMovement));
         m_CurrPosition = endPosition;
+
+        void FinishMovement()
+        {
+            m_Animator.SetBool("MoveForward", false);
+            onCompleteMovement?.Invoke();
+        }
     }
 
     private IEnumerator MoveThroughCheckpoints(Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
+        Vector3 currDirectionVec = new Vector3(-1f, -1f, -1f);
+        string currentParam = string.Empty;
+
         while (positionsToMoveThrough.Count > 0)
         {
             float time = 0f;
             Vector3 currPos = transform.position;
             Vector3 nextPos = positionsToMoveThrough.Pop();
+
             if (currPos == nextPos)
                 continue;
+
+            // TODO: Handle this better later
+            Vector3 directionVec = (nextPos - currPos).normalized;
+            if (directionVec != currDirectionVec)
+            {
+                if (!string.IsNullOrEmpty(currentParam))
+                {
+                    m_Animator.SetBool(currentParam, false);
+                }
+
+                if (directionVec == transform.forward)
+                {
+                    m_Animator.SetBool("MoveForward", true);
+                }
+                else if (directionVec == -transform.forward)
+                {
+                    m_Animator.SetBool("MoveBack", true);
+                }
+                else if (directionVec == transform.right)
+                {
+                    m_Animator.SetBool("MoveRight", true);
+                }
+                else
+                {
+                    m_Animator.SetBool("MoveLeft", true);
+                }
+            }
+            currDirectionVec = directionVec;
             while (time < CHECKPOINT_MOVE_TIME)
             {
                 time += Time.deltaTime;
@@ -124,6 +168,7 @@ public abstract class Unit : MonoBehaviour, IHealth
             }
             transform.position = nextPos;
         }
+        m_Animator.SetBool(currentParam, false);
         onCompleteMovement?.Invoke();
     }
     #endregion
@@ -135,13 +180,46 @@ public abstract class Unit : MonoBehaviour, IHealth
     }
     #endregion
 
-    public IEnumerable<Token> GetAttackTokens()
+    public IEnumerable<Token> GetTokens(ConsumeType consumeType)
     {
-        return m_StatusManager.GetAttackTokens();
+        return m_StatusManager.GetTokens(consumeType);
     }
 
     public IEnumerable<Token> GetTokens(TokenType tokenType)
     {
         return m_StatusManager.GetTokens(tokenType);
+    }
+
+    public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
+    {
+        return m_StatusManager.GetTokens(consumeType, tokenType);
+    }
+
+    public float GetTotalMovementRange()
+    {
+        // account for buffs at some point
+        return Stat.m_MovementRange;
+    }
+
+    // for preview purposes
+    public Stats GetTotalStats()
+    {
+        return m_Stats;
+    }
+
+    public void ClearTokens(ConsumeType consumeType)
+    {
+        m_StatusManager.ClearTokens(consumeType);
+    }
+
+    public void InflictStatus(StatusEffect statusEffect)
+    {
+        m_StatusManager.AddEffect(statusEffect);
+    }
+
+    public void Die()
+    {
+        m_Animator.SetTrigger("IsDead");
+        Destroy(gameObject, 1f);
     }
 }
