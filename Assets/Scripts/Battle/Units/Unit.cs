@@ -85,12 +85,12 @@ public abstract class Unit : MonoBehaviour, IHealth
     #region Health and Damage
     void IHealth.Heal(float healAmount)
     {
-
+        m_Health = Mathf.Min(m_Stats.m_Health, m_Health + healAmount);
     }
 
     void IHealth.SetHealth(float health)
     {
-
+        m_Health = health;
     }
 
     // account for status conditions/inflicted tokens here
@@ -180,21 +180,19 @@ public abstract class Unit : MonoBehaviour, IHealth
     }
     #endregion
 
-    public IEnumerable<Token> GetTokens(ConsumeType consumeType)
-    {
-        return m_StatusManager.GetTokens(consumeType);
-    }
-
-    public IEnumerable<Token> GetTokens(TokenType tokenType)
-    {
-        return m_StatusManager.GetTokens(tokenType);
-    }
-
+    #region Tokens
     public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
     {
         return m_StatusManager.GetTokens(consumeType, tokenType);
     }
 
+    public void ClearTokens(ConsumeType consumeType)
+    {
+        m_StatusManager.ClearTokens(consumeType);
+    }
+    #endregion
+
+    #region Stats
     public float GetTotalMovementRange()
     {
         // account for buffs at some point
@@ -207,19 +205,29 @@ public abstract class Unit : MonoBehaviour, IHealth
         return m_Stats;
     }
 
-    public void ClearTokens(ConsumeType consumeType)
+    public float GetFlatStatChange(StatType statType)
     {
-        m_StatusManager.ClearTokens(consumeType);
+        return m_StatusManager.GetFlatStatChange(statType);
     }
 
+    public float GetMultStatChange(StatType statType)
+    {
+        return m_StatusManager.GetMultStatChange(statType);
+    }
+    #endregion
+
+    #region Status
     public void InflictStatus(StatusEffect statusEffect)
     {
         m_StatusManager.AddEffect(statusEffect);
     }
+    #endregion
 
+    #region Death
     public void Die()
     {
         m_Animator.SetTrigger("IsDead");
         Destroy(gameObject, 1f);
     }
+    #endregion
 }

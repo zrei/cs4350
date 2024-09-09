@@ -1,11 +1,41 @@
 using UnityEngine;
 
-public struct Token 
+[System.Serializable]
+public class Token : IStatChange
 {
     public TokenSO m_TokenData;
 
     // represents different things for different token types
     public float m_Amount;
+
+    public float GetFlatStatChange(StatType statType)
+    {
+        if (m_TokenData.m_TokenType == TokenType.FLAT_STAT_CHANGE && ((StatChangeTokenSO) m_TokenData).m_AffectedStat == statType)
+            return m_Amount;
+        else
+            return 0;
+    }
+
+    public float GetMultStatChange(StatType statType)
+    {
+        if (m_TokenData.m_TokenType == TokenType.FLAT_STAT_CHANGE && ((StatChangeTokenSO) m_TokenData).m_AffectedStat == statType)
+            return m_Amount;
+        else
+            return 1;
+    }
+
+    /*
+    public bool TryGetInflictedStatusEffect(out StatusEffect statusEffect)
+    {
+        if (m_TokenData.m_TokenType != TokenType.INFLICT_STATUS)
+        {
+            statusEffect = null;
+            return false;
+        }
+
+        statusEffect = new StatusEffect();
+    }
+    */
 }
 
 public enum TokenType
@@ -32,7 +62,7 @@ public abstract class TokenSO : ScriptableObject
     public Sprite m_Icon;
     public TokenType m_TokenType;
     [Tooltip("When to consume this token")]
-    public ConsumeType m_Consumption;
+    public ConsumeType[] m_Consumption;
 }
 
 public class StatusEffectTokenSO : TokenSO

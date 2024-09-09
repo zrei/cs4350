@@ -84,12 +84,12 @@ public class StatusManager
 
     public IEnumerable<Token> GetTokens(ConsumeType consumeType)
     {
-        return m_Tokens.Where(x => x.m_TokenData.m_Consumption == consumeType);
+        return m_Tokens.Where(x => x.m_TokenData.m_Consumption.Contains(consumeType));
     }
 
     public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
     {
-        return m_Tokens.Where(x => x.m_TokenData.m_Consumption == consumeType && x.m_TokenData.m_TokenType == tokenType);
+        return m_Tokens.Where(x => x.m_TokenData.m_Consumption.Contains(consumeType) && x.m_TokenData.m_TokenType == tokenType);
     }
 
     public void ClearTokens()
@@ -99,6 +99,35 @@ public class StatusManager
 
     public void ClearTokens(ConsumeType consumeType)
     {
-        m_Tokens = m_Tokens.Where(x => x.m_TokenData.m_Consumption != consumeType).ToList();
+        m_Tokens = m_Tokens.Where(x => !x.m_TokenData.m_Consumption.Contains(consumeType)).ToList();
     }
+
+    public float GetFlatStatChange(StatType statType)
+    {
+        float totalFlatStatChange = 0;
+        foreach (Token token in m_Tokens)
+        {
+            totalFlatStatChange += token.GetFlatStatChange(statType);
+        }
+        // dump the status effects on here too later
+        return totalFlatStatChange;
+    }
+
+    public float GetMultStatChange(StatType statType)
+    {
+        float totalFlatStatChange = 1;
+        foreach (Token token in m_Tokens)
+        {
+            totalFlatStatChange *= token.GetMultStatChange(statType);
+        }
+        // dump the status effects on here too later
+        return totalFlatStatChange;
+    }
+}
+
+public interface IStatChange
+{
+    public float GetFlatStatChange(StatType statType);
+
+    public float GetMultStatChange(StatType statType);
 }
