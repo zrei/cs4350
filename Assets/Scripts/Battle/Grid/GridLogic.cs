@@ -217,8 +217,6 @@ public class GridLogic : MonoBehaviour
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
         List<Unit> deadUnits = new List<Unit>();
-
-        IEnumerable<Token> statusTokens = attacker.GetTokens(attack.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND, TokenType.INFLICT_STATUS);
         
         foreach (CoordPair coordPair in targetTiles)
         {
@@ -235,14 +233,11 @@ public class GridLogic : MonoBehaviour
                     deadUnits.Add(target);
                 else
                 {
+                    List<StatusEffect> inflictedStatusEffects = attacker.GetInflictedStatusEffects(attack.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
                     // probably subsume this into the unit itself
-                    foreach (Token token in statusTokens)
+                    foreach (StatusEffect statusEffect in inflictedStatusEffects)
                     {
-                        // doesn't account for adding stacks
-                        StatusEffectTokenSO statusEffectTokenSO = (StatusEffectTokenSO) token.m_TokenData;
-                        PoisonStatusEffect poisonStatusEffect = new PoisonStatusEffect();
-                        poisonStatusEffect.AddStack(2);
-                        target.InflictStatus(poisonStatusEffect);
+                        target.InflictStatus(statusEffect);
                     }
                 }
             }

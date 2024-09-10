@@ -1,30 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
-
-/// <summary>
-/// This is used to store what their stats SHOULD be,
-/// accounting for base stats + growths so far.
-/// It DOES NOT account for any transient stat changes
-/// due to buffs/debuffs.
-/// TODO: Should account for class stats? Or just leave it
-/// as separate
-/// </summary>
-[System.Serializable]
-public struct Stats
-{
-    public float m_Health;
-    public float m_Mana;
-    public float m_PhysicalAttack;
-    public float m_MagicAttack;
-    public float m_PhysicalDefence;
-    public float m_MagicDefence;
-    public float m_Speed;
-    public int m_MovementRange;
-    public TileType[] m_TraversableTileTypes;
-    public bool m_CanSwapTiles;
-}
 
 /*
 public struct AnimationState
@@ -49,7 +25,12 @@ public abstract class Unit : MonoBehaviour, IHealth
     private float m_Health;
     public bool IsDead => m_Health <= 0;
 
-    // note that this should already have accounted for the class boost
+    /// <summary>
+    /// This is used to store what their stats SHOULD be,
+    /// accounting for base stats + growths + class bonuses so far.
+    /// It DOES NOT account for any transient stat changes
+    /// due to buffs/debuffs.
+    /// </summary>
     private Stats m_Stats;
     public Stats Stat => m_Stats;
 
@@ -189,6 +170,11 @@ public abstract class Unit : MonoBehaviour, IHealth
     public void ClearTokens(ConsumeType consumeType)
     {
         m_StatusManager.ClearTokens(consumeType);
+    }
+
+    public List<StatusEffect> GetInflictedStatusEffects(ConsumeType consumeType)
+    {
+        return m_StatusManager.GetInflictedStatusEffects(consumeType);
     }
     #endregion
 
