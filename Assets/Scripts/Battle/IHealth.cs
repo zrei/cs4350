@@ -1,5 +1,6 @@
-public interface IHealth
+public interface IHealth : IStat
 {
+    public bool IsDead => true;
     public void TakeDamage(float damage);
 
     public void Heal(float healAmount);

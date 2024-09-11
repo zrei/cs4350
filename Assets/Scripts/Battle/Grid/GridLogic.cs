@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Class that maintains the internal representation of the grid (tile types, which tiles are occupied and with what units),
@@ -216,10 +217,7 @@ public class GridLogic : MonoBehaviour
     public void Attack(Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
-        List<Unit> deadUnits = new List<Unit>();
-
-        IEnumerable<Token> statusTokens = attacker.GetTokens(attack.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND, TokenType.INFLICT_STATUS);
-        
+        List<IHealth> targets = new();
         foreach (CoordPair coordPair in targetTiles)
         {
             if (!MapData.WithinBounds(coordPair))
@@ -227,26 +225,14 @@ public class GridLogic : MonoBehaviour
             
             if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied)
             {
-                Unit target = m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit;
-                target.TakeDamage(DamageCalc.CalculateDamage(attacker, target, attack));
-                // might be subsumed 
-                target.ClearTokens(attack.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
-                if (target.IsDead)
-                    deadUnits.Add(target);
-                else
-                {
-                    // probably subsume this into the unit itself
-                    foreach (Token token in statusTokens)
-                    {
-                        // doesn't account for adding stacks
-                        StatusEffectTokenSO statusEffectTokenSO = (StatusEffectTokenSO) token.m_TokenData;
-                        PoisonStatusEffect poisonStatusEffect = new PoisonStatusEffect();
-                        poisonStatusEffect.AddStack(2);
-                        target.InflictStatus(poisonStatusEffect);
-                    }
-                }
+                targets.Add(m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit);
             }
         }
+
+        attacker.Attack(attack, targets);
+
+        // TODO: Clean this up further?
+        List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
 
         foreach (Unit deadUnit in deadUnits)
         {
@@ -255,7 +241,6 @@ public class GridLogic : MonoBehaviour
             m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = false;
             GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
         }
-        attacker.ClearTokens(attack.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
     }
     #endregion
 }
