@@ -15,6 +15,7 @@ public class ActiveSkillSO : ScriptableObject
  
     [Header("Details")]
     public string m_SkillName;
+    public string m_Description;
     public Sprite m_Icon;
 
     [Header("Attack Config")]
@@ -95,4 +96,20 @@ public class ActiveSkillSO : ScriptableObject
 
         return attackTargetTiles;
     }
+}
+
+public abstract class MagicSkillSO : ActiveSkillSO
+{
+    [SerializeField] private float m_ManaCost;
+}
+
+public class HealSkillSO : MagicSkillSO
+{
+    [SerializeField] private float m_HealAmount;
+}
+
+public class SupportSkillSO : MagicSkillSO
+{
+    [SerializeField] private List<StatusEffect> m_InflictedStatusEffects;
+    [SerializeField] private List<Token> m_InflictedTokens;
 }
