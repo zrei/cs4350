@@ -217,7 +217,7 @@ public class GridLogic : MonoBehaviour
     public void Attack(Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
-        List<Unit> targets = new();
+        List<IHealth> targets = new();
         foreach (CoordPair coordPair in targetTiles)
         {
             if (!MapData.WithinBounds(coordPair))
@@ -231,7 +231,8 @@ public class GridLogic : MonoBehaviour
 
         attacker.Attack(attack, targets);
 
-        List<Unit> deadUnits = targets.Where(x => x.IsDead).ToList();
+        // TODO: Clean this up further?
+        List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
 
         foreach (Unit deadUnit in deadUnits)
         {

@@ -5,7 +5,6 @@ using Game.Input;
 public class PlayerUnitSetup : MonoBehaviour
 {
     private MapLogic m_MapLogic;
-    private bool m_IsSettingUp = false;
     private List<CoordPair> m_PlayerSquares;
 
     private CoordPair m_TileToSwap;
@@ -23,7 +22,6 @@ public class PlayerUnitSetup : MonoBehaviour
     {
         Logger.Log(this.GetType().Name, "Begin player unit set up", LogLevel.LOG);
         m_PlayerSquares = playerBeginningSquares;
-        m_IsSettingUp = true;
         GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
 
         InputManager.Instance.EndTurn.OnPressEvent += OnEndTurn;
@@ -33,7 +31,6 @@ public class PlayerUnitSetup : MonoBehaviour
     private void OnEndTurn(IInput input)
     {
         Logger.Log(this.GetType().Name, "Complete player unit set up", LogLevel.LOG);
-        m_IsSettingUp = false;
         m_CompleteSetupEvent?.Invoke();
 
         InputManager.Instance.EndTurn.OnPressEvent -= OnEndTurn;
