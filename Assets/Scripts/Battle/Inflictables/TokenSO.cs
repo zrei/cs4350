@@ -1,18 +1,10 @@
+using System.Linq;
 using UnityEngine;
-
-public struct Token 
-{
-    public TokenSO m_TokenData;
-
-    // represents different things for different token types
-    public float m_Amount;
-}
 
 public enum TokenType
 {
     INFLICT_STATUS,
-    FLAT_STAT_CHANGE,
-    MULT_STAT_CHANGE,
+    STAT_CHANGE,
     SUPPORT_EFFECT_UP
 }
 
@@ -32,27 +24,21 @@ public abstract class TokenSO : ScriptableObject
     public Sprite m_Icon;
     public TokenType m_TokenType;
     [Tooltip("When to consume this token")]
-    public ConsumeType m_Consumption;
+    public ConsumeType[] m_Consumption;
+
+    public bool ContainsConsumptionType(ConsumeType consumeType)
+    {
+        return m_Consumption.Contains(consumeType);
+    }
 }
 
 public class StatusEffectTokenSO : TokenSO
 {
-    public StatusEffectType m_StatusToCast;
-}
-
-public enum StatType
-{
-    HEALTH,
-    MANA,
-    PHYS_ATTACK,
-    MAG_ATTACK,
-    PHYS_DEFENCE,
-    MAG_DEFENCE,
-    SPEED,
-    MOVEMENT_RANGE
+    public StatusEffect m_StatusEffect;
 }
 
 public class StatChangeTokenSO : TokenSO
 {
     public StatType m_AffectedStat;
+    public StatChangeType m_StatChangeType;
 }

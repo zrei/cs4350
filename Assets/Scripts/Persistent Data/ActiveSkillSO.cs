@@ -86,8 +86,7 @@ public class ActiveSkillSO : ScriptableObject
 
     public List<CoordPair> ConstructAttackTargetTiles(CoordPair target)
     {
-        List<CoordPair> attackTargetTiles = new() {};
-        attackTargetTiles.Add(target);
+        List<CoordPair> attackTargetTiles = new() {target};
 
         foreach (CoordPair offset in m_TargetSquares)
         {

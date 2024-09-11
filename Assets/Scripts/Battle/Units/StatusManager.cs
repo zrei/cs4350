@@ -1,55 +1,13 @@
 // going to keep mods separate from status effects for now...
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-public enum StatusEffectType
-{
-    POISON,
-    STUN,
-}
-
-// status effects are 
-public abstract class StatusEffect
-{
-    public virtual StatusEffectType StatusEffectType => StatusEffectType.POISON;
-    public bool IsDepleted => m_StackRemaining <= 0;
-
-    public const int MAX_STACK = 3;
-    protected int m_StackRemaining;
-
-    public virtual void Tick(Unit unit)
-    {
-        ApplyAffect(unit);
-        ReduceStack(1);
-    }
-
-    public void AddStack(int amt)
-    {
-        m_StackRemaining = Mathf.Max(m_StackRemaining + amt, MAX_STACK);
-    }
-
-    public void ReduceStack(int amt)
-    {
-        m_StackRemaining -= amt;
-    }
-
-    protected abstract void ApplyAffect(Unit unit);
-}
-
-public class PoisonStatusEffect : StatusEffect
-{
-    protected override void ApplyAffect(Unit unit)
-    {
-        unit.TakeDamage(2);
-    }
-}
-
-public class StatusManager 
+public class StatusManager : IStatChange
 {
     private List<StatusEffect> m_StatusEffects = new List<StatusEffect>();
     private List<Token> m_Tokens = new List<Token>();
 
+    #region Add Inflictable
     // haven't accounted for. add this much stack
     public void AddEffect(StatusEffect statusEffect)
     {
@@ -60,7 +18,9 @@ public class StatusManager
     {
         m_Tokens.Add(token);
     }
+    #endregion
 
+    #region Tick
     public void Tick(Unit unit)
     {
         HashSet<StatusEffect> toRemove = new() {};
@@ -76,22 +36,41 @@ public class StatusManager
             m_StatusEffects.Remove(statusEffect);
         }
     }
+    #endregion
 
+    #region Getters
     public IEnumerable<Token> GetTokens(TokenType tokenType)
     {
-        return m_Tokens.Where(x => x.m_TokenData.m_TokenType == tokenType);
+        return m_Tokens.Where(x => x.TokenType == tokenType);
     }
 
     public IEnumerable<Token> GetTokens(ConsumeType consumeType)
     {
-        return m_Tokens.Where(x => x.m_TokenData.m_Consumption == consumeType);
+        return m_Tokens.Where(x => x.ContainsConsumptionType(consumeType));
     }
 
     public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
     {
-        return m_Tokens.Where(x => x.m_TokenData.m_Consumption == consumeType && x.m_TokenData.m_TokenType == tokenType);
+        return m_Tokens.Where(x => x.ContainsConsumptionType(consumeType) && x.TokenType == tokenType);
     }
 
+    public List<StatusEffect> GetInflictedStatusEffects(ConsumeType consumeType)
+    {
+        List<StatusEffect> statusEffects = new();
+
+        foreach (Token token in m_Tokens)
+        {
+            if (token.ContainsConsumptionType(consumeType) && token.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
+            {
+                statusEffects.Add(statusEffect);
+            }
+        }
+        
+        return statusEffects;
+    }
+    #endregion
+
+    #region Clear Tokens
     public void ClearTokens()
     {
         m_Tokens.Clear();
@@ -99,6 +78,43 @@ public class StatusManager
 
     public void ClearTokens(ConsumeType consumeType)
     {
-        m_Tokens = m_Tokens.Where(x => x.m_TokenData.m_Consumption != consumeType).ToList();
+        m_Tokens = m_Tokens.Where(x => !x.ContainsConsumptionType(consumeType)).ToList();
     }
+    #endregion
+
+    #region Stat Change
+    public float GetFlatStatChange(StatType statType)
+    {
+        float totalFlatStatChange = 0;
+
+        foreach (Token token in m_Tokens)
+        {
+            totalFlatStatChange += token.GetFlatStatChange(statType);
+        }
+
+        foreach (StatusEffect statusEffect in m_StatusEffects)
+        {
+            totalFlatStatChange += statusEffect.GetFlatStatChange(statType);
+        }
+
+        return totalFlatStatChange;
+    }
+
+    public float GetMultStatChange(StatType statType)
+    {
+        float totalFlatStatChange = 1;
+
+        foreach (Token token in m_Tokens)
+        {
+            totalFlatStatChange *= token.GetMultStatChange(statType);
+        }
+
+        foreach (StatusEffect statusEffect in m_StatusEffects)
+        {
+            totalFlatStatChange *= statusEffect.GetMultStatChange(statType);
+        }
+
+        return totalFlatStatChange;
+    }
+    #endregion
 }

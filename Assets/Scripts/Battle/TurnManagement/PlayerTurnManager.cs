@@ -23,10 +23,7 @@ public class PlayerTurnManager : TurnManager
     /// </summary>
     private PlayerUnit m_CurrUnit;
     private PlayerTurnState m_CurrState = PlayerTurnState.SELECTING_MOVEMENT_SQUARE;
-    /// <summary>
-    /// Whether it's currently the player's turn
-    /// </summary>
-    private bool m_WithinTurn = false;
+
     #endregion
 
     #region Input and Selected Tile
@@ -90,8 +87,8 @@ public class PlayerTurnManager : TurnManager
 
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
 
-        m_TotalMovementRange = m_CurrUnit.Stat.m_MovementRange;
-        m_MovementRangeRemaining = m_CurrUnit.Stat.m_MovementRange;
+        m_TotalMovementRange = (int) m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);
+        m_MovementRangeRemaining = m_TotalMovementRange;
         GlobalEvents.Battle.MovementRemainingUpdateEvent?.Invoke(m_MovementRangeRemaining, m_TotalMovementRange);
 
         FillTraversablePoints();
@@ -103,8 +100,6 @@ public class PlayerTurnManager : TurnManager
             m_RemainingActions.Add(action);
         }
         */
-
-        m_WithinTurn = true;
 
         TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
 
@@ -139,7 +134,6 @@ public class PlayerTurnManager : TurnManager
     {
         if (TryPerformAction())
         {
-            m_WithinTurn = false;
             return;
         }
     }
@@ -322,7 +316,6 @@ public class PlayerTurnManager : TurnManager
     #region End Turn
     private void EndTurn()
     {
-        m_WithinTurn = false;
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
 
         InputManager.Instance.EndTurn.OnPressEvent -= OnEndTurn;
