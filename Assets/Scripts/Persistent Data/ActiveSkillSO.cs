@@ -47,9 +47,6 @@ public class ActiveSkillSO : ScriptableObject
     [Header("Target")]
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetSquares;
-    
-    [Header("Power")]
-    public float m_BasePower;
 
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit)
     {
