@@ -19,6 +19,16 @@ public enum UnitAllegiance
 // TODO: Store position here so we don't have to keep raycasting :|
 public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
 {
+    private const string DirXAnimParam = "DirX";
+    private const string DirYAnimParam = "DirY";
+    private const string IsMoveAnimParam = "IsMove";
+
+    private static int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
+    private static int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
+    private static int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
+    private static int DeathAnimHash = Animator.StringToHash("Death");
+    private static int HurtAnimHash = Animator.StringToHash("Hurt");
+
     [SerializeField] Animator m_Animator;
 
     // current health
@@ -64,6 +74,8 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
     #endregion
 
     #region Health and Damage
+    public float CurrentHealth => m_Health;
+
     void IHealth.Heal(float healAmount)
     {
         m_Health = Mathf.Min(m_Stats.m_Health, m_Health + healAmount);
@@ -77,7 +89,7 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
     // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
-        m_Animator.SetBool("IsHurt", true);
+        m_Animator.Play(HurtAnimHash);
         m_Health -= damage;
     }
     #endregion
@@ -85,13 +97,13 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
     #region Movement
     public void Move(CoordPair endPosition, Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
-        m_Animator.SetBool("MoveForward", true);
+        m_Animator.SetBool(IsMoveAnimParam, true);
         StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, FinishMovement));
         m_CurrPosition = endPosition;
 
         void FinishMovement()
         {
-            m_Animator.SetBool("MoveForward", false);
+            m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
         }
     }
@@ -112,30 +124,10 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
 
             // TODO: Handle this better later
             Vector3 directionVec = (nextPos - currPos).normalized;
-            if (directionVec != currDirectionVec)
-            {
-                if (!string.IsNullOrEmpty(currentParam))
-                {
-                    m_Animator.SetBool(currentParam, false);
-                }
-
-                if (directionVec == transform.forward)
-                {
-                    m_Animator.SetBool("MoveForward", true);
-                }
-                else if (directionVec == -transform.forward)
-                {
-                    m_Animator.SetBool("MoveBack", true);
-                }
-                else if (directionVec == transform.right)
-                {
-                    m_Animator.SetBool("MoveRight", true);
-                }
-                else
-                {
-                    m_Animator.SetBool("MoveLeft", true);
-                }
-            }
+            Vector3 localVec = transform.InverseTransformVector(directionVec);
+            m_Animator.SetFloat(DirXAnimParam, directionVec.x);
+            m_Animator.SetFloat(DirYAnimParam, directionVec.z);
+            print($"x: {m_Animator.GetFloat(DirXAnimParam)}; z: {m_Animator.GetFloat(DirYAnimParam)}");
             currDirectionVec = directionVec;
             while (time < CHECKPOINT_MOVE_TIME)
             {
@@ -149,7 +141,6 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
             }
             transform.position = nextPos;
         }
-        m_Animator.SetBool(currentParam, false);
         onCompleteMovement?.Invoke();
     }
     #endregion
@@ -219,7 +210,7 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
     #region Death
     public void Die()
     {
-        m_Animator.SetTrigger("IsDead");
+        m_Animator.Play(DeathAnimHash);
         Destroy(gameObject, 1f);
     }
     #endregion
@@ -228,7 +219,8 @@ public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
     public void Attack(ActiveSkillSO attackSO, List<IHealth> targets)
     {
         List<StatusEffect> inflictedStatusEffects = GetInflictedStatusEffects(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
-    
+        m_Animator.Play(SwordAttackAnimHash);
+
         foreach (Unit target in targets)
         {
             target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));

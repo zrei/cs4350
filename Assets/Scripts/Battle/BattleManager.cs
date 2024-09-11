@@ -56,7 +56,7 @@ public class BattleManager : MonoBehaviour
         // TODO: Handle this separately if need be
         m_BattleCamera = Camera.main;
         m_BattleCamera.transform.LookAt(m_CameraLookAtPoint);
-        InputManager.Instance.PrimaryAxis.OnHoldEvent += OnRotateCamera;
+        InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
 
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);

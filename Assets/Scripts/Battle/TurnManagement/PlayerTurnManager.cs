@@ -103,10 +103,10 @@ public class PlayerTurnManager : TurnManager
 
         TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
 
-        InputManager.Instance.EndTurn.OnPressEvent += OnEndTurn;
-        InputManager.Instance.SwitchAction.OnPressEvent += OnSwitchAction;
-        InputManager.Instance.PointerPosition.OnChangeEvent += OnPointerPosition;
-        InputManager.Instance.PointerSelect.OnPressEvent += OnPointerSelect;
+        InputManager.Instance.EndTurnInput.OnPressEvent += OnEndTurn;
+        InputManager.Instance.SwitchActionInput.OnPressEvent += OnSwitchAction;
+        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
     }
     #endregion
 
@@ -318,10 +318,10 @@ public class PlayerTurnManager : TurnManager
     {
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
 
-        InputManager.Instance.EndTurn.OnPressEvent -= OnEndTurn;
-        InputManager.Instance.SwitchAction.OnPressEvent -= OnSwitchAction;
-        InputManager.Instance.PointerPosition.OnChangeEvent -= OnPointerPosition;
-        InputManager.Instance.PointerSelect.OnPressEvent -= OnPointerSelect;
+        InputManager.Instance.EndTurnInput.OnPressEvent -= OnEndTurn;
+        InputManager.Instance.SwitchActionInput.OnPressEvent -= OnSwitchAction;
+        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
     }
     #endregion
 }

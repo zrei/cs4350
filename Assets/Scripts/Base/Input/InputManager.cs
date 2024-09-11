@@ -121,11 +121,25 @@ namespace Game.Input
 
         private Dictionary<string, Input> inputs = new();
 
-        public IInput SwitchAction => GetInput("SwitchAction");
-        public IInput EndTurn => GetInput("EndTurn");
-        public IInput PrimaryAxis => GetInput("PrimaryAxis");
-        public IInput PointerPosition => GetInput("PointerPosition");
-        public IInput PointerSelect => GetInput("PointerSelect");
+        #region [ Game Input ]
+        public IInput SwitchActionInput => GetInput("SwitchAction");
+        public IInput EndTurnInput => GetInput("EndTurn");
+        public IInput PrimaryAxisInput => GetInput("PrimaryAxis");
+        public IInput PointerPositionInput => GetInput("PointerPosition");
+        public IInput PointerSelectInput => GetInput("PointerSelect");
+        #endregion
+
+        // Input actions used by Unity's event system input module
+        #region [ UI Input ]
+        public IInput PointInput => GetInput("Point");
+        public IInput ClickInput => GetInput("Click");
+        public IInput MiddleClickInput => GetInput("MiddleClick");
+        public IInput RightClickInput => GetInput("RightClick");
+        public IInput ScrollWheelInput => GetInput("ScrollWheel");
+        public IInput NavigateInput => GetInput("Navigate");
+        public IInput SubmitInput => GetInput("Submit");
+        public IInput CancelInput => GetInput("Cancel");
+        #endregion
 
         protected override void HandleAwake()
         {

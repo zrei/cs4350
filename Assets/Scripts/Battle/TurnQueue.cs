@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
+using Game.UI;
 
 public class TurnQueue
 {
     #region Configuration
     private const float DISTANCE_THRESHOLD = 50f;
-    private const float TICK_AMOUNT = 1f;
+    private const float TICK_AMOUNT = 0.1f;
     #endregion
 
     #region Turn
@@ -14,11 +15,15 @@ public class TurnQueue
     {
         public float m_TimeRemaining;
         public Unit m_Unit;
+        public TurnDisplayUnit m_Display;
 
         public TurnWrapper(float timeRemaining, Unit unit)
         {
             m_TimeRemaining = timeRemaining;
             m_Unit = unit;
+
+            m_Display = TurnDisplay.Instance.InstantiateTurnDisplayUnit(unit);
+            m_Display.UpdateTurnValue(m_TimeRemaining, DISTANCE_THRESHOLD / m_Unit.Stat.GetStat(StatType.SPEED));
         }
 
         public override string ToString()
@@ -29,6 +34,7 @@ public class TurnQueue
         public void TickTime(float tickAmount)
         {
             m_TimeRemaining -= tickAmount;
+            m_Display.UpdateTurnValue(m_TimeRemaining, DISTANCE_THRESHOLD / m_Unit.Stat.GetStat(StatType.SPEED));
         }
     }
     private List<TurnWrapper> m_Turns = new List<TurnWrapper>();
@@ -69,7 +75,9 @@ public class TurnQueue
         }
 
         if (idx >= 0)
+        {
             m_Turns.RemoveAt(idx);
+        }
     }
 
     public void AddUnit(Unit unit)
