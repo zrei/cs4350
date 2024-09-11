@@ -17,7 +17,7 @@ public enum UnitAllegiance
 }
 
 // TODO: Store position here so we don't have to keep raycasting :|
-public abstract class Unit : MonoBehaviour, IHealth
+public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
 {
     [SerializeField] Animator m_Animator;
 
@@ -179,26 +179,27 @@ public abstract class Unit : MonoBehaviour, IHealth
     #endregion
 
     #region Stats
-    public float GetTotalMovementRange()
-    {
-        // account for buffs at some point
-        return Stat.m_MovementRange;
-    }
-
-    // for preview purposes
+    // for preview purposes, account for buffs!
     public Stats GetTotalStats()
     {
         return m_Stats;
     }
 
+    // for preview purposes
     public float GetFlatStatChange(StatType statType)
     {
         return m_StatusManager.GetFlatStatChange(statType);
     }
 
+    // for preview purposes
     public float GetMultStatChange(StatType statType)
     {
         return m_StatusManager.GetMultStatChange(statType);
+    }
+
+    public float GetTotalStat(StatType statType)
+    {
+        return (m_Stats.GetStat(statType) + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
     }
     #endregion
 
@@ -207,6 +208,12 @@ public abstract class Unit : MonoBehaviour, IHealth
     {
         m_StatusManager.AddEffect(statusEffect);
     }
+
+    public void InflictStatus(List<StatusEffect> statusEffects)
+    {
+        foreach (StatusEffect statusEffect in statusEffects)
+            InflictStatus(statusEffect);
+    }
     #endregion
 
     #region Death
@@ -214,6 +221,25 @@ public abstract class Unit : MonoBehaviour, IHealth
     {
         m_Animator.SetTrigger("IsDead");
         Destroy(gameObject, 1f);
+    }
+    #endregion
+
+    #region Attack
+    public void Attack(ActiveSkillSO attackSO, List<IHealth> targets)
+    {
+        List<StatusEffect> inflictedStatusEffects = GetInflictedStatusEffects(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
+    
+        foreach (Unit target in targets)
+        {
+            target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
+            target.ClearTokens(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
+            if (!target.IsDead)
+            {
+                target.InflictStatus(inflictedStatusEffects);
+            }
+        }
+
+        ClearTokens(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
     }
     #endregion
 }

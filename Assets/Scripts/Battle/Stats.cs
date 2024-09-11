@@ -14,6 +14,36 @@ public struct Stats
     public int m_MovementRange;
     public TileType[] m_TraversableTileTypes;
     public bool m_CanSwapTiles;
+
+    public float GetStat(StatType stat)
+    {
+        return stat switch
+        {
+            StatType.HEALTH => m_Health,
+            StatType.MANA => m_Mana,
+            StatType.PHYS_ATTACK => m_PhysicalAttack,
+            StatType.MAG_ATTACK => m_MagicAttack,
+            StatType.PHYS_DEFENCE => m_PhysicalDefence,
+            StatType.MAG_DEFENCE => m_MagicDefence,
+            StatType.SPEED => m_Speed,
+            StatType.MOVEMENT_RANGE => m_MovementRange,
+            _ => -1,
+        };
+    }
+
+    public Stats(float health, float mana, float physicalAttack, float magicalAttack, float physicalDefence, float magicDefence, float speed, int movementRange, TileType[] traversableTileTypes, bool canSwapTiles)
+    {
+        m_Health = health;
+        m_Mana = mana;
+        m_PhysicalAttack = physicalAttack;
+        m_MagicAttack = magicalAttack;
+        m_PhysicalDefence = physicalDefence;
+        m_MagicDefence = magicDefence;
+        m_Speed = speed;
+        m_MovementRange = movementRange;
+        m_TraversableTileTypes = traversableTileTypes;
+        m_CanSwapTiles = canSwapTiles;
+    }
 }
 
 public enum StatChangeType
@@ -39,4 +69,9 @@ public interface IStatChange
     public float GetFlatStatChange(StatType statType);
 
     public float GetMultStatChange(StatType statType);
+}
+
+public interface IStat
+{
+    public float GetTotalStat(StatType statType);
 }
