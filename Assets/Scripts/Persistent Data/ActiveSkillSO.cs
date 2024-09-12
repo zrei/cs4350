@@ -5,11 +5,10 @@ public enum AttackType
 {
     PHYSICAL,
     MAGICAL,
-    SUPPORT
+    SUPPORT,
+    HEAL
 }
 
-// TODO: May want to create a hierarchy with this as an abstract class and then all variants of attacks as childs
-[CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkillSO")]
 public abstract class ActiveSkillSO : ScriptableObject
 {
     public AttackType m_AttackType;
@@ -99,7 +98,12 @@ public abstract class ActiveSkillSO : ScriptableObject
     }
 }
 
-public class PhysicalAttackSkillSO : ActiveSkillSO {}
+public class PhysicalAttackSkillSO : ActiveSkillSO, IAttack {
+    public bool IsPhysical()
+    {
+        return true;
+    }
+}
 
 public abstract class MagicSkillSO : ActiveSkillSO
 {
@@ -117,4 +121,14 @@ public class SupportSkillSO : MagicSkillSO
     [SerializeField] private List<Token> m_InflictedTokens;
 }
 
-public class MagicAttackSkillSO : MagicSkillSO {}
+public class MagicAttackSkillSO : MagicSkillSO, IAttack {
+    public bool IsPhysical()
+    {
+        return false;
+    }
+}
+
+public interface IAttack
+{
+    public bool IsPhysical();
+}
