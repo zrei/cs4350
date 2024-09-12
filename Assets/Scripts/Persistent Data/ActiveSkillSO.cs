@@ -11,7 +11,7 @@ public enum SkillType
 
 public abstract class ActiveSkillSO : ScriptableObject
 {
-    public SkillType m_AttackType;
+    public virtual SkillType SkillType => SkillType.PHYSICAL_ATTACK;
  
     [Header("Details")]
     public string m_SkillName;
@@ -117,6 +117,8 @@ public class PhysicalAttackSkillSO : ActiveSkillSO, IAttack {
             return targetGridType == GridType.PLAYER;
         return false;
     }
+
+    public override SkillType SkillType => SkillType.PHYSICAL_ATTACK;
 }
 
 public abstract class MagicSkillSO : ActiveSkillSO
@@ -140,16 +142,19 @@ public abstract class SupportSkillSO : MagicSkillSO
 
 public class HealSkillSO : SupportSkillSO
 {
+    public override SkillType SkillType => SkillType.HEAL_SUPPORT;
     public float m_HealAmount;
 }
 
 public class StatusSupportSkillSO : SupportSkillSO
 {
+    public override SkillType SkillType => SkillType.STATUS_SUPPORT;
     public List<StatusEffect> m_InflictedStatusEffects;
     public List<Token> m_InflictedTokens;
 }
 
 public class MagicAttackSkillSO : MagicSkillSO, IAttack {
+    public override SkillType SkillType => SkillType.MAGICAL_ATTACK;
     public bool IsPhysical()
     {
         return false;

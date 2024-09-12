@@ -22,7 +22,8 @@ public abstract class TokenSO : ScriptableObject
     public string m_TokenName;
     public string m_Description;
     public Sprite m_Icon;
-    public TokenType m_TokenType;
+    public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
+
     [Tooltip("When to consume this token")]
     public ConsumeType[] m_Consumption;
 
@@ -35,10 +36,12 @@ public abstract class TokenSO : ScriptableObject
 public class StatusEffectTokenSO : TokenSO
 {
     public StatusEffect m_StatusEffect;
+    public override TokenType TokenType => TokenType.INFLICT_STATUS;
 }
 
 public class StatChangeTokenSO : TokenSO
 {
     public StatType m_AffectedStat;
     public StatChangeType m_StatChangeType;
+    public override TokenType TokenType => TokenType.STAT_CHANGE;
 }
