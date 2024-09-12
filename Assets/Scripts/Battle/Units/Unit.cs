@@ -17,7 +17,7 @@ public enum UnitAllegiance
 }
 
 // TODO: Store position here so we don't have to keep raycasting :|
-public abstract class Unit : MonoBehaviour, IHealth, IAttack, IStatChange
+public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 {
     private const string DirXAnimParam = "DirX";
     private const string DirYAnimParam = "DirY";

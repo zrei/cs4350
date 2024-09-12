@@ -7,9 +7,10 @@ public enum AttackType
     MAGICAL,
     SUPPORT
 }
+
 // TODO: May want to create a hierarchy with this as an abstract class and then all variants of attacks as childs
 [CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkillSO")]
-public class ActiveSkillSO : ScriptableObject
+public abstract class ActiveSkillSO : ScriptableObject
 {
     public AttackType m_AttackType;
  
@@ -98,6 +99,8 @@ public class ActiveSkillSO : ScriptableObject
     }
 }
 
+public class PhysicalAttackSkillSO : ActiveSkillSO {}
+
 public abstract class MagicSkillSO : ActiveSkillSO
 {
     [SerializeField] private float m_ManaCost;
@@ -113,3 +116,5 @@ public class SupportSkillSO : MagicSkillSO
     [SerializeField] private List<StatusEffect> m_InflictedStatusEffects;
     [SerializeField] private List<Token> m_InflictedTokens;
 }
+
+public class MagicAttackSkillSO : MagicSkillSO {}

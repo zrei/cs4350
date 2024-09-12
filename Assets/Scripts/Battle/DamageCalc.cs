@@ -5,7 +5,7 @@ public static class DamageCalc
 {
     private const float ALPHA = 0.5f;
 
-    public static float CalculateDamage(IAttack attacker, IHealth target, ActiveSkillSO attackSO)
+    public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO)
     {
         // accounting for support somehow getting in here?
         bool isPhysical = attackSO.m_AttackType == AttackType.PHYSICAL;

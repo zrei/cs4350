@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public interface IAttack : IStat
+public interface ICanAttack : IStat
 {
     // break it out later, possibly
     public void Attack(ActiveSkillSO attack, List<IHealth> targets);
