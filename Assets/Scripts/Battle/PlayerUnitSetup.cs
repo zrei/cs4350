@@ -24,8 +24,8 @@ public class PlayerUnitSetup : MonoBehaviour
         m_PlayerSquares = playerBeginningSquares;
         GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
 
-        InputManager.Instance.EndTurn.OnPressEvent += OnEndTurn;
-        InputManager.Instance.PointerSelect.OnPressEvent += OnPointerSelect;
+        InputManager.Instance.EndTurnInput.OnPressEvent += OnEndTurn;
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
     }
 
     private void OnEndTurn(IInput input)
@@ -33,13 +33,13 @@ public class PlayerUnitSetup : MonoBehaviour
         Logger.Log(this.GetType().Name, "Complete player unit set up", LogLevel.LOG);
         m_CompleteSetupEvent?.Invoke();
 
-        InputManager.Instance.EndTurn.OnPressEvent -= OnEndTurn;
-        InputManager.Instance.PointerSelect.OnPressEvent -= OnPointerSelect;
+        InputManager.Instance.EndTurnInput.OnPressEvent -= OnEndTurn;
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
     }
 
     private void OnPointerSelect(IInput input)
     {
-        var inputVector = InputManager.Instance.PointerPosition.GetValue<Vector2>();
+        var inputVector = InputManager.Instance.PointerPositionInput.GetValue<Vector2>();
         Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
         bool hasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out CoordPair targetTile, out GridType gridType);
 
