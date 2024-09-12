@@ -222,7 +222,7 @@ public class PlayerTurnManager : TurnManager
     {
         if (m_HasHitGrid && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
-            m_MapLogic.Attack(GridType.ENEMY, m_CurrUnit, m_TestAttackSO, m_CurrTargetTile);
+            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_TestAttackSO, m_CurrTargetTile);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
             EndTurn();
             return true;

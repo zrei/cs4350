@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum SkillType
@@ -9,14 +10,20 @@ public enum SkillType
     HEAL_SUPPORT
 }
 
-public abstract class ActiveSkillSO : ScriptableObject
+[CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSKillSO")]
+public class ActiveSkillSO : ScriptableObject
 {
-    public virtual SkillType SkillType => SkillType.PHYSICAL_ATTACK;
- 
     [Header("Details")]
     public string m_SkillName;
     public string m_Description;
     public Sprite m_Icon;
+    public bool m_CastOnOppositeType;
+    public SkillType[] m_SkillTypes;
+    public List<Token> m_InflictedTokens;
+    public List<StatusEffect> m_InflictedStatusEffects;
+    // used for different purposes: Multipliers for attacks and heal amount for heal skills
+    public float m_Amount = 1f;
+    public float m_ConsumedManaAmount = 0f;
 
     [Header("Attack Config")]
     [Tooltip("Whether this attack can only target a specific row")]
@@ -29,7 +36,7 @@ public abstract class ActiveSkillSO : ScriptableObject
     [Tooltip("will be ignored if target cols are not locked")]
     public List<int> m_AllowedTargetCols;
 
-    // TODO: This seems more like a support skill thing...
+    // NOTE: Target squares can be on the same side as the caster
     [Tooltip("Whether the allowed target square is locked by range")]
     public bool m_LockTargetRange;
     [Tooltip("Will be ignored if target range is not locked")]
@@ -49,7 +56,35 @@ public abstract class ActiveSkillSO : ScriptableObject
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetSquares;
 
-    protected abstract bool AllowedGridTypes(Unit unit, GridType targetGridType);
+    public bool IsAoe => m_TargetSquares.Count > 0;
+    public bool DealsDamage => ContainsAnyAttackType(SkillType.PHYSICAL_ATTACK, SkillType.MAGICAL_ATTACK);
+
+    public bool ContainsAttackType(SkillType skillType)
+    {
+        return m_SkillTypes.Contains(skillType);
+    }
+
+    public bool ContainsAllAttackTypes(params SkillType[] skillTypes)
+    {
+        return skillTypes.All(x => ContainsAttackType(x));
+    }
+
+    public bool ContainsAnyAttackType(params SkillType[] skillTypes)
+    {
+        return skillTypes.Any(x => ContainsAttackType(x));
+    }
+
+    private bool AllowedGridTypes(Unit unit, GridType targetGridType)
+    {
+        if (m_CastOnOppositeType)
+        {
+            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
+        }
+        else
+        {
+            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
+        }
+    }
 
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
@@ -101,76 +136,12 @@ public abstract class ActiveSkillSO : ScriptableObject
 
         return attackTargetTiles;
     }
-}
 
-public class PhysicalAttackSkillSO : ActiveSkillSO, IAttack {
-    public bool IsPhysical()
+#if UNITY_EDITOR
+    private void OnValidate()
     {
-        return true;
+        if (ContainsAttackType(SkillType.PHYSICAL_ATTACK) && ContainsAttackType(SkillType.MAGICAL_ATTACK))
+            Logger.Log(this.GetType().Name, $"Active skill SO {name} is both a physical and magical attack", LogLevel.ERROR);
     }
-
-    protected override bool AllowedGridTypes(Unit unit, GridType targetGridType)
-    {
-        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
-            return targetGridType == GridType.ENEMY;
-        else if (unit.UnitAllegiance == UnitAllegiance.ENEMY)
-            return targetGridType == GridType.PLAYER;
-        return false;
-    }
-
-    public override SkillType SkillType => SkillType.PHYSICAL_ATTACK;
-}
-
-public abstract class MagicSkillSO : ActiveSkillSO
-{
-    public float m_ManaCost;
-}
-
-public abstract class SupportSkillSO : MagicSkillSO
-{
-    public bool m_AllowSelfTarget;
-
-    protected override bool AllowedGridTypes(Unit unit, GridType targetGridType)
-    {
-        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
-            return targetGridType == GridType.PLAYER;
-        else if (unit.UnitAllegiance == UnitAllegiance.ENEMY)
-            return targetGridType == GridType.ENEMY;
-        return false;
-    }
-}
-
-public class HealSkillSO : SupportSkillSO
-{
-    public override SkillType SkillType => SkillType.HEAL_SUPPORT;
-    public float m_HealAmount;
-}
-
-public class StatusSupportSkillSO : SupportSkillSO
-{
-    public override SkillType SkillType => SkillType.STATUS_SUPPORT;
-    public List<StatusEffect> m_InflictedStatusEffects;
-    public List<Token> m_InflictedTokens;
-}
-
-public class MagicAttackSkillSO : MagicSkillSO, IAttack {
-    public override SkillType SkillType => SkillType.MAGICAL_ATTACK;
-    public bool IsPhysical()
-    {
-        return false;
-    }
-
-    protected override bool AllowedGridTypes(Unit unit, GridType targetGridType)
-    {
-        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
-            return targetGridType == GridType.ENEMY;
-        else if (unit.UnitAllegiance == UnitAllegiance.ENEMY)
-            return targetGridType == GridType.PLAYER;
-        return false;
-    }
-}
-
-public interface IAttack
-{
-    public bool IsPhysical();
+#endif
 }

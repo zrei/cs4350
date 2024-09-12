@@ -8,11 +8,11 @@ public class Token : IStatChange
     // represents different things for different token types
     [SerializeField] float m_Amount;
 
-    public TokenType TokenType => m_TokenData.m_TokenType;
+    public TokenType TokenType => m_TokenData.TokenType;
 
     public float GetFlatStatChange(StatType statType)
     {
-        if (m_TokenData.m_TokenType != TokenType.STAT_CHANGE)
+        if (m_TokenData.TokenType != TokenType.STAT_CHANGE)
             return 0;
 
         StatChangeTokenSO statChangeTokenSO = (StatChangeTokenSO) m_TokenData;
@@ -28,7 +28,7 @@ public class Token : IStatChange
 
     public float GetMultStatChange(StatType statType)
     {
-         if (m_TokenData.m_TokenType != TokenType.STAT_CHANGE)
+         if (m_TokenData.TokenType != TokenType.STAT_CHANGE)
             return 1;
 
         StatChangeTokenSO statChangeTokenSO = (StatChangeTokenSO) m_TokenData;
@@ -49,7 +49,7 @@ public class Token : IStatChange
 
     public bool TryGetInflictedStatusEffect(out StatusEffect statusEffect)
     {
-        if (m_TokenData.m_TokenType != TokenType.INFLICT_STATUS)
+        if (m_TokenData.TokenType != TokenType.INFLICT_STATUS)
         {
             statusEffect = null;
             return false;

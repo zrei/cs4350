@@ -38,9 +38,9 @@ public class EnemyTurnManager : TurnManager
                 CoordPair target = new CoordPair(m_AttackRow, i);
                 if (m_MapLogic.IsTileOccupied(GridType.PLAYER, target))
                 {
-                    if (attackSO.IsValidTargetTile(target, m_CurrUnit))
+                    if (attackSO.IsValidTargetTile(target, m_CurrUnit, GridType.PLAYER))
                     {
-                        m_MapLogic.Attack(GridType.PLAYER, m_CurrUnit, attackSO, target);
+                        m_MapLogic.PerformSkill(GridType.PLAYER, m_CurrUnit, attackSO, target);
                         m_AttackIndex = (m_AttackIndex + 1) % m_TestAttacks.Length;
                         Logger.Log(this.GetType().Name, $"Enemy {m_CurrUnit.name} attacks!", LogLevel.LOG);
                         m_AttackedLastTurn = true;

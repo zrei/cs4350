@@ -35,6 +35,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     private float m_Health;
     public bool IsDead => m_Health <= 0;
 
+    private float m_Mana;
+
     /// <summary>
     /// This is used to store what their stats SHOULD be,
     /// accounting for base stats + growths + class bonuses so far.
@@ -76,9 +78,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #region Health and Damage
     public float CurrentHealth => m_Health;
 
-    void IHealth.Heal(float healAmount)
+    public void Heal(float healAmount)
     {
-        m_Health = Mathf.Min(m_Stats.m_Health, m_Health + healAmount);
+        m_Health = Mathf.Min(GetTotalStat(StatType.HEALTH), m_Health + healAmount);
     }
 
     void IHealth.SetHealth(float health)
@@ -90,7 +92,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public void TakeDamage(float damage)
     {
         m_Animator.Play(HurtAnimHash);
-        m_Health -= damage;
+        m_Health = Mathf.Max(0f, m_Health - damage);
     }
     #endregion
 
@@ -188,9 +190,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         return m_StatusManager.GetMultStatChange(statType);
     }
 
-    public float GetTotalStat(StatType statType)
+    public float GetTotalStat(StatType statType, float baseModifier = 1f)
     {
-        return (m_Stats.GetStat(statType) + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
+        return (m_Stats.GetStat(statType) * baseModifier + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
     }
     #endregion
 
@@ -207,6 +209,26 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     }
     #endregion
 
+    #region Token
+    public void InflictToken(Token token)
+    {
+        m_StatusManager.AddToken(token);
+    }
+
+    public void InflictTokens(List<Token> tokens)
+    {
+        foreach (Token token in tokens)
+            InflictToken(token);
+    }
+    #endregion
+
+    #region Mana
+    private void AlterMana(float amount)
+    {
+        m_Mana = Mathf.Clamp(m_Mana + amount, 0f, GetTotalStat(StatType.MANA));
+    }
+    #endregion
+
     #region Death
     public void Die()
     {
@@ -215,23 +237,43 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     }
     #endregion
 
-    #region Attack
-    public void Attack(ActiveSkillSO attackSO, List<IHealth> targets)
+    #region Skills
+    public void PerformSKill(ActiveSkillSO attackSO, List<IHealth> targets)
     {
-        List<StatusEffect> inflictedStatusEffects = GetInflictedStatusEffects(attackSO.SkillType == SkillType.PHYSICAL_ATTACK ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
+        List<StatusEffect> inflictedStatusEffects = new();
+        
+        if (attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK))
+            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_PHYS_ATTACK));
+        else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
+            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
+
+        inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects);
+        List<Token> inflictedTokens = attackSO.m_InflictedTokens;
+
         m_Animator.Play(SwordAttackAnimHash);
 
         foreach (Unit target in targets)
         {
-            target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-            target.ClearTokens(attackSO.SkillType == SkillType.PHYSICAL_ATTACK ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
+            if (attackSO.DealsDamage)
+            {
+                target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
+                target.ClearTokens(attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK) ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
+            }
+            else if (attackSO.ContainsAttackType(SkillType.HEAL_SUPPORT))
+                target.Heal(attackSO.m_Amount);
+            
             if (!target.IsDead)
             {
                 target.InflictStatus(inflictedStatusEffects);
+                target.InflictTokens(inflictedTokens);
             }
         }
 
-        ClearTokens(attackSO.SkillType == SkillType.PHYSICAL_ATTACK ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
+        AlterMana(-attackSO.m_ConsumedManaAmount);
+        if (attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK))
+            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
+        else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
+            ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
     }
     #endregion
 }
