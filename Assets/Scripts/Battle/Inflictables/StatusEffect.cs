@@ -27,7 +27,7 @@ public class StatusEffect : IStatChange
 
     private void ApplyAffect(Unit unit)
     {
-        if (m_StatusEffectSO.m_StatusEffectType == StatusEffectType.INFLICT_DAMAGE)
+        if (m_StatusEffectSO.StatusEffectType == StatusEffectType.INFLICT_DAMAGE)
         {
             unit.TakeDamage(((DamageStatusEffectSO) m_StatusEffectSO).m_DamagePerTurn);
         }
@@ -35,7 +35,7 @@ public class StatusEffect : IStatChange
 
     public float GetFlatStatChange(StatType statType)
     {
-        if (m_StatusEffectSO.m_StatusEffectType != StatusEffectType.STAT_CHANGE)
+        if (m_StatusEffectSO.StatusEffectType != StatusEffectType.STAT_CHANGE)
             return 0;
 
         StatStatusEffectSO statStatusEffectSO = (StatStatusEffectSO) m_StatusEffectSO;
@@ -51,7 +51,7 @@ public class StatusEffect : IStatChange
 
     public float GetMultStatChange(StatType statType)
     {
-        if (m_StatusEffectSO.m_StatusEffectType != StatusEffectType.STAT_CHANGE)
+        if (m_StatusEffectSO.StatusEffectType != StatusEffectType.STAT_CHANGE)
             return 1;
 
         StatStatusEffectSO statStatusEffectSO = (StatStatusEffectSO) m_StatusEffectSO;

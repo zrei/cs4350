@@ -79,5 +79,5 @@ public interface IStatChange
 
 public interface IStat
 {
-    public float GetTotalStat(StatType statType);
+    public float GetTotalStat(StatType statType, float baseModifier = 1f);
 }

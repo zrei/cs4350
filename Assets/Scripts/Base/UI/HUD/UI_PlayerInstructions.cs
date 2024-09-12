@@ -30,7 +30,7 @@ public class UI_PlayerInstructions : MonoBehaviour
         m_PhaseText.text = currState switch
         {
             PlayerTurnState.SELECTING_MOVEMENT_SQUARE => "Move",
-            PlayerTurnState.SELECTING_ATTACK_TARGET => "Attack",
+            PlayerTurnState.SELECTING_ACTION_TARGET => "Attack",
             _ => "Unknown"
         };
     }

@@ -214,7 +214,7 @@ public class GridLogic : MonoBehaviour
     /// </summary>
     /// <param name="attackPoints"></param>
     /// <param name="damage"></param>
-    public void Attack(Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
+    public void PerformSkill(Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
         List<IHealth> targets = new();
@@ -229,7 +229,7 @@ public class GridLogic : MonoBehaviour
             }
         }
 
-        attacker.Attack(attack, targets);
+        attacker.PerformSKill(attack, targets);
 
         // TODO: Clean this up further?
         List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();

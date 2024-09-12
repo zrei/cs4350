@@ -1,21 +1,29 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public enum AttackType
+public enum SkillType
 {
-    PHYSICAL,
-    MAGICAL,
-    SUPPORT
+    PHYSICAL_ATTACK,
+    MAGICAL_ATTACK,
+    STATUS_SUPPORT,
+    HEAL_SUPPORT
 }
-// TODO: May want to create a hierarchy with this as an abstract class and then all variants of attacks as childs
-[CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkillSO")]
+
+[CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSKillSO")]
 public class ActiveSkillSO : ScriptableObject
 {
-    public AttackType m_AttackType;
- 
     [Header("Details")]
     public string m_SkillName;
+    public string m_Description;
     public Sprite m_Icon;
+    public bool m_CastOnOppositeType;
+    public SkillType[] m_SkillTypes;
+    public List<Token> m_InflictedTokens;
+    public List<StatusEffect> m_InflictedStatusEffects;
+    // used for different purposes: Multipliers for attacks and heal amount for heal skills
+    public float m_Amount = 1f;
+    public float m_ConsumedManaAmount = 0f;
 
     [Header("Attack Config")]
     [Tooltip("Whether this attack can only target a specific row")]
@@ -28,7 +36,7 @@ public class ActiveSkillSO : ScriptableObject
     [Tooltip("will be ignored if target cols are not locked")]
     public List<int> m_AllowedTargetCols;
 
-    // TODO: This seems more like a support skill thing...
+    // NOTE: Target squares can be on the same side as the caster
     [Tooltip("Whether the allowed target square is locked by range")]
     public bool m_LockTargetRange;
     [Tooltip("Will be ignored if target range is not locked")]
@@ -47,12 +55,42 @@ public class ActiveSkillSO : ScriptableObject
     [Header("Target")]
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetSquares;
-    
-    [Header("Power")]
-    public float m_BasePower;
 
-    public bool IsValidTargetTile(CoordPair targetTile, Unit unit)
+    public bool IsAoe => m_TargetSquares.Count > 0;
+    public bool DealsDamage => ContainsAnyAttackType(SkillType.PHYSICAL_ATTACK, SkillType.MAGICAL_ATTACK);
+
+    public bool ContainsAttackType(SkillType skillType)
     {
+        return m_SkillTypes.Contains(skillType);
+    }
+
+    public bool ContainsAllAttackTypes(params SkillType[] skillTypes)
+    {
+        return skillTypes.All(x => ContainsAttackType(x));
+    }
+
+    public bool ContainsAnyAttackType(params SkillType[] skillTypes)
+    {
+        return skillTypes.Any(x => ContainsAttackType(x));
+    }
+
+    private bool AllowedGridTypes(Unit unit, GridType targetGridType)
+    {
+        if (m_CastOnOppositeType)
+        {
+            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
+        }
+        else
+        {
+            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
+        }
+    }
+
+    public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
+    {
+        if (!AllowedGridTypes(unit, targetGridType))
+            return false;
+
         if (m_LockTargetRow)
         {
             if (!m_AllowedTargetRows.Contains(targetTile.m_Row))
@@ -98,4 +136,12 @@ public class ActiveSkillSO : ScriptableObject
 
         return attackTargetTiles;
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (ContainsAttackType(SkillType.PHYSICAL_ATTACK) && ContainsAttackType(SkillType.MAGICAL_ATTACK))
+            Logger.Log(this.GetType().Name, $"Active skill SO {name} is both a physical and magical attack", LogLevel.ERROR);
+    }
+#endif
 }
