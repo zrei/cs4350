@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Input;
+using Game;
 
 // may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
@@ -54,7 +55,7 @@ public class BattleManager : MonoBehaviour
         m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
 
         // TODO: Handle this separately if need be
-        m_BattleCamera = Camera.main;
+        m_BattleCamera = CameraManager.Instance.MainCamera;
         m_BattleCamera.transform.LookAt(m_CameraLookAtPoint);
         InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
 
