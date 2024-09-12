@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AttackType
+public enum SkillType
 {
-    PHYSICAL,
-    MAGICAL,
-    SUPPORT,
-    HEAL
+    PHYSICAL_ATTACK,
+    MAGICAL_ATTACK,
+    STATUS_SUPPORT,
+    HEAL_SUPPORT
 }
 
 public abstract class ActiveSkillSO : ScriptableObject
 {
-    public AttackType m_AttackType;
+    public SkillType m_AttackType;
  
     [Header("Details")]
     public string m_SkillName;
@@ -49,8 +49,13 @@ public abstract class ActiveSkillSO : ScriptableObject
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetSquares;
 
-    public bool IsValidTargetTile(CoordPair targetTile, Unit unit)
+    protected abstract bool AllowedGridTypes(Unit unit, GridType targetGridType);
+
+    public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
+        if (!AllowedGridTypes(unit, targetGridType))
+            return false;
+
         if (m_LockTargetRow)
         {
             if (!m_AllowedTargetRows.Contains(targetTile.m_Row))
@@ -103,27 +108,59 @@ public class PhysicalAttackSkillSO : ActiveSkillSO, IAttack {
     {
         return true;
     }
+
+    protected override bool AllowedGridTypes(Unit unit, GridType targetGridType)
+    {
+        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
+            return targetGridType == GridType.ENEMY;
+        else if (unit.UnitAllegiance == UnitAllegiance.ENEMY)
+            return targetGridType == GridType.PLAYER;
+        return false;
+    }
 }
 
 public abstract class MagicSkillSO : ActiveSkillSO
 {
-    [SerializeField] private float m_ManaCost;
+    public float m_ManaCost;
 }
 
-public class HealSkillSO : MagicSkillSO
+public abstract class SupportSkillSO : MagicSkillSO
 {
-    [SerializeField] private float m_HealAmount;
+    public bool m_AllowSelfTarget;
+
+    protected override bool AllowedGridTypes(Unit unit, GridType targetGridType)
+    {
+        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
+            return targetGridType == GridType.PLAYER;
+        else if (unit.UnitAllegiance == UnitAllegiance.ENEMY)
+            return targetGridType == GridType.ENEMY;
+        return false;
+    }
 }
 
-public class SupportSkillSO : MagicSkillSO
+public class HealSkillSO : SupportSkillSO
 {
-    [SerializeField] private List<StatusEffect> m_InflictedStatusEffects;
-    [SerializeField] private List<Token> m_InflictedTokens;
+    public float m_HealAmount;
+}
+
+public class StatusSupportSkillSO : SupportSkillSO
+{
+    public List<StatusEffect> m_InflictedStatusEffects;
+    public List<Token> m_InflictedTokens;
 }
 
 public class MagicAttackSkillSO : MagicSkillSO, IAttack {
     public bool IsPhysical()
     {
+        return false;
+    }
+
+    protected override bool AllowedGridTypes(Unit unit, GridType targetGridType)
+    {
+        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
+            return targetGridType == GridType.ENEMY;
+        else if (unit.UnitAllegiance == UnitAllegiance.ENEMY)
+            return targetGridType == GridType.PLAYER;
         return false;
     }
 }

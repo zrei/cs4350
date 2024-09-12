@@ -8,7 +8,7 @@ public static class DamageCalc
     public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO)
     {
         // accounting for support somehow getting in here?
-        bool isPhysical = attackSO.m_AttackType == AttackType.PHYSICAL;
+        bool isPhysical = attackSO.m_AttackType == SkillType.PHYSICAL_ATTACK;
         
         float totalAttackStat = attacker.GetTotalStat(isPhysical ? StatType.PHYS_ATTACK : StatType.MAG_ATTACK);
 

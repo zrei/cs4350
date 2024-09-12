@@ -8,7 +8,7 @@ public enum PlayerTurnState
     SELECTING_ACTION,
     INSPECT,
     SELECTING_MOVEMENT_SQUARE,
-    SELECTING_ATTACK_TARGET
+    SELECTING_ACTION_TARGET
 }
 
 public class PlayerTurnManager : TurnManager
@@ -55,6 +55,8 @@ public class PlayerTurnManager : TurnManager
     /// </summary>
     private HashSet<PlayerTurnState> m_RemainingActions;
     */
+
+    private ActiveSkillSO m_CurrSelectedSkill;
 
     #region Initialisation
     private void Start()
@@ -144,7 +146,7 @@ public class PlayerTurnManager : TurnManager
     {
         switch (m_CurrState)
         {
-            case PlayerTurnState.SELECTING_ATTACK_TARGET:
+            case PlayerTurnState.SELECTING_ACTION_TARGET:
                 UpdateAttackState();
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
@@ -167,7 +169,7 @@ public class PlayerTurnManager : TurnManager
 
     private void UpdateAttackState()
     {
-        if (m_HasHitGrid && m_CurrTileSide == GridType.ENEMY && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit))
+        if (m_HasHitGrid && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
             m_MapLogic.SetTarget(GridType.ENEMY, m_TestAttackSO, m_CurrTargetTile);
         }
@@ -188,7 +190,7 @@ public class PlayerTurnManager : TurnManager
     {
         return m_CurrState switch
         {
-            PlayerTurnState.SELECTING_ATTACK_TARGET => TryPerformAttack(),
+            PlayerTurnState.SELECTING_ACTION_TARGET => TryPerformSkill(),
             PlayerTurnState.SELECTING_MOVEMENT_SQUARE => TryPerformMove(),
             PlayerTurnState.INSPECT => TryInspect(),
             PlayerTurnState.SELECTING_ACTION => TrySelectAction(),
@@ -216,9 +218,9 @@ public class PlayerTurnManager : TurnManager
         }
     }
 
-    private bool TryPerformAttack()
+    private bool TryPerformSkill()
     {
-        if (m_HasHitGrid && m_CurrTileSide == GridType.ENEMY && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit))
+        if (m_HasHitGrid && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
             m_MapLogic.Attack(GridType.ENEMY, m_CurrUnit, m_TestAttackSO, m_CurrTargetTile);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);

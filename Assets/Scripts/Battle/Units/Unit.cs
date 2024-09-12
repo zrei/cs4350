@@ -218,20 +218,20 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #region Attack
     public void Attack(ActiveSkillSO attackSO, List<IHealth> targets)
     {
-        List<StatusEffect> inflictedStatusEffects = GetInflictedStatusEffects(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
+        List<StatusEffect> inflictedStatusEffects = GetInflictedStatusEffects(attackSO.m_AttackType == SkillType.PHYSICAL_ATTACK ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
         m_Animator.Play(SwordAttackAnimHash);
 
         foreach (Unit target in targets)
         {
             target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-            target.ClearTokens(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
+            target.ClearTokens(attackSO.m_AttackType == SkillType.PHYSICAL_ATTACK ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
             if (!target.IsDead)
             {
                 target.InflictStatus(inflictedStatusEffects);
             }
         }
 
-        ClearTokens(attackSO.m_AttackType == AttackType.PHYSICAL ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
+        ClearTokens(attackSO.m_AttackType == SkillType.PHYSICAL_ATTACK ? ConsumeType.CONSUME_ON_PHYS_ATTACK : ConsumeType.CONSUME_ON_MAG_ATTACK);
     }
     #endregion
 }
