@@ -23,11 +23,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     private const string DirYAnimParam = "DirY";
     private const string IsMoveAnimParam = "IsMove";
 
-    private static int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
-    private static int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
-    private static int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
-    private static int DeathAnimHash = Animator.StringToHash("Death");
-    private static int HurtAnimHash = Animator.StringToHash("Hurt");
+    public static readonly int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
+    public static readonly int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
+    public static readonly int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
+    public static readonly int HurtAnimHash = Animator.StringToHash("Hurt");
+    private static readonly int DeathAnimHash = Animator.StringToHash("Death");
 
     [SerializeField] Animator m_Animator;
 
@@ -91,7 +91,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
-        m_Animator.Play(HurtAnimHash);
+        PlayAnimations(HurtAnimHash);
         m_Health = Mathf.Max(0f, m_Health - damage);
     }
     #endregion
@@ -232,8 +232,34 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #region Death
     public void Die()
     {
-        m_Animator.Play(DeathAnimHash);
+        PlayAnimations(DeathAnimHash);
         Destroy(gameObject, 1f);
+    }
+    #endregion
+
+    #region Attack Animations
+    public void PlayAnimations(int animationId)
+    {
+        m_Animator.Play(animationId);
+    }
+
+    public void PlayAttackAnimation(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.SWORD:
+            case WeaponType.AXE:
+            case WeaponType.LANCE:
+            case WeaponType.BOW:
+                PlayAnimations(SwordAttackAnimHash);
+                break;
+            case WeaponType.SUPPORT:
+                PlayAnimations(MagicSupportAnimHash);
+                break;
+            case WeaponType.MAGIC:
+                PlayAnimations(MagicAttackAnimHash);
+                break;
+        }
     }
     #endregion
 
@@ -250,7 +276,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects);
         List<Token> inflictedTokens = attackSO.m_InflictedTokens;
 
-        m_Animator.Play(SwordAttackAnimHash);
+        PlayAnimations(SwordAttackAnimHash);
 
         foreach (Unit target in targets)
         {
