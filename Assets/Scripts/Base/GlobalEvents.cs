@@ -17,7 +17,7 @@ public static class GlobalEvents {
         public delegate void TurnOrderEvent(List<Unit> _);
         public delegate void PhaseEvent(PlayerTurnState _);
         public delegate void UnitAllegianceEvent(UnitAllegiance _);
-        public delegate void AttackEvent(WeaponType weaponType, Unit attacker, Unit target);
+        public delegate void AttackEvent(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target);
         public static UnitEvent UnitDefeatedEvent;
         public static TurnOrderEvent TurnOrderUpdatedEvent;
         public static PhaseEvent PlayerPhaseUpdateEvent;

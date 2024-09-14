@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 /*
@@ -55,6 +57,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     protected StatusManager m_StatusManager = new StatusManager();
 
+    public VoidEvent PostAttackEvent;
+
     #region Initialisation
     /// <summary>
     /// Initialise stats, position, etc.
@@ -65,6 +69,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_Stats = stats;
         m_Health = stats.m_Health;
     }
+
     #endregion
 
     #region Placement
@@ -91,7 +96,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
-        PlayAnimations(HurtAnimHash);
+        //PlayAnimations(HurtAnimHash);
         m_Health = Mathf.Max(0f, m_Health - damage);
     }
     #endregion
@@ -276,7 +281,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects);
         List<Token> inflictedTokens = attackSO.m_InflictedTokens;
 
-        PlayAnimations(SwordAttackAnimHash);
+        GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
+        GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
+
+        //PlayAnimations(SwordAttackAnimHash);
 
         foreach (Unit target in targets)
         {
@@ -300,6 +308,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
         else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
             ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
+
+        void CompleteAttackAnimationEvent()
+        {
+            GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
+            PostAttackEvent?.Invoke();
+        }
     }
     #endregion
 }

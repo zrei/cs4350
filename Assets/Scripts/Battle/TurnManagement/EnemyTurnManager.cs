@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,12 +10,6 @@ public class EnemyTurnManager : TurnManager
     [SerializeField] private int m_AttackRow;
     private int m_AttackIndex = 0;
     private bool m_AttackedLastTurn = false;
-
-    private IEnumerator WaitForAttackToEnd()
-    {
-        yield return new WaitForSeconds(2f);
-        CompleteTurn();
-    }
     #endregion
 
     private EnemyUnit m_CurrUnit;
@@ -40,11 +33,10 @@ public class EnemyTurnManager : TurnManager
                 {
                     if (attackSO.IsValidTargetTile(target, m_CurrUnit, GridType.PLAYER))
                     {
-                        m_MapLogic.PerformSkill(GridType.PLAYER, m_CurrUnit, attackSO, target);
+                        m_MapLogic.PerformSkill(GridType.PLAYER, m_CurrUnit, attackSO, target, CompleteTurn);
                         m_AttackIndex = (m_AttackIndex + 1) % m_TestAttacks.Length;
                         Logger.Log(this.GetType().Name, $"Enemy {m_CurrUnit.name} attacks!", LogLevel.LOG);
                         m_AttackedLastTurn = true;
-                        StartCoroutine(WaitForAttackToEnd());
                         return;
                     }
                 }

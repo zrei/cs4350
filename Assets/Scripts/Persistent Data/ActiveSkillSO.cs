@@ -19,6 +19,7 @@ public class ActiveSkillSO : ScriptableObject
     public Sprite m_Icon;
     public bool m_CastOnOppositeType;
     public SkillType[] m_SkillTypes;
+    public WeaponType m_WeaponType;
     public List<Token> m_InflictedTokens;
     public List<StatusEffect> m_InflictedStatusEffects;
     // used for different purposes: Multipliers for attacks and heal amount for heal skills
