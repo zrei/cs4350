@@ -7,6 +7,7 @@ public class AttackAnimationManager : MonoBehaviour
 {
     [SerializeField] Transform m_AttackerPosition;
     [SerializeField] Transform m_TargetPosition;
+    [SerializeField] Transform m_CameraPosition;
 
     private Vector3 m_CachedAttackerPosition;
     private Quaternion m_CachedAttackerRotation;
@@ -26,9 +27,12 @@ public class AttackAnimationManager : MonoBehaviour
     // skill for dama
     private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-
         if (!activeSkill.IsAoe)
         {
+            Camera attackCamera = CameraManager.Instance.AttackAnimCamera;
+            attackCamera.transform.position = m_CameraPosition.position;
+            attackCamera.transform.rotation = m_CameraPosition.rotation;
+
             Unit target = targets[0];
             m_CachedAttackerPosition = attacker.transform.position;
             m_CachedAttackerRotation = attacker.transform.rotation;
@@ -38,7 +42,7 @@ public class AttackAnimationManager : MonoBehaviour
             m_CachedTargetRotation = target.transform.rotation;
             target.transform.position = m_TargetPosition.position;
             target.transform.rotation = m_TargetPosition.rotation;
-            CameraManager.Instance.AttackAnimCamera.enabled = true;
+            attackCamera.enabled = true;
         }
 
         StartCoroutine(PlayAttackAnimation(activeSkill, attacker, targets));
@@ -48,11 +52,12 @@ public class AttackAnimationManager : MonoBehaviour
     {
         attacker.PlayAttackAnimation(activeSkill.m_WeaponType);
 
+        yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
         foreach (Unit target in targets)
             target.PlayAnimations(Unit.HurtAnimHash);
 
-        // get some actual wait time
-        yield return new WaitForSeconds(2f);
+        // need to account for hurt animation time and take the maximum of the end times
+        yield return new WaitForSeconds(activeSkill.m_AnimationTime);
 
         if (!activeSkill.IsAoe)
         {

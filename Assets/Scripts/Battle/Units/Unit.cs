@@ -273,9 +273,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     {
         List<StatusEffect> inflictedStatusEffects = new();
         
-        if (attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK))
+        if (attackSO.IsPhysicalAttack)
             inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_PHYS_ATTACK));
-        else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
+        else if (attackSO.IsMagicAttack)
             inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
 
         inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects);
@@ -284,14 +284,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
         GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
 
-        //PlayAnimations(SwordAttackAnimHash);
-
         foreach (Unit target in targets)
         {
             if (attackSO.DealsDamage)
             {
                 target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-                target.ClearTokens(attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK) ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
+                target.ClearTokens(attackSO.IsMagic ? ConsumeType.CONSUME_ON_MAG_DEFEND : ConsumeType.CONSUME_ON_PHYS_DEFEND);
             }
             else if (attackSO.ContainsAttackType(SkillType.HEAL_SUPPORT))
                 target.Heal(attackSO.m_Amount);
@@ -303,11 +301,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             }
         }
 
-        AlterMana(-attackSO.m_ConsumedManaAmount);
-        if (attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK))
-            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
-        else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
+        if (attackSO.IsMagic)
+            AlterMana(- ((MagicActiveSkillSO) attackSO).m_ConsumedManaAmount);
+        if (attackSO.IsMagicAttack)
             ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
+        else if (attackSO.IsPhysicalAttack)
+            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
 
         void CompleteAttackAnimationEvent()
         {

@@ -9,14 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: TestEnemyAttack2
-  m_EditorClassIdentifier: 
-  m_AttackType: 0
-  m_SkillName: Attack2
+  m_Script: {fileID: 0}
+  m_Name: PhysicalActiveSkillSO
+  m_EditorClassIdentifier: Assembly-CSharp::PhysicalActiveSkillSO
+  m_SkillName: Attack 1
+  m_Description: 
   m_Icon: {fileID: 0}
+  m_CastOnOppositeType: 1
+  m_SkillTypes: 00000000
+  m_WeaponType: 0
+  m_InflictedTokens: []
+  m_InflictedStatusEffects: []
+  m_Amount: 1
+  m_DelayResponseAnimationTime: 0.8
+  m_AnimationTime: 2
   m_LockTargetRow: 1
-  m_AllowedTargetRows: 0200000003000000
+  m_AllowedTargetRows: 04000000
   m_LockTargetCol: 0
   m_AllowedTargetCols: 
   m_LockTargetRange: 0
@@ -25,9 +33,4 @@ MonoBehaviour:
   m_AllowedAttackerRows: 
   m_LockAttackerCol: 0
   m_AllowedAttackerCols: 
-  m_TargetSquares:
-  - m_Row: 0
-    m_Col: 2
-  - m_Row: 2
-    m_Col: 0
-  m_BasePower: 1
+  m_TargetSquares: []
