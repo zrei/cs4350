@@ -83,4 +83,32 @@ public class LevelNodeManager : MonoBehaviour
     }
 
     #endregion
+
+    #region Helper
+
+    /// <summary>
+    /// Given a ray, tries to retrieve a node that the ray connects with.
+    /// Nodes must have a collider and be on the layer "LevelMap"
+    /// </summary>
+    /// <param name="ray"></param>
+    /// <param name="node"></param>
+    /// <returns></returns>
+    public bool TryRetrieveNode(Ray ray, out NodeInternal node)
+    {
+        RaycastHit[] raycastHits = Physics.RaycastAll(ray, Mathf.Infinity, LayerMask.GetMask("LevelMap"));
+        //Debug.DrawRay(ray.origin, ray.direction * 100, Color.white, 100f, false); 
+        foreach (RaycastHit raycastHit in raycastHits)
+        {
+            node = raycastHit.collider.gameObject.GetComponent<NodeInternal>();
+
+            if (node)
+                return true;
+        }
+        node = default;
+        
+        return false;
+    }
+    
+
+    #endregion
 }

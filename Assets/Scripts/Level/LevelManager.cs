@@ -1,10 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Input;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
 
 public class LevelManager : MonoBehaviour
 {
@@ -13,6 +10,12 @@ public class LevelManager : MonoBehaviour
     
     // Graphics
     [SerializeField] LevelGraphicsManager m_LevelGraphicsManager;
+    
+    #region Input and Selected Node
+    private NodeInternal m_CurrSelectedNode;
+    private NodeInternal m_CurrTargetNode;
+    private bool m_HasHitNode;
+    #endregion
     
     #region Test
     [SerializeField] private LevelSO m_TestLevel;
@@ -24,7 +27,17 @@ public class LevelManager : MonoBehaviour
         Initialise();
 
         GlobalEvents.Level.NodeEnteredEvent(testStartNodeInternal);
+        
+        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
     }
+
+    public void OnDestroy()
+    {
+        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+    }
+
     #endregion
     
     #region Initialisation
@@ -45,10 +58,48 @@ public class LevelManager : MonoBehaviour
     }
 
     #endregion
-    
 
-    // Update is called once per frame
-    void Update()
+    #region Inputs
+
+    private void OnPointerPosition(IInput input)
     {
+        var inputVector = input.GetValue<Vector2>();
+        Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
+        m_HasHitNode = m_LevelNodeManager.TryRetrieveNode(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetNode);
     }
+    
+    private void OnPointerSelect(IInput input)
+    {
+        TryPerformAction();
+    }
+
+    #endregion
+
+    #region Perform Action
+
+    private void TryPerformAction()
+    {
+        TrySelectNode();
+    }
+
+    private void TrySelectNode()
+    {
+        if (m_HasHitNode)
+        {
+            if (m_CurrSelectedNode && m_CurrSelectedNode != m_CurrTargetNode)
+            {
+                GlobalEvents.Level.NodeDeselectedEvent(m_CurrSelectedNode);
+            }
+
+            m_CurrSelectedNode = m_CurrTargetNode;
+            GlobalEvents.Level.NodeSelectedEvent(m_CurrTargetNode);
+        }
+        else if (m_CurrSelectedNode)
+        {
+            GlobalEvents.Level.NodeDeselectedEvent(m_CurrSelectedNode);
+            m_CurrSelectedNode = null;
+        }
+    }
+
+    #endregion
 }
