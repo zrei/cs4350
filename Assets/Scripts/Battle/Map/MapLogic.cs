@@ -121,9 +121,9 @@ public class MapLogic : MonoBehaviour
     #endregion
 
     #region Attacks
-    public void PerformSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
+    public void PerformSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
-        RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile);
+        RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile, completeSkillEvent);
     }
     #endregion
 

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 /*
@@ -23,11 +25,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     private const string DirYAnimParam = "DirY";
     private const string IsMoveAnimParam = "IsMove";
 
-    private static int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
-    private static int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
-    private static int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
-    private static int DeathAnimHash = Animator.StringToHash("Death");
-    private static int HurtAnimHash = Animator.StringToHash("Hurt");
+    public static readonly int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
+    public static readonly int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
+    public static readonly int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
+    public static readonly int HurtAnimHash = Animator.StringToHash("Hurt");
+    private static readonly int DeathAnimHash = Animator.StringToHash("Death");
 
     [SerializeField] Animator m_Animator;
 
@@ -55,6 +57,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     protected StatusManager m_StatusManager = new StatusManager();
 
+    public VoidEvent PostAttackEvent;
+
     #region Initialisation
     /// <summary>
     /// Initialise stats, position, etc.
@@ -65,6 +69,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_Stats = stats;
         m_Health = stats.m_Health;
     }
+
     #endregion
 
     #region Placement
@@ -91,7 +96,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
-        m_Animator.Play(HurtAnimHash);
+        //PlayAnimations(HurtAnimHash);
         m_Health = Mathf.Max(0f, m_Health - damage);
     }
     #endregion
@@ -232,8 +237,34 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #region Death
     public void Die()
     {
-        m_Animator.Play(DeathAnimHash);
+        PlayAnimations(DeathAnimHash);
         Destroy(gameObject, 1f);
+    }
+    #endregion
+
+    #region Attack Animations
+    public void PlayAnimations(int animationId)
+    {
+        m_Animator.Play(animationId);
+    }
+
+    public void PlayAttackAnimation(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.SWORD:
+            case WeaponType.AXE:
+            case WeaponType.LANCE:
+            case WeaponType.BOW:
+                PlayAnimations(SwordAttackAnimHash);
+                break;
+            case WeaponType.SUPPORT:
+                PlayAnimations(MagicSupportAnimHash);
+                break;
+            case WeaponType.MAGIC:
+                PlayAnimations(MagicAttackAnimHash);
+                break;
+        }
     }
     #endregion
 
@@ -242,22 +273,23 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     {
         List<StatusEffect> inflictedStatusEffects = new();
         
-        if (attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK))
+        if (attackSO.IsPhysicalAttack)
             inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_PHYS_ATTACK));
-        else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
+        else if (attackSO.IsMagicAttack)
             inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
 
         inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects);
         List<Token> inflictedTokens = attackSO.m_InflictedTokens;
 
-        m_Animator.Play(SwordAttackAnimHash);
+        GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
+        GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
 
         foreach (Unit target in targets)
         {
             if (attackSO.DealsDamage)
             {
                 target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-                target.ClearTokens(attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK) ? ConsumeType.CONSUME_ON_PHYS_DEFEND : ConsumeType.CONSUME_ON_MAG_DEFEND);
+                target.ClearTokens(attackSO.IsMagic ? ConsumeType.CONSUME_ON_MAG_DEFEND : ConsumeType.CONSUME_ON_PHYS_DEFEND);
             }
             else if (attackSO.ContainsAttackType(SkillType.HEAL_SUPPORT))
                 target.Heal(attackSO.m_Amount);
@@ -269,11 +301,18 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             }
         }
 
-        AlterMana(-attackSO.m_ConsumedManaAmount);
-        if (attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK))
-            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
-        else if (attackSO.ContainsAttackType(SkillType.MAGICAL_ATTACK))
+        if (attackSO.IsMagic)
+            AlterMana(- ((MagicActiveSkillSO) attackSO).m_ConsumedManaAmount);
+        if (attackSO.IsMagicAttack)
             ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
+        else if (attackSO.IsPhysicalAttack)
+            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
+
+        void CompleteAttackAnimationEvent()
+        {
+            GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
+            PostAttackEvent?.Invoke();
+        }
     }
     #endregion
 }

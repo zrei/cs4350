@@ -214,7 +214,7 @@ public class GridLogic : MonoBehaviour
     /// </summary>
     /// <param name="attackPoints"></param>
     /// <param name="damage"></param>
-    public void PerformSkill(Unit attacker, ActiveSkillSO attack, CoordPair targetTile)
+    public void PerformSkill(Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
         List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
         List<IHealth> targets = new();
@@ -229,18 +229,27 @@ public class GridLogic : MonoBehaviour
             }
         }
 
+        attacker.PostAttackEvent += CompleteSkill;
         attacker.PerformSKill(attack, targets);
 
-        // TODO: Clean this up further?
-        List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
-
-        foreach (Unit deadUnit in deadUnits)
+        void CompleteSkill()
         {
-            CoordPair coordinates = deadUnit.CurrPosition;
-            m_TileData[coordinates.m_Row, coordinates.m_Col].m_CurrUnit = null;
-            m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = false;
-            GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
+            attacker.PostAttackEvent -= CompleteSkill;
+
+            // TODO: Clean this up further?
+            List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
+
+            foreach (Unit deadUnit in deadUnits)
+            {
+                CoordPair coordinates = deadUnit.CurrPosition;
+                m_TileData[coordinates.m_Row, coordinates.m_Col].m_CurrUnit = null;
+                m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = false;
+                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
+            }
+
+            completeSkillEvent?.Invoke();
         }
+        
     }
     #endregion
 }

@@ -15,8 +15,12 @@ namespace Game
         [SerializeField]
         private Camera uiCamera;
 
+        [SerializeField]
+        private Camera attackAnimCamera;
+
         public Camera MainCamera => mainCamera;
         public Camera HUDCamera => hudCamera;
         public Camera UICamera => uiCamera;
+        public Camera AttackAnimCamera => attackAnimCamera;
     }
 }

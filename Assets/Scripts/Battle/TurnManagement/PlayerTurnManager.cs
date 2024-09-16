@@ -91,7 +91,6 @@ public class PlayerTurnManager : TurnManager
 
         m_TotalMovementRange = (int) m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);
         m_MovementRangeRemaining = m_TotalMovementRange;
-        GlobalEvents.Battle.MovementRemainingUpdateEvent?.Invoke(m_MovementRangeRemaining, m_TotalMovementRange);
 
         FillTraversablePoints();
 
@@ -207,8 +206,6 @@ public class PlayerTurnManager : TurnManager
             int movedDistance = destination.m_Coordinates.GetDistanceToPoint(m_CurrUnit.CurrPosition);
             m_MovementRangeRemaining -= movedDistance;
 
-            GlobalEvents.Battle.MovementRemainingUpdateEvent?.Invoke(m_MovementRangeRemaining, m_TotalMovementRange);
-
             m_MapLogic.MoveUnit(GridType.PLAYER, m_CurrUnit, destination, OnCompleteMove);
             return true;
         }
@@ -222,9 +219,8 @@ public class PlayerTurnManager : TurnManager
     {
         if (m_HasHitGrid && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
-            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_TestAttackSO, m_CurrTargetTile);
+            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_TestAttackSO, m_CurrTargetTile, CompleteSkill);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
-            EndTurn();
             return true;
         }
         else
@@ -232,6 +228,10 @@ public class PlayerTurnManager : TurnManager
             return false;
         }
         
+        void CompleteSkill()
+        {
+            EndTurn();
+        }
     }
 
     private bool TrySelectAction()

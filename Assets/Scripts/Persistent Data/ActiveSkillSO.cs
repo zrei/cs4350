@@ -4,26 +4,31 @@ using UnityEngine;
 
 public enum SkillType
 {
-    PHYSICAL_ATTACK,
-    MAGICAL_ATTACK,
+    ATTACK,
     STATUS_SUPPORT,
     HEAL_SUPPORT
 }
 
-[CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSKillSO")]
-public class ActiveSkillSO : ScriptableObject
+public abstract class ActiveSkillSO : ScriptableObject
 {
     [Header("Details")]
     public string m_SkillName;
     public string m_Description;
     public Sprite m_Icon;
+    [Tooltip("Whether to target same side or other side")]
     public bool m_CastOnOppositeType;
+    // possible to have multiple skill types
     public SkillType[] m_SkillTypes;
+    // mostly for easy reference later (TODO: If an attack can belong to multiple weapon types then this will have to be referenced from elsewhere)
+    public WeaponType m_WeaponType;
     public List<Token> m_InflictedTokens;
+    // TODO: If status effects cannot be inflicted at all without a token already being applied, then this can be removed
     public List<StatusEffect> m_InflictedStatusEffects;
-    // used for different purposes: Multipliers for attacks and heal amount for heal skills
+    [Tooltip("used for different purposes: Multipliers for attacks and heal amount for heal skills")]
     public float m_Amount = 1f;
-    public float m_ConsumedManaAmount = 0f;
+    [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
+    public float m_DelayResponseAnimationTime = 0.2f;
+    public float m_AnimationTime = 2f;
 
     [Header("Attack Config")]
     [Tooltip("Whether this attack can only target a specific row")]
@@ -56,8 +61,12 @@ public class ActiveSkillSO : ScriptableObject
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetSquares;
 
+    // helpers
     public bool IsAoe => m_TargetSquares.Count > 0;
-    public bool DealsDamage => ContainsAnyAttackType(SkillType.PHYSICAL_ATTACK, SkillType.MAGICAL_ATTACK);
+    public bool DealsDamage => ContainsAttackType(SkillType.ATTACK);
+    public virtual bool IsMagic => true;
+    public bool IsPhysicalAttack => !IsMagic && ContainsAttackType(SkillType.ATTACK);
+    public bool IsMagicAttack => IsMagic && ContainsAttackType(SkillType.ATTACK);
 
     public bool ContainsAttackType(SkillType skillType)
     {
@@ -136,12 +145,17 @@ public class ActiveSkillSO : ScriptableObject
 
         return attackTargetTiles;
     }
+}
 
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (ContainsAttackType(SkillType.PHYSICAL_ATTACK) && ContainsAttackType(SkillType.MAGICAL_ATTACK))
-            Logger.Log(this.GetType().Name, $"Active skill SO {name} is both a physical and magical attack", LogLevel.ERROR);
-    }
-#endif
+[CreateAssetMenu(fileName = "PhysicalActiveSkillSO", menuName = "ScriptableObject/PhysicalActiveSkillSO")]
+public class PhysicalActiveSkillSO : ActiveSkillSO
+{
+    public override bool IsMagic => true;
+}
+
+[CreateAssetMenu(fileName = "MagicActiveSkillSO", menuName = "ScriptableObject/MagicActiveSkillSO")]
+public class MagicActiveSkillSO : ActiveSkillSO
+{
+    public override bool IsMagic => false;
+    public float m_ConsumedManaAmount = 0f;
 }

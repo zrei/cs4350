@@ -8,11 +8,11 @@ public static class DamageCalc
     public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO)
     {
         // accounting for support somehow getting in here?
-        bool isPhysical = attackSO.ContainsAttackType(SkillType.PHYSICAL_ATTACK);
+        bool isMagic = attackSO.IsMagic;
         
-        float totalAttackStat = attacker.GetTotalStat(isPhysical ? StatType.PHYS_ATTACK : StatType.MAG_ATTACK, attackSO.m_Amount);
+        float totalAttackStat = attacker.GetTotalStat(isMagic ? StatType.MAG_ATTACK : StatType.PHYS_ATTACK, attackSO.m_Amount);
 
-        float totalDefenceStat = target.GetTotalStat(isPhysical ? StatType.PHYS_DEFENCE : StatType.MAG_DEFENCE);
+        float totalDefenceStat = target.GetTotalStat(isMagic ? StatType.MAG_DEFENCE : StatType.PHYS_DEFENCE);
 
         float damage = Mathf.Max(0f, totalAttackStat - (1 - totalDefenceStat / (totalDefenceStat + ALPHA)));
         Logger.Log("Damage calc", $"Damage: {damage}", LogLevel.LOG);
