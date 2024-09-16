@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 /*
@@ -96,7 +95,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
-        //PlayAnimations(HurtAnimHash);
+        Logger.Log(this.GetType().Name, $"Unit {name} took {damage} damage", name, this.gameObject, LogLevel.LOG);
         m_Health = Mathf.Max(0f, m_Health - damage);
     }
     #endregion
@@ -230,6 +229,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #region Mana
     private void AlterMana(float amount)
     {
+        Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
         m_Mana = Mathf.Clamp(m_Mana + amount, 0f, GetTotalStat(StatType.MANA));
     }
     #endregion
@@ -278,7 +278,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         else if (attackSO.IsMagicAttack)
             inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
 
-        inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects);
+        inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects.Select(x => new StatusEffect(x.m_StatusEffect, x.m_Stack)));
+        
         List<Token> inflictedTokens = attackSO.m_InflictedTokens;
 
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
@@ -303,6 +304,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
         if (attackSO.IsMagic)
             AlterMana(- ((MagicActiveSkillSO) attackSO).m_ConsumedManaAmount);
+
         if (attackSO.IsMagicAttack)
             ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
         else if (attackSO.IsPhysicalAttack)

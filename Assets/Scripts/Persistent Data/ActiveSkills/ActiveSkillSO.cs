@@ -9,6 +9,13 @@ public enum SkillType
     HEAL_SUPPORT
 }
 
+[System.Serializable]
+public struct InflictedStatusEffect
+{
+    public StatusEffectSO m_StatusEffect;
+    public int m_Stack;
+}
+
 public abstract class ActiveSkillSO : ScriptableObject
 {
     [Header("Details")]
@@ -23,7 +30,7 @@ public abstract class ActiveSkillSO : ScriptableObject
     public WeaponType m_WeaponType;
     public List<Token> m_InflictedTokens;
     // TODO: If status effects cannot be inflicted at all without a token already being applied, then this can be removed
-    public List<StatusEffect> m_InflictedStatusEffects;
+    public List<InflictedStatusEffect> m_InflictedStatusEffects;
     [Tooltip("used for different purposes: Multipliers for attacks and heal amount for heal skills")]
     public float m_Amount = 1f;
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -145,17 +152,4 @@ public abstract class ActiveSkillSO : ScriptableObject
 
         return attackTargetTiles;
     }
-}
-
-[CreateAssetMenu(fileName = "PhysicalActiveSkillSO", menuName = "ScriptableObject/PhysicalActiveSkillSO")]
-public class PhysicalActiveSkillSO : ActiveSkillSO
-{
-    public override bool IsMagic => true;
-}
-
-[CreateAssetMenu(fileName = "MagicActiveSkillSO", menuName = "ScriptableObject/MagicActiveSkillSO")]
-public class MagicActiveSkillSO : ActiveSkillSO
-{
-    public override bool IsMagic => false;
-    public float m_ConsumedManaAmount = 0f;
 }

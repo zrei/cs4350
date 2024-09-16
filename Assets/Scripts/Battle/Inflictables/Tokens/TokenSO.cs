@@ -32,16 +32,3 @@ public abstract class TokenSO : ScriptableObject
         return m_Consumption.Contains(consumeType);
     }
 }
-
-public class StatusEffectTokenSO : TokenSO
-{
-    public StatusEffect m_StatusEffect;
-    public override TokenType TokenType => TokenType.INFLICT_STATUS;
-}
-
-public class StatChangeTokenSO : TokenSO
-{
-    public StatType m_AffectedStat;
-    public StatChangeType m_StatChangeType;
-    public override TokenType TokenType => TokenType.STAT_CHANGE;
-}

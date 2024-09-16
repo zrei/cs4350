@@ -1,13 +1,18 @@
 using UnityEngine;
 
-[System.Serializable]
 public class StatusEffect : IStatChange
 {
-    [SerializeField] StatusEffectSO m_StatusEffectSO;
+    private StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
 
     public int StackRemaining => m_StackRemaining;
     public bool IsDepleted => m_StackRemaining <= 0;
+
+    public StatusEffect(StatusEffectSO statusEffect, int initialStack)
+    {
+        m_StatusEffectSO = statusEffect;
+        m_StackRemaining = initialStack;
+    }
 
     public void Tick(Unit unit)
     {

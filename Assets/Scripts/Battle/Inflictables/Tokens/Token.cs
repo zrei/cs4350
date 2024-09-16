@@ -55,7 +55,8 @@ public class Token : IStatChange
             return false;
         }
 
-        statusEffect = ((StatusEffectTokenSO) m_TokenData).m_StatusEffect;
+        StatusEffectTokenSO statusEffectTokenSO = (StatusEffectTokenSO) m_TokenData;
+        statusEffect = new StatusEffect(statusEffectTokenSO.m_StatusEffect.m_StatusEffect, statusEffectTokenSO.m_StatusEffect.m_Stack);
         return true;
     }
 }

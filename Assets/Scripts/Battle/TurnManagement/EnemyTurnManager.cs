@@ -19,6 +19,13 @@ public class EnemyTurnManager : TurnManager
         m_CurrUnit = enemyUnit;
         Logger.Log(this.GetType().Name, "Start enemy turn with " + m_CurrUnit.name, LogLevel.LOG);
 
+        m_CurrUnit.Tick();
+
+        if (m_CurrUnit.IsDead)
+        {
+            GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
+            return;
+        }
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
 
         ActiveSkillSO attackSO = m_TestAttacks[m_AttackIndex];

@@ -1,5 +1,6 @@
 // going to keep mods separate from status effects for now...
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 public class StatusManager : IStatChange
@@ -11,6 +12,7 @@ public class StatusManager : IStatChange
     // haven't accounted for. add this much stack
     public void AddEffect(StatusEffect statusEffect)
     {
+        Logger.Log(this.GetType().Name, "ADD STATUS EFFECT", LogLevel.LOG);
         m_StatusEffects.Add(statusEffect);
     }
 
@@ -26,6 +28,7 @@ public class StatusManager : IStatChange
         HashSet<StatusEffect> toRemove = new() {};
         foreach (StatusEffect statusEffect in m_StatusEffects)
         {
+            Logger.Log(this.GetType().Name, $"Afflicting status effect", LogLevel.LOG);
             statusEffect.Tick(unit);
             if (statusEffect.IsDepleted)
                 toRemove.Add(statusEffect);
