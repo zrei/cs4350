@@ -30,4 +30,16 @@ public static class GlobalEvents {
         public static AttackEvent AttackAnimationEvent; 
         public static VoidEvent CompleteAttackAnimationEvent;
     }
+
+    public static class Level
+    {
+        public delegate void NodeEvent(NodeInternal _);
+        public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
+        public static NodeEvent NodeEnteredEvent;
+        public static NodeEvent NodeClearedEvent;
+        public static NodeEvent NodeExitedEvent;
+        public static NodeEvent NodeSelectedEvent;
+        public static NodeEvent NodeDeselectedEvent;
+        public static NodeTransitionEvent NodeMovementEvent;
+    }
 }
