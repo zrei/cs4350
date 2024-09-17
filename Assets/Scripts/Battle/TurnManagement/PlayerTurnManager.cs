@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Input;
+using System.Collections;
 
 public enum PlayerTurnState
 {
@@ -14,7 +15,28 @@ public enum PlayerTurnState
 public class PlayerTurnManager : TurnManager
 {
     #region Test
-    [SerializeField] ActiveSkillSO m_TestAttackSO;
+    [SerializeField] ActiveSkillSO[] m_TestAttackSOs;
+
+    private int m_CurrAttackIndex = 0;
+    private const float ATTACK_INTERVAL_TIME = 5f;
+
+    private Coroutine m_AttackSwapCoroutine = null;
+
+    private IEnumerator SwitchActiveSkills()
+    {
+        float t = 0f;
+        while (true)
+        {
+            t += Time.deltaTime;
+            if (t >= ATTACK_INTERVAL_TIME)
+            {
+                t = 0f;
+                m_CurrAttackIndex = (m_CurrAttackIndex + 1) % m_TestAttackSOs.Length;
+                Logger.Log(this.GetType().Name, $"Switch to attack: {m_TestAttackSOs[m_CurrAttackIndex].m_SkillName}", LogLevel.LOG);
+            }
+            yield return null;
+        }
+    }
     #endregion
 
     #region Current State
@@ -168,9 +190,9 @@ public class PlayerTurnManager : TurnManager
 
     private void UpdateAttackState()
     {
-        if (m_HasHitGrid && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
+        if (m_HasHitGrid && m_TestAttackSOs[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
-            m_MapLogic.SetTarget(GridType.ENEMY, m_TestAttackSO, m_CurrTargetTile);
+            m_MapLogic.SetTarget(m_CurrTileSide, m_TestAttackSOs[m_CurrAttackIndex], m_CurrTargetTile);
         }
         else
         {
@@ -217,9 +239,9 @@ public class PlayerTurnManager : TurnManager
 
     private bool TryPerformSkill()
     {
-        if (m_HasHitGrid && m_TestAttackSO.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
+        if (m_HasHitGrid && m_TestAttackSOs[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
-            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_TestAttackSO, m_CurrTargetTile, CompleteSkill);
+            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_TestAttackSOs[m_CurrAttackIndex], m_CurrTargetTile, CompleteSkill);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
             return true;
         }
@@ -305,8 +327,17 @@ public class PlayerTurnManager : TurnManager
 
         switch (currAction)
         {
+            case PlayerTurnState.SELECTING_ACTION_TARGET:
+                m_AttackSwapCoroutine = StartCoroutine(SwitchActiveSkills());
+                break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
+                if (m_AttackSwapCoroutine != null)
+                    StopCoroutine(m_AttackSwapCoroutine);
+                break;
+            default:
+                if (m_AttackSwapCoroutine != null)
+                    StopCoroutine(m_AttackSwapCoroutine);
                 break;
         }
 
