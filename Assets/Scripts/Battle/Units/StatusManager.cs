@@ -3,6 +3,7 @@ using System.Linq;
 
 public class StatusManager : IStatChange
 {
+    // add another enum?
     private readonly Dictionary<string, StatusEffect> m_StatusEffects = new();
     private List<Token> m_Tokens = new List<Token>();
 
@@ -20,6 +21,10 @@ public class StatusManager : IStatChange
     {
         m_Tokens.Add(token);
     }
+    #endregion
+
+    #region Reduce Stack
+
     #endregion
 
     #region Tick
