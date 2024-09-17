@@ -8,7 +8,6 @@ public class LevelNodeManager : MonoBehaviour
     public List<NodeInternal> LevelNodes => m_LevelNodes;
     
     // Current State
-    private float m_TimeRemaining;
     private NodeInternal m_CurrentNodeInternal;
 
     #region Initialisation
@@ -17,9 +16,6 @@ public class LevelNodeManager : MonoBehaviour
     {
         // Initialise the internal graph representation of the level
         InitialiseMap(levelNodes, levelEdges);
-        
-        // Initialise the time limit
-        m_TimeRemaining = timeLimit;
     }
     
     /// <summary>
@@ -53,36 +49,18 @@ public class LevelNodeManager : MonoBehaviour
         m_CurrentNodeInternal.OnEnterNode();
     }
 
-    public void MoveToNode(NodeInternal nodeInternal)
+    public void MoveToNode(NodeInternal nodeInternal, out float timeCost)
     {
-        if (m_CurrentNodeInternal)
-        {
-            // if (!m_CurrentNodeInternal.AdjacentNodes.ContainsKey(nodeInternal))
-            // {
-            //     Debug.Log("Node is not reachable");
-            //     return;
-            // } 
+        m_CurrentNodeInternal.OnClearNode();
+        m_CurrentNodeInternal.OnExitNode();
+        m_CurrentNodeInternal.SetCurrent(false);
             
-            if (m_CurrentNodeInternal == nodeInternal)
-            {
-                Debug.Log("Already at the node");
-                return;
-            }
-            
-            m_CurrentNodeInternal.OnClearNode();
-            m_CurrentNodeInternal.OnExitNode();
-            m_CurrentNodeInternal.SetCurrent(false);
-            
-            // Retrieve cost to move to the node
-            // float cost = m_CurrentNodeInternal.AdjacentNodes[nodeInternal];
-            // m_TimeRemaining -= cost;
-        }
+        // Retrieve cost to move to the node
+        timeCost = m_CurrentNodeInternal.AdjacentNodes[nodeInternal];
         
         m_CurrentNodeInternal = nodeInternal;
         m_CurrentNodeInternal.OnEnterNode();
         m_CurrentNodeInternal.SetCurrent(true);
-        
-        Debug.Log($"Time remaining: {m_TimeRemaining}");
     }
 
     #endregion

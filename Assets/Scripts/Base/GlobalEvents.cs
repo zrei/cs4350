@@ -35,6 +35,7 @@ public static class GlobalEvents {
     {
         public delegate void NodeEvent(NodeInternal _);
         public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
+        public static FloatEvent TimeRemainingUpdatedEvent;
         public static NodeEvent NodeEnteredEvent;
         public static NodeEvent NodeClearedEvent;
         public static NodeEvent NodeExitedEvent;

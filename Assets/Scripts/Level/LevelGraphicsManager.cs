@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class LevelGraphicsManager : MonoBehaviour
 {
+    #region Test
+    
+    [SerializeField] private LevelSO m_TestLevel;
+    
+
+    #endregion
+    
     // Graphics
     private Dictionary<NodeInternal, NodeVisual> m_NodeVisuals = new();
 

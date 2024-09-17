@@ -13,9 +13,11 @@ public class LevelManager : MonoBehaviour
 {
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
-    
-    // Graphics
     [SerializeField] LevelGraphicsManager m_LevelGraphicsManager;
+    
+    // Level Timer
+    [SerializeField] LevelTimerLogic m_LevelTimerLogic;
+    [SerializeField] LevelTimerVisual m_LevelTimerVisual;
 
     #region Current State
     private NodeInternal m_CurrSelectedNode;
@@ -61,8 +63,12 @@ public class LevelManager : MonoBehaviour
         // Initialise the internal graph representation of the level
         m_LevelNodeManager.Initialise(levelNodes, levelEdges, timeLimit);
         
+        // Initialise the timer
+        m_LevelTimerLogic.Initialise(timeLimit);
+        
         // Initialise the graphics of the level
         m_LevelGraphicsManager.Initialise(levelNodes, levelEdges);
+        m_LevelTimerVisual.Initialise(m_LevelTimerLogic);
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
     }
@@ -112,12 +118,12 @@ public class LevelManager : MonoBehaviour
         switch (m_CurrState)
         {
             case PlayerLevelSelectionState.SELECTING_NODE:
+                Debug.Log("Player Action: Selecting Node");
                 TrySelectNode();
-                Debug.Log("Selecting Node");
                 break;
             case PlayerLevelSelectionState.MOVING_NODE:
+                Debug.Log("Player Action: Moving to Node");
                 TryMoveToNode();
-                Debug.Log("Moving Node");
                 break;
         }
     }
@@ -146,11 +152,27 @@ public class LevelManager : MonoBehaviour
         var currNode = m_LevelNodeManager.CurrentNode;
         var destNode = m_CurrSelectedNode;
         
-        m_LevelNodeManager.MoveToNode(destNode);
+        if (currNode == destNode)
+        {
+            Debug.Log("Node Movement: Already at node");
+            return;
+        }
+        
+        if (!currNode.AdjacentNodes.ContainsKey(destNode))
+        {
+            Debug.Log("Node Movement: Node is not reachable");
+            return;
+        }
+
+        m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
         
         GlobalEvents.Level.NodeExitedEvent(currNode);
         GlobalEvents.Level.NodeMovementEvent(currNode, destNode);
         GlobalEvents.Level.NodeEnteredEvent(destNode);
+        
+        m_LevelTimerLogic.AdvanceTimer(timeCost);
+        
+        GlobalEvents.Level.TimeRemainingUpdatedEvent(m_LevelTimerLogic.TimeRemaining);
     }
 
     #endregion
