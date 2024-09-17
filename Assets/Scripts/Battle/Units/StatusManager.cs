@@ -1,17 +1,20 @@
-// going to keep mods separate from status effects for now...
 using System.Collections.Generic;
 using System.Linq;
 
 public class StatusManager : IStatChange
 {
-    private List<StatusEffect> m_StatusEffects = new List<StatusEffect>();
+    // add another enum?
+    private readonly Dictionary<string, StatusEffect> m_StatusEffects = new();
     private List<Token> m_Tokens = new List<Token>();
 
     #region Add Inflictable
-    // haven't accounted for. add this much stack
     public void AddEffect(StatusEffect statusEffect)
     {
-        m_StatusEffects.Add(statusEffect);
+        if (m_StatusEffects.ContainsKey(statusEffect.Name))
+            m_StatusEffects[statusEffect.Name].AddStack(statusEffect.StackRemaining);
+        else
+            m_StatusEffects[statusEffect.Name] = statusEffect;
+        Logger.Log(this.GetType().Name, "ADD STATUS EFFECT", LogLevel.LOG);
     }
 
     public void AddToken(Token token)
@@ -20,20 +23,24 @@ public class StatusManager : IStatChange
     }
     #endregion
 
+    #region Reduce Stack
+
+    #endregion
+
     #region Tick
     public void Tick(Unit unit)
     {
         HashSet<StatusEffect> toRemove = new() {};
-        foreach (StatusEffect statusEffect in m_StatusEffects)
+        foreach (StatusEffect statusEffect in m_StatusEffects.Values)
         {
+            Logger.Log(this.GetType().Name, $"Afflicting status effect", LogLevel.LOG);
             statusEffect.Tick(unit);
-            if (statusEffect.IsDepleted)
-                toRemove.Add(statusEffect);
+            toRemove.Add(statusEffect);
         }
 
         foreach (StatusEffect statusEffect in toRemove)
         {
-            m_StatusEffects.Remove(statusEffect);
+            m_StatusEffects.Remove(statusEffect.Name);
         }
     }
     #endregion
@@ -92,9 +99,10 @@ public class StatusManager : IStatChange
             totalFlatStatChange += token.GetFlatStatChange(statType);
         }
 
-        foreach (StatusEffect statusEffect in m_StatusEffects)
+        foreach (StatusEffect statusEffect in m_StatusEffects.Values)
         {
-            totalFlatStatChange += statusEffect.GetFlatStatChange(statType);
+            if (!statusEffect.IsDepleted)
+                totalFlatStatChange += statusEffect.GetFlatStatChange(statType);
         }
 
         return totalFlatStatChange;
@@ -109,9 +117,10 @@ public class StatusManager : IStatChange
             totalFlatStatChange *= token.GetMultStatChange(statType);
         }
 
-        foreach (StatusEffect statusEffect in m_StatusEffects)
+        foreach (StatusEffect statusEffect in m_StatusEffects.Values)
         {
-            totalFlatStatChange *= statusEffect.GetMultStatChange(statType);
+            if (!statusEffect.IsDepleted)
+                totalFlatStatChange *= statusEffect.GetMultStatChange(statType);
         }
 
         return totalFlatStatChange;

@@ -9,21 +9,37 @@ public enum SkillType
     HEAL_SUPPORT
 }
 
+public enum TargetType
+{
+    TARGET_SELF,
+    TARGET_SELF_AND_OTHERS,
+    TARGET_OTHERS
+}
+
+[System.Serializable]
+public struct InflictedStatusEffect
+{
+    public StatusEffectSO m_StatusEffect;
+    public int m_Stack;
+}
+
 public abstract class ActiveSkillSO : ScriptableObject
 {
     [Header("Details")]
     public string m_SkillName;
     public string m_Description;
     public Sprite m_Icon;
-    [Tooltip("Whether to target same side or other side")]
+    [Tooltip("Whether to target same side or other side - will be ignored for self targeting")]
     public bool m_CastOnOppositeType;
+    [Tooltip("What can be targeted")]
+    public TargetType m_TargetType;
     // possible to have multiple skill types
     public SkillType[] m_SkillTypes;
     // mostly for easy reference later (TODO: If an attack can belong to multiple weapon types then this will have to be referenced from elsewhere)
     public WeaponType m_WeaponType;
     public List<Token> m_InflictedTokens;
     // TODO: If status effects cannot be inflicted at all without a token already being applied, then this can be removed
-    public List<StatusEffect> m_InflictedStatusEffects;
+    public List<InflictedStatusEffect> m_InflictedStatusEffects;
     [Tooltip("used for different purposes: Multipliers for attacks and heal amount for heal skills")]
     public float m_Amount = 1f;
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -85,19 +101,25 @@ public abstract class ActiveSkillSO : ScriptableObject
 
     private bool AllowedGridTypes(Unit unit, GridType targetGridType)
     {
-        if (m_CastOnOppositeType)
+        if (m_TargetType == TargetType.TARGET_SELF || m_TargetType == TargetType.TARGET_SELF_AND_OTHERS || !m_CastOnOppositeType)
         {
-            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
+            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
         }
         else
         {
-            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
+            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
         }
     }
 
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
         if (!AllowedGridTypes(unit, targetGridType))
+            return false;
+
+        if (m_TargetType == TargetType.TARGET_SELF && !targetTile.Equals(unit.CurrPosition))
+            return false;
+
+        if (m_TargetType == TargetType.TARGET_OTHERS && !m_CastOnOppositeType && targetTile.Equals(unit.CurrPosition))
             return false;
 
         if (m_LockTargetRow)
@@ -145,17 +167,4 @@ public abstract class ActiveSkillSO : ScriptableObject
 
         return attackTargetTiles;
     }
-}
-
-[CreateAssetMenu(fileName = "PhysicalActiveSkillSO", menuName = "ScriptableObject/PhysicalActiveSkillSO")]
-public class PhysicalActiveSkillSO : ActiveSkillSO
-{
-    public override bool IsMagic => true;
-}
-
-[CreateAssetMenu(fileName = "MagicActiveSkillSO", menuName = "ScriptableObject/MagicActiveSkillSO")]
-public class MagicActiveSkillSO : ActiveSkillSO
-{
-    public override bool IsMagic => false;
-    public float m_ConsumedManaAmount = 0f;
 }
