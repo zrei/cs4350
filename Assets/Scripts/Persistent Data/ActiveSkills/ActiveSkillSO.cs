@@ -9,6 +9,13 @@ public enum SkillType
     HEAL_SUPPORT
 }
 
+public enum TargetType
+{
+    TARGET_SELF,
+    TARGET_SELF_AND_OTHERS,
+    TARGET_OTHERS
+}
+
 [System.Serializable]
 public struct InflictedStatusEffect
 {
@@ -22,8 +29,10 @@ public abstract class ActiveSkillSO : ScriptableObject
     public string m_SkillName;
     public string m_Description;
     public Sprite m_Icon;
-    [Tooltip("Whether to target same side or other side")]
+    [Tooltip("Whether to target same side or other side - will be ignored for self targeting")]
     public bool m_CastOnOppositeType;
+    [Tooltip("What can be targeted")]
+    public TargetType m_TargetType;
     // possible to have multiple skill types
     public SkillType[] m_SkillTypes;
     // mostly for easy reference later (TODO: If an attack can belong to multiple weapon types then this will have to be referenced from elsewhere)
@@ -92,19 +101,25 @@ public abstract class ActiveSkillSO : ScriptableObject
 
     private bool AllowedGridTypes(Unit unit, GridType targetGridType)
     {
-        if (m_CastOnOppositeType)
+        if (m_TargetType == TargetType.TARGET_SELF || m_TargetType == TargetType.TARGET_SELF_AND_OTHERS || !m_CastOnOppositeType)
         {
-            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
+            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
         }
         else
         {
-            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
+            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
         }
     }
 
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
         if (!AllowedGridTypes(unit, targetGridType))
+            return false;
+
+        if (m_TargetType == TargetType.TARGET_SELF && !targetTile.Equals(unit.CurrPosition))
+            return false;
+
+        if (m_TargetType == TargetType.TARGET_OTHERS && !m_CastOnOppositeType && targetTile.Equals(unit.CurrPosition))
             return false;
 
         if (m_LockTargetRow)

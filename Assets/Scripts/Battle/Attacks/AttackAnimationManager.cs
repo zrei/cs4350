@@ -24,16 +24,18 @@ public class AttackAnimationManager : MonoBehaviour
         GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
     }
 
-    // skill for dama
+    // perform attack skill
     private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
         if (!activeSkill.IsAoe)
         {
+            Unit target = targets[0];
+
             Camera attackCamera = CameraManager.Instance.AttackAnimCamera;
             attackCamera.transform.position = m_CameraPosition.position;
             attackCamera.transform.rotation = m_CameraPosition.rotation;
 
-            Unit target = targets[0];
+                
             m_CachedAttackerPosition = attacker.transform.position;
             m_CachedAttackerRotation = attacker.transform.rotation;
             attacker.transform.position = m_AttackerPosition.position;

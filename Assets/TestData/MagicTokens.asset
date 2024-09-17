@@ -12,15 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 305f67ef624e44e368f072c09ad00dbc, type: 3}
   m_Name: MagicTokens
   m_EditorClassIdentifier: 
-  m_SkillName: Magic Attack
+  m_SkillName: Magic Token
   m_Description: 
   m_Icon: {fileID: 0}
   m_CastOnOppositeType: 0
+  m_TargetType: 2
   m_SkillTypes: 01000000
   m_WeaponType: 4
   m_InflictedTokens:
   - m_TokenData: {fileID: 11400000, guid: 82cca6c2e70a14292beab459fddcbcf2, type: 2}
-    m_Amount: 0
+    m_Amount: 2
   m_InflictedStatusEffects: []
   m_Amount: 1
   m_DelayResponseAnimationTime: 0.2

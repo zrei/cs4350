@@ -5,6 +5,7 @@ public class StatusEffect : IStatChange
     private StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
 
+    public string Name => m_StatusEffectSO.name;
     public int StackRemaining => m_StackRemaining;
     public bool IsDepleted => m_StackRemaining <= 0;
 
@@ -16,6 +17,8 @@ public class StatusEffect : IStatChange
 
     public void Tick(Unit unit)
     {
+        if (IsDepleted)
+            return;
         ApplyAffect(unit);
         ReduceStack(1);
     }
