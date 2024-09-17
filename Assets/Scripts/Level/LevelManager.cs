@@ -3,6 +3,12 @@ using System.Linq;
 using Game.Input;
 using UnityEngine;
 
+public enum PlayerLevelSelectionState
+{
+    SELECTING_NODE,
+    MOVING_NODE
+}
+
 public class LevelManager : MonoBehaviour
 {
     // Graph Information
@@ -10,9 +16,13 @@ public class LevelManager : MonoBehaviour
     
     // Graphics
     [SerializeField] LevelGraphicsManager m_LevelGraphicsManager;
+
+    #region Current State
+    private NodeInternal m_CurrSelectedNode;
+    private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+    #endregion
     
     #region Input and Selected Node
-    private NodeInternal m_CurrSelectedNode;
     private NodeInternal m_CurrTargetNode;
     private bool m_HasHitNode;
     #endregion
@@ -45,7 +55,7 @@ public class LevelManager : MonoBehaviour
     public void Initialise()
     {
         var levelNodes = GetComponentsInChildren<NodeInternal>().ToList();
-        var levelEdges = GetComponentsInChildren<LevelEdge>().ToList();
+        var levelEdges = GetComponentsInChildren<EdgeInternal>().ToList();
         var timeLimit = m_TestLevel.m_TimeLimit;
         
         // Initialise the internal graph representation of the level
@@ -66,11 +76,31 @@ public class LevelManager : MonoBehaviour
         var inputVector = input.GetValue<Vector2>();
         Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
         m_HasHitNode = m_LevelNodeManager.TryRetrieveNode(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetNode);
+        
+        UpdateState();
     }
     
     private void OnPointerSelect(IInput input)
     {
         TryPerformAction();
+        
+        UpdateState();
+    }
+
+    #endregion
+
+    #region Update State
+
+    private void UpdateState()
+    {
+        if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
+        {
+            m_CurrState = PlayerLevelSelectionState.MOVING_NODE;
+        }
+        else
+        {
+            m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+        }
     }
 
     #endregion
@@ -79,7 +109,17 @@ public class LevelManager : MonoBehaviour
 
     private void TryPerformAction()
     {
-        TrySelectNode();
+        switch (m_CurrState)
+        {
+            case PlayerLevelSelectionState.SELECTING_NODE:
+                TrySelectNode();
+                Debug.Log("Selecting Node");
+                break;
+            case PlayerLevelSelectionState.MOVING_NODE:
+                TryMoveToNode();
+                Debug.Log("Moving Node");
+                break;
+        }
     }
 
     private void TrySelectNode()
@@ -99,6 +139,18 @@ public class LevelManager : MonoBehaviour
             GlobalEvents.Level.NodeDeselectedEvent(m_CurrSelectedNode);
             m_CurrSelectedNode = null;
         }
+    }
+
+    private void TryMoveToNode()
+    {
+        var currNode = m_LevelNodeManager.CurrentNode;
+        var destNode = m_CurrSelectedNode;
+        
+        m_LevelNodeManager.MoveToNode(destNode);
+        
+        GlobalEvents.Level.NodeExitedEvent(currNode);
+        GlobalEvents.Level.NodeMovementEvent(currNode, destNode);
+        GlobalEvents.Level.NodeEnteredEvent(destNode);
     }
 
     #endregion

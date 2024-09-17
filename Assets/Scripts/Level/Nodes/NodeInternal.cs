@@ -11,7 +11,7 @@ public struct NodeInfo
 }
 
 /// <summary>
-/// Base class that maintains the internal representation of the nodes in the graph
+/// Base class that maintains the internal representation of a node in the graph
 /// (node information and connected nodes),
 /// </summary>
 public abstract class NodeInternal : MonoBehaviour

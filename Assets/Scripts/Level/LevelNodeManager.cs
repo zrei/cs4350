@@ -13,7 +13,7 @@ public class LevelNodeManager : MonoBehaviour
 
     #region Initialisation
 
-    public void Initialise(List<NodeInternal> levelNodes, List<LevelEdge> levelEdges, float timeLimit)
+    public void Initialise(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges, float timeLimit)
     {
         // Initialise the internal graph representation of the level
         InitialiseMap(levelNodes, levelEdges);
@@ -25,7 +25,7 @@ public class LevelNodeManager : MonoBehaviour
     /// <summary>
     /// Initialise the level map with the nodes and edges in scene
     /// </summary>
-    public void InitialiseMap(List<NodeInternal> levelNodes, List<LevelEdge> levelEdges)
+    public void InitialiseMap(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
     {
         // Retrieve all nodes in the level
         foreach (var levelNode in levelNodes)
@@ -44,6 +44,7 @@ public class LevelNodeManager : MonoBehaviour
     #endregion
 
     #region Graph
+    public NodeInternal CurrentNode => m_CurrentNodeInternal;
     
     public void SetStartNode(NodeInternal startNode)
     {
@@ -56,11 +57,11 @@ public class LevelNodeManager : MonoBehaviour
     {
         if (m_CurrentNodeInternal)
         {
-            if (!m_CurrentNodeInternal.AdjacentNodes.ContainsKey(nodeInternal))
-            {
-                Debug.Log("Node is not reachable");
-                return;
-            } 
+            // if (!m_CurrentNodeInternal.AdjacentNodes.ContainsKey(nodeInternal))
+            // {
+            //     Debug.Log("Node is not reachable");
+            //     return;
+            // } 
             
             if (m_CurrentNodeInternal == nodeInternal)
             {
@@ -70,14 +71,16 @@ public class LevelNodeManager : MonoBehaviour
             
             m_CurrentNodeInternal.OnClearNode();
             m_CurrentNodeInternal.OnExitNode();
+            m_CurrentNodeInternal.SetCurrent(false);
             
             // Retrieve cost to move to the node
-            float cost = m_CurrentNodeInternal.AdjacentNodes[nodeInternal];
-            m_TimeRemaining -= cost;
+            // float cost = m_CurrentNodeInternal.AdjacentNodes[nodeInternal];
+            // m_TimeRemaining -= cost;
         }
         
         m_CurrentNodeInternal = nodeInternal;
         m_CurrentNodeInternal.OnEnterNode();
+        m_CurrentNodeInternal.SetCurrent(true);
         
         Debug.Log($"Time remaining: {m_TimeRemaining}");
     }
