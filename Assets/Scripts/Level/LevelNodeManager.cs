@@ -1,6 +1,10 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
+/// <summary>
+/// Manages the internal representation of the level graph
+/// </summary>
 public class LevelNodeManager : MonoBehaviour
 {
     // Graph Information
@@ -88,6 +92,16 @@ public class LevelNodeManager : MonoBehaviour
         node = default;
         
         return false;
+    }
+    
+    /// <summary>
+    /// Check if the player can move to the given node
+    /// </summary>
+    /// <param name="destNode"></param>
+    /// <returns></returns>
+    public bool CanMoveToNode(NodeInternal destNode)
+    {
+        return m_CurrentNodeInternal.AdjacentNodes.ContainsKey(destNode);
     }
     
 

@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelGraphicsManager : MonoBehaviour
+/// <summary>
+/// Manages the visuals of the nodes in the level and their associated events
+/// (like transitions between nodes and clearing nodes)
+/// </summary>
+public class LevelNodeVisualManager : MonoBehaviour
 {
-    #region Test
-    
-    [SerializeField] private LevelSO m_TestLevel;
-    
-
-    #endregion
-    
     // Graphics
     private Dictionary<NodeInternal, NodeVisual> m_NodeVisuals = new();
 
@@ -88,7 +85,36 @@ public class LevelGraphicsManager : MonoBehaviour
         // Insert transition animations here
         Debug.Log("Animation: Transitioning between nodes: " + nodeInternal1 + " -> " + nodeInternal2);
     }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Level.NodeEnteredEvent -= OnNodeEntered;
+        GlobalEvents.Level.NodeClearedEvent -= OnNodeCleared;
+        GlobalEvents.Level.NodeExitedEvent -= OnNodeExited;
+        GlobalEvents.Level.NodeSelectedEvent -= OnNodeSelected;
+        GlobalEvents.Level.NodeDeselectedEvent -= OnNodeDeselected;
+        GlobalEvents.Level.NodeMovementEvent -= OnNodeMovement;
+    }
+
+    #endregion
     
+    #region Helper
+    
+    public void DisplayMovableNodes(NodeInternal currentNode)
+    {
+        foreach (var node in currentNode.AdjacentNodes.Keys)
+        {
+            m_NodeVisuals[node].ToggleMovable(true);
+        }
+    }
+    
+    public void ClearMovableNodes()
+    {
+        foreach (var nodeVisual in m_NodeVisuals.Values)
+        {
+            nodeVisual.ToggleMovable(false);
+        }
+    }
     
     #endregion
 }

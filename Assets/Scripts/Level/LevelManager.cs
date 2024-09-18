@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Input;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
 {
@@ -9,11 +10,14 @@ public enum PlayerLevelSelectionState
     MOVING_NODE
 }
 
+/// <summary>
+/// Manages the overall level and player interactions
+/// </summary>
 public class LevelManager : MonoBehaviour
 {
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
-    [SerializeField] LevelGraphicsManager m_LevelGraphicsManager;
+    [SerializeField] LevelNodeVisualManager m_LevelNodeVisualManager;
     
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
@@ -49,6 +53,12 @@ public class LevelManager : MonoBehaviour
         InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
     }
+    
+    public void DisplayMovableNodes()
+    {
+        m_LevelNodeVisualManager.ClearMovableNodes();
+        m_LevelNodeVisualManager.DisplayMovableNodes(m_LevelNodeManager.CurrentNode);
+    }
 
     #endregion
     
@@ -66,11 +76,13 @@ public class LevelManager : MonoBehaviour
         // Initialise the timer
         m_LevelTimerLogic.Initialise(timeLimit);
         
-        // Initialise the graphics of the level
-        m_LevelGraphicsManager.Initialise(levelNodes, levelEdges);
+        // Initialise the visuals of the level
+        m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         m_LevelTimerVisual.Initialise(m_LevelTimerLogic);
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
+        
+        DisplayMovableNodes();
     }
 
     #endregion
@@ -158,7 +170,7 @@ public class LevelManager : MonoBehaviour
             return;
         }
         
-        if (!currNode.AdjacentNodes.ContainsKey(destNode))
+        if (m_LevelNodeManager.CanMoveToNode(destNode) == false)
         {
             Debug.Log("Node Movement: Node is not reachable");
             return;
@@ -173,6 +185,8 @@ public class LevelManager : MonoBehaviour
         m_LevelTimerLogic.AdvanceTimer(timeCost);
         
         GlobalEvents.Level.TimeRemainingUpdatedEvent(m_LevelTimerLogic.TimeRemaining);
+        
+        DisplayMovableNodes();
     }
 
     #endregion
