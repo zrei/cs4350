@@ -14,6 +14,7 @@ public class AttackAnimationManager : MonoBehaviour
     private Vector3 m_CachedTargetPosition;
     private Quaternion m_CachedTargetRotation;
 
+    private bool m_IsSelfTarget = false;
     private void Awake()
     {
         GlobalEvents.Battle.AttackAnimationEvent += OnSkillAnimation;
@@ -27,8 +28,9 @@ public class AttackAnimationManager : MonoBehaviour
     // perform attack skill
     private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
+        m_IsSelfTarget = activeSkill.IsSelfTarget || targets[0].Equals(attacker);
         // if it's a self target or an AOE skill, do not shift the units
-        if (!activeSkill.m_LockToSelfTarget && !activeSkill.IsAoe)
+        if (!m_IsSelfTarget && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
 
@@ -55,7 +57,7 @@ public class AttackAnimationManager : MonoBehaviour
         attacker.PlayAttackAnimation(!activeSkill.DealsDamage);
 
         // for none damage dealing attacks and self attacks, there are no response animations, just VFX
-        if (!activeSkill.m_LockToSelfTarget || !activeSkill.DealsDamage)
+        if (!m_IsSelfTarget || !activeSkill.DealsDamage)
         {
             yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
             foreach (Unit target in targets)
@@ -65,7 +67,7 @@ public class AttackAnimationManager : MonoBehaviour
         // need to account for hurt animation time and take the maximum of the end times
         yield return new WaitForSeconds(activeSkill.m_AnimationTime);
 
-        if (!activeSkill.m_LockToSelfTarget && !activeSkill.IsAoe)
+        if (!m_IsSelfTarget && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
             attacker.transform.position = m_CachedAttackerPosition;

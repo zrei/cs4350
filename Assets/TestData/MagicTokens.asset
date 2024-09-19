@@ -15,10 +15,7 @@ MonoBehaviour:
   m_SkillName: Magic Token
   m_Description: 
   m_Icon: {fileID: 0}
-  m_CastOnOppositeType: 0
-  m_TargetType: 2
   m_SkillTypes: 01000000
-  m_WeaponType: 4
   m_InflictedTokens:
   - m_TokenData: {fileID: 11400000, guid: 82cca6c2e70a14292beab459fddcbcf2, type: 2}
     m_Amount: 2
@@ -26,15 +23,7 @@ MonoBehaviour:
   m_Amount: 1
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
-  m_LockTargetRow: 0
-  m_AllowedTargetRows: 
-  m_LockTargetCol: 0
-  m_AllowedTargetCols: 
-  m_LockTargetRange: 0
-  m_AllowedTargetRange: 0
-  m_LockAttackerRow: 0
-  m_AllowedAttackerRows: 
-  m_LockAttackerCol: 0
-  m_AllowedAttackerCols: 
+  m_TargetRules:
+  - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
   m_TargetSquares: []
   m_ConsumedManaAmount: 0

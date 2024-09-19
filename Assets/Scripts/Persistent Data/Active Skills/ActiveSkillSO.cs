@@ -34,6 +34,7 @@ public abstract class ActiveSkillSO : ScriptableObject
     public float m_AnimationTime = 2f;
 
     [Header("Attack Config")]
+    /*
     [Tooltip("Whether to lock the target to only self")]
     public bool m_LockToSelfTarget;
     [Tooltip("Whether to target same side or other side - will be ignored for self targeting")]
@@ -64,6 +65,8 @@ public abstract class ActiveSkillSO : ScriptableObject
     public bool m_LockAttackerCol;
     [Tooltip("Will be ignored if attacker cols are not locked")]
     public List<int> m_AllowedAttackerCols;
+    */
+    public List<SkillTargetRuleSO> m_TargetRules;
 
     [Header("Target")]
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
@@ -75,6 +78,7 @@ public abstract class ActiveSkillSO : ScriptableObject
     public virtual bool IsMagic => true;
     public bool IsPhysicalAttack => !IsMagic && ContainsAttackType(SkillType.ATTACK);
     public bool IsMagicAttack => IsMagic && ContainsAttackType(SkillType.ATTACK);
+    public bool IsSelfTarget => m_TargetRules.Any(x => x is LockToSelfTargetRuleSO);
 
     public bool ContainsAttackType(SkillType skillType)
     {
@@ -91,59 +95,10 @@ public abstract class ActiveSkillSO : ScriptableObject
         return skillTypes.Any(x => ContainsAttackType(x));
     }
 
-    private bool AllowedGridTypes(Unit unit, GridType targetGridType)
-    {
-        if (m_LockToSelfTarget || !m_CastOnOppositeType)
-        {
-            return (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.PLAYER);
-        }
-        else
-        {
-            return (unit.UnitAllegiance == UnitAllegiance.PLAYER && targetGridType == GridType.ENEMY) || (unit.UnitAllegiance == UnitAllegiance.ENEMY && targetGridType == GridType.PLAYER);
-        }
-    }
-
-    // does not check for occupied tiles
+    // does not check for occupied tiles, that is the responsibility of the grid logic
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
-        if (!AllowedGridTypes(unit, targetGridType))
-            return false;
-
-        if (m_LockToSelfTarget && !targetTile.Equals(unit.CurrPosition))
-            return false;
-
-        if (m_LockTargetRow)
-        {
-            if (!m_AllowedTargetRows.Contains(targetTile.m_Row))
-                return false;
-        }
-
-        if (m_LockTargetCol)
-        {
-            if (!m_AllowedTargetCols.Contains(targetTile.m_Col))
-                return false;
-        }
-
-        if (m_LockAttackerRow)
-        {
-            if (!m_AllowedAttackerRows.Contains(unit.CurrPosition.m_Row))
-                return false;
-        }
-
-        if (m_LockAttackerCol)
-        {
-            if (!m_AllowedAttackerCols.Contains(unit.CurrPosition.m_Col))
-                return false;
-        }
-
-        if (m_LockTargetRange)
-        {
-            int manhattenDistance = unit.CurrPosition.GetDistanceToPoint(targetTile);
-            if (manhattenDistance > m_AllowedTargetRange)
-                return false;
-        }
-
-        return true;
+        return m_TargetRules.All(x => x.IsValidTargetTile(targetTile, unit, targetGridType));
     }
 
     public List<CoordPair> ConstructAttackTargetTiles(CoordPair target)

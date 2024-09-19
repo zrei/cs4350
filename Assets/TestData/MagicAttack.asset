@@ -15,24 +15,13 @@ MonoBehaviour:
   m_SkillName: Magic Attack
   m_Description: 
   m_Icon: {fileID: 0}
-  m_CastOnOppositeType: 1
-  m_TargetType: 2
   m_SkillTypes: 00000000
-  m_WeaponType: 4
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_Amount: 1
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
-  m_LockTargetRow: 0
-  m_AllowedTargetRows: 
-  m_LockTargetCol: 0
-  m_AllowedTargetCols: 
-  m_LockTargetRange: 0
-  m_AllowedTargetRange: 0
-  m_LockAttackerRow: 0
-  m_AllowedAttackerRows: 
-  m_LockAttackerCol: 0
-  m_AllowedAttackerCols: 
+  m_TargetRules:
+  - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
   m_TargetSquares: []
   m_ConsumedManaAmount: 3
