@@ -117,7 +117,7 @@ public class BattleManager : MonoBehaviour
     private void InstantiateUnit(UnitPlacement unitPlacement, GridType gridType)
     {
         Unit unit = Instantiate(unitPlacement.m_Unit);
-        unit.Initialise(unitPlacement.m_Stats);
+        unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class);
         m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
         m_TurnQueue.AddUnit(unit);
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)

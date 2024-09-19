@@ -6,8 +6,7 @@ public enum WeaponType
     LANCE,
     AXE,
     BOW,
-    MAGIC,
-    SUPPORT
+    MAGIC
 }
 
 public class WeaponSO

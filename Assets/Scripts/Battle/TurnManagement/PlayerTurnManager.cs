@@ -239,7 +239,7 @@ public class PlayerTurnManager : TurnManager
 
     private bool TryPerformSkill()
     {
-        if (m_HasHitGrid && m_TestAttackSOs[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
+        if (m_HasHitGrid && m_TestAttackSOs[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide) && m_MapLogic.IsTileOccupied(m_CurrTileSide, m_CurrTargetTile))
         {
             m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_TestAttackSOs[m_CurrAttackIndex], m_CurrTargetTile, CompleteSkill);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);

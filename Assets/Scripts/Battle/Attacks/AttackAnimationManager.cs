@@ -27,7 +27,8 @@ public class AttackAnimationManager : MonoBehaviour
     // perform attack skill
     private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        if (activeSkill.m_TargetType != TargetType.TARGET_SELF && !activeSkill.IsAoe)
+        // if it's a self target or an AOE skill, do not shift the units
+        if (!activeSkill.m_LockToSelfTarget && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
 
@@ -51,9 +52,10 @@ public class AttackAnimationManager : MonoBehaviour
 
     private IEnumerator PlayAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        attacker.PlayAttackAnimation(activeSkill.m_WeaponType);
+        attacker.PlayAttackAnimation(!activeSkill.DealsDamage);
 
-        if (activeSkill.m_TargetType != TargetType.TARGET_SELF)
+        // for none damage dealing attacks and self attacks, there are no response animations, just VFX
+        if (!activeSkill.m_LockToSelfTarget || !activeSkill.DealsDamage)
         {
             yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
             foreach (Unit target in targets)
@@ -63,7 +65,7 @@ public class AttackAnimationManager : MonoBehaviour
         // need to account for hurt animation time and take the maximum of the end times
         yield return new WaitForSeconds(activeSkill.m_AnimationTime);
 
-        if (activeSkill.m_TargetType != TargetType.TARGET_SELF && !activeSkill.IsAoe)
+        if (!activeSkill.m_LockToSelfTarget && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
             attacker.transform.position = m_CachedAttackerPosition;

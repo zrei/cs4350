@@ -56,6 +56,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     protected StatusManager m_StatusManager = new StatusManager();
 
+    private ClassSO m_Class;
+
     public VoidEvent PostAttackEvent;
 
     #region Initialisation
@@ -63,10 +65,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     /// Initialise stats, position, etc.
     /// Called when the unit is first spawned onto the battlefield
     /// </summary>
-    public virtual void Initialise(Stats stats)
+    public virtual void Initialise(Stats stats, ClassSO unitClass)
     {
         m_Stats = stats;
         m_Health = stats.m_Health;
+        m_Class = unitClass;
     }
 
     #endregion
@@ -248,18 +251,21 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_Animator.Play(animationId);
     }
 
-    public void PlayAttackAnimation(WeaponType weaponType)
+    public void PlayAttackAnimation(bool isSupport)
     {
-        switch (weaponType)
+        if (isSupport)
+        {
+            // support for other weapon types???
+            PlayAnimations(MagicSupportAnimHash);
+        }
+
+        switch (m_Class.m_Weapon.m_WeaponType)
         {
             case WeaponType.SWORD:
             case WeaponType.AXE:
             case WeaponType.LANCE:
             case WeaponType.BOW:
                 PlayAnimations(SwordAttackAnimHash);
-                break;
-            case WeaponType.SUPPORT:
-                PlayAnimations(MagicSupportAnimHash);
                 break;
             case WeaponType.MAGIC:
                 PlayAnimations(MagicAttackAnimHash);
