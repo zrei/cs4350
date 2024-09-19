@@ -16,18 +16,18 @@ public class AttackAnimationManager : MonoBehaviour
 
     private void Awake()
     {
-        GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
+        GlobalEvents.Battle.AttackAnimationEvent += OnSkillAnimation;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+        GlobalEvents.Battle.AttackAnimationEvent -= OnSkillAnimation;
     }
 
     // perform attack skill
-    private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
+    private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        if (!activeSkill.IsAoe)
+        if (activeSkill.m_TargetType != TargetType.TARGET_SELF && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
 
@@ -35,7 +35,6 @@ public class AttackAnimationManager : MonoBehaviour
             attackCamera.transform.position = m_CameraPosition.position;
             attackCamera.transform.rotation = m_CameraPosition.rotation;
 
-                
             m_CachedAttackerPosition = attacker.transform.position;
             m_CachedAttackerRotation = attacker.transform.rotation;
             attacker.transform.position = m_AttackerPosition.position;
@@ -54,14 +53,17 @@ public class AttackAnimationManager : MonoBehaviour
     {
         attacker.PlayAttackAnimation(activeSkill.m_WeaponType);
 
-        yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
-        foreach (Unit target in targets)
-            target.PlayAnimations(Unit.HurtAnimHash);
+        if (activeSkill.m_TargetType != TargetType.TARGET_SELF)
+        {
+            yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
+            foreach (Unit target in targets)
+                target.PlayAnimations(Unit.HurtAnimHash);
+        }
 
         // need to account for hurt animation time and take the maximum of the end times
         yield return new WaitForSeconds(activeSkill.m_AnimationTime);
 
-        if (!activeSkill.IsAoe)
+        if (activeSkill.m_TargetType != TargetType.TARGET_SELF && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
             attacker.transform.position = m_CachedAttackerPosition;
