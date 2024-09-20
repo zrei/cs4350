@@ -14,20 +14,23 @@ public class AttackAnimationManager : MonoBehaviour
     private Vector3 m_CachedTargetPosition;
     private Quaternion m_CachedTargetRotation;
 
+    private bool m_IsSelfTarget = false;
     private void Awake()
     {
-        GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
+        GlobalEvents.Battle.AttackAnimationEvent += OnSkillAnimation;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+        GlobalEvents.Battle.AttackAnimationEvent -= OnSkillAnimation;
     }
 
     // perform attack skill
-    private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
+    private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        if (!activeSkill.IsAoe)
+        m_IsSelfTarget = activeSkill.IsSelfTarget || targets[0].Equals(attacker);
+        // if it's a self target or an AOE skill, do not shift the units
+        if (!m_IsSelfTarget && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
 
@@ -35,7 +38,6 @@ public class AttackAnimationManager : MonoBehaviour
             attackCamera.transform.position = m_CameraPosition.position;
             attackCamera.transform.rotation = m_CameraPosition.rotation;
 
-                
             m_CachedAttackerPosition = attacker.transform.position;
             m_CachedAttackerRotation = attacker.transform.rotation;
             attacker.transform.position = m_AttackerPosition.position;
@@ -52,16 +54,20 @@ public class AttackAnimationManager : MonoBehaviour
 
     private IEnumerator PlayAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        attacker.PlayAttackAnimation(activeSkill.m_WeaponType);
+        attacker.PlayAttackAnimation(!activeSkill.DealsDamage);
 
-        yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
-        foreach (Unit target in targets)
-            target.PlayAnimations(Unit.HurtAnimHash);
+        // for none damage dealing attacks and self attacks, there are no response animations, just VFX
+        if (!m_IsSelfTarget || !activeSkill.DealsDamage)
+        {
+            yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
+            foreach (Unit target in targets)
+                target.PlayAnimations(Unit.HurtAnimHash);
+        }
 
         // need to account for hurt animation time and take the maximum of the end times
         yield return new WaitForSeconds(activeSkill.m_AnimationTime);
 
-        if (!activeSkill.IsAoe)
+        if (!m_IsSelfTarget && !activeSkill.IsAoe)
         {
             Unit target = targets[0];
             attacker.transform.position = m_CachedAttackerPosition;

@@ -253,3 +253,16 @@ public class GridLogic : MonoBehaviour
     }
     #endregion
 }
+
+public static class GridHelper
+{
+    public static bool IsSameSide(UnitAllegiance unitSide, GridType targetType)
+    {
+        return (unitSide == UnitAllegiance.PLAYER && targetType == GridType.PLAYER) || (unitSide == UnitAllegiance.ENEMY && targetType == GridType.ENEMY);
+    }
+
+    public static bool IsOpposingSide(UnitAllegiance unitSide, GridType targetType)
+    {
+        return (unitSide == UnitAllegiance.PLAYER && targetType == GridType.ENEMY) || (unitSide == UnitAllegiance.ENEMY && targetType == GridType.PLAYER);
+    }
+}

@@ -8,6 +8,7 @@ public struct UnitPlacement
     public Unit m_Unit;
     public CoordPair m_Coodinates;
     public Stats m_Stats;
+    public ClassSO m_Class;
 }
 
 [CreateAssetMenu(fileName="BattleSO", menuName="ScriptableObject/Battle/BattleSO")]

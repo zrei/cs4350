@@ -24,7 +24,21 @@ public class StatusManager : IStatChange
     #endregion
 
     #region Reduce Stack
+    public void ReduceStack(string statusEffectName, int reduceAmount)
+    {
+        if (!m_StatusEffects.TryGetValue(statusEffectName, out StatusEffect statusEffect))
+            return;
 
+        statusEffect.ReduceStack(reduceAmount);
+        if (statusEffect.IsDepleted)
+            m_StatusEffects.Remove(statusEffectName);
+    }
+
+    public void ClearStatusEffect(string statusEffectName)
+    {
+        if (m_StatusEffects.ContainsKey(statusEffectName))
+            m_StatusEffects.Remove(statusEffectName);
+    }
     #endregion
 
     #region Tick
