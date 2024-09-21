@@ -57,7 +57,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     protected StatusManager m_StatusManager = new StatusManager();
 
-    private ClassSO m_Class;
+    protected ClassSO m_Class;
 
     public VoidEvent PostAttackEvent;
 
@@ -236,13 +236,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     {
         Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
         m_Mana = Mathf.Clamp(m_Mana + amount, 0f, GetTotalStat(StatType.MANA));
-    }
-    #endregion
-
-    #region Active Skills
-    public List<ActiveSkillSO> GetAvailableActiveSkills()
-    {
-        return m_Class.m_Weapon.m_WeaponActiveSkills.ToList();
     }
     #endregion
 
