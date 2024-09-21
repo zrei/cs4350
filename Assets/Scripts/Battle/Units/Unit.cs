@@ -37,6 +37,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public bool IsDead => m_Health <= 0;
 
     private float m_Mana;
+    public float RemainingMana => m_Mana;
 
     /// <summary>
     /// This is used to store what their stats SHOULD be,
@@ -56,7 +57,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     protected StatusManager m_StatusManager = new StatusManager();
 
-    private ClassSO m_Class;
+    protected ClassSO m_Class;
 
     public VoidEvent PostAttackEvent;
 
@@ -69,6 +70,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     {
         m_Stats = stats;
         m_Health = stats.m_Health;
+        m_Mana = stats.m_Mana;
         m_Class = unitClass;
     }
 

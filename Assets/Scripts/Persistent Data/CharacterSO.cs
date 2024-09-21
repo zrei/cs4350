@@ -4,7 +4,7 @@ using UnityEngine;
 public class CharacterSO : ScriptableObject
 {
     // public Mesh m_BaseModel;
-    public string m_Name;
+    public string m_CharacterName;
     public string m_Description;
     public ClassSO m_StartingClass;
     public int m_StartingLevel;
