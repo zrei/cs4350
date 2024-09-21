@@ -9,7 +9,8 @@ public enum WeaponType
     MAGIC
 }
 
-public class WeaponSO
+[CreateAssetMenu(fileName = "WeaponSO", menuName = "ScriptableObject/WeaponSO")]
+public class WeaponSO : ScriptableObject
 {
     public WeaponType m_WeaponType;
     // public Mesh m_WeaponModel;

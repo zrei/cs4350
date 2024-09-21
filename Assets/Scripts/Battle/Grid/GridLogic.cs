@@ -265,4 +265,34 @@ public static class GridHelper
     {
         return (unitSide == UnitAllegiance.PLAYER && targetType == GridType.ENEMY) || (unitSide == UnitAllegiance.ENEMY && targetType == GridType.PLAYER);
     }
+
+    public static GridType GetTargetType(ActiveSkillSO activeSkillSO, UnitAllegiance unitSide)
+    {
+        if (activeSkillSO.IsSelfTarget)
+            return GetSameSide(unitSide);
+        else if (activeSkillSO.IsOpposingSideTarget)
+            return GetOpposingSide(unitSide);
+        else
+            return GetSameSide(unitSide);
+    }   
+
+    public static GridType GetSameSide(UnitAllegiance unitSide)
+    {
+        return unitSide switch
+        {
+            UnitAllegiance.PLAYER => GridType.PLAYER,
+            UnitAllegiance.ENEMY => GridType.ENEMY,
+            _ => GridType.PLAYER
+        };
+    }
+
+    public static GridType GetOpposingSide(UnitAllegiance unitSide)
+    {
+        return unitSide switch
+        {
+            UnitAllegiance.PLAYER => GridType.ENEMY,
+            UnitAllegiance.ENEMY => GridType.PLAYER,
+            _ => GridType.PLAYER
+        };
+    }
 }

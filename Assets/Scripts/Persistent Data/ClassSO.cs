@@ -1,10 +1,11 @@
 using UnityEngine;
 
 // account for outfit types somewhere along the way
+[CreateAssetMenu(fileName = "ClassSO", menuName = "ScriptableObject/ClassSO")]
 public class ClassSO : ScriptableObject
 {
     [Header("Details")]
-    public string m_Name;
+    public string m_ClassName;
     public Sprite m_Icon;
     [Tooltip("Level at which this class is unlocked")]
     public int m_LevelLock;

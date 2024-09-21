@@ -47,9 +47,11 @@ public class StatusManager : IStatChange
         HashSet<StatusEffect> toRemove = new() {};
         foreach (StatusEffect statusEffect in m_StatusEffects.Values)
         {
-            Logger.Log(this.GetType().Name, $"Afflicting status effect", LogLevel.LOG);
+            Logger.Log(this.GetType().Name, $"Afflicting status effect {statusEffect.Name}", LogLevel.LOG);
             statusEffect.Tick(unit);
-            toRemove.Add(statusEffect);
+
+            if (statusEffect.IsDepleted)
+                toRemove.Add(statusEffect);
         }
 
         foreach (StatusEffect statusEffect in toRemove)

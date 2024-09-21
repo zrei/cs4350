@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 [System.Serializable]
@@ -9,6 +8,7 @@ public struct UnitPlacement
     public CoordPair m_Coodinates;
     public Stats m_Stats;
     public ClassSO m_Class;
+    public EnemyActionSetSO m_Actions;
 }
 
 [CreateAssetMenu(fileName="BattleSO", menuName="ScriptableObject/Battle/BattleSO")]

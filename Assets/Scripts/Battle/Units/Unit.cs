@@ -37,6 +37,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public bool IsDead => m_Health <= 0;
 
     private float m_Mana;
+    public float RemainingMana => m_Mana;
 
     /// <summary>
     /// This is used to store what their stats SHOULD be,
@@ -69,6 +70,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     {
         m_Stats = stats;
         m_Health = stats.m_Health;
+        m_Mana = stats.m_Mana;
         m_Class = unitClass;
     }
 
@@ -234,6 +236,13 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     {
         Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
         m_Mana = Mathf.Clamp(m_Mana + amount, 0f, GetTotalStat(StatType.MANA));
+    }
+    #endregion
+
+    #region Active Skills
+    public List<ActiveSkillSO> GetAvailableActiveSkills()
+    {
+        return m_Class.m_Weapon.m_WeaponActiveSkills.ToList();
     }
     #endregion
 

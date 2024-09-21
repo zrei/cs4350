@@ -79,6 +79,7 @@ public abstract class ActiveSkillSO : ScriptableObject
     public bool IsPhysicalAttack => !IsMagic && ContainsAttackType(SkillType.ATTACK);
     public bool IsMagicAttack => IsMagic && ContainsAttackType(SkillType.ATTACK);
     public bool IsSelfTarget => m_TargetRules.Any(x => x is LockToSelfTargetRuleSO);
+    public bool IsOpposingSideTarget => !IsSelfTarget && m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
 
     public bool ContainsAttackType(SkillType skillType)
     {

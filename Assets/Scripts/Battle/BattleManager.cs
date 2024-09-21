@@ -14,6 +14,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleSO m_TestBattle;
     [SerializeField] private List<Unit> m_TestPlacement;
     [SerializeField] private List<Stats> m_TestStats;
+    [SerializeField] private List<ClassSO> m_TestClasses;
 
     private IEnumerator TestStart()
     {
@@ -64,7 +65,7 @@ public class BattleManager : MonoBehaviour
         m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
 
         // TODO: This is test code
-        InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats);
+        InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats, m_TestClasses);
     }
 
     private void Awake()
@@ -83,7 +84,7 @@ public class BattleManager : MonoBehaviour
     /// <param name="battleSO"></param>
     /// <param name="playerUnits"></param>
     // TODO: Bundle the players in a better way OR intialise them in the level FIRST
-    public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats)
+    public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats, List<ClassSO> playerClasses)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
@@ -101,7 +102,7 @@ public class BattleManager : MonoBehaviour
 
         for (int i = 0; i < playerUnits.Count; ++i)
         {
-            InstantiateUnit(new UnitPlacement {m_Coodinates = battleSO.m_PlayerStartingTiles[i], m_Unit = playerUnits[i], m_Stats = playerStats[i]}, GridType.PLAYER);
+            InstantiateUnit(new UnitPlacement {m_Coodinates = battleSO.m_PlayerStartingTiles[i], m_Unit = playerUnits[i], m_Stats = playerStats[i], m_Class = playerClasses[i]}, GridType.PLAYER);
         }
 
         m_TurnQueue.OrderTurnQueue();
@@ -117,7 +118,10 @@ public class BattleManager : MonoBehaviour
     private void InstantiateUnit(UnitPlacement unitPlacement, GridType gridType)
     {
         Unit unit = Instantiate(unitPlacement.m_Unit);
-        unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class);
+        if (gridType == GridType.PLAYER)
+            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class);
+        else
+            ((EnemyUnit) unit).Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions);
         m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
         m_TurnQueue.AddUnit(unit);
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
