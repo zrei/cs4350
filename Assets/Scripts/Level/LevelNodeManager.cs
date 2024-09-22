@@ -84,7 +84,7 @@ public class LevelNodeManager : MonoBehaviour
         //Debug.DrawRay(ray.origin, ray.direction * 100, Color.white, 100f, false); 
         foreach (RaycastHit raycastHit in raycastHits)
         {
-            node = raycastHit.collider.gameObject.GetComponent<NodeInternal>();
+            node = raycastHit.collider.gameObject.GetComponentInParent<NodeInternal>();
 
             if (node)
                 return true;
