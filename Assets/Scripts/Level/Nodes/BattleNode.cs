@@ -7,6 +7,12 @@ public class BattleNode : NodeInternal
         Debug.Log("Entered Battle Node");
     }
     
+    public override void StartNode()
+    {
+        Debug.Log("Starting Battle Node");
+        GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
+    }
+    
     public override void OnClearNode()
     {
         Debug.Log("Cleared Battle Node");

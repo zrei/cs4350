@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 
 namespace Game
@@ -18,9 +19,13 @@ namespace Game
         [SerializeField]
         private Camera attackAnimCamera;
 
+        [SerializeField]
+        private Camera levelCamera;
+
         public Camera MainCamera => mainCamera;
         public Camera HUDCamera => hudCamera;
         public Camera UICamera => uiCamera;
         public Camera AttackAnimCamera => attackAnimCamera;
+        public Camera LevelCamera => levelCamera;
     }
 }

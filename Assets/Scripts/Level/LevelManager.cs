@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game;
 using Game.Input;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -15,6 +17,9 @@ public enum PlayerLevelSelectionState
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
+    // Camera
+    [SerializeField] private Camera m_LevelCamera;
+    
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
     [SerializeField] LevelNodeVisualManager m_LevelNodeVisualManager;
@@ -46,6 +51,9 @@ public class LevelManager : MonoBehaviour
         
         InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
+        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
     }
 
     public void OnDestroy()
@@ -66,8 +74,8 @@ public class LevelManager : MonoBehaviour
 
     public void Initialise()
     {
-        var levelNodes = GetComponentsInChildren<NodeInternal>().ToList();
-        var levelEdges = GetComponentsInChildren<EdgeInternal>().ToList();
+        var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
+        var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
         var timeLimit = m_TestLevel.m_TimeLimit;
         
         // Initialise the internal graph representation of the level
@@ -186,8 +194,54 @@ public class LevelManager : MonoBehaviour
         
         GlobalEvents.Level.TimeRemainingUpdatedEvent(m_LevelTimerLogic.TimeRemaining);
         
+        destNode.StartNode();
+    }
+
+    #endregion
+
+    #region Callbacks
+
+    private void OnBattleNodeStart(BattleNode battleNode)
+    {
+        Debug.Log("Starting Battle Node");
+        
+        // Disable inputs
+        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        
+        GlobalEvents.Battle.BattleEndEvent += OnBattleEnd(battleNode);
+        
+        m_LevelCamera.gameObject.SetActive(false);
+        GameSceneManager.Instance.LoadBattleScene();
+    }
+    
+    private GlobalEvents.Battle.UnitAllegianceEvent OnBattleEnd(BattleNode battleNode)
+    {
+        return (victoriousSide) =>
+        {
+            Debug.Log("Ending Battle in 5 seconds");
+            
+            // Insert some delay here?
+            
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd(battleNode);
+            GlobalEvents.Level.BattleNodeEndEvent?.Invoke(battleNode);
+        };
+    }
+    
+    private void OnBattleNodeEnd(BattleNode battleNode)
+    {
+        Debug.Log("Ending Battle Node");
+        GameSceneManager.Instance.UnloadBattleScene();
+        
+        // Enable inputs
+        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        m_LevelCamera.gameObject.SetActive(true);
+        
         DisplayMovableNodes();
     }
+    
 
     #endregion
 }

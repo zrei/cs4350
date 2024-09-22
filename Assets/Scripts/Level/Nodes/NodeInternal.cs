@@ -71,19 +71,16 @@ public abstract class NodeInternal : MonoBehaviour
 
     #endregion
 
-    #region Events
-    
-    public VoidEvent OnEnterNodeEvent;
-    public VoidEvent OnClearNodeEvent;
-    public VoidEvent OnExitNodeEvent;
-
-    #endregion
-
     #region Callbacks
 
     public virtual void OnEnterNode()
     {
         Debug.Log("Entered Node: " + m_NodeInfo.m_NodeName);
+    }
+
+    public virtual void StartNode()
+    {
+        Debug.Log("Starting Node: " + m_NodeInfo.m_NodeName);
     }
     
     public virtual void OnClearNode()

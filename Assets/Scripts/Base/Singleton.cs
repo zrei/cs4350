@@ -13,7 +13,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
         if (m_Instance != null)
         {
-            Debug.LogError("An instance already exists!");
+            Debug.LogError("An instance already exists! : " + typeof(T).Name);
             Destroy(this.gameObject);
             return;
         }
