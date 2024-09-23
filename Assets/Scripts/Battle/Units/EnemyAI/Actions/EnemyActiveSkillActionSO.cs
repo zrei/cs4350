@@ -29,7 +29,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                if (m_ActiveSkill.IsValidTargetTile(coordinates, enemyUnit, targetGridType) && mapLogic.IsTileOccupied(targetGridType, coordinates))
+                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, true))
                 {
                     m_PossibleAttackPositions.Add(coordinates);
                     hasPossibleAttackPosition = true;

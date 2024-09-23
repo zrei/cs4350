@@ -74,11 +74,6 @@ public class MapLogic : MonoBehaviour
     #endregion
 
     #region Helper
-    public bool IsTileOccupied(GridType gridType, CoordPair tile)
-    {
-        return RetrieveGrid(gridType).IsTileOccupied(tile);
-    }
-
     /// <summary>
     /// Given a ray, tries to retrieve a tile that the ray connects with. Will also return
     /// the grid type of the hit ray, helpful for attacks.
