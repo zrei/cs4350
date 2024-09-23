@@ -188,9 +188,10 @@ public class PlayerTurnManager : TurnManager
 
     private void UpdateAttackState()
     {
-        if (m_HasHitGrid && m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
+        ActiveSkillSO currSkill = m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex];
+        if (m_HasHitGrid && m_MapLogic.IsValidSkillTargetTile(currSkill, m_CurrUnit, m_CurrTargetTile, m_CurrTileSide))
         {
-            m_MapLogic.SetTarget(m_CurrTileSide, m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex], m_CurrTargetTile);
+            m_MapLogic.SetTarget(m_CurrTileSide, currSkill, m_CurrTargetTile);
         }
         else
         {
@@ -237,9 +238,10 @@ public class PlayerTurnManager : TurnManager
 
     private bool TryPerformSkill()
     {
-        if (m_HasHitGrid && m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide) && m_MapLogic.IsTileOccupied(m_CurrTileSide, m_CurrTargetTile))
+        ActiveSkillSO currSkill = m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex];
+        if (m_HasHitGrid && m_MapLogic.IsValidSkillTargetTile(currSkill, m_CurrUnit, m_CurrTargetTile, m_CurrTileSide, true))
         {
-            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex], m_CurrTargetTile, CompleteSkill);
+            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, currSkill, m_CurrTargetTile, CompleteSkill);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
             return true;
         }

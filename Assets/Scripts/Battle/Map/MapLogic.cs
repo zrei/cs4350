@@ -125,6 +125,11 @@ public class MapLogic : MonoBehaviour
     {
         RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile, completeSkillEvent);
     }
+
+    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
+    {
+        return RetrieveGrid(gridType).IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied);
+    }
     #endregion
 
     #region Unit Movement
