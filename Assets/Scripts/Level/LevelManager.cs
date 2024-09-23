@@ -9,11 +9,12 @@ using UnityEngine.Serialization;
 public enum PlayerLevelSelectionState
 {
     SELECTING_NODE,
-    MOVING_NODE
+    MOVING_NODE,
+    STARTING_NODE_EVENT
 }
 
 /// <summary>
-/// Manages the overall level and player interactions
+/// Main driver class of the level, manages the overall level and player interactions
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
@@ -121,7 +122,9 @@ public class LevelManager : MonoBehaviour
     {
         if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
         {
-            m_CurrState = PlayerLevelSelectionState.MOVING_NODE;
+            m_CurrState = m_CurrSelectedNode == m_LevelNodeManager.CurrentNode 
+                ? PlayerLevelSelectionState.STARTING_NODE_EVENT 
+                : PlayerLevelSelectionState.MOVING_NODE;
         }
         else
         {
@@ -145,6 +148,13 @@ public class LevelManager : MonoBehaviour
                 Debug.Log("Player Action: Moving to Node");
                 TryMoveToNode();
                 break;
+            case PlayerLevelSelectionState.STARTING_NODE_EVENT:
+                Debug.Log("Player Action: Starting Node Event");
+                TryStartNodeEvent();
+                break;
+            default:
+                Debug.Log("Player Action: Invalid State");
+                break;
         }
     }
 
@@ -157,24 +167,21 @@ public class LevelManager : MonoBehaviour
                 GlobalEvents.Level.NodeDeselectedEvent(m_CurrSelectedNode);
             }
 
-            m_CurrSelectedNode = m_CurrTargetNode;
-            GlobalEvents.Level.NodeSelectedEvent(m_CurrTargetNode);
+            SelectNode(m_CurrTargetNode);
         }
         else if (m_CurrSelectedNode)
         {
-            GlobalEvents.Level.NodeDeselectedEvent(m_CurrSelectedNode);
-            m_CurrSelectedNode = null;
+            DeselectNode();
         }
     }
 
     private void TryMoveToNode()
     {
-        var currNode = m_LevelNodeManager.CurrentNode;
         var destNode = m_CurrSelectedNode;
         
-        if (currNode == destNode)
+        if (m_LevelNodeManager.IsCurrentNodeCleared() == false)
         {
-            Debug.Log("Node Movement: Already at node");
+            Debug.Log("Node Movement: Current Node is not yet cleared");
             return;
         }
         
@@ -186,15 +193,35 @@ public class LevelManager : MonoBehaviour
 
         m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
         
-        GlobalEvents.Level.NodeExitedEvent(currNode);
-        GlobalEvents.Level.NodeMovementEvent(currNode, destNode);
-        GlobalEvents.Level.NodeEnteredEvent(destNode);
-        
         m_LevelTimerLogic.AdvanceTimer(timeCost);
+    }
+
+    private void TryStartNodeEvent()
+    {
+        var currNode = m_LevelNodeManager.CurrentNode;
+
+        if (currNode.IsCleared)
+        {
+            Debug.Log("Node Event: Node is already cleared");
+            return;
+        }
         
-        GlobalEvents.Level.TimeRemainingUpdatedEvent(m_LevelTimerLogic.TimeRemaining);
+        DeselectNode();
         
-        destNode.StartNode();
+        currNode.StartNodeEvent();
+    }
+    
+    private void SelectNode(NodeInternal node)
+    {
+        m_CurrSelectedNode = node;
+        GlobalEvents.Level.NodeSelectedEvent(m_CurrTargetNode);
+    }
+    
+    private void DeselectNode()
+    {
+        var selectedNode = m_CurrSelectedNode;
+        m_CurrSelectedNode = null;
+        GlobalEvents.Level.NodeSelectedEvent(selectedNode);
     }
 
     #endregion
@@ -231,15 +258,19 @@ public class LevelManager : MonoBehaviour
     private void OnBattleNodeEnd(BattleNode battleNode)
     {
         Debug.Log("Ending Battle Node");
+        
+        m_LevelCamera.gameObject.SetActive(true);
+        
         GameSceneManager.Instance.UnloadBattleScene();
+        
+        // Update the level state
+        m_LevelNodeManager.ClearCurrentNode();
+        
+        DisplayMovableNodes();
         
         // Enable inputs
         InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
-        
-        m_LevelCamera.gameObject.SetActive(true);
-        
-        DisplayMovableNodes();
     }
     
 

@@ -27,6 +27,8 @@ public class LevelTimerLogic : MonoBehaviour
     {
         m_TimeRemaining -= deltaTime;
         m_TimeRemaining = Mathf.Max(0, m_TimeRemaining);
+        
+        GlobalEvents.Level.TimeRemainingUpdatedEvent(m_TimeRemaining);
     }
     
     #endregion

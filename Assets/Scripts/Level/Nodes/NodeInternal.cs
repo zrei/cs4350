@@ -44,7 +44,7 @@ public abstract class NodeInternal : MonoBehaviour
     public bool IsCleared => m_IsCleared;
     public bool IsCurrent => m_IsCurrent;
     
-    public void ClearNode()
+    public void SetCleared()
     {
         m_IsCleared = true;
     }
@@ -73,25 +73,30 @@ public abstract class NodeInternal : MonoBehaviour
 
     #region Callbacks
 
-    public virtual void OnEnterNode()
+    public virtual void EnterNode()
     {
         Debug.Log("Entered Node: " + m_NodeInfo.m_NodeName);
+        m_IsCurrent = true;
+        GlobalEvents.Level.NodeEnteredEvent(this);
     }
 
-    public virtual void StartNode()
+    public virtual void StartNodeEvent()
     {
         Debug.Log("Starting Node: " + m_NodeInfo.m_NodeName);
     }
     
-    public virtual void OnClearNode()
+    public virtual void ClearNode()
     {
-        ClearNode();
         Debug.Log("Cleared Node: " + m_NodeInfo.m_NodeName);
+        SetCleared();
+        GlobalEvents.Level.NodeClearedEvent(this);
     }
     
-    public virtual void OnExitNode()
+    public virtual void ExitNode()
     {
         Debug.Log("Exited Node: " + m_NodeInfo.m_NodeName);
+        m_IsCurrent = false;
+        GlobalEvents.Level.NodeExitedEvent(this);
     }
 
     #endregion

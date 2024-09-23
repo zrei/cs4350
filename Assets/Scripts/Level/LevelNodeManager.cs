@@ -30,6 +30,7 @@ public class LevelNodeManager : MonoBehaviour
         // Retrieve all nodes in the level
         foreach (var levelNode in levelNodes)
         {
+            levelNode.Initialise();
             m_LevelNodes.Add(levelNode);
         }
         
@@ -49,22 +50,21 @@ public class LevelNodeManager : MonoBehaviour
     public void SetStartNode(NodeInternal startNode)
     {
         m_CurrentNodeInternal = startNode;
-        m_CurrentNodeInternal.SetCurrent(true);
-        m_CurrentNodeInternal.OnEnterNode();
+        m_CurrentNodeInternal.EnterNode();
     }
 
-    public void MoveToNode(NodeInternal nodeInternal, out float timeCost)
+    public void MoveToNode(NodeInternal destNode, out float timeCost)
     {
-        m_CurrentNodeInternal.OnClearNode();
-        m_CurrentNodeInternal.OnExitNode();
-        m_CurrentNodeInternal.SetCurrent(false);
+        m_CurrentNodeInternal.ClearNode();
+        m_CurrentNodeInternal.ExitNode();
             
         // Retrieve cost to move to the node
-        timeCost = m_CurrentNodeInternal.AdjacentNodes[nodeInternal];
+        timeCost = m_CurrentNodeInternal.AdjacentNodes[destNode];
         
-        m_CurrentNodeInternal = nodeInternal;
-        m_CurrentNodeInternal.OnEnterNode();
-        m_CurrentNodeInternal.SetCurrent(true);
+        GlobalEvents.Level.NodeMovementEvent(m_CurrentNodeInternal, destNode);
+        
+        m_CurrentNodeInternal = destNode;
+        m_CurrentNodeInternal.EnterNode();
     }
 
     #endregion
@@ -102,6 +102,16 @@ public class LevelNodeManager : MonoBehaviour
     public bool CanMoveToNode(NodeInternal destNode)
     {
         return m_CurrentNodeInternal.AdjacentNodes.ContainsKey(destNode);
+    }
+    
+    public bool IsCurrentNodeCleared()
+    {
+        return m_CurrentNodeInternal.IsCleared;
+    }
+    
+    public void ClearCurrentNode()
+    {
+        m_CurrentNodeInternal.ClearNode();
     }
     
 
