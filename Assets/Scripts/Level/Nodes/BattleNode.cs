@@ -2,19 +2,12 @@ using UnityEngine;
 
 public class BattleNode : NodeInternal
 {
-    public override void OnEnterNode()
-    {
-        Debug.Log("Entered Battle Node");
-    }
+    [SerializeField] private BattleSO m_BattleSO;
+    public BattleSO BattleSO => m_BattleSO;
     
-    public override void OnClearNode()
+    public override void StartNodeEvent()
     {
-        Debug.Log("Cleared Battle Node");
-        ClearNode();
-    }
-    
-    public override void OnExitNode()
-    {
-        Debug.Log("Exited Battle Node");
+        Debug.Log("Starting Battle Node");
+        GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
     }
 }

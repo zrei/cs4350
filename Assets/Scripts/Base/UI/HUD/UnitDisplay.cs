@@ -52,6 +52,11 @@ namespace Game.UI
 
             GlobalEvents.Battle.PreviewCurrentUnitEvent += PreviewCurrentUnit;
         }
+        
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= PreviewCurrentUnit;
+        }
 
         private void PreviewCurrentUnit(Unit currentUnit)
         {
