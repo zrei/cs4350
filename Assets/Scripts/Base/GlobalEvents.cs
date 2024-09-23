@@ -29,6 +29,7 @@ public static class GlobalEvents {
         public static UnitEvent PreviewCurrentUnitEvent;
         public static AttackEvent AttackAnimationEvent; 
         public static VoidEvent CompleteAttackAnimationEvent;
+        public static VoidEvent ReturnFromBattleEvent;
     }
 
     public static class Level
@@ -44,6 +45,11 @@ public static class GlobalEvents {
         public static NodeEvent NodeDeselectedEvent;
         public static NodeTransitionEvent NodeMovementEvent;
         public static BattleNodeEvent BattleNodeStartEvent;
-        public static BattleNodeEvent BattleNodeEndEvent;
+    }
+
+    public static class Scene
+    {
+        public delegate void BattleManagerEvent(BattleManager _);
+        public static BattleManagerEvent BattleSceneLoadedEvent;
     }
 }

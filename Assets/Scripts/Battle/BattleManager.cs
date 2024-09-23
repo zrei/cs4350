@@ -49,6 +49,8 @@ public class BattleManager : MonoBehaviour
     private const float CAMERA_ROTATION_SPEED = 50f;
 
     #region Initialisation
+    private bool isBattleInitialised = false;
+    
     private void Start()
     {
         m_PlayerTurnManager = GetComponent<PlayerTurnManager>();
@@ -65,7 +67,8 @@ public class BattleManager : MonoBehaviour
         m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
 
         // TODO: This is test code
-        InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats, m_TestClasses);
+        // InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats, m_TestClasses);
+        GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke(this);
     }
 
     private void Awake()
@@ -107,6 +110,8 @@ public class BattleManager : MonoBehaviour
 
         m_TurnQueue.OrderTurnQueue();
         m_PlayerUnitSetup.BeginSetup(battleSO.m_PlayerStartingTiles);
+        
+        isBattleInitialised = true;
     }
 
     /// <summary>
@@ -215,7 +220,7 @@ public class BattleManager : MonoBehaviour
     #region Tick Queue
     private void Update()
     {
-        if (!m_BattleTick || !m_WithinBattle)
+        if (!m_BattleTick || !m_WithinBattle || !isBattleInitialised)
             return;
 
         if (m_TurnQueue.TryGetReadyUnit(out Unit readyUnit))

@@ -1,16 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Game;
 using Game.Input;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
 {
     SELECTING_NODE,
-    MOVING_NODE,
-    STARTING_NODE_EVENT
+    MOVING_NODE
 }
 
 /// <summary>
@@ -40,9 +36,13 @@ public class LevelManager : MonoBehaviour
     #endregion
     
     #region Test
+    
+    [Header("Test Settings")]
     [SerializeField] private LevelSO m_TestLevel;
     [SerializeField] private NodeInternal testStartNodeInternal;
     [SerializeField] private List<Unit> m_TestPlayerUnits;
+    [SerializeField] private List<Stats> m_TestStats;
+    [SerializeField] private List<ClassSO> m_TestClasses;
     
     public void Start()
     {
@@ -54,13 +54,16 @@ public class LevelManager : MonoBehaviour
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
         
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
+        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
     }
 
-    public void OnDestroy()
+    public void OnDisable()
     {
         InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        
+        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
+        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
     }
     
     public void DisplayMovableNodes()
@@ -122,9 +125,7 @@ public class LevelManager : MonoBehaviour
     {
         if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
         {
-            m_CurrState = m_CurrSelectedNode == m_LevelNodeManager.CurrentNode 
-                ? PlayerLevelSelectionState.STARTING_NODE_EVENT 
-                : PlayerLevelSelectionState.MOVING_NODE;
+            m_CurrState = PlayerLevelSelectionState.MOVING_NODE;
         }
         else
         {
@@ -147,10 +148,6 @@ public class LevelManager : MonoBehaviour
             case PlayerLevelSelectionState.MOVING_NODE:
                 Debug.Log("Player Action: Moving to Node");
                 TryMoveToNode();
-                break;
-            case PlayerLevelSelectionState.STARTING_NODE_EVENT:
-                Debug.Log("Player Action: Starting Node Event");
-                TryStartNodeEvent();
                 break;
             default:
                 Debug.Log("Player Action: Invalid State");
@@ -190,29 +187,31 @@ public class LevelManager : MonoBehaviour
             Debug.Log("Node Movement: Node is not reachable");
             return;
         }
+        
+        DeselectNode();
+        m_LevelNodeVisualManager.ClearMovableNodes();
 
         m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
         
         m_LevelTimerLogic.AdvanceTimer(timeCost);
-    }
 
-    private void TryStartNodeEvent()
-    {
-        var currNode = m_LevelNodeManager.CurrentNode;
-
-        if (currNode.IsCleared)
+        if (m_LevelNodeManager.IsCurrentNodeCleared())
         {
-            Debug.Log("Node Event: Node is already cleared");
-            return;
+            DisplayMovableNodes();
         }
-        
-        DeselectNode();
-        
-        currNode.StartNodeEvent();
+        else
+        {
+            m_LevelNodeManager.StartCurrentNodeEvent();
+        }
     }
     
     private void SelectNode(NodeInternal node)
     {
+        if (m_CurrSelectedNode)
+        {
+            DeselectNode();
+        }
+        
         m_CurrSelectedNode = node;
         GlobalEvents.Level.NodeSelectedEvent(m_CurrTargetNode);
     }
@@ -221,7 +220,7 @@ public class LevelManager : MonoBehaviour
     {
         var selectedNode = m_CurrSelectedNode;
         m_CurrSelectedNode = null;
-        GlobalEvents.Level.NodeSelectedEvent(selectedNode);
+        GlobalEvents.Level.NodeDeselectedEvent(selectedNode);
     }
 
     #endregion
@@ -236,26 +235,11 @@ public class LevelManager : MonoBehaviour
         InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
         
-        GlobalEvents.Battle.BattleEndEvent += OnBattleEnd(battleNode);
-        
         m_LevelCamera.gameObject.SetActive(false);
-        GameSceneManager.Instance.LoadBattleScene();
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestPlayerUnits, m_TestStats, m_TestClasses);
     }
     
-    private GlobalEvents.Battle.UnitAllegianceEvent OnBattleEnd(BattleNode battleNode)
-    {
-        return (victoriousSide) =>
-        {
-            Debug.Log("Ending Battle in 5 seconds");
-            
-            // Insert some delay here?
-            
-            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd(battleNode);
-            GlobalEvents.Level.BattleNodeEndEvent?.Invoke(battleNode);
-        };
-    }
-    
-    private void OnBattleNodeEnd(BattleNode battleNode)
+    private void OnBattleNodeEnd()
     {
         Debug.Log("Ending Battle Node");
         

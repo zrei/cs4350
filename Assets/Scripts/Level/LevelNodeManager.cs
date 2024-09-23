@@ -114,6 +114,11 @@ public class LevelNodeManager : MonoBehaviour
         m_CurrentNodeInternal.ClearNode();
     }
     
+    public void StartCurrentNodeEvent()
+    {
+        m_CurrentNodeInternal.StartNodeEvent();
+    }
+    
 
     #endregion
 }
