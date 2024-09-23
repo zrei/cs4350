@@ -79,6 +79,7 @@ public class BattleManager : MonoBehaviour
     private void OnDestroy()
     {
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
+        InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
     }
 
     /// <summary>
