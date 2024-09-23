@@ -31,6 +31,7 @@ Transform:
   m_Children:
   - {fileID: 4670914996241298357}
   - {fileID: 2007945793450073597}
+  - {fileID: 5911035684380781142}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5341447321886158398
@@ -79,6 +80,82 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputActions: {fileID: -944628639613478452, guid: dc02e0a4941a08b49a4c4e5b775db800,
     type: 3}
+--- !u!1 &6450751059232893121
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5911035684380781142}
+  - component: {fileID: 8827779406493447720}
+  m_Layer: 0
+  m_Name: GameSceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5911035684380781142
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6450751059232893121}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3907866146980207107}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8827779406493447720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6450751059232893121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6ec8f2a93584fae954a50699caf5f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TestBattle: {fileID: 11400000, guid: 8e0da63f4b4c64a69bb5778440c253a8, type: 2}
+  m_TestPlacement:
+  - {fileID: 8221421887714101629, guid: d1f18683d03ba40e994155cdb2df3f7e, type: 3}
+  - {fileID: 8221421887714101629, guid: c0956fa6dc83b4839853cb08296b9a9e, type: 3}
+  m_TestStats:
+  - m_name: Unit A
+    m_class: Soldier
+    m_Health: 34
+    m_Mana: 0
+    m_PhysicalAttack: 4
+    m_MagicAttack: 4
+    m_PhysicalDefence: 2
+    m_MagicDefence: 2
+    m_Speed: 10
+    m_MovementRange: 4
+    m_TraversableTileTypes: 00000000
+    m_CanSwapTiles: 0
+  - m_name: Unit B
+    m_class: Soldier
+    m_Health: 69
+    m_Mana: 0
+    m_PhysicalAttack: 3
+    m_MagicAttack: 1
+    m_PhysicalDefence: 2
+    m_MagicDefence: 1
+    m_Speed: 2
+    m_MovementRange: 3
+    m_TraversableTileTypes: 00000000
+    m_CanSwapTiles: 0
+  m_TestClasses:
+  - {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+  - {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
 --- !u!1001 &2548829378727783383
 PrefabInstance:
   m_ObjectHideFlags: 0
