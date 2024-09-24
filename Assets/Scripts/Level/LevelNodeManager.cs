@@ -11,6 +11,8 @@ public class LevelNodeManager : MonoBehaviour
     private List<NodeInternal> m_LevelNodes = new();
     public List<NodeInternal> LevelNodes => m_LevelNodes;
     
+    private NodeInternal m_GoalNode;
+    
     // Current State
     private NodeInternal m_CurrentNodeInternal;
 
@@ -118,7 +120,16 @@ public class LevelNodeManager : MonoBehaviour
     {
         m_CurrentNodeInternal.StartNodeEvent();
     }
+
+    public void SetGoalNode(NodeInternal goalNode)
+    {
+        m_GoalNode = goalNode;
+    }
     
+    public bool IsGoalNodeCleared()
+    {
+        return m_GoalNode.IsCleared;
+    }
 
     #endregion
 }
