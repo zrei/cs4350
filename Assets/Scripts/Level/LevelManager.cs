@@ -40,9 +40,7 @@ public class LevelManager : MonoBehaviour
     [Header("Test Settings")]
     [SerializeField] private LevelSO m_TestLevel;
     [SerializeField] private NodeInternal testStartNodeInternal;
-    [SerializeField] private List<Unit> m_TestPlayerUnits;
-    [SerializeField] private List<Stats> m_TestStats;
-    [SerializeField] private List<ClassSO> m_TestClasses;
+    [SerializeField] private List<CharacterBattleData> m_TestPlayer;
     
     public void Start()
     {
@@ -236,7 +234,7 @@ public class LevelManager : MonoBehaviour
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
         
         m_LevelCamera.gameObject.SetActive(false);
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestPlayerUnits, m_TestStats, m_TestClasses);
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestPlayer);
     }
     
     private void OnBattleNodeEnd()

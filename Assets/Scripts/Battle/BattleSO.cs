@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct UnitPlacement
+public struct EnemyUnitPlacement
 {
-    public Unit m_Unit;
+    public EnemyUnit m_Unit;
     public CoordPair m_Coodinates;
     public Stats m_Stats;
     public ClassSO m_Class;
@@ -14,7 +14,7 @@ public struct UnitPlacement
 [CreateAssetMenu(fileName="BattleSO", menuName="ScriptableObject/Battle/BattleSO")]
 public class BattleSO : ScriptableObject
 {
-    public List<UnitPlacement> m_EnemyUnitsToSpawn;
+    public List<EnemyUnitPlacement> m_EnemyUnitsToSpawn;
     /// <summary>
     /// List of coordinates that the player units start in
     /// </summary>

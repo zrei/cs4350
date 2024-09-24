@@ -1,6 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct CharacterSaveData
+{
+    public int m_CharacterId;
+    public int m_ClassId;
+    public int m_CurrLevel;
+    public int m_CurrExp;
+    public Stats m_CurrStats; // write serialiser for this :<
+}
 /*
 // need a serialiser hrm
 public struct CharacterData
@@ -13,10 +21,11 @@ public struct CharacterData
     public Stats m_CurrStats;
 }
 */
-//
+/// <summary>
+/// Saves to JSON only
+/// </summary>
 public class SaveManager : Singleton<SaveManager>
 {
-    private List<CharacterData> m_CurrData = new();
 
     protected override void HandleAwake()
     {

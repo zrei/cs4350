@@ -6,10 +6,8 @@ using UnityEngine;
 /// </summary>
 public class TestBattleInitialiser : MonoBehaviour
 {
+    [SerializeField] private List<CharacterBattleData> m_TestPlayerUnits;
     [SerializeField] private BattleSO m_TestBattle;
-    [SerializeField] private List<Unit> m_TestPlacement;
-    [SerializeField] private List<Stats> m_TestStats;
-    [SerializeField] private List<ClassSO> m_TestClasses;
     
     private void Awake()
     {
@@ -23,6 +21,6 @@ public class TestBattleInitialiser : MonoBehaviour
     private void OnBattleSceneLoaded(BattleManager manager)
     {
         Debug.Log("TestBattleInitializer: Battle scene loaded. Initialising battle.");
-        manager.InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats, m_TestClasses);
+        manager.InitialiseBattle(m_TestBattle, m_TestPlayerUnits);
     }
 }

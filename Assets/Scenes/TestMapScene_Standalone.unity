@@ -1926,6 +1926,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf3d3d0c15b6a4740a61da6bfc3fb51f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_TestPlayerUnits:
+  - m_BaseData: {fileID: 0}
+    m_CurrStats:
+      m_name: Unit A
+      m_class: Soldier
+      m_Health: 34
+      m_Mana: 0
+      m_PhysicalAttack: 4
+      m_MagicAttack: 4
+      m_PhysicalDefence: 2
+      m_MagicDefence: 2
+      m_Speed: 10
+      m_MovementRange: 4
+      m_TraversableTileTypes: 00000000
+      m_CanSwapTiles: 0
+    m_ClassSO: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+  - m_BaseData: {fileID: 0}
+    m_CurrStats:
+      m_name: Unit B
+      m_class: Soldier
+      m_Health: 69
+      m_Mana: 0
+      m_PhysicalAttack: 3
+      m_MagicAttack: 1
+      m_PhysicalDefence: 2
+      m_MagicDefence: 1
+      m_Speed: 2
+      m_MovementRange: 2
+      m_TraversableTileTypes: 00000000
+      m_CanSwapTiles: 0
+    m_ClassSO: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
   m_TestBattle: {fileID: 11400000, guid: 8e0da63f4b4c64a69bb5778440c253a8, type: 2}
   m_TestPlacement:
   - {fileID: 8221421887714101629, guid: d1f18683d03ba40e994155cdb2df3f7e, type: 3}
