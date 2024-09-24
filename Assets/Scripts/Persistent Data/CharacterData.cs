@@ -1,4 +1,4 @@
-public struct CharacterData
+public class CharacterData
 {
     public CharacterSO m_BaseData;
     public ClassSO m_CurrClass;
