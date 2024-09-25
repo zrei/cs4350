@@ -86,7 +86,7 @@ public class BattleManager : MonoBehaviour
     /// <param name="battleSO"></param>
     /// <param name="playerUnits"></param>
     // TODO: Bundle the players in a better way OR intialise them in the level FIRST
-    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitBattleData)
+    public void InitialiseBattle(BattleSO battleSO, List<PlayerUnit> playerUnits)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
@@ -99,12 +99,12 @@ public class BattleManager : MonoBehaviour
             InstantiateEnemyUnit(unitPlacement);
         }
 
-        if (playerUnitBattleData.Count > battleSO.m_PlayerStartingTiles.Count)
+        if (playerUnits.Count > battleSO.m_PlayerStartingTiles.Count)
             Logger.Log(this.GetType().Name, "There are more player units than there are tiles to put them!", LogLevel.ERROR);
 
-        for (int i = 0; i < playerUnitBattleData.Count; ++i)
+        for (int i = 0; i < playerUnits.Count; ++i)
         {
-            InstantiatePlayerUnit(playerUnitBattleData[i], battleSO.m_PlayerStartingTiles[i]);
+            PlacePlayerUnit(playerUnits[i], battleSO.m_PlayerStartingTiles[i]);
         }
 
         m_TurnQueue.OrderTurnQueue();
@@ -128,10 +128,8 @@ public class BattleManager : MonoBehaviour
         m_EnemyUnits.Add(unit);
     }
 
-    private void InstantiatePlayerUnit(CharacterBattleData characterBattleData, CoordPair position)
+    private void PlacePlayerUnit(PlayerUnit unit, CoordPair position)
     {
-        PlayerUnit unit = Instantiate(m_TestPlayerUnit);
-        unit.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO);
         m_MapLogic.PlaceUnit(GridType.PLAYER, unit, position);
         m_TurnQueue.AddUnit(unit);
         m_PlayerUnits.Add(unit);

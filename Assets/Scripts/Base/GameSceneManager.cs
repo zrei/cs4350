@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +9,8 @@ using UnityEngine.SceneManagement;
 public class GameSceneManager : Singleton<GameSceneManager>
 {
     #region Scene Management
+
+    [SerializeField] PlayerUnit m_TestUnit;
 
     public void LoadBattleScene(BattleSO battleSo, List<CharacterBattleData> playerUnits)
     {
@@ -37,8 +40,15 @@ public class GameSceneManager : Singleton<GameSceneManager>
         return manager =>
         {
             Debug.Log("Battle scene loaded. Initialising battle.");
-            manager.InitialiseBattle(battleSo, playerUnits);
+            manager.InitialiseBattle(battleSo, playerUnits.Select(x => InstantiatePlayerUnit(x)).ToList());
         };
+    }
+
+    private PlayerUnit InstantiatePlayerUnit(CharacterBattleData battleData)
+    {
+        PlayerUnit unit = Instantiate(m_TestUnit);
+        unit.Initialise(battleData.m_CurrStats, battleData.m_ClassSO);
+        return unit;
     }
 
     #endregion
