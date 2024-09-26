@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &2117009466897926394
+--- !u!1001 &6922285831468339954
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -11,12 +11,12 @@ PrefabInstance:
     - target: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       propertyPath: m_Name
-      value: BattleNode
+      value: RewardNode
       objectReference: {fileID: 0}
     - target: {fileID: 7512533894349906086, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.68
+      value: 4.19
       objectReference: {fileID: 0}
     - target: {fileID: 7512533894349906086, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
@@ -26,7 +26,7 @@ PrefabInstance:
     - target: {fileID: 7512533894349906086, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.27
+      value: 1.08
       objectReference: {fileID: 0}
     - target: {fileID: 7512533894349906086, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
@@ -70,78 +70,79 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4181535030482913831}
+      addedObject: {fileID: 5848132962229706104}
     - targetCorrespondingSourceObject: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 699115565003873301}
+      addedObject: {fileID: 1456872817153676707}
   m_SourcePrefab: {fileID: 100100000, guid: c9071d1592e7143be9c500ec030495ce, type: 3}
---- !u!114 &3503048923923455154 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3313651568230962248, guid: c9071d1592e7143be9c500ec030495ce,
-    type: 3}
-  m_PrefabInstance: {fileID: 2117009466897926394}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &3986082552617621597 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3040008993552519335, guid: c9071d1592e7143be9c500ec030495ce,
-    type: 3}
-  m_PrefabInstance: {fileID: 2117009466897926394}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &6087823778707063156 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
-    type: 3}
-  m_PrefabInstance: {fileID: 2117009466897926394}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &4181535030482913831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6087823778707063156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb34e478eb4f84f019354305831bcfaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_NodeInfo:
-    m_NodeName: Battle
-    m_NodeDescription: Enemies! Defeat them!
-  m_BattleSO: {fileID: 11400000, guid: 8e0da63f4b4c64a69bb5778440c253a8, type: 2}
---- !u!114 &699115565003873301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6087823778707063156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5909e7c8ed1b4c828617137832762c90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_NodeStateText: {fileID: 8700085001738638169}
-  m_IsSelectedText: {fileID: 3986082552617621597}
-  m_IsMovableText: {fileID: 3503048923923455154}
---- !u!114 &8700085001738638169 stripped
+--- !u!114 &418042686178658641 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7340244871476861859, guid: c9071d1592e7143be9c500ec030495ce,
     type: 3}
-  m_PrefabInstance: {fileID: 2117009466897926394}
+  m_PrefabInstance: {fileID: 6922285831468339954}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &2958176479037758332 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 6922285831468339954}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5848132962229706104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2958176479037758332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47803f9ee7e441d3add5dd391a61d5f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NodeInfo:
+    m_NodeName: Reward
+    m_NodeDescription: Get some rewards
+  m_goldReward: 100
+  m_manaStoneReward: 10
+--- !u!114 &1456872817153676707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2958176479037758332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6918f2f79c1848cfbd15e32a46ca0389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NodeStateText: {fileID: 418042686178658641}
+  m_IsSelectedText: {fileID: 5341460864410255957}
+  m_IsMovableText: {fileID: 5615024200762869434}
+--- !u!114 &5341460864410255957 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3040008993552519335, guid: c9071d1592e7143be9c500ec030495ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 6922285831468339954}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5615024200762869434 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3313651568230962248, guid: c9071d1592e7143be9c500ec030495ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 6922285831468339954}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1

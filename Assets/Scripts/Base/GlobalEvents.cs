@@ -37,6 +37,7 @@ public static class GlobalEvents {
         public delegate void NodeEvent(NodeInternal _);
         public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
         public delegate void BattleNodeEvent(BattleNode _);
+        public delegate void RewardNodeEvent(RewardNode _);
         public delegate void LevelResultEvent(LevelResultType _);
         public static FloatEvent TimeRemainingUpdatedEvent;
         public static NodeEvent NodeEnteredEvent;
@@ -46,6 +47,7 @@ public static class GlobalEvents {
         public static NodeEvent NodeDeselectedEvent;
         public static NodeTransitionEvent NodeMovementEvent;
         public static BattleNodeEvent BattleNodeStartEvent;
+        public static RewardNodeEvent RewardNodeStartEvent;
         public static LevelResultEvent LevelEndEvent;
         public static VoidEvent ReturnFromLevelEvent;
     }

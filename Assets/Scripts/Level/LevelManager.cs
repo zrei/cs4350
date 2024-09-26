@@ -59,12 +59,10 @@ public class LevelManager : MonoBehaviour
     {
         if (InputManager.Instance)
         {
-            InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
-            InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+            DisableLevelGraphInput();
         }
         
-        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent -= OnBattleNodeEnd;
+        RemoveNodeEventCallbacks();
     }
     
     public void DisplayMovableNodes()
@@ -96,13 +94,7 @@ public class LevelManager : MonoBehaviour
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
         
-        InitialiseCallbacks();
-    }
-    
-    private void InitialiseCallbacks()
-    {
-        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        AddNodeEventCallbacks();
     }
     
     private void StartPlayerPhase()
@@ -260,10 +252,24 @@ public class LevelManager : MonoBehaviour
     #endregion
 
     #region Callbacks
+    
+    private void AddNodeEventCallbacks()
+    {
+        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
+        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
+    }
+    
+    private void RemoveNodeEventCallbacks()
+    {
+        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
+        GlobalEvents.Battle.ReturnFromBattleEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
+    }
 
     private void OnBattleNodeStart(BattleNode battleNode)
     {
-        Debug.Log("Starting Battle Node");
+        Debug.Log("LevelManager: Starting Battle Node");
         
         // Disable inputs
         DisableLevelGraphInput();
@@ -277,13 +283,28 @@ public class LevelManager : MonoBehaviour
     
     private void OnBattleNodeEnd()
     {
-        Debug.Log("Ending Battle Node");
+        Debug.Log("LevelManager: Ending Battle Node");
         
         m_LevelCamera.gameObject.SetActive(true);
         
         GameSceneManager.Instance.UnloadBattleScene();
         
         m_TestLevelEventSystem.enabled = true;
+        
+        // Update the level state
+        m_LevelNodeManager.ClearCurrentNode();
+        
+        StartPlayerPhase();
+    }
+    
+    private void OnRewardNodeStart(RewardNode rewardNode)
+    {
+        Debug.Log("LevelManager: Starting Reward Node");
+        
+        // Disable inputs
+        DisableLevelGraphInput();
+        
+        // Maybe insert open chest animation here
         
         // Update the level state
         m_LevelNodeManager.ClearCurrentNode();

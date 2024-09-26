@@ -21,6 +21,10 @@ public class BattleNodeVisual : NodeVisual
         {
             SetNodeState("Current");
         }
+        else if (m_BattleNode.IsGoalNode)
+        {
+            SetNodeState("Final Battle");
+        }
         else
         {
             SetNodeState(m_BattleNode.IsCleared ? "Cleared" : "Battle");

@@ -34,6 +34,12 @@ public class LevelNodeManager : MonoBehaviour
         {
             levelNode.Initialise();
             m_LevelNodes.Add(levelNode);
+            
+            // Check if goal node
+            if (levelNode.IsGoalNode)
+            {
+                m_GoalNode = levelNode;
+            }
         }
         
         // Building the graph from the scene objects
@@ -124,6 +130,7 @@ public class LevelNodeManager : MonoBehaviour
     public void SetGoalNode(NodeInternal goalNode)
     {
         m_GoalNode = goalNode;
+        m_GoalNode.SetGoalNode();
     }
     
     public bool IsGoalNodeCleared()
