@@ -17,6 +17,8 @@ public enum UnitAllegiance
     NONE
 }
 
+public delegate void TrackedValueEvent(float change, float current, float max);
+
 // TODO: Store position here so we don't have to keep raycasting :|
 public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 {
@@ -86,23 +88,35 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     #region Health and Damage
     public float CurrentHealth => m_Health;
+    public float MaxHealth => GetTotalStat(StatType.HEALTH);
 
     public void Heal(float healAmount)
     {
-        m_Health = Mathf.Min(GetTotalStat(StatType.HEALTH), m_Health + healAmount);
+        var max = MaxHealth;
+        var value = Mathf.Min(max, m_Health + healAmount);
+        var change = value - m_Health;
+        m_Health = value;
+        OnHealthChange?.Invoke(change, m_Health, max);
     }
 
     void IHealth.SetHealth(float health)
     {
+        var change = health - m_Health;
         m_Health = health;
+        OnHealthChange?.Invoke(change, m_Health, MaxHealth);
     }
 
     // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
         Logger.Log(this.GetType().Name, $"Unit {name} took {damage} damage", name, this.gameObject, LogLevel.LOG);
-        m_Health = Mathf.Max(0f, m_Health - damage);
+        var value = Mathf.Max(0f, m_Health - damage);
+        var change = value - m_Health;
+        m_Health = value;
+        OnHealthChange?.Invoke(change, value, MaxHealth);
     }
+
+    public event TrackedValueEvent OnHealthChange;
     #endregion
 
     #region Movement
@@ -232,11 +246,20 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Mana
+    public float CurrentMana => m_Mana;
+    public float MaxMana => GetTotalStat(StatType.MANA);
+
     private void AlterMana(float amount)
     {
         Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
-        m_Mana = Mathf.Clamp(m_Mana + amount, 0f, GetTotalStat(StatType.MANA));
+        var max = MaxMana;
+        var value = Mathf.Clamp(m_Mana + amount, 0f, max);
+        var change = value - m_Mana;
+        m_Mana = value;
+        OnManaChange?.Invoke(change, value, max);
     }
+
+    public event TrackedValueEvent OnManaChange;
     #endregion
 
     #region Death
