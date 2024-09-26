@@ -35,7 +35,7 @@ namespace Game.UI
             switch (unit.UnitAllegiance)
             {
                 case UnitAllegiance.PLAYER:
-                    image.color = Color.green;
+                    image.color = Color.cyan;
                     break;
                 case UnitAllegiance.ENEMY:
                     image.color = Color.red;
