@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -60,6 +61,11 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = false;
+        }
+
+        private void OnDisable()
+        {
+            GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
         }
     }
 }
