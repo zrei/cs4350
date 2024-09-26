@@ -1,3 +1,5 @@
+// TODO: This also shouldn't be serializable once data is being passed from persistent manager to level
+[System.Serializable]
 public class CharacterData
 {
     public CharacterSO m_BaseData;
@@ -6,7 +8,10 @@ public class CharacterData
     public int m_CurrExp;
     // current base stats accounting for all levelling but not classes
     public Stats m_CurrStats;
+    
+    public Stats GrowthRate => m_BaseData.m_GrowthRates;
 
+    public int Id => m_BaseData.m_Id;
     public CharacterBattleData GetBattleData()
     {
         return new CharacterBattleData(m_BaseData, m_CurrStats, m_CurrClass);

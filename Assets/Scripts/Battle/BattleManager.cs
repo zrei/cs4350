@@ -84,9 +84,9 @@ public class BattleManager : MonoBehaviour
     /// Initialise battle with the decided upon player units and the pre-placed enemy units
     /// </summary>
     /// <param name="battleSO"></param>
-    /// <param name="playerUnits"></param>
+    /// <param name="playerUnitData"></param>
     // TODO: Bundle the players in a better way OR intialise them in the level FIRST
-    public void InitialiseBattle(BattleSO battleSO, List<PlayerUnit> playerUnits)
+    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitData)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
@@ -99,12 +99,12 @@ public class BattleManager : MonoBehaviour
             InstantiateEnemyUnit(unitPlacement);
         }
 
-        if (playerUnits.Count > battleSO.m_PlayerStartingTiles.Count)
+        if (playerUnitData.Count > battleSO.m_PlayerStartingTiles.Count)
             Logger.Log(this.GetType().Name, "There are more player units than there are tiles to put them!", LogLevel.ERROR);
 
-        for (int i = 0; i < playerUnits.Count; ++i)
+        for (int i = 0; i < playerUnitData.Count; ++i)
         {
-            PlacePlayerUnit(playerUnits[i], battleSO.m_PlayerStartingTiles[i]);
+            InstantiatePlayerUnit(playerUnitData[i], battleSO.m_PlayerStartingTiles[i]);
         }
 
         m_TurnQueue.OrderTurnQueue();
@@ -128,11 +128,13 @@ public class BattleManager : MonoBehaviour
         m_EnemyUnits.Add(unit);
     }
 
-    private void PlacePlayerUnit(PlayerUnit unit, CoordPair position)
+    private void InstantiatePlayerUnit(CharacterBattleData unitBattleData, CoordPair position)
     {
-        m_MapLogic.PlaceUnit(GridType.PLAYER, unit, position);
-        m_TurnQueue.AddUnit(unit);
-        m_PlayerUnits.Add(unit);
+        PlayerUnit playerUnit = Instantiate(m_TestPlayerUnit);
+        playerUnit.Initialise(unitBattleData);
+        m_MapLogic.PlaceUnit(GridType.PLAYER, playerUnit, position);
+        m_TurnQueue.AddUnit(playerUnit);
+        m_PlayerUnits.Add(playerUnit);
     }
     #endregion
 

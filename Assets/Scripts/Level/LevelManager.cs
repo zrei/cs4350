@@ -34,13 +34,14 @@ public class LevelManager : MonoBehaviour
     private NodeInternal m_CurrTargetNode;
     private bool m_HasHitNode;
     #endregion
-    
+
     #region Test
     
     [Header("Test Settings")]
     [SerializeField] private LevelSO m_TestLevel;
     [SerializeField] private NodeInternal testStartNodeInternal;
-    [SerializeField] private List<CharacterBattleData> m_TestPlayer;
+    // should be sent in in the future
+    [SerializeField] private List<CharacterData> m_TestCharacterData;
     
     public void Start()
     {
@@ -234,7 +235,7 @@ public class LevelManager : MonoBehaviour
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
         
         m_LevelCamera.gameObject.SetActive(false);
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestPlayer);
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList());
     }
     
     private void OnBattleNodeEnd()

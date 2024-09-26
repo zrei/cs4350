@@ -5,6 +5,7 @@ using UnityEngine;
 public class ClassSO : ScriptableObject
 {
     [Header("Details")]
+    public int m_Id;
     public string m_ClassName;
     public Sprite m_Icon;
     [Tooltip("Level at which this class is unlocked")]

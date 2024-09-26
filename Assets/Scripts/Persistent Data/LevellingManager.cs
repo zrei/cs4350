@@ -18,6 +18,7 @@ public class LevellingManager : MonoBehaviour
         {
             hasLevelledUp = true;
             characterData.m_CurrLevel += 1;
+            characterData.m_CurrStats = LevelUpStats(characterData.m_CurrStats, characterData.GrowthRate);
         }
         else
         {

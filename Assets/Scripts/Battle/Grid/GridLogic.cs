@@ -147,7 +147,7 @@ public class GridLogic : MonoBehaviour
     #region Unit
     public void PlaceUnit(Unit unit, CoordPair coordinates)
     {
-        unit.transform.parent = transform;
+        //unit.transform.parent = transform;
         unit.PlaceUnit(coordinates, GetTilePosition(coordinates));
         Logger.Log(this.GetType().Name, unit.gameObject.name, $"Placed unit at tile {coordinates} with world position {unit.transform.position}", unit.gameObject, LogLevel.LOG);
         m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = true;

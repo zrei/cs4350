@@ -33,10 +33,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     [SerializeField] Animator m_Animator;
 
     // current health
-    private float m_Health;
+    protected float m_Health;
     public bool IsDead => m_Health <= 0;
 
-    private float m_Mana;
+    protected float m_Mana;
     public float RemainingMana => m_Mana;
 
     /// <summary>
@@ -45,7 +45,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     /// It DOES NOT account for any transient stat changes
     /// due to buffs/debuffs.
     /// </summary>
-    private Stats m_Stats;
+    protected Stats m_Stats;
     public Stats Stat => m_Stats;
 
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
@@ -62,18 +62,13 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public VoidEvent PostAttackEvent;
 
     #region Initialisation
-    /// <summary>
-    /// Initialise stats, position, etc.
-    /// Called when the unit is first spawned onto the battlefield
-    /// </summary>
-    public virtual void Initialise(Stats stats, ClassSO unitClass)
+    protected void Initialise(Stats stats, ClassSO classSo)
     {
         m_Stats = stats;
-        m_Health = stats.m_Health;
-        m_Mana = stats.m_Mana;
-        m_Class = unitClass;
+        m_Health = m_Stats.m_Health;
+        m_Mana = m_Stats.m_Mana;
+        m_Class = classSo;
     }
-
     #endregion
 
     #region Placement

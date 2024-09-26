@@ -10,12 +10,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
 {
     #region Scene Management
 
-    [SerializeField] PlayerUnit m_TestUnit;
-
-    public void LoadBattleScene(BattleSO battleSo, List<CharacterBattleData> playerUnits)
+    public void LoadBattleScene(BattleSO battleSo, List<CharacterBattleData> unitBattleData)
     {
         // Set up the callback to initialize battle parameters for when the battle scene is loaded
-        GlobalEvents.Scene.BattleSceneLoadedEvent = OnBattleSceneLoaded(battleSo, playerUnits);
+        GlobalEvents.Scene.BattleSceneLoadedEvent = OnBattleSceneLoaded(battleSo, unitBattleData);
         
         // Load the battle scene
         SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
@@ -35,22 +33,14 @@ public class GameSceneManager : Singleton<GameSceneManager>
     #region Callbacks
 
     private GlobalEvents.Scene.BattleManagerEvent OnBattleSceneLoaded(
-        BattleSO battleSo, List<CharacterBattleData> playerUnits)
+        BattleSO battleSo, List<CharacterBattleData> unitBattleData)
     {
         return manager =>
         {
             Debug.Log("Battle scene loaded. Initialising battle.");
-            manager.InitialiseBattle(battleSo, playerUnits.Select(x => InstantiatePlayerUnit(x)).ToList());
+            manager.InitialiseBattle(battleSo, unitBattleData);
         };
     }
-
-    private PlayerUnit InstantiatePlayerUnit(CharacterBattleData battleData)
-    {
-        PlayerUnit unit = Instantiate(m_TestUnit);
-        unit.Initialise(battleData.m_CurrStats, battleData.m_ClassSO);
-        return unit;
-    }
-
     #endregion
     
 }

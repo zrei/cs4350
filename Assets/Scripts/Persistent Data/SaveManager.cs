@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 [System.Serializable]
@@ -19,27 +20,19 @@ public struct CharacterSaveData
         m_CurrStats = currStats;
     }
 }
-/*
-// need a serialiser hrm
-public struct CharacterData
-{
-    public CharacterSO m_BaseData;
-    public ClassSO m_CurrClass;
-    public int m_CurrLevel;
-    public int m_CurrExp;
-    // current base stats accounting for all levelling but not classes
-    public Stats m_CurrStats;
-}
-*/
+
 /// <summary>
 /// Saves to JSON only
 /// </summary>
 public class SaveManager : Singleton<SaveManager>
 {
+    private const string UnitDataKey = "UnitData";
 
     protected override void HandleAwake()
     {
         base.HandleAwake();
+        SaveCharacterData(new() {new CharacterSaveData(1, 1, 1, 1, new Stats()), new CharacterSaveData(2, 2, 2, 2, new Stats())});
+        LoadCharacterSaveData();
     }
 
     protected override void HandleDestroy()
@@ -47,13 +40,57 @@ public class SaveManager : Singleton<SaveManager>
         base.HandleDestroy();
     }
 
-    public List<CharacterSaveData> LoadSaveData()
+    public List<CharacterSaveData> LoadCharacterSaveData()
     {
-        return new();
+        string[] saveData = PlayerPrefs.GetString(UnitDataKey).Split("\t");
+        List<CharacterSaveData> characterData = new();
+        foreach (string data in saveData)
+        {
+            if (string.IsNullOrEmpty(data))
+                continue;
+            characterData.Add(JsonUtility.FromJson<CharacterSaveData>(data));
+        }
+        characterData.ForEach(x => Debug.Log(x.m_CharacterId));
+        return characterData;
     }
     
-    public void Save()
+    public void SaveCharacterData(List<CharacterSaveData> data)
     {
-        string jsonString = JsonUtility.ToJson(new CharacterSaveData(1, 2, 3, 4, new Stats()));
+        StringBuilder finalString = new();
+        foreach (CharacterSaveData saveData in data)
+        {
+            finalString.Append(JsonUtility.ToJson(saveData) + "\t");
+        }
+        Debug.Log(finalString);
+        PlayerPrefs.SetString(UnitDataKey, finalString.ToString());
+    }
+}
+
+public static class JsonHelper
+{
+    public static T[] FromJson<T>(string json)
+    {
+        Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
+        return wrapper.Items;
+    }
+
+    public static string ToJson<T>(T[] array)
+    {
+        Wrapper<T> wrapper = new Wrapper<T>();
+        wrapper.Items = array;
+        return JsonUtility.ToJson(wrapper);
+    }
+
+    public static string ToJson<T>(T[] array, bool prettyPrint)
+    {
+        Wrapper<T> wrapper = new Wrapper<T>();
+        wrapper.Items = array;
+        return JsonUtility.ToJson(wrapper, prettyPrint);
+    }
+
+    [System.Serializable]
+    private class Wrapper<T>
+    {
+        public T[] Items;
     }
 }
