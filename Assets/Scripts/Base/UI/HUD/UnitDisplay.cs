@@ -4,25 +4,18 @@ using UnityEngine;
 
 namespace Game.UI
 {
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public class UnitDisplay : MonoBehaviour
     {
         [SerializeField]
+        private bool isCurrentUnitDisplay = true;
+
+        [SerializeField]
+        private UnitAllegiance displayType = UnitAllegiance.PLAYER;
+
+        [SerializeField]
         private FormattedTextDisplay nameDisplay;
-
-        [SerializeField]
-        private FormattedTextDisplay classDisplay;
-
-        [SerializeField]
-        private FormattedTextDisplay levelDisplay;
-
-        [SerializeField]
-        private FormattedTextDisplay moveDisplay;
-
-        [SerializeField]
-        private FormattedTextDisplay hpDisplay;
-
-        [SerializeField]
-        private FormattedTextDisplay mpDisplay;
 
         [SerializeField]
         private FormattedTextDisplay phyAtkDisplay;
@@ -39,56 +32,119 @@ namespace Game.UI
         [SerializeField]
         private FormattedTextDisplay spdDisplay;
 
+        [SerializeField]
+        private ProgressBar hpBar;
+
+        [SerializeField]
+        private ProgressBar mpBar;
+
         private Animator animator;
-        private AnimatorCallbackExecuter animatorCallbackExecuter;
         private bool isHidden;
+
+        private Unit TrackedUnit
+        {
+            get => trackedUnit;
+            set
+            {
+                if (trackedUnit == value) return;
+
+                if (trackedUnit != null)
+                {
+                    trackedUnit.OnHealthChange -= OnHealthChange;
+                    trackedUnit.OnManaChange -= OnManaChange;
+                }
+
+                trackedUnit = value;
+                if (trackedUnit != null)
+                {
+                    trackedUnit.OnHealthChange += OnHealthChange;
+                    trackedUnit.OnManaChange += OnManaChange;
+
+                    if (hpBar != null)
+                    {
+                        hpBar.SetValue(trackedUnit.CurrentHealth, trackedUnit.MaxHealth, 0);
+                    }
+
+                    if (mpBar != null)
+                    {
+                        var maxMana = trackedUnit.MaxMana;
+                        if (maxMana == 0)
+                        {
+                            mpBar.gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            mpBar.gameObject.SetActive(true);
+                            mpBar.SetValue(trackedUnit.CurrentMana, maxMana, 0);
+                        }
+                    }
+                }
+            }
+        }
+        private Unit trackedUnit;
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             animator.enabled = false;
-            animatorCallbackExecuter = animator.GetBehaviour<AnimatorCallbackExecuter>();
-            Hide();
 
-            GlobalEvents.Battle.PreviewCurrentUnitEvent += PreviewCurrentUnit;
+            GetComponent<CanvasGroup>().alpha = 0;
+            isHidden = true;
+
+            if (isCurrentUnitDisplay)
+            {
+                GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewUnit;
+            }
+            else
+            {
+                GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
+            }
         }
         
         private void OnDestroy()
         {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent -= PreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
         }
 
-        private void PreviewCurrentUnit(Unit currentUnit)
+        private void OnPreviewUnit(Unit currentUnit)
         {
-            if (currentUnit == null)
+            if (currentUnit == null || currentUnit.UnitAllegiance != displayType)
             {
                 if (!isHidden) Hide();
-            }
-            else if (currentUnit != null)
-            {
-                if (isHidden) Show();
 
-                var totalStats = currentUnit.GetTotalStats();
-                nameDisplay?.SetValue(totalStats.m_name); // placeholder
-                classDisplay?.SetValue(totalStats.m_class); // placeholder
-                levelDisplay?.SetValue("1"); // placeholder
-                moveDisplay?.SetValue(totalStats.m_MovementRange);
-                hpDisplay?.SetValue(currentUnit.CurrentHealth, totalStats.m_Health);
-                mpDisplay?.SetValue(totalStats.m_Mana, totalStats.m_Mana); // placeholder
-                phyAtkDisplay?.SetValue(totalStats.m_PhysicalAttack);
-                mgcAtkDisplay?.SetValue(totalStats.m_MagicAttack);
-                phyDefDisplay?.SetValue(totalStats.m_PhysicalDefence);
-                mgcDefDisplay?.SetValue(totalStats.m_MagicDefence);
-                spdDisplay?.SetValue(totalStats.m_Speed);
+                TrackedUnit = null;
+                return;
             }
+
+            if (isHidden) Show();
+
+            var totalStats = currentUnit.GetTotalStats();
+            nameDisplay?.SetValue(totalStats.m_name, totalStats.m_class); // placeholder
+
+            phyAtkDisplay?.SetValue(totalStats.m_PhysicalAttack);
+            mgcAtkDisplay?.SetValue(totalStats.m_MagicAttack);
+            phyDefDisplay?.SetValue(totalStats.m_PhysicalDefence);
+            mgcDefDisplay?.SetValue(totalStats.m_MagicDefence);
+            spdDisplay?.SetValue(totalStats.m_Speed);
+
+            TrackedUnit = currentUnit;
+        }
+
+        private void OnHealthChange(float change, float value, float max)
+        {
+            hpBar?.SetValue(value, max);
+        }
+
+        private void OnManaChange(float change, float value, float max)
+        {
+            mpBar?.SetValue(value, max);
         }
 
         private void Show()
         {
             isHidden = false;
             animator.enabled = true;
-            animatorCallbackExecuter.RemoveAllListeners();
-            animatorCallbackExecuter.AddListener(() => animator.enabled = false);
             animator.Play(UIConstants.ShowAnimHash);
         }
 
@@ -96,9 +152,12 @@ namespace Game.UI
         {
             isHidden = true;
             animator.enabled = true;
-            animatorCallbackExecuter.RemoveAllListeners();
-            animatorCallbackExecuter.AddListener(() => animator.enabled = false);
             animator.Play(UIConstants.HideAnimHash);
+        }
+
+        private void OnAnimationFinish()
+        {
+            animator.enabled = false;
         }
     }
 }

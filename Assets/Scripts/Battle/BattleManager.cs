@@ -4,11 +4,10 @@ using UnityEngine;
 using Game.Input;
 using Game;
 
-// may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
 [RequireComponent(typeof(PlayerUnitSetup))]
-public class BattleManager : MonoBehaviour
+public class BattleManager : Singleton<BattleManager>
 {
     #region Test
     [SerializeField] private BattleSO m_TestBattle;
@@ -50,6 +49,9 @@ public class BattleManager : MonoBehaviour
 
     #region Initialisation
     private bool isBattleInitialised = false;
+
+    public PlayerUnitSetup PlayerUnitSetup => m_PlayerUnitSetup;
+    public PlayerTurnManager PlayerTurnManager => m_PlayerTurnManager;
     
     private void Start()
     {
@@ -71,8 +73,9 @@ public class BattleManager : MonoBehaviour
         GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke(this);
     }
 
-    private void Awake()
+    protected override void HandleAwake()
     {
+        base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
     }
 
@@ -212,8 +215,7 @@ public class BattleManager : MonoBehaviour
 
     private void OnRotateCamera(IInput input)
     {
-        var inputVector = input.GetValue<Vector2>();
-        var hAxis = inputVector.x;
+        var hAxis = input.GetValue<float>();
         m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -hAxis * CAMERA_ROTATION_SPEED * Time.deltaTime);
     }
     #endregion
