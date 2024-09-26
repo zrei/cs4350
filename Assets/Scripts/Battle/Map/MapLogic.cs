@@ -128,11 +128,6 @@ public class MapLogic : MonoBehaviour
     #endregion
 
     #region Helper
-    public bool IsTileOccupied(GridType gridType, CoordPair tile)
-    {
-        return RetrieveGrid(gridType).IsTileOccupied(tile);
-    }
-
     /// <summary>
     /// Given a ray, tries to retrieve a tile that the ray connects with. Will also return
     /// the grid type of the hit ray, helpful for attacks.
@@ -178,6 +173,11 @@ public class MapLogic : MonoBehaviour
     public void PerformSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
         RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile, completeSkillEvent);
+    }
+
+    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
+    {
+        return RetrieveGrid(gridType).IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied);
     }
     #endregion
 

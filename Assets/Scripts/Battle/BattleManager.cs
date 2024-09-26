@@ -10,10 +10,8 @@ using Game;
 public class BattleManager : Singleton<BattleManager>
 {
     #region Test
-    [SerializeField] private BattleSO m_TestBattle;
-    [SerializeField] private List<Unit> m_TestPlacement;
-    [SerializeField] private List<Stats> m_TestStats;
-    [SerializeField] private List<ClassSO> m_TestClasses;
+    // TODO: Remove once the method of obtaining the mesh is confirmed
+    [SerializeField] private PlayerUnit m_TestPlayerUnit;
 
     private IEnumerator TestStart()
     {
@@ -89,9 +87,9 @@ public class BattleManager : Singleton<BattleManager>
     /// Initialise battle with the decided upon player units and the pre-placed enemy units
     /// </summary>
     /// <param name="battleSO"></param>
-    /// <param name="playerUnits"></param>
+    /// <param name="playerUnitData"></param>
     // TODO: Bundle the players in a better way OR intialise them in the level FIRST
-    public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats, List<ClassSO> playerClasses)
+    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitData)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
@@ -99,17 +97,17 @@ public class BattleManager : Singleton<BattleManager>
 
         m_MapLogic.ResetMap();
 
-        foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
+        foreach (EnemyUnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
-            InstantiateUnit(unitPlacement, GridType.ENEMY);
+            InstantiateEnemyUnit(unitPlacement);
         }
 
-        if (playerUnits.Count > battleSO.m_PlayerStartingTiles.Count)
+        if (playerUnitData.Count > battleSO.m_PlayerStartingTiles.Count)
             Logger.Log(this.GetType().Name, "There are more player units than there are tiles to put them!", LogLevel.ERROR);
 
-        for (int i = 0; i < playerUnits.Count; ++i)
+        for (int i = 0; i < playerUnitData.Count; ++i)
         {
-            InstantiateUnit(new UnitPlacement {m_Coodinates = battleSO.m_PlayerStartingTiles[i], m_Unit = playerUnits[i], m_Stats = playerStats[i], m_Class = playerClasses[i]}, GridType.PLAYER);
+            InstantiatePlayerUnit(playerUnitData[i], battleSO.m_PlayerStartingTiles[i]);
         }
 
         m_TurnQueue.OrderTurnQueue();
@@ -119,24 +117,27 @@ public class BattleManager : Singleton<BattleManager>
     }
 
     /// <summary>
-    /// Instantiate the visual representation of the unit, placing it on the grid
+    /// Instantiate the visual representation of an enemy unit, placing it on the grid
     /// and initialising the unit
     /// </summary>
     /// <param name="unitPlacement"></param>
     /// <param name="gridType"></param>
-    private void InstantiateUnit(UnitPlacement unitPlacement, GridType gridType)
+    private void InstantiateEnemyUnit(EnemyUnitPlacement unitPlacement)
     {
-        Unit unit = Instantiate(unitPlacement.m_Unit);
-        if (gridType == GridType.PLAYER)
-            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class);
-        else
-            ((EnemyUnit) unit).Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions);
-        m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
+        EnemyUnit unit = Instantiate(unitPlacement.m_Unit);
+        unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions);
+        m_MapLogic.PlaceUnit(GridType.ENEMY, unit, unitPlacement.m_Coodinates);
         m_TurnQueue.AddUnit(unit);
-        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
-            m_PlayerUnits.Add(unit);
-        else
-            m_EnemyUnits.Add(unit);
+        m_EnemyUnits.Add(unit);
+    }
+
+    private void InstantiatePlayerUnit(CharacterBattleData unitBattleData, CoordPair position)
+    {
+        PlayerUnit playerUnit = Instantiate(m_TestPlayerUnit);
+        playerUnit.Initialise(unitBattleData);
+        m_MapLogic.PlaceUnit(GridType.PLAYER, playerUnit, position);
+        m_TurnQueue.AddUnit(playerUnit);
+        m_PlayerUnits.Add(playerUnit);
     }
     #endregion
 
@@ -187,7 +188,7 @@ public class BattleManager : Singleton<BattleManager>
         m_TurnQueue.RemoveUnit(unit);
         // TODO: move this somewhere else
         unit.Die();
-        // Destroy(unit.gameObject);
+        Destroy(unit.gameObject);
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {

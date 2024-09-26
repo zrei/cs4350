@@ -843,6 +843,7 @@ GameObject:
   m_Component:
   - component: {fileID: 975374358}
   - component: {fileID: 975374359}
+  - component: {fileID: 975374360}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -887,37 +888,54 @@ MonoBehaviour:
   m_LevelTimerVisual: {fileID: 2123650210}
   m_TestLevel: {fileID: 11400000, guid: 9806a7bf1e11d4f8898512fad31a8d64, type: 2}
   testStartNodeInternal: {fileID: 7291539890855984691}
-  m_TestPlayerUnits:
-  - {fileID: 8221421887714101629, guid: d1f18683d03ba40e994155cdb2df3f7e, type: 3}
-  - {fileID: 8221421887714101629, guid: c0956fa6dc83b4839853cb08296b9a9e, type: 3}
-  m_TestStats:
-  - m_name: Unit A
-    m_class: Soldier
-    m_Health: 34
-    m_Mana: 0
-    m_PhysicalAttack: 40
-    m_MagicAttack: 4
-    m_PhysicalDefence: 2
-    m_MagicDefence: 2
-    m_Speed: 10
-    m_MovementRange: 4
-    m_TraversableTileTypes: 00000000
-    m_CanSwapTiles: 0
-  - m_name: Unit B
-    m_class: Soldier
-    m_Health: 69
-    m_Mana: 0
-    m_PhysicalAttack: 3
-    m_MagicAttack: 1
-    m_PhysicalDefence: 2
-    m_MagicDefence: 1
-    m_Speed: 2
-    m_MovementRange: 3
-    m_TraversableTileTypes: 00000000
-    m_CanSwapTiles: 0
-  m_TestClasses:
-  - {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
-  - {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+  m_TestCharacterData:
+  - m_BaseData: {fileID: 11400000, guid: fb6157bbfc94f4156b133d12fbdb4025, type: 2}
+    m_CurrClass: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+    m_CurrLevel: 1
+    m_CurrExp: 0
+    m_CurrStats:
+      m_name: Banand
+      m_class: Sword
+      m_Health: 10
+      m_Mana: 1
+      m_PhysicalAttack: 100
+      m_MagicAttack: 1
+      m_PhysicalDefence: 1
+      m_MagicDefence: 1
+      m_Speed: 5
+      m_MovementRange: 1
+      m_TraversableTileTypes: 00000000
+      m_CanSwapTiles: 0
+  - m_BaseData: {fileID: 11400000, guid: b33869b06409249b2aec46848ab45a3d, type: 2}
+    m_CurrClass: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+    m_CurrLevel: 1
+    m_CurrExp: 0
+    m_CurrStats:
+      m_name: :(
+      m_class: Sword
+      m_Health: 10
+      m_Mana: 1
+      m_PhysicalAttack: 100
+      m_MagicAttack: 1
+      m_PhysicalDefence: 1
+      m_MagicDefence: 1
+      m_Speed: 5
+      m_MovementRange: 1
+      m_TraversableTileTypes: 00000000
+      m_CanSwapTiles: 0
+--- !u!114 &975374360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
 --- !u!1 &1375450757
 GameObject:
   m_ObjectHideFlags: 0
@@ -929,6 +947,7 @@ GameObject:
   - component: {fileID: 1375450759}
   - component: {fileID: 1375450758}
   - component: {fileID: 1375450760}
+  - component: {fileID: 1375450761}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -1036,6 +1055,18 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!114 &1375450761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375450757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53bd0d52d36e3fa4a89886241be0abe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1393434861 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3376211541325626010, guid: a5f9622d305ee472e96dd0ceb3fa7997,

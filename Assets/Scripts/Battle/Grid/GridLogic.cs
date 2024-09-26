@@ -306,9 +306,46 @@ public class GridLogic : MonoBehaviour
         return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
     }
 
-    public bool IsTileOccupied(CoordPair tile)
+    private bool IsTileOccupied(CoordPair tile)
     {
         return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
+    }
+
+    /// <summary>
+    /// Checks that it's a valid target tile for the active skill and also checks that at least one square within the target is occupied
+    /// </summary>
+    /// <param name="activeSkillSO"></param>
+    /// <param name="unit"></param>
+    /// <param name="targetTile"></param>
+    /// <returns></returns>
+    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, bool checkOccupied)
+    {
+        if (!activeSkillSO.IsValidTargetTile(targetTile, unit, m_GridType))
+            return false;
+
+        if (!checkOccupied)
+            return true;
+
+        foreach (CoordPair tile in GetInBoundsTargetTiles(activeSkillSO, targetTile))
+        {
+            if (IsTileOccupied(tile))
+                return true;
+        }
+
+        return false;
+    }
+
+    private List<CoordPair> GetInBoundsTargetTiles(ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        List<CoordPair> targetTiles = new();
+        foreach (CoordPair coordPair in activeSkillSO.ConstructAttackTargetTiles(targetTile))
+        {
+            if (!MapData.WithinBounds(coordPair))
+                continue;
+
+            targetTiles.Add(coordPair);
+        }
+        return targetTiles;
     }
     #endregion
 
@@ -319,23 +356,19 @@ public class GridLogic : MonoBehaviour
     /// </summary>
     /// <param name="attackPoints"></param>
     /// <param name="damage"></param>
-    public void PerformSkill(Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
+    public void PerformSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
-        List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
         List<IHealth> targets = new();
-        foreach (CoordPair coordPair in targetTiles)
-        {
-            if (!MapData.WithinBounds(coordPair))
-                continue;
-            
-            if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied)
+        foreach (CoordPair coordPair in GetInBoundsTargetTiles(activeSkill, targetTile))
+        {       
+            if (IsTileOccupied(coordPair))
             {
                 targets.Add(m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit);
             }
         }
 
         attacker.PostAttackEvent += CompleteSkill;
-        attacker.PerformSKill(attack, targets);
+        attacker.PerformSKill(activeSkill, targets);
 
         void CompleteSkill()
         {

@@ -3,9 +3,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName="CharacterSO", menuName="ScriptableObject/CharacterSO")]
 public class CharacterSO : ScriptableObject
 {
-    // public Mesh m_BaseModel;
+    public int m_Id;
+    public GameObject m_BaseModel;
     public string m_CharacterName;
     public string m_Description;
+    public Sprite m_CharacterSprite;
     public ClassSO m_StartingClass;
     public int m_StartingLevel;
     [Tooltip("Starting stats when first unlocked by the player")]

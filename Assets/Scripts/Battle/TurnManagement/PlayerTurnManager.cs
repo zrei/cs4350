@@ -106,7 +106,7 @@ public class PlayerTurnManager : TurnManager
         switch (m_CurrState)
         {
             case PlayerTurnState.SELECTING_ACTION_TARGET:
-                UpdateAttackState();
+                UpdateActiveSkillState();
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 UpdateMoveState();
@@ -128,11 +128,11 @@ public class PlayerTurnManager : TurnManager
         }            
     }
 
-    private void UpdateAttackState()
+    private void UpdateActiveSkillState()
     {
         if (selectedTileData == null || selectedTileVisual == null) return;
 
-        if (SelectedSkill.IsValidTargetTile(selectedTileVisual.Coordinates, m_CurrUnit, selectedTileVisual.GridType))
+        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
         {
             m_MapLogic.SetTarget(selectedTileVisual.GridType, SelectedSkill, selectedTileVisual.Coordinates);
         }
@@ -185,8 +185,7 @@ public class PlayerTurnManager : TurnManager
     {
         if (selectedTileData == null || selectedTileVisual == null) return false;
 
-        if (SelectedSkill.IsValidTargetTile(selectedTileVisual.Coordinates, m_CurrUnit, selectedTileVisual.GridType)
-            && m_MapLogic.IsTileOccupied(selectedTileVisual.GridType, selectedTileVisual.Coordinates))
+        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
         {
             m_MapLogic.PerformSkill(
                 selectedTileVisual.GridType,

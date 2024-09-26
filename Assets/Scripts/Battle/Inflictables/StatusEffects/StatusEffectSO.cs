@@ -8,6 +8,7 @@ public enum StatusEffectType
 
 public abstract class StatusEffectSO : ScriptableObject
 {
+    public int m_Id;
     public string m_StatusEffectName;
     public string m_Description;
     public Sprite m_Sprite;
