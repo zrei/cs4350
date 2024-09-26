@@ -1,28 +1,28 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
+using Game.UI;
 
 public enum TileState
 {
+    SWAPPABLE,
     TRAVERSABLE,
     ATTACKABLE,
+    INSPECTABLE,
     NONE
 }
 
 /// <summary>
 /// Manages the visuals of the tile, e.g. highlighting the tile
 /// </summary>
-[RequireComponent(typeof(Collider))]
 public class TileVisual : MonoBehaviour
 {
-    [SerializeField] TextMeshPro m_TraverseText;
-    [SerializeField] TextMeshPro m_PathText;
-    [SerializeField] TextMeshPro m_TargetText;
+    [SerializeField] RawImage tileImage;
+    public SelectableBase selectable;
 
     private TileState m_CurrState = TileState.NONE;
 
-    public GridType GridType {get; private set;}
-    public Unit ContainedUnit {get; private set;}
-    public CoordPair Coordinates {get; private set;}
+    public GridType GridType { get; private set;}
+    public CoordPair Coordinates { get; private set;}
 
     #region Initialisation
     public void Initialise(GridType gridType, CoordPair coordinates)
@@ -35,10 +35,9 @@ public class TileVisual : MonoBehaviour
     #region State
     public void ResetTile()
     {
+        selectable.interactable = false;
         m_CurrState = TileState.NONE;
         ToggleState(m_CurrState);
-        TogglePath(false);
-        ToggleTarget(false);
     }
 
     public void SetTileState(TileState state)
@@ -46,33 +45,41 @@ public class TileVisual : MonoBehaviour
         m_CurrState = state;
         ToggleState(m_CurrState);
     }
-
-    public void SetUnit(Unit unit)
-    {
-        ContainedUnit = unit;
-    }
     #endregion
 
     #region Graphics
     private void ToggleState(TileState state)
     {
-        m_TraverseText.text = state switch
+        tileImage.color = state switch
         {
-            TileState.NONE => string.Empty,
-            TileState.TRAVERSABLE => "Traverse",
-            TileState.ATTACKABLE => "Attack",
-            _ => "Error"
+            TileState.NONE => new(0, 0, 0, 0),
+            TileState.SWAPPABLE => new(0, 0.5f, 0, 1),
+            TileState.TRAVERSABLE => new(0.1f, 0.1f, 0.5f, 1),
+            TileState.ATTACKABLE => new(0.5f, 0.1f, 0.1f, 1),
+            TileState.INSPECTABLE => new(0.5f, 0.5f, 0, 1),
+            _ => new(0, 0, 0, 0)
         };
+    }
+
+    public void ToggleSwapTarget(bool isTarget)
+    {
+        if (m_CurrState == TileState.NONE) return;
+
+        tileImage.color = isTarget ? new(0.5f, 1, 0.5f, 1) : new(0, 0.5f, 0, 1);
     }
 
     public void TogglePath(bool isPartOfPath)
     {
-        m_PathText.gameObject.SetActive(isPartOfPath);
+        if (m_CurrState == TileState.NONE) return;
+
+        tileImage.color = isPartOfPath ? new(0, 1, 1, 1) : new(0.1f, 0.1f, 0.5f, 1);
     }
 
     public void ToggleTarget(bool isTarget)
     {
-        m_TargetText.gameObject.SetActive(isTarget);
+        if (m_CurrState == TileState.NONE) return;
+
+        tileImage.color = isTarget ? new(1, 0.2f, 0.2f, 1) : new(0.5f, 0.1f, 0.1f, 1);
     }
     #endregion
 }

@@ -1,6 +1,7 @@
 public interface IHealth : IStat
 {
     public float CurrentHealth { get; }
+    public float MaxHealth { get; }
     public bool IsDead => true;
     public void TakeDamage(float damage);
 
@@ -10,4 +11,6 @@ public interface IHealth : IStat
     public void SetHealth(float health);
 
     public void Die();
+
+    public event TrackedValueEvent OnHealthChange;
 }
