@@ -4,6 +4,7 @@ using UnityEngine;
 [System.Serializable]
 public struct EnemyUnitPlacement
 {
+    public GameObject m_BaseMesh;
     public EnemyUnit m_Unit;
     public CoordPair m_Coodinates;
     public Stats m_Stats;
@@ -19,4 +20,5 @@ public class BattleSO : ScriptableObject
     /// List of coordinates that the player units start in
     /// </summary>
     public List<CoordPair> m_PlayerStartingTiles;
+    public int m_ExpReward;
 }

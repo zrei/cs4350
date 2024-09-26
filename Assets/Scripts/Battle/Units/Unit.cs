@@ -64,7 +64,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public VoidEvent PostAttackEvent;
 
     #region Initialisation
-    protected void Initialise(Stats stats, ClassSO classSo)
+    protected void Initialise(Stats stats, ClassSO classSo/*, GameObject baseModel*/)
     {
         m_Stats = stats;
         m_Health = m_Stats.m_Health;

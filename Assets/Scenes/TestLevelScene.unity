@@ -843,6 +843,7 @@ GameObject:
   m_Component:
   - component: {fileID: 975374358}
   - component: {fileID: 975374359}
+  - component: {fileID: 975374360}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -922,6 +923,19 @@ MonoBehaviour:
       m_MovementRange: 1
       m_TraversableTileTypes: 00000000
       m_CanSwapTiles: 0
+--- !u!114 &975374360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
 --- !u!1 &1375450757
 GameObject:
   m_ObjectHideFlags: 0
