@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Input;
+using UnityEngine.EventSystems;
 
 public class PlayerUnitSetup : MonoBehaviour
 {
@@ -41,9 +42,13 @@ public class PlayerUnitSetup : MonoBehaviour
     {
         var inputVector = InputManager.Instance.PointerPositionInput.GetValue<Vector2>();
         Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
-        bool hasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out CoordPair targetTile, out GridType gridType);
+        //bool hasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out CoordPair targetTile, out GridType gridType);
 
-        if (!hasHitGrid || gridType != GridType.PLAYER || !m_PlayerSquares.Contains(targetTile))
+        var targetTile = m_MapLogic.currentTile;
+        if (targetTile == null) return;
+
+
+        if (targetTile.GridType != GridType.PLAYER || !m_PlayerSquares.Contains(targetTile.Coordinates))
             return;
 
         if (m_HasSelectedTile && targetTile.Equals(m_TileToSwap))
@@ -51,14 +56,14 @@ public class PlayerUnitSetup : MonoBehaviour
 
         if (m_HasSelectedTile)
         {
-            m_MapLogic.SwapTiles(GridType.PLAYER, m_TileToSwap, targetTile);
+            m_MapLogic.SwapTiles(GridType.PLAYER, m_TileToSwap, targetTile.Coordinates);
             m_HasSelectedTile = false;
             Logger.Log(this.GetType().Name, $"Swap {m_TileToSwap} with {targetTile}", LogLevel.LOG);
         }
         else
         {
             m_HasSelectedTile = true;
-            m_TileToSwap = targetTile;
+            m_TileToSwap = targetTile.Coordinates;
             Logger.Log(this.GetType().Name, $"Select initial tile {m_TileToSwap}", LogLevel.LOG);
         }
     }

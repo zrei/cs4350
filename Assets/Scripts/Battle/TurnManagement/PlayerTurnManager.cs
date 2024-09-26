@@ -18,7 +18,7 @@ public class PlayerTurnManager : TurnManager
     private int m_CurrAttackIndex = 0;
     private const float ATTACK_INTERVAL_TIME = 5f;
 
-    private Coroutine m_AttackSwapCoroutine = null;
+    //private Coroutine m_AttackSwapCoroutine = null;
 
     private IEnumerator SwitchActiveSkills()
     {
@@ -76,7 +76,16 @@ public class PlayerTurnManager : TurnManager
     private HashSet<PlayerTurnState> m_RemainingActions;
     */
 
-    private ActiveSkillSO m_CurrSelectedSkill;
+    public ActiveSkillSO SelectedSkill
+    {
+        get => selectedSkill;
+        set
+        {
+            selectedSkill = value;
+            // show attackable tiles
+        }
+    }
+    private ActiveSkillSO selectedSkill;
 
     #region Initialisation
     private void Start()
@@ -122,7 +131,7 @@ public class PlayerTurnManager : TurnManager
         }
         */
 
-        TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
+        TransitToAction(PlayerTurnState.SELECTING_ACTION);
 
         InputManager.Instance.EndTurnInput.OnPressEvent += OnEndTurn;
         InputManager.Instance.SwitchActionInput.OnPressEvent += OnSwitchAction;
@@ -146,7 +155,15 @@ public class PlayerTurnManager : TurnManager
     {
         var inputVector = input.GetValue<Vector2>();
         Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
-        m_HasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetTile, out m_CurrTileSide);
+        //m_HasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetTile, out m_CurrTileSide);
+        var currentTile = m_MapLogic.currentTile;
+        m_HasHitGrid = m_MapLogic.currentTile;
+
+        if (m_HasHitGrid)
+        {
+            m_CurrTargetTile = currentTile.Coordinates;
+            m_CurrTileSide = currentTile.GridType;
+        }
 
         UpdateState();
     }
@@ -188,9 +205,9 @@ public class PlayerTurnManager : TurnManager
 
     private void UpdateAttackState()
     {
-        if (m_HasHitGrid && m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
+        if (m_HasHitGrid && SelectedSkill.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide))
         {
-            m_MapLogic.SetTarget(m_CurrTileSide, m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex], m_CurrTargetTile);
+            m_MapLogic.SetTarget(m_CurrTileSide, SelectedSkill, m_CurrTargetTile);
         }
         else
         {
@@ -205,7 +222,7 @@ public class PlayerTurnManager : TurnManager
     #endregion
 
     #region Perform Action
-    private bool TryPerformAction()
+    public bool TryPerformAction()
     {
         return m_CurrState switch
         {
@@ -237,9 +254,9 @@ public class PlayerTurnManager : TurnManager
 
     private bool TryPerformSkill()
     {
-        if (m_HasHitGrid && m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex].IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide) && m_MapLogic.IsTileOccupied(m_CurrTileSide, m_CurrTargetTile))
+        if (m_HasHitGrid && SelectedSkill.IsValidTargetTile(m_CurrTargetTile, m_CurrUnit, m_CurrTileSide) && m_MapLogic.IsTileOccupied(m_CurrTileSide, m_CurrTargetTile))
         {
-            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, m_CurrUnit.GetAvailableActiveSkills()[m_CurrAttackIndex], m_CurrTargetTile, CompleteSkill);
+            m_MapLogic.PerformSkill(m_CurrTileSide, m_CurrUnit, SelectedSkill, m_CurrTargetTile, CompleteSkill);
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
             return true;
         }
@@ -318,24 +335,35 @@ public class PlayerTurnManager : TurnManager
         TransitToAction(nextState);
     }
 
-    private void TransitToAction(PlayerTurnState currAction)
+    public void TransitToAction(PlayerTurnState currAction)
     {
         m_MapLogic.ResetMap();
         m_CurrState = currAction;
 
         switch (currAction)
         {
+            case PlayerTurnState.SELECTING_ACTION:
+                m_MapLogic.SetGridInteractable(GridType.PLAYER, false);
+                m_MapLogic.SetGridInteractable(GridType.ENEMY, false);
+                break;
             case PlayerTurnState.SELECTING_ACTION_TARGET:
-                m_AttackSwapCoroutine = StartCoroutine(SwitchActiveSkills());
+                if (SelectedSkill == null)
+                {
+                    // this should not be possible if unit has no available active skills
+                    SelectedSkill = m_CurrUnit.GetAvailableActiveSkills()[0];
+                }
+                m_MapLogic.ShowAttackRange(GridType.ENEMY, SelectedSkill);
+                m_MapLogic.SetGridInteractable(GridType.PLAYER, false);
+                m_MapLogic.SetGridInteractable(GridType.ENEMY, true);
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
-                if (m_AttackSwapCoroutine != null)
-                    StopCoroutine(m_AttackSwapCoroutine);
+                m_MapLogic.SetGridInteractable(GridType.PLAYER, true);
+                m_MapLogic.SetGridInteractable(GridType.ENEMY, false);
                 break;
-            default:
-                if (m_AttackSwapCoroutine != null)
-                    StopCoroutine(m_AttackSwapCoroutine);
+            case PlayerTurnState.INSPECT:
+                m_MapLogic.SetGridInteractable(GridType.PLAYER, true);
+                m_MapLogic.SetGridInteractable(GridType.ENEMY, true);
                 break;
         }
 
@@ -345,7 +373,7 @@ public class PlayerTurnManager : TurnManager
     #endregion
 
     #region End Turn
-    private void EndTurn()
+    public void EndTurn()
     {
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
 
