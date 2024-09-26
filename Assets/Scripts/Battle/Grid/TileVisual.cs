@@ -1,5 +1,6 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
+using Game.UI;
 
 public enum TileState
 {
@@ -11,12 +12,10 @@ public enum TileState
 /// <summary>
 /// Manages the visuals of the tile, e.g. highlighting the tile
 /// </summary>
-[RequireComponent(typeof(Collider))]
 public class TileVisual : MonoBehaviour
 {
-    [SerializeField] TextMeshPro m_TraverseText;
-    [SerializeField] TextMeshPro m_PathText;
-    [SerializeField] TextMeshPro m_TargetText;
+    [SerializeField] RawImage tileImage;
+    public SelectableBase selectable;
 
     private TileState m_CurrState = TileState.NONE;
 
@@ -56,23 +55,23 @@ public class TileVisual : MonoBehaviour
     #region Graphics
     private void ToggleState(TileState state)
     {
-        m_TraverseText.text = state switch
+        tileImage.color = state switch
         {
-            TileState.NONE => string.Empty,
-            TileState.TRAVERSABLE => "Traverse",
-            TileState.ATTACKABLE => "Attack",
-            _ => "Error"
+            TileState.NONE => new(0, 0, 0, 0),
+            TileState.TRAVERSABLE => new(0, 0.75f, 1, 1),
+            TileState.ATTACKABLE => new(1, 0.125f, 0, 1),
+            _ => new(0, 0, 0, 0)
         };
     }
 
     public void TogglePath(bool isPartOfPath)
     {
-        m_PathText.gameObject.SetActive(isPartOfPath);
+        selectable.interactable = m_CurrState == TileState.TRAVERSABLE && isPartOfPath;
     }
 
     public void ToggleTarget(bool isTarget)
     {
-        m_TargetText.gameObject.SetActive(isTarget);
+        selectable.interactable = m_CurrState == TileState.ATTACKABLE && isTarget;
     }
     #endregion
 }

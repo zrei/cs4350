@@ -19,11 +19,21 @@ public class GridLogic : MonoBehaviour
 
     private const float SPAWN_HEIGHT_OFFSET = 1.0f;
 
+    private CanvasGroup canvasGroup;
+
     #region Initialisation
     private void Start()
     {
         InitialiseTileData();
-        InitialiseTileVisuals();  
+        InitialiseTileVisuals();
+
+        canvasGroup = GetComponent<CanvasGroup>();
+        canvasGroup.interactable = false;
+    }
+
+    public void SetInteractable(bool interactable)
+    {
+        canvasGroup.interactable = interactable;
     }
 
     private void InitialiseTileData()
@@ -61,6 +71,20 @@ public class GridLogic : MonoBehaviour
         {
             CoordPair coordinates = pathNode.m_Coordinates;
             m_TileVisuals[coordinates.m_Row, coordinates.m_Col].SetTileState(TileState.TRAVERSABLE);
+        }
+    }
+
+    public void ShowAttackRange(ActiveSkillSO skill)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tile = m_TileVisuals[r, c];
+                tile.SetTileState(TileState.ATTACKABLE);
+                var isTarget = tile.ContainedUnit != null && skill.IsValidTargetTile(tile.Coordinates, tile.ContainedUnit, m_GridType);
+                tile.ToggleTarget(isTarget);
+            }
         }
     }
 

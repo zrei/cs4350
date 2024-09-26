@@ -1,3 +1,5 @@
+using Game;
+using Game.UI;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +17,35 @@ public class MapLogic : MonoBehaviour
     [Header("Grid")]
     [SerializeField] private GridLogic m_PlayerGrid;
     [SerializeField] private GridLogic m_EnemyGrid;
+
+    public TileVisual currentTile;
+
+    private void Start()
+    {
+        var canvas = GetComponent<Canvas>();
+        canvas.worldCamera = CameraManager.Instance.MainCamera;
+
+        var tiles = GetComponentsInChildren<TileVisual>();
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            var tile = tiles[i];
+            tile.selectable.onSelect.RemoveAllListeners();
+            tile.selectable.onSelect.AddListener(() =>
+            {
+                currentTile = tile;
+            });
+            tile.selectable.onSubmit.RemoveAllListeners();
+            tile.selectable.onSubmit.AddListener(() =>
+            {
+                BattleManager.Instance.PlayerTurnManager.TryPerformAction();
+            });
+        }
+    }
+
+    public void SetGridInteractable(GridType gridType, bool interactable)
+    {
+        RetrieveGrid(gridType).SetInteractable(interactable);
+    }
 
     #region Units
     public void PlaceUnit(GridType gridType, Unit unit, CoordPair coord)
@@ -65,6 +96,12 @@ public class MapLogic : MonoBehaviour
     public void ColorPath(GridType gridType, PathNode end)
     {
         RetrieveGrid(gridType).ColorPath(end);
+    }
+
+    public void ShowAttackRange(GridType gridType, ActiveSkillSO skill)
+    {
+        var grid = RetrieveGrid(gridType);
+        grid.ShowAttackRange(skill);
     }
 
     public void SetTarget(GridType gridType, ActiveSkillSO attack, CoordPair target)
