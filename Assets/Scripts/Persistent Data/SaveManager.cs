@@ -31,8 +31,6 @@ public class SaveManager : Singleton<SaveManager>
     protected override void HandleAwake()
     {
         base.HandleAwake();
-        SaveCharacterData(new() {new CharacterSaveData(1, 1, 1, 1, new Stats()), new CharacterSaveData(2, 2, 2, 2, new Stats())});
-        LoadCharacterSaveData();
     }
 
     protected override void HandleDestroy()
@@ -50,7 +48,6 @@ public class SaveManager : Singleton<SaveManager>
                 continue;
             characterData.Add(JsonUtility.FromJson<CharacterSaveData>(data));
         }
-        characterData.ForEach(x => Debug.Log(x.m_CharacterId));
         return characterData;
     }
     
@@ -61,7 +58,6 @@ public class SaveManager : Singleton<SaveManager>
         {
             finalString.Append(JsonUtility.ToJson(saveData) + "\t");
         }
-        Debug.Log(finalString);
         PlayerPrefs.SetString(UnitDataKey, finalString.ToString());
     }
 }
