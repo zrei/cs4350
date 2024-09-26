@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,12 +14,16 @@ namespace Game.UI
 
         public override void OnSelect(BaseEventData eventData)
         {
+            if (!IsInteractable()) return;
+
             base.OnSelect(eventData);
             onSelect?.Invoke();
         }
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
+            if (!IsInteractable()) return;
+
             base.OnPointerEnter(eventData);
             onPointerEnter?.Invoke();
 
@@ -31,11 +32,15 @@ namespace Game.UI
 
         public void OnSubmit(BaseEventData eventData)
         {
+            if (!IsInteractable()) return;
+
             onSubmit?.Invoke();
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (!IsInteractable()) return;
+
             onSubmit?.Invoke();
         }
     }

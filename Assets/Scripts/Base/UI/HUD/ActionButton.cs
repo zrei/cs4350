@@ -7,7 +7,6 @@ namespace Game.UI
 {
     public class ActionButton : SelectableBase
     {
-        public Image border;
         public Image icon;
     }
 }

@@ -1,14 +1,13 @@
+using Game.Input;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Input;
-using UnityEngine.EventSystems;
 
 public class PlayerUnitSetup : MonoBehaviour
 {
     private MapLogic m_MapLogic;
     private List<CoordPair> m_PlayerSquares;
 
-    private CoordPair m_TileToSwap;
+    private TileVisual m_TileToSwap;
     private bool m_HasSelectedTile = false;
 
     private VoidEvent m_CompleteSetupEvent;
@@ -25,45 +24,54 @@ public class PlayerUnitSetup : MonoBehaviour
         m_PlayerSquares = playerBeginningSquares;
         GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
 
-        InputManager.Instance.EndTurnInput.OnPressEvent += OnEndTurn;
-        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        m_MapLogic.onTileSelect += OnTileSelect;
+        m_MapLogic.onTileSubmit += OnTileSubmit;
+        m_MapLogic.ResetMap();
+        m_MapLogic.ShowSetupTiles(GridType.PLAYER, m_PlayerSquares);
+        m_MapLogic.ShowInspectable(GridType.ENEMY, true);
     }
 
-    private void OnEndTurn(IInput input)
+    public void EndSetup()
     {
         Logger.Log(this.GetType().Name, "Complete player unit set up", LogLevel.LOG);
         m_CompleteSetupEvent?.Invoke();
 
-        InputManager.Instance.EndTurnInput.OnPressEvent -= OnEndTurn;
-        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        GlobalEvents.Battle.PreviewUnitEvent(null);
+
+        m_MapLogic.onTileSelect -= OnTileSelect;
+        m_MapLogic.onTileSubmit -= OnTileSubmit;
+        m_MapLogic.ResetMap();
     }
 
-    private void OnPointerSelect(IInput input)
+    private void OnTileSelect(TileData data, TileVisual visual)
     {
-        var inputVector = InputManager.Instance.PointerPositionInput.GetValue<Vector2>();
-        Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
-        //bool hasHitGrid = m_MapLogic.TryRetrieveTile(Camera.main.ScreenPointToRay(mousePos), out CoordPair targetTile, out GridType gridType);
+        GlobalEvents.Battle.PreviewUnitEvent(data.m_CurrUnit);
+    }
 
-        var targetTile = m_MapLogic.currentTile;
-        if (targetTile == null) return;
+    private void OnTileSubmit(TileData data, TileVisual visual)
+    {
+        if (visual == null) return;
 
-
-        if (targetTile.GridType != GridType.PLAYER || !m_PlayerSquares.Contains(targetTile.Coordinates))
+        if (visual.GridType != GridType.PLAYER || !m_PlayerSquares.Contains(visual.Coordinates))
             return;
 
-        if (m_HasSelectedTile && targetTile.Equals(m_TileToSwap))
+        if (m_HasSelectedTile && visual.Equals(m_TileToSwap))
             return;
 
         if (m_HasSelectedTile)
         {
-            m_MapLogic.SwapTiles(GridType.PLAYER, m_TileToSwap, targetTile.Coordinates);
+
+            m_MapLogic.SwapTiles(GridType.PLAYER, m_TileToSwap.Coordinates, visual.Coordinates);
+            m_TileToSwap.ToggleSwapTarget(false);
+            visual.ToggleSwapTarget(false);
             m_HasSelectedTile = false;
-            Logger.Log(this.GetType().Name, $"Swap {m_TileToSwap} with {targetTile}", LogLevel.LOG);
+            Logger.Log(this.GetType().Name, $"Swap {m_TileToSwap} with {visual}", LogLevel.LOG);
         }
         else
         {
             m_HasSelectedTile = true;
-            m_TileToSwap = targetTile.Coordinates;
+            visual.ToggleSwapTarget(true);
+            m_TileToSwap = visual;
             Logger.Log(this.GetType().Name, $"Select initial tile {m_TileToSwap}", LogLevel.LOG);
         }
     }

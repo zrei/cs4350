@@ -143,15 +143,6 @@ namespace Game.UI
             attackButtons[0].Select();
         }
 
-        //private void SetInteractable(bool interactable)
-        //{
-        //    if (!interactable)
-        //    {
-        //        attackButtons.ForEach(x => x.interactable = false);
-        //        leftScrollButton.
-        //    }
-        //}
-
         private void PreviewMove()
         {
             BattleManager.Instance.PlayerTurnManager.SelectedSkill = SelectedSkill;
@@ -163,7 +154,6 @@ namespace Game.UI
             isHidden = false;
             animator.enabled = true;
             animator.Play(UIConstants.ShowAnimHash);
-            
         }
 
         private void Hide()

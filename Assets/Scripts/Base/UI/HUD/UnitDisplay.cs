@@ -9,7 +9,10 @@ namespace Game.UI
     public class UnitDisplay : MonoBehaviour
     {
         [SerializeField]
-        private UnitAllegiance type = UnitAllegiance.PLAYER;
+        private bool isCurrentUnitDisplay = true;
+
+        [SerializeField]
+        private UnitAllegiance displayType = UnitAllegiance.PLAYER;
 
         [SerializeField]
         private FormattedTextDisplay nameDisplay;
@@ -88,24 +91,31 @@ namespace Game.UI
             GetComponent<CanvasGroup>().alpha = 0;
             isHidden = true;
 
-            GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
+            if (isCurrentUnitDisplay)
+            {
+                GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewUnit;
+            }
+            else
+            {
+                GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
+            }
         }
         
         private void OnDestroy()
         {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
         }
 
-        private void OnPreviewCurrentUnit(Unit currentUnit)
+        private void OnPreviewUnit(Unit currentUnit)
         {
-            if (currentUnit == null)
+            if (currentUnit == null || currentUnit.UnitAllegiance != displayType)
             {
                 if (!isHidden) Hide();
 
                 TrackedUnit = null;
+                return;
             }
-
-            if (currentUnit.UnitAllegiance != type) return;
 
             if (isHidden) Show();
 

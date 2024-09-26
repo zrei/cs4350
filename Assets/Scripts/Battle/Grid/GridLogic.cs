@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 /// <summary>
 /// Class that maintains the internal representation of the grid (tile types, which tiles are occupied and with what units),
@@ -19,6 +20,9 @@ public class GridLogic : MonoBehaviour
 
     private const float SPAWN_HEIGHT_OFFSET = 1.0f;
 
+    public event MapInputEvent onTileSelect;
+    public event MapInputEvent onTileSubmit;
+
     private CanvasGroup canvasGroup;
 
     #region Initialisation
@@ -34,6 +38,26 @@ public class GridLogic : MonoBehaviour
     public void SetInteractable(bool interactable)
     {
         canvasGroup.interactable = interactable;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                m_TileVisuals[r, c].selectable.interactable = interactable;
+            }
+        }
+    }
+
+    public void SetInteractableWhere(bool interactable, Func<TileVisual, bool> condition)
+    {
+        canvasGroup.interactable = interactable;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tile = m_TileVisuals[r, c];
+                tile.selectable.interactable = condition(tile);
+            }
+        }
     }
 
     private void InitialiseTileData()
@@ -57,7 +81,19 @@ public class GridLogic : MonoBehaviour
                 Transform tileTrf = row.GetChild(c);
                 TileVisual tile = tileTrf.GetComponent<TileVisual>();
                 tile.Initialise(m_GridType, new CoordPair(r, c));
+                TileData data = m_TileData[r, c];
                 m_TileVisuals[r, c] = tile;
+
+                tile.selectable.onSelect.RemoveAllListeners();
+                tile.selectable.onSelect.AddListener(() =>
+                {
+                    onTileSelect?.Invoke(data, tile);
+                });
+                tile.selectable.onSubmit.RemoveAllListeners();
+                tile.selectable.onSubmit.AddListener(() =>
+                {
+                    onTileSubmit?.Invoke(data, tile);
+                });
             }
         }
     }
@@ -67,29 +103,74 @@ public class GridLogic : MonoBehaviour
     public void ColorReachablePoints(HashSet<PathNode> reachablePoints)
     {
         ResetPath();
+        canvasGroup.interactable = true;
         foreach (PathNode pathNode in reachablePoints)
         {
             CoordPair coordinates = pathNode.m_Coordinates;
-            m_TileVisuals[coordinates.m_Row, coordinates.m_Col].SetTileState(TileState.TRAVERSABLE);
+            var tile = m_TileVisuals[coordinates.m_Row, coordinates.m_Col];
+            tile.SetTileState(TileState.TRAVERSABLE);
+            tile.selectable.interactable = true;
         }
     }
 
-    public void ShowAttackRange(ActiveSkillSO skill)
+    public void ShowAttackRange(Unit currentUnit, ActiveSkillSO skill)
     {
+        canvasGroup.interactable = true;
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                var tile = m_TileVisuals[r, c];
-                tile.SetTileState(TileState.ATTACKABLE);
-                var isTarget = tile.ContainedUnit != null && skill.IsValidTargetTile(tile.Coordinates, tile.ContainedUnit, m_GridType);
-                tile.ToggleTarget(isTarget);
+                var tileVisual = m_TileVisuals[r, c];
+                var isAttackable = skill.IsValidTargetTile(tileVisual.Coordinates, currentUnit, m_GridType);
+                if (isAttackable)
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.ATTACKABLE);
+                }
+            }
+        }
+    }
+
+    public void ShowInspectable(bool ignoreEmpty)
+    {
+        canvasGroup.interactable = true;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var tileData = m_TileData[r, c];
+                if (!ignoreEmpty || tileData.m_CurrUnit != null)
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.INSPECTABLE);
+                }
+            }
+        }
+    }
+
+    public void ShowSetupTiles(List<CoordPair> validTiles)
+    {
+        canvasGroup.interactable = true;
+        var set = new HashSet<CoordPair>(validTiles);
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var tileData = m_TileData[r, c];
+                if (set.Contains(tileVisual.Coordinates))
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.SWAPPABLE);
+                }
             }
         }
     }
 
     public void ResetMap()
     {
+        canvasGroup.interactable = false;
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)

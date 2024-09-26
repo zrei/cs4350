@@ -50,6 +50,7 @@ public class BattleManager : Singleton<BattleManager>
     #region Initialisation
     private bool isBattleInitialised = false;
 
+    public PlayerUnitSetup PlayerUnitSetup => m_PlayerUnitSetup;
     public PlayerTurnManager PlayerTurnManager => m_PlayerTurnManager;
     
     private void Start()
@@ -214,8 +215,7 @@ public class BattleManager : Singleton<BattleManager>
 
     private void OnRotateCamera(IInput input)
     {
-        var inputVector = input.GetValue<Vector2>();
-        var hAxis = inputVector.x;
+        var hAxis = input.GetValue<float>();
         m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -hAxis * CAMERA_ROTATION_SPEED * Time.deltaTime);
     }
     #endregion
