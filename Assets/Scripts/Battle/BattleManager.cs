@@ -4,11 +4,10 @@ using UnityEngine;
 using Game.Input;
 using Game;
 
-// may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
 [RequireComponent(typeof(PlayerUnitSetup))]
-public class BattleManager : MonoBehaviour
+public class BattleManager : Singleton<BattleManager>
 {
     #region Test
     [SerializeField] private BattleSO m_TestBattle;
@@ -50,6 +49,8 @@ public class BattleManager : MonoBehaviour
 
     #region Initialisation
     private bool isBattleInitialised = false;
+
+    public PlayerTurnManager PlayerTurnManager => m_PlayerTurnManager;
     
     private void Start()
     {
@@ -71,8 +72,9 @@ public class BattleManager : MonoBehaviour
         GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke(this);
     }
 
-    private void Awake()
+    protected override void HandleAwake()
     {
+        base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
     }
 
