@@ -31,11 +31,11 @@ public class CharacterData
     /// <summary>
     /// Total base stats accounting for both character's current stats with equipped class' flat augments
     /// </summary>
-    public Stats m_TotalBaseStats => m_CurrStats.FlatAugment(m_CurrClass.m_StatAugments);
+    public Stats TotalBaseStats => m_CurrStats.FlatAugment(m_CurrClass.m_StatAugments);
 
     public CharacterBattleData GetBattleData()
     {
-        return new CharacterBattleData(m_BaseData, m_TotalBaseStats, m_CurrClass);
+        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass);
     }
 }
 
@@ -44,6 +44,10 @@ public class CharacterData
 public struct CharacterBattleData
 {
     public CharacterSO m_BaseData;
+
+    /// <summary>
+    /// This accounts for base stats + class augments
+    /// </summary>
     public Stats m_CurrStats;
     public ClassSO m_ClassSO;
 
