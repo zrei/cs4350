@@ -61,6 +61,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     protected StatusManager m_StatusManager = new StatusManager();
 
     protected ClassSO m_Class;
+    public string ClassName => m_Class.m_ClassName;
 
     public VoidEvent PostAttackEvent;
 
