@@ -6,24 +6,29 @@ public class LevellingManager : MonoBehaviour
 
     public void LevelCharacter(CharacterData characterData, int expGained, out bool hasLevelledUp)
     {
+        hasLevelledUp = false;
+
         if (characterData.m_CurrLevel == LevellingSO.MAX_LEVEL)
         {
-            hasLevelledUp = false;
             return;
         }
 
         int finalExp = Mathf.Min(characterData.m_CurrExp + expGained, m_LevellingSO.GetRequiredExpAmount(LevellingSO.MAX_LEVEL));
         
-        if (finalExp >= m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1))
+        while (characterData.m_CurrLevel < LevellingSO.MAX_LEVEL)
         {
-            hasLevelledUp = true;
-            characterData.m_CurrLevel += 1;
-            characterData.m_CurrStats = LevelUpStats(characterData.m_CurrStats, characterData.GrowthRate);
+            if (finalExp >= m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1))
+            {
+                hasLevelledUp = true;
+                characterData.m_CurrLevel += 1;
+                characterData.m_CurrStats = LevelUpStats(characterData.m_CurrStats, characterData.GrowthRate);
+            }
+            else
+            {
+                break;
+            }
         }
-        else
-        {
-            hasLevelledUp = false;
-        }
+        
     }
 
     public Stats LevelUpStats(Stats previousStats, Stats growthRate)
