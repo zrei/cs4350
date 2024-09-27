@@ -245,7 +245,7 @@ public class GridLogic : MonoBehaviour
 
     public HashSet<PathNode> CalculateReachablePoints(Unit unit, int remainingMovementRange)
     {
-        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.Stat.m_CanSwapTiles, unit.Stat.m_TraversableTileTypes);
+        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.CanSwapTiles, unit.TraversableTileTypes);
     }
     #endregion
 

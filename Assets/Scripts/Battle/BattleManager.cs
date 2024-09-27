@@ -125,7 +125,7 @@ public class BattleManager : Singleton<BattleManager>
     private void InstantiateEnemyUnit(EnemyUnitPlacement unitPlacement)
     {
         EnemyUnit unit = Instantiate(unitPlacement.m_Unit);
-        unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions);
+        unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions, unitPlacement.m_EnemySprite);
         m_MapLogic.PlaceUnit(GridType.ENEMY, unit, unitPlacement.m_Coodinates);
         m_TurnQueue.AddUnit(unit);
         m_EnemyUnits.Add(unit);
