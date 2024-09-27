@@ -10,14 +10,16 @@ public struct CharacterSaveData
     public int m_CurrLevel;
     public int m_CurrExp;
     public Stats m_CurrStats;
+    public StatProgress m_CurrStatProgress;
 
-    public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats)
+    public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress)
     {
         m_CharacterId = characterId;
         m_ClassId = classId;
         m_CurrLevel = currLevel;
         m_CurrExp = currExp;
         m_CurrStats = currStats;
+        m_CurrStatProgress = currStatProgress;
     }
 }
 

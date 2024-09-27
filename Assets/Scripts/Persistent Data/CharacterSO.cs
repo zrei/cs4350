@@ -18,5 +18,5 @@ public class CharacterSO : ScriptableObject
     [Tooltip("Starting stats when first unlocked by the player")]
     public Stats m_StartingStats;
     [Tooltip("Growth rates for each stat - how growth rates work is that once the internally tracked progress of each stat reaches an arbitrary value, a single stat point is added to their base stats. Growth rates control how fast the internal progress grows.")]
-    public Stats m_GrowthRates;
+    public GrowthRate m_GrowthRates;
 }

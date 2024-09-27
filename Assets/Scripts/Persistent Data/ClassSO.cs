@@ -13,7 +13,7 @@ public class ClassSO : ScriptableObject
     [Tooltip("Amount that character's base stats are augmented")]
     public Stats m_StatAugments;
     [Tooltip("Amount that character's growth rate is augmented")]
-    public Stats m_GrowthRateAugments;
+    public GrowthRate m_GrowthRateAugments;
     public WeaponSO m_Weapon;
     public PassiveSkillSO[] m_PassiveSkills;
     public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
