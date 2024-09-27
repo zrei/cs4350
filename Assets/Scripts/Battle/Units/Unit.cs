@@ -33,6 +33,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     private static readonly int DeathAnimHash = Animator.StringToHash("Death");
 
     [SerializeField] Animator m_Animator;
+    [SerializeField] Transform rightHand;
 
     // current health
     protected float m_Health;
@@ -70,6 +71,13 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_Health = m_Stats.m_Health;
         m_Mana = m_Stats.m_Mana;
         m_Class = classSo;
+
+        var weapon = m_Class.m_Weapon;
+        var weaponModel = weapon.m_WeaponModel;
+        if (weaponModel != null && rightHand != null)
+        {
+            Instantiate(weaponModel, rightHand);
+        }
     }
     #endregion
 
