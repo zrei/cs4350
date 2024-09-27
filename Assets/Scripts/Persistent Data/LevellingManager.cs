@@ -33,6 +33,6 @@ public class LevellingManager : MonoBehaviour
 
     public Stats LevelUpStats(Stats previousStats, Stats growthRate)
     {
-        return new Stats(previousStats.m_name, previousStats.m_class, previousStats.m_Health + growthRate.m_Health, previousStats.m_Mana + growthRate.m_Mana, previousStats.m_PhysicalAttack + growthRate.m_PhysicalAttack, previousStats.m_MagicAttack + growthRate.m_MagicAttack, previousStats.m_PhysicalDefence + growthRate.m_PhysicalDefence, previousStats.m_MagicDefence + growthRate.m_MagicDefence, previousStats.m_Speed + growthRate.m_Speed, previousStats.m_MovementRange);
+        return new Stats(previousStats.m_Health + growthRate.m_Health, previousStats.m_Mana + growthRate.m_Mana, previousStats.m_PhysicalAttack + growthRate.m_PhysicalAttack, previousStats.m_MagicAttack + growthRate.m_MagicAttack, previousStats.m_PhysicalDefence + growthRate.m_PhysicalDefence, previousStats.m_MagicDefence + growthRate.m_MagicDefence, previousStats.m_Speed + growthRate.m_Speed, previousStats.m_MovementRange);
     }
 }

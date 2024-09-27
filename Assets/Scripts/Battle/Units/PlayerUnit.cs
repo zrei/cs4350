@@ -5,6 +5,8 @@ public class PlayerUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.PLAYER;
 
+    public string CharacterName { get; private set; }
+
     #region Initialisation
     /// <summary>
     /// Initialise stats, position, etc.
@@ -12,6 +14,7 @@ public class PlayerUnit : Unit
     /// </summary>
     public void Initialise(CharacterBattleData characterBattleData)
     {
+        CharacterName = characterBattleData.m_BaseData.m_CharacterName;
         base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO);
     }
     #endregion

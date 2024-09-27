@@ -120,7 +120,16 @@ namespace Game.UI
             if (isHidden) Show();
 
             var totalStats = currentUnit.GetTotalStats();
-            nameDisplay?.SetValue(totalStats.m_name, totalStats.m_class); // placeholder
+            switch(currentUnit.UnitAllegiance)
+            {
+                case UnitAllegiance.PLAYER:
+                    var playerUnit = currentUnit as PlayerUnit;
+                    nameDisplay?.SetValue($"{playerUnit.CharacterName} / {playerUnit.ClassName}");
+                    break;
+                case UnitAllegiance.ENEMY:
+                    nameDisplay?.SetValue(currentUnit.ClassName);
+                    break;
+            }
 
             phyAtkDisplay?.SetValue(totalStats.m_PhysicalAttack);
             mgcAtkDisplay?.SetValue(totalStats.m_MagicAttack);
