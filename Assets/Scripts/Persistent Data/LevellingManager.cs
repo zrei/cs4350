@@ -1,33 +1,50 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LevellingManager : MonoBehaviour
 {
     [SerializeField] LevellingSO m_LevellingSO;
 
-    public void LevelCharacter(CharacterData characterData, int expGained, out bool hasLevelledUp)
+    public void LevelCharacter(CharacterData characterData, int expGained, out bool hasLevelledUp, out Dictionary<StatType, int> totalStatGrowths)
     {
+        hasLevelledUp = false;
+        totalStatGrowths = new();
         if (characterData.m_CurrLevel == LevellingSO.MAX_LEVEL)
         {
-            hasLevelledUp = false;
             return;
         }
 
         int finalExp = Mathf.Min(characterData.m_CurrExp + expGained, m_LevellingSO.GetRequiredExpAmount(LevellingSO.MAX_LEVEL));
         
-        if (finalExp >= m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1))
+        while (characterData.m_CurrLevel < LevellingSO.MAX_LEVEL)
         {
-            hasLevelledUp = true;
-            characterData.m_CurrLevel += 1;
-            characterData.m_CurrStats = LevelUpStats(characterData.m_CurrStats, characterData.GrowthRate);
+            if (finalExp >= m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1))
+            {
+                hasLevelledUp = true;
+                characterData.m_CurrLevel += 1;
+                characterData.m_CurrStats = LevelUpStats(characterData.m_CurrStats, characterData.m_CurrStatsProgress, characterData.TotalGrowthRate, out List<(StatType, int)> statGrowths);
+                foreach ((StatType statType, int growth) in statGrowths)
+                {
+                    if (!totalStatGrowths.ContainsKey(statType))
+                        totalStatGrowths[statType] = 0;
+
+                    totalStatGrowths[statType] += growth;
+                }
+            }
+            else
+            {
+                break;
+            }
         }
-        else
-        {
-            hasLevelledUp = false;
-        }
+        
     }
 
-    public Stats LevelUpStats(Stats previousStats, Stats growthRate)
+    public Stats LevelUpStats(Stats currStats, StatProgress currStatProgress, GrowthRate growthRate, out List<(StatType, int)> statGrowths)
     {
-        return new Stats(previousStats.m_Health + growthRate.m_Health, previousStats.m_Mana + growthRate.m_Mana, previousStats.m_PhysicalAttack + growthRate.m_PhysicalAttack, previousStats.m_MagicAttack + growthRate.m_MagicAttack, previousStats.m_PhysicalDefence + growthRate.m_PhysicalDefence, previousStats.m_MagicDefence + growthRate.m_MagicDefence, previousStats.m_Speed + growthRate.m_Speed, previousStats.m_MovementRange, previousStats.m_TraversableTileTypes, previousStats.m_CanSwapTiles);
+        currStatProgress.TryProgressStats(growthRate, out statGrowths);
+
+        Dictionary<StatType, int> statGrowthDict = new();
+        statGrowths.ForEach(x => statGrowthDict.Add(x.Item1, x.Item2));
+        return currStats.LevelUpStats(statGrowthDict);
     }
 }
