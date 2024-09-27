@@ -46,6 +46,11 @@ public struct Stats
         m_Speed = speed;
         m_MovementRange = movementRange;
     }
+
+    public Stats FlatAugment(Stats otherStat)
+    {
+        return new Stats();
+    }
 }
 
 public enum StatChangeType
