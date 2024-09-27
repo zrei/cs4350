@@ -10,6 +10,7 @@ public struct EnemyUnitPlacement
     public Stats m_Stats;
     public ClassSO m_Class;
     public EnemyActionSetSO m_Actions;
+    public Sprite m_EnemySprite;
 }
 
 [CreateAssetMenu(fileName="BattleSO", menuName="ScriptableObject/Battle/BattleSO")]
