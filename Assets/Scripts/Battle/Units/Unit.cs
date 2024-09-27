@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /*
@@ -62,6 +63,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     protected ClassSO m_Class;
 
     public VoidEvent PostAttackEvent;
+
+    public bool CanSwapTiles => m_Class.m_CanSwapTiles;
+    public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo/*, GameObject baseModel*/)

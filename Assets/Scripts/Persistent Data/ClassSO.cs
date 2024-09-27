@@ -16,4 +16,6 @@ public class ClassSO : ScriptableObject
     public Stats m_GrowthRateAugments;
     public WeaponSO m_Weapon;
     public PassiveSkillSO[] m_PassiveSkills;
+    public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
+    public bool m_CanSwapTiles = false;
 }

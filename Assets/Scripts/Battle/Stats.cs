@@ -16,8 +16,6 @@ public struct Stats
     public float m_MagicDefence;
     public float m_Speed;
     public int m_MovementRange;
-    public TileType[] m_TraversableTileTypes;
-    public bool m_CanSwapTiles;
 
     public float GetStat(StatType stat)
     {
@@ -35,7 +33,7 @@ public struct Stats
         };
     }
 
-    public Stats(string name, string char_class, float health, float mana, float physicalAttack, float magicalAttack, float physicalDefence, float magicDefence, float speed, int movementRange, TileType[] traversableTileTypes, bool canSwapTiles)
+    public Stats(string name, string char_class, float health, float mana, float physicalAttack, float magicalAttack, float physicalDefence, float magicDefence, float speed, int movementRange)
     {
         m_name = name;
         m_class = char_class;
@@ -47,8 +45,6 @@ public struct Stats
         m_MagicDefence = magicDefence;
         m_Speed = speed;
         m_MovementRange = movementRange;
-        m_TraversableTileTypes = traversableTileTypes;
-        m_CanSwapTiles = canSwapTiles;
     }
 }
 
