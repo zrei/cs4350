@@ -13,6 +13,6 @@ public enum WeaponType
 public class WeaponSO : ScriptableObject
 {
     public WeaponType m_WeaponType;
-    // public Mesh m_WeaponModel;
+    public GameObject m_WeaponModel;
     public ActiveSkillSO[] m_WeaponActiveSkills;
 }

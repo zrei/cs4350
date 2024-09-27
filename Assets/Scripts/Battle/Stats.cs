@@ -4,10 +4,6 @@
 [System.Serializable]
 public struct Stats
 {
-    // temporary, move to some character data class
-    public string m_name;
-    public string m_class;
-
     public float m_Health;
     public float m_Mana;
     public float m_PhysicalAttack;
@@ -35,10 +31,8 @@ public struct Stats
         };
     }
 
-    public Stats(string name, string char_class, float health, float mana, float physicalAttack, float magicalAttack, float physicalDefence, float magicDefence, float speed, int movementRange, TileType[] traversableTileTypes, bool canSwapTiles)
+    public Stats(float health, float mana, float physicalAttack, float magicalAttack, float physicalDefence, float magicDefence, float speed, int movementRange, TileType[] traversableTileTypes, bool canSwapTiles)
     {
-        m_name = name;
-        m_class = char_class;
         m_Health = health;
         m_Mana = mana;
         m_PhysicalAttack = physicalAttack;
