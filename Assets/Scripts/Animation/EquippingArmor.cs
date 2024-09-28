@@ -1,51 +1,49 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EquippingArmor : MonoBehaviour
 {
-    [Header("PlayerBones")]
-    public Transform[] playerBonesArray;
-    public Transform rootBone;
-    public Dictionary<string, Transform> playerBonesDict;
+    [Header("Bones")]
+    public List<Transform> m_UnitBonesArray;
+    [SerializeField] Transform m_RootBone;
+    [SerializeField] Transform m_RightArmBone;
 
-    [Header("AttachItem")]
-    public SkinnedMeshRenderer[] itemMeshes;
+    public Transform RightArmBone => m_RightArmBone;
+    
+    private Dictionary<string, Transform> m_PlayerBonesDict;
 
-    // Start is called before the first frame update
-    void Start()
+    public void Initialize(SkinnedMeshRenderer[] itemMeshes)
     {
-        InitializeBoneDictionary(); // Build the bone dictionary
-
+        InitializeBoneDictionary();
         foreach (SkinnedMeshRenderer itemMesh in itemMeshes) {
             AttachItemToPlayer(itemMesh); // Attach item to Player
         }
     }
 
-    public void InitializeBoneDictionary() {
+    private void InitializeBoneDictionary() {
         // build bones dictionary
-        playerBonesDict = new Dictionary<string, Transform>();
+        m_PlayerBonesDict = new Dictionary<string, Transform>();
 
-        foreach (Transform bone in playerBonesArray) {
-            playerBonesDict.Add(bone.name, bone);
+        foreach (Transform bone in m_UnitBonesArray) {
+            m_PlayerBonesDict.Add(bone.name, bone);
         }
     }
 
-    public void AttachItemToPlayer(SkinnedMeshRenderer itemMesh) {
+    private void AttachItemToPlayer(SkinnedMeshRenderer itemMesh) {
         SkinnedMeshRenderer newMesh = Instantiate<SkinnedMeshRenderer>(itemMesh);
 
-        Transform[] newBones = new Transform[playerBonesArray.Length];
+        Transform[] newBones = new Transform[m_UnitBonesArray.Count];
 
         for (int i = 0; i < itemMesh.bones.Length; i++) {
-            if (playerBonesDict.ContainsKey(itemMesh.bones[i].name)) {
-                newBones[i] = playerBonesDict[itemMesh.bones[i].name];
+            if (m_PlayerBonesDict.ContainsKey(itemMesh.bones[i].name)) {
+                newBones[i] = m_PlayerBonesDict[itemMesh.bones[i].name];
             } else {
                 Debug.LogError("Player bones dictionary does not contain bone: " + itemMesh.bones[i].name);
             }
         }
 
         newMesh.bones = newBones;
-        newMesh.rootBone = rootBone;
-        newMesh.transform.SetParent(rootBone.parent);
+        newMesh.rootBone = m_RootBone;
+        newMesh.transform.SetParent(m_RootBone.parent);
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName="StatStatusEffectSO", menuName = "ScriptableObject/StatusEffect/StatStatusEffectSO")]
+[CreateAssetMenu(fileName="StatStatusEffectSO", menuName = "ScriptableObject/Classes/ActiveSkills/StatusEffect/StatStatusEffectSO")]
 public class StatStatusEffectSO : StatusEffectSO
 {
     public StatType m_AffectedStat;

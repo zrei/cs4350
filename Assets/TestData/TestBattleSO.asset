@@ -13,14 +13,11 @@ MonoBehaviour:
   m_Name: TestBattleSO
   m_EditorClassIdentifier: 
   m_EnemyUnitsToSpawn:
-  - m_Unit: {fileID: 7402076927746927486, guid: 721900ea4a920415a89d53e256491377,
-      type: 3}
+  - m_Gender: 0
     m_Coodinates:
       m_Row: 4
-      m_Col: 2
+      m_Col: 4
     m_Stats:
-      m_name: 
-      m_class: 
       m_Health: 5
       m_Mana: 0
       m_PhysicalAttack: 30
@@ -29,12 +26,51 @@ MonoBehaviour:
       m_MagicDefence: 1
       m_Speed: 3
       m_MovementRange: 2
-      m_TraversableTileTypes: 00000000
-      m_CanSwapTiles: 0
     m_Class: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+    m_Race: {fileID: 11400000, guid: b1f1db96095384d6fabce47618260e88, type: 2}
     m_Actions: {fileID: 11400000, guid: 686cfd3a9b5664927965009b5a367b39, type: 2}
+    m_EnemySprite: {fileID: 0}
+  - m_Gender: 1
+    m_Coodinates:
+      m_Row: 4
+      m_Col: 0
+    m_Stats:
+      m_Health: 5
+      m_Mana: 0
+      m_PhysicalAttack: 30
+      m_MagicAttack: 2
+      m_PhysicalDefence: 1
+      m_MagicDefence: 1
+      m_Speed: 3
+      m_MovementRange: 2
+    m_Class: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+    m_Race: {fileID: 11400000, guid: b1f1db96095384d6fabce47618260e88, type: 2}
+    m_Actions: {fileID: 11400000, guid: 686cfd3a9b5664927965009b5a367b39, type: 2}
+    m_EnemySprite: {fileID: 0}
+  - m_Gender: 1
+    m_Coodinates:
+      m_Row: 0
+      m_Col: 0
+    m_Stats:
+      m_Health: 5
+      m_Mana: 0
+      m_PhysicalAttack: 30
+      m_MagicAttack: 2
+      m_PhysicalDefence: 1
+      m_MagicDefence: 1
+      m_Speed: 3
+      m_MovementRange: 2
+    m_Class: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
+    m_Race: {fileID: 11400000, guid: 5266948bbd4bb493882065acdb9fc9d2, type: 2}
+    m_Actions: {fileID: 11400000, guid: 686cfd3a9b5664927965009b5a367b39, type: 2}
+    m_EnemySprite: {fileID: 0}
   m_PlayerStartingTiles:
-  - m_Row: 2
-    m_Col: 2
-  - m_Row: 3
-    m_Col: 3
+  - m_Row: 4
+    m_Col: 4
+  - m_Row: 0
+    m_Col: 4
+  - m_Row: 0
+    m_Col: 0
+  - m_Row: 4
+    m_Col: 0
+  m_ExpReward: 0

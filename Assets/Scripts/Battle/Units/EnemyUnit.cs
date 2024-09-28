@@ -6,9 +6,9 @@ public class EnemyUnit : Unit
 
     private EnemyActionSetSO m_Actions;
 
-    public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet, Sprite enemySprite)
+    public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet, Sprite enemySprite, UnitModelData unitModelData)
     {
-        base.Initialise(stats, enemyClass, enemySprite);
+        base.Initialise(stats, enemyClass, enemySprite, unitModelData);
         m_Actions = actionSet;
     }
 

@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/*
-public struct AnimationState
-{
-    public string 
-}
-*/
-
 public enum UnitAllegiance
 {
     PLAYER,
@@ -17,74 +10,119 @@ public enum UnitAllegiance
     NONE
 }
 
+public struct UnitModelData
+{
+    public GameObject m_Model;
+    public float m_GridYOffset;
+    public SkinnedMeshRenderer[] m_AttachItems;
+
+    public UnitModelData(GameObject model, SkinnedMeshRenderer[] attachItems, float gridYOffset)
+    {
+        m_Model = model;
+        m_AttachItems = attachItems;
+        m_GridYOffset = gridYOffset;
+    }
+}
+
 public delegate void TrackedValueEvent(float change, float current, float max);
 
-// TODO: Store position here so we don't have to keep raycasting :|
 public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 {
+    #region Animation
     private const string DirXAnimParam = "DirX";
     private const string DirYAnimParam = "DirY";
     private const string IsMoveAnimParam = "IsMove";
 
+    /*
     public static readonly int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
     public static readonly int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
     public static readonly int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
+    */
+
     public static readonly int HurtAnimHash = Animator.StringToHash("Hurt");
     private static readonly int DeathAnimHash = Animator.StringToHash("Death");
 
-    [SerializeField] Animator m_Animator;
-    [SerializeField] Transform rightHand;
+    private int m_AttackAnimHash;
+    private int m_SupportAnimHash;
+ 
+    private Animator m_Animator;
+    #endregion
 
+    #region Current Status
     // current health
-    protected float m_Health;
-    public bool IsDead => m_Health <= 0;
+    protected float m_CurrHealth;
 
-    protected float m_Mana;
-    public float RemainingMana => m_Mana;
+    protected float m_CurrMana;
 
     /// <summary>
     /// This is used to store what their stats SHOULD be,
-    /// accounting for base stats + growths + class bonuses so far.
+    /// accounting for base stats + class bonuses so far.
     /// It DOES NOT account for any transient stat changes
     /// due to buffs/debuffs.
     /// </summary>
     protected Stats m_Stats;
-    public Stats Stat => m_Stats;
-
-    public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
-
-    private const float CHECKPOINT_MOVE_TIME = 0.5f;
 
     private CoordPair m_CurrPosition;
     public CoordPair CurrPosition => m_CurrPosition;
 
     protected StatusManager m_StatusManager = new StatusManager();
+    #endregion
 
+    #region Static Data
     protected ClassSO m_Class;
     public string ClassName => m_Class.m_ClassName;
-
-    public VoidEvent PostAttackEvent;
 
     public bool CanSwapTiles => m_Class.m_CanSwapTiles;
     public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
     public Sprite Sprite {get; private set;}
 
+    public Vector3 GridYOffset {get; private set;}
+
+    private const float CHECKPOINT_MOVE_TIME = 0.5f;
+
+    public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
+    #endregion
+
     #region Initialisation
-    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite/*, GameObject baseModel*/)
+    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData)
     {
         Sprite = sprite;
         m_Stats = stats;
-        m_Health = m_Stats.m_Health;
-        m_Mana = m_Stats.m_Mana;
+        m_CurrHealth = m_Stats.m_Health;
+        m_CurrMana = m_Stats.m_Mana;
         m_Class = classSo;
 
-        var weapon = m_Class.m_Weapon;
-        var weaponModel = weapon.m_WeaponModel;
-        if (weaponModel != null && rightHand != null)
+        InstantiateModel(unitModelData, m_Class.m_Weapon);
+    }
+
+    /// <summary>
+    /// Helps to instantiate the correct base model, and equip it with the class' equipment + weapons
+    /// </summary>
+    /// <param name="unitModelData"></param>
+    /// <param name="weaponSO"></param>
+    private void InstantiateModel(UnitModelData unitModelData, WeaponSO weaponSO)
+    {
+        GameObject model = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, this.transform);
+        EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
+        equipArmor.Initialize(unitModelData.m_AttachItems);
+        
+        GameObject weaponModel = weaponSO.m_WeaponModel;
+        if (weaponModel != null && equipArmor.RightArmBone != null)
         {
-            Instantiate(weaponModel, rightHand);
+            Instantiate(weaponModel, equipArmor.RightArmBone);
         }
+
+        m_Animator = model.GetComponentInChildren<Animator>();
+        if (m_Animator == null)
+        {
+            Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
+        }
+
+        m_AttackAnimHash = Animator.StringToHash(weaponSO.m_AttackAnimatorParam);
+        m_SupportAnimHash = Animator.StringToHash(weaponSO.m_SupportAnimatorParam);
+
+        GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
     }
     #endregion
 
@@ -92,37 +130,36 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public virtual void PlaceUnit(CoordPair coordinates, Vector3 worldPosition)
     {
         m_CurrPosition = coordinates;
-        transform.position = worldPosition;
+        transform.position = worldPosition + GridYOffset;
     }
     #endregion
 
     #region Health and Damage
-    public float CurrentHealth => m_Health;
+    public float CurrentHealth => m_CurrHealth;
     public float MaxHealth => GetTotalStat(StatType.HEALTH);
 
     public void Heal(float healAmount)
     {
         var max = MaxHealth;
-        var value = Mathf.Min(max, m_Health + healAmount);
-        var change = value - m_Health;
-        m_Health = value;
-        OnHealthChange?.Invoke(change, m_Health, max);
+        var value = Mathf.Min(max, m_CurrHealth + healAmount);
+        var change = value - m_CurrHealth;
+        m_CurrHealth = value;
+        OnHealthChange?.Invoke(change, m_CurrHealth, max);
     }
 
     void IHealth.SetHealth(float health)
     {
-        var change = health - m_Health;
-        m_Health = health;
-        OnHealthChange?.Invoke(change, m_Health, MaxHealth);
+        var change = health - m_CurrHealth;
+        m_CurrHealth = health;
+        OnHealthChange?.Invoke(change, m_CurrHealth, MaxHealth);
     }
 
-    // account for status conditions/inflicted tokens here
     public void TakeDamage(float damage)
     {
         Logger.Log(this.GetType().Name, $"Unit {name} took {damage} damage", name, this.gameObject, LogLevel.LOG);
-        var value = Mathf.Max(0f, m_Health - damage);
-        var change = value - m_Health;
-        m_Health = value;
+        var value = Mathf.Max(0f, m_CurrHealth - damage);
+        var change = value - m_CurrHealth;
+        m_CurrHealth = value;
         OnHealthChange?.Invoke(change, value, MaxHealth);
     }
 
@@ -152,7 +189,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         {
             float time = 0f;
             Vector3 currPos = transform.position;
-            Vector3 nextPos = positionsToMoveThrough.Pop();
+            Vector3 nextPos = positionsToMoveThrough.Pop() + GridYOffset;
 
             if (currPos == nextPos)
                 continue;
@@ -205,10 +242,15 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Stats
-    // for preview purposes, account for buffs!
+    public Stats Stat => m_Stats;
+
+    /// <summary>
+    /// Returned total stat accounts for all buffs and debuffs
+    /// </summary>
+    /// <returns></returns>
     public Stats GetTotalStats()
     {
-        return m_Stats;
+        return new Stats(GetTotalStat(StatType.HEALTH), GetTotalStat(StatType.MANA), GetTotalStat(StatType.PHYS_ATTACK), GetTotalStat(StatType.MAG_ATTACK), GetTotalStat(StatType.PHYS_DEFENCE), GetTotalStat(StatType.MAG_DEFENCE), GetTotalStat(StatType.SPEED), (int) GetTotalStat(StatType.MOVEMENT_RANGE));
     }
 
     // for preview purposes
@@ -256,16 +298,16 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Mana
-    public float CurrentMana => m_Mana;
+    public float CurrentMana => m_CurrMana;
     public float MaxMana => GetTotalStat(StatType.MANA);
 
     private void AlterMana(float amount)
     {
         Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
         var max = MaxMana;
-        var value = Mathf.Clamp(m_Mana + amount, 0f, max);
-        var change = value - m_Mana;
-        m_Mana = value;
+        var value = Mathf.Clamp(m_CurrMana + amount, 0f, max);
+        var change = value - m_CurrMana;
+        m_CurrMana = value;
         OnManaChange?.Invoke(change, value, max);
     }
 
@@ -273,6 +315,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Death
+    public bool IsDead => m_CurrHealth <= 0;
+
     public void Die()
     {
         PlayAnimations(DeathAnimHash);
@@ -288,6 +332,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     public void PlayAttackAnimation(bool isSupport)
     {
+        PlayAnimations(isSupport ? m_SupportAnimHash : m_AttackAnimHash);
+        /*
+        Debug.Log("Is support: " + isSupport);
         if (isSupport)
         {
             // support for other weapon types???
@@ -306,6 +353,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
                 PlayAnimations(MagicAttackAnimHash);
                 break;
         }
+        */
     }
     #endregion
 
@@ -354,8 +402,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         void CompleteAttackAnimationEvent()
         {
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
-            PostAttackEvent?.Invoke();
+            PostSkillEvent?.Invoke();
         }
     }
+
+    public VoidEvent PostSkillEvent;
     #endregion
 }

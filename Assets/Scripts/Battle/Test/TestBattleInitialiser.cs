@@ -7,9 +7,9 @@ using UnityEngine;
 /// </summary>
 public class TestBattleInitialiser : MonoBehaviour
 {
-    [SerializeField] private PlayerUnit m_UnitPrefab;
     [SerializeField] private List<CharacterBattleData> m_TestData;
     [SerializeField] private BattleSO m_TestBattle;
+    [SerializeField] private GameObject m_MapBiome;
     
     private void Awake()
     {
@@ -23,6 +23,6 @@ public class TestBattleInitialiser : MonoBehaviour
     private void OnBattleSceneLoaded(BattleManager manager)
     {
         Debug.Log("TestBattleInitializer: Battle scene loaded. Initialising battle.");
-        manager.InitialiseBattle(m_TestBattle, m_TestData);
+        manager.InitialiseBattle(m_TestBattle, m_TestData, m_MapBiome);
     }
 }

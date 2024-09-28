@@ -18,8 +18,6 @@ public class GridLogic : MonoBehaviour
     private MapData MapData => new MapData(m_TileData);
     #endregion
 
-    private const float SPAWN_HEIGHT_OFFSET = 1.0f;
-
     public event MapInputEvent onTileSelect;
     public event MapInputEvent onTileSubmit;
 
@@ -253,6 +251,7 @@ public class GridLogic : MonoBehaviour
     public void PlaceUnit(Unit unit, CoordPair coordinates)
     {
         unit.transform.parent = transform;
+        unit.transform.localRotation = Quaternion.identity;
         unit.PlaceUnit(coordinates, GetTilePosition(coordinates));
         Logger.Log(this.GetType().Name, unit.gameObject.name, $"Placed unit at tile {coordinates} with world position {unit.transform.position}", unit.gameObject, LogLevel.LOG);
         m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = true;
@@ -303,7 +302,7 @@ public class GridLogic : MonoBehaviour
     #region Helper
     private Vector3 GetTilePosition(CoordPair coordPair)
     {
-        return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
+        return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position;
     }
 
     private bool IsTileOccupied(CoordPair tile)
@@ -367,12 +366,12 @@ public class GridLogic : MonoBehaviour
             }
         }
 
-        attacker.PostAttackEvent += CompleteSkill;
+        attacker.PostSkillEvent += CompleteSkill;
         attacker.PerformSKill(activeSkill, targets);
 
         void CompleteSkill()
         {
-            attacker.PostAttackEvent -= CompleteSkill;
+            attacker.PostSkillEvent -= CompleteSkill;
 
             // TODO: Clean this up further?
             List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();

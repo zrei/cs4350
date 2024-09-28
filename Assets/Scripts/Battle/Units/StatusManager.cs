@@ -3,7 +3,6 @@ using System.Linq;
 
 public class StatusManager : IStatChange
 {
-    // add another enum?
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
     private List<Token> m_Tokens = new List<Token>();
 
