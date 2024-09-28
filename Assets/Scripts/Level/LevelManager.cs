@@ -235,7 +235,7 @@ public class LevelManager : MonoBehaviour
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
         
         m_LevelCamera.gameObject.SetActive(false);
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList());
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
     private void OnBattleNodeEnd()

@@ -2064,35 +2064,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3623446776709900491, guid: 0455c34086d6442e5b286c90018fa688,
-        type: 3}
-      propertyPath: m_TestAttackSO
-      value: 
-      objectReference: {fileID: 11400000, guid: 2b4a763a7ff3f4caea7665eabcba78ba,
-        type: 2}
-    - target: {fileID: 3623446776709900491, guid: 0455c34086d6442e5b286c90018fa688,
-        type: 3}
-      propertyPath: m_TestAttackSOs.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3623446776709900491, guid: 0455c34086d6442e5b286c90018fa688,
-        type: 3}
-      propertyPath: m_TestAttackSOs.Array.data[0]
-      value: 
-      objectReference: {fileID: 11400000, guid: 2b4a763a7ff3f4caea7665eabcba78ba,
-        type: 2}
-    - target: {fileID: 3623446776709900491, guid: 0455c34086d6442e5b286c90018fa688,
-        type: 3}
-      propertyPath: m_TestAttackSOs.Array.data[1]
-      value: 
-      objectReference: {fileID: 11400000, guid: 8908cff3faa36a549bed21f6a87c153f,
-        type: 2}
-    - target: {fileID: 3623446776709900491, guid: 0455c34086d6442e5b286c90018fa688,
-        type: 3}
-      propertyPath: m_TestAttackSOs.Array.data[2]
-      value: 
-      objectReference: {fileID: 11400000, guid: 9a8e83394860e462a8516a8526beaefd,
-        type: 2}
     - target: {fileID: 6107480647979012678, guid: 0455c34086d6442e5b286c90018fa688,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2101,7 +2072,7 @@ PrefabInstance:
     - target: {fileID: 6107480647979012678, guid: 0455c34086d6442e5b286c90018fa688,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.72
       objectReference: {fileID: 0}
     - target: {fileID: 6107480647979012678, guid: 0455c34086d6442e5b286c90018fa688,
         type: 3}
@@ -2148,12 +2119,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BattleManager
       objectReference: {fileID: 0}
-    - target: {fileID: 8999284960528061869, guid: 0455c34086d6442e5b286c90018fa688,
-        type: 3}
-      propertyPath: m_TestAttacks.Array.data[0]
-      value: 
-      objectReference: {fileID: 11400000, guid: 8908cff3faa36a549bed21f6a87c153f,
-        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2181,8 +2146,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf3d3d0c15b6a4740a61da6bfc3fb51f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TestData: []
+  m_TestData:
+  - m_BaseData: {fileID: 11400000, guid: fb6157bbfc94f4156b133d12fbdb4025, type: 2}
+    m_CurrStats:
+      m_Health: 10
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 1
+      m_MovementRange: 1
+    m_ClassSO: {fileID: 11400000, guid: 2441b9d6b4d55fd46a28d0b6d09fabb8, type: 2}
   m_TestBattle: {fileID: 11400000, guid: 8e0da63f4b4c64a69bb5778440c253a8, type: 2}
+  m_MapBiome: {fileID: 919132149155446097, guid: a20b6864febd2db458cfb96638e3d34c,
+    type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

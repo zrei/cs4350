@@ -16,6 +16,7 @@ public class BattleManager : Singleton<BattleManager>
     [Header("References")]
     [SerializeField] private MapLogic m_MapLogic;
     [SerializeField] private Transform m_CameraLookAtPoint;
+    [SerializeField] private Transform m_MapBiomeParent;
 
     #region Player Setup
     // for initial battlefield setup
@@ -85,13 +86,15 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnitData"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitData)
+    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitData, GameObject mapBiome)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
         m_PlayerUnits.Clear();
 
         m_MapLogic.ResetMap();
+
+        InstantiateBiome(mapBiome);
 
         foreach (EnemyUnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
@@ -110,6 +113,14 @@ public class BattleManager : Singleton<BattleManager>
         m_PlayerUnitSetup.BeginSetup(battleSO.m_PlayerStartingTiles);
         
         isBattleInitialised = true;
+    }
+
+    private void InstantiateBiome(GameObject biomeObj)
+    {
+        GameObject map = Instantiate(biomeObj, m_MapBiomeParent);
+        map.transform.localPosition = Vector3.zero;
+        map.transform.localRotation = Quaternion.identity;
+        map.transform.localScale = Vector3.one;
     }
 
     /// <summary>
