@@ -3,26 +3,18 @@ using UnityEngine;
 
 public class EquippingArmor : MonoBehaviour
 {
-    [Header("PlayerBones")]
+    [Header("Bones")]
     public List<Transform> m_UnitBonesArray;
     [SerializeField] Transform m_RootBone;
+    [SerializeField] Transform m_RightArmBone;
+
+    public Transform RightArmBone => m_RightArmBone;
     
     private Dictionary<string, Transform> m_PlayerBonesDict;
 
-    [Header("AttachItem")]
-    public SkinnedMeshRenderer[] itemMeshes;
-
-    
-
     public void Initialize(SkinnedMeshRenderer[] itemMeshes)
     {
-
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        InitializeBoneDictionary(); // Build the bone dictionary
-
+        InitializeBoneDictionary();
         foreach (SkinnedMeshRenderer itemMesh in itemMeshes) {
             AttachItemToPlayer(itemMesh); // Attach item to Player
         }

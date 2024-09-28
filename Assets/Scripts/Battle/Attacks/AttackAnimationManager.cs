@@ -28,7 +28,8 @@ public class AttackAnimationManager : MonoBehaviour
     // perform attack skill
     private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        m_IsSelfTarget = activeSkill.IsSelfTarget || targets[0].Equals(attacker);
+        m_IsSelfTarget = activeSkill.IsSelfTarget || (!activeSkill.IsAoe && targets[0].Equals(attacker));
+        Logger.Log(this.GetType().Name, "Is self target: " + m_IsSelfTarget, LogLevel.LOG);
         // if it's a self target or an AOE skill, do not shift the units
         if (!m_IsSelfTarget && !activeSkill.IsAoe)
         {

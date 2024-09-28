@@ -15,7 +15,7 @@ public class PlayerUnit : Unit
     public void Initialise(CharacterBattleData characterBattleData)
     {
         CharacterName = characterBattleData.m_BaseData.m_CharacterName;
-        base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite);
+        base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData());
     }
     #endregion
 

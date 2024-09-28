@@ -7,7 +7,6 @@ using UnityEngine;
 /// </summary>
 public class TestBattleInitialiser : MonoBehaviour
 {
-    [SerializeField] private PlayerUnit m_UnitPrefab;
     [SerializeField] private List<CharacterBattleData> m_TestData;
     [SerializeField] private BattleSO m_TestBattle;
     
