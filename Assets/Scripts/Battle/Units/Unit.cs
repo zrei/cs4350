@@ -69,6 +69,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Static Data
+    public WeaponAnimationType WeaponAnimationType {get; private set;}
+
     protected ClassSO m_Class;
     public string ClassName => m_Class.m_ClassName;
 
@@ -121,6 +123,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
         m_AttackAnimHash = Animator.StringToHash(weaponSO.m_AttackAnimatorParam);
         m_SupportAnimHash = Animator.StringToHash(weaponSO.m_SupportAnimatorParam);
+
+        WeaponAnimationType = weaponSO.m_WeaponAnimationType;
 
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
     }
@@ -330,9 +334,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_Animator.Play(animationId);
     }
 
-    public void PlayAttackAnimation(bool isSupport)
+    public void PlaySkillAnimation(int triggerId)
     {
-        PlayAnimations(isSupport ? m_SupportAnimHash : m_AttackAnimHash);
+        /*PlayAnimations(isSupport ? m_SupportAnimHash : m_AttackAnimHash);*/
         /*
         Debug.Log("Is support: " + isSupport);
         if (isSupport)
@@ -358,7 +362,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Skills
-    public void PerformSKill(ActiveSkillSO attackSO, List<IHealth> targets)
+    public void PerformSkill(ActiveSkillSO attackSO, List<IHealth> targets)
     {
         List<StatusEffect> inflictedStatusEffects = new();
         
@@ -367,7 +371,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         else if (attackSO.IsMagicAttack)
             inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
 
-        inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects.Select(x => new StatusEffect(x.m_StatusEffect, x.m_Stack)));
+        if (attackSO.ContainsSkillType(SkillType.DEALS_STATUS_OR_TOKENS))
+            inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects.Select(x => new StatusEffect(x.m_StatusEffect, x.m_Stack)));
         
         List<Token> inflictedTokens = attackSO.m_InflictedTokens;
 
@@ -381,8 +386,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
                 target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
                 target.ClearTokens(attackSO.IsMagic ? ConsumeType.CONSUME_ON_MAG_DEFEND : ConsumeType.CONSUME_ON_PHYS_DEFEND);
             }
-            else if (attackSO.ContainsAttackType(SkillType.HEAL_SUPPORT))
-                target.Heal(attackSO.m_Amount);
+            else if (attackSO.ContainsSkillType(SkillType.HEAL))
+                target.Heal(attackSO.m_HealAmount);
             
             if (!target.IsDead)
             {

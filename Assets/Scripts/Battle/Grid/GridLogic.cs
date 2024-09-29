@@ -367,7 +367,7 @@ public class GridLogic : MonoBehaviour
         }
 
         attacker.PostSkillEvent += CompleteSkill;
-        attacker.PerformSKill(activeSkill, targets);
+        attacker.PerformSkill(activeSkill, targets);
 
         void CompleteSkill()
         {
