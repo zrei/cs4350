@@ -3,17 +3,16 @@ using System.Linq;
 
 public class StatusManager : IStatChange
 {
-    // add another enum?
-    private readonly Dictionary<string, StatusEffect> m_StatusEffects = new();
+    private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
     private List<Token> m_Tokens = new List<Token>();
 
     #region Add Inflictable
     public void AddEffect(StatusEffect statusEffect)
     {
-        if (m_StatusEffects.ContainsKey(statusEffect.Name))
-            m_StatusEffects[statusEffect.Name].AddStack(statusEffect.StackRemaining);
+        if (m_StatusEffects.ContainsKey(statusEffect.Id))
+            m_StatusEffects[statusEffect.Id].AddStack(statusEffect.StackRemaining);
         else
-            m_StatusEffects[statusEffect.Name] = statusEffect;
+            m_StatusEffects[statusEffect.Id] = statusEffect;
         Logger.Log(this.GetType().Name, "ADD STATUS EFFECT", LogLevel.LOG);
     }
 
@@ -24,20 +23,20 @@ public class StatusManager : IStatChange
     #endregion
 
     #region Reduce Stack
-    public void ReduceStack(string statusEffectName, int reduceAmount)
+    public void ReduceStack(int statusEffectId, int reduceAmount)
     {
-        if (!m_StatusEffects.TryGetValue(statusEffectName, out StatusEffect statusEffect))
+        if (!m_StatusEffects.TryGetValue(statusEffectId, out StatusEffect statusEffect))
             return;
 
         statusEffect.ReduceStack(reduceAmount);
         if (statusEffect.IsDepleted)
-            m_StatusEffects.Remove(statusEffectName);
+            m_StatusEffects.Remove(statusEffectId);
     }
 
-    public void ClearStatusEffect(string statusEffectName)
+    public void ClearStatusEffect(int statusEffectId)
     {
-        if (m_StatusEffects.ContainsKey(statusEffectName))
-            m_StatusEffects.Remove(statusEffectName);
+        if (m_StatusEffects.ContainsKey(statusEffectId))
+            m_StatusEffects.Remove(statusEffectId);
     }
     #endregion
 
@@ -56,7 +55,7 @@ public class StatusManager : IStatChange
 
         foreach (StatusEffect statusEffect in toRemove)
         {
-            m_StatusEffects.Remove(statusEffect.Name);
+            m_StatusEffects.Remove(statusEffect.Id);
         }
     }
     #endregion

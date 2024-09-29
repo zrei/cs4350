@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace Game.UI
 {
+    [RequireComponent(typeof(CanvasRenderer))]
     public class BackgroundGradient : MaskableGraphic
     {
         [SerializeField]

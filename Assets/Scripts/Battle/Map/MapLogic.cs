@@ -1,3 +1,6 @@
+using Game;
+using Game.UI;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +10,8 @@ public enum GridType
     PLAYER
 }
 
+public delegate void MapInputEvent(TileData data, TileVisual visual);
+
 /// <summary>
 /// Acts as a facade to the GridLogic of both sides
 /// </summary>
@@ -15,6 +20,40 @@ public class MapLogic : MonoBehaviour
     [Header("Grid")]
     [SerializeField] private GridLogic m_PlayerGrid;
     [SerializeField] private GridLogic m_EnemyGrid;
+
+    public event MapInputEvent onTileSelect;
+    public event MapInputEvent onTileSubmit;
+
+    private void Start()
+    {
+        var canvas = GetComponent<Canvas>();
+        canvas.worldCamera = CameraManager.Instance.MainCamera;
+
+        m_PlayerGrid.onTileSelect += OnTileSelect;
+        m_PlayerGrid.onTileSubmit += OnTileSubmit;
+        m_EnemyGrid.onTileSelect += OnTileSelect;
+        m_EnemyGrid.onTileSubmit += OnTileSubmit;
+    }
+
+    private void OnTileSelect(TileData data, TileVisual visual)
+    {
+        onTileSelect?.Invoke(data, visual);
+    }
+
+    private void OnTileSubmit(TileData data, TileVisual visual)
+    {
+        onTileSubmit?.Invoke(data, visual);
+    }
+
+    public void SetGridInteractable(GridType gridType, bool interactable)
+    {
+        RetrieveGrid(gridType).SetInteractable(interactable);
+    }
+
+    public void SetGridInteractableWhere(GridType gridType, bool interactable, Func<TileVisual, bool> condition)
+    {
+        RetrieveGrid(gridType).SetInteractableWhere(interactable, condition);
+    }
 
     #region Units
     public void PlaceUnit(GridType gridType, Unit unit, CoordPair coord)
@@ -67,18 +106,28 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).ColorPath(end);
     }
 
+    public void ShowAttackable(GridType gridType, Unit currentUnit, ActiveSkillSO skill)
+    {
+        RetrieveGrid(gridType).ShowAttackRange(currentUnit, skill);
+    }
+
     public void SetTarget(GridType gridType, ActiveSkillSO attack, CoordPair target)
     {
         RetrieveGrid(gridType).ColorTarget(attack, target);
     }
+
+    public void ShowInspectable(GridType gridType, bool ignoreEmpty=false)
+    {
+        RetrieveGrid(gridType).ShowInspectable(ignoreEmpty);
+    }
+
+    public void ShowSetupTiles(GridType gridType, List<CoordPair> validTiles)
+    {
+        RetrieveGrid(gridType).ShowSetupTiles(validTiles);
+    }
     #endregion
 
     #region Helper
-    public bool IsTileOccupied(GridType gridType, CoordPair tile)
-    {
-        return RetrieveGrid(gridType).IsTileOccupied(tile);
-    }
-
     /// <summary>
     /// Given a ray, tries to retrieve a tile that the ray connects with. Will also return
     /// the grid type of the hit ray, helpful for attacks.
@@ -124,6 +173,11 @@ public class MapLogic : MonoBehaviour
     public void PerformSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
         RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile, completeSkillEvent);
+    }
+
+    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
+    {
+        return RetrieveGrid(gridType).IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied);
     }
     #endregion
 

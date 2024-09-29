@@ -1,12 +1,14 @@
+using UnityEngine;
+
 public class EnemyUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
 
     private EnemyActionSetSO m_Actions;
 
-    public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet)
+    public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet, Sprite enemySprite, UnitModelData unitModelData)
     {
-        base.Initialise(stats, enemyClass);
+        base.Initialise(stats, enemyClass, enemySprite, unitModelData);
         m_Actions = actionSet;
     }
 

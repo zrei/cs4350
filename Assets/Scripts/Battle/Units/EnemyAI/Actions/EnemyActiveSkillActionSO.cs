@@ -14,7 +14,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        if (m_ActiveSkill is MagicActiveSkillSO && enemyUnit.RemainingMana < ((MagicActiveSkillSO) m_ActiveSkill).m_ConsumedManaAmount)
+        if (m_ActiveSkill is MagicActiveSkillSO && enemyUnit.CurrentMana < ((MagicActiveSkillSO) m_ActiveSkill).m_ConsumedManaAmount)
             return false;
 
         if (m_ActiveSkill.IsSelfTarget)
@@ -29,7 +29,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                if (m_ActiveSkill.IsValidTargetTile(coordinates, enemyUnit, targetGridType) && mapLogic.IsTileOccupied(targetGridType, coordinates))
+                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, true))
                 {
                     m_PossibleAttackPositions.Add(coordinates);
                     hasPossibleAttackPosition = true;

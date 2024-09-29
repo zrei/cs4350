@@ -4,49 +4,49 @@ using UnityEngine;
 using Game.Input;
 using Game;
 
-// may or may not become a singleton
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
 [RequireComponent(typeof(PlayerUnitSetup))]
-public class BattleManager : MonoBehaviour
+public class BattleManager : Singleton<BattleManager>
 {
-    #region Test
-    [SerializeField] private BattleSO m_TestBattle;
-    [SerializeField] private List<Unit> m_TestPlacement;
-    [SerializeField] private List<Stats> m_TestStats;
-    [SerializeField] private List<ClassSO> m_TestClasses;
-
-    private IEnumerator TestStart()
-    {
-        yield return new WaitForEndOfFrame();
-        GlobalEvents.Battle.TurnOrderUpdatedEvent?.Invoke(m_TurnQueue.GetTurnOrder());
-        m_WithinBattle = true;
-        m_BattleTick = true;
-    }
-    #endregion
+    [Header("Unit Prefabs")]
+    [SerializeField] private PlayerUnit m_PlayerUnit;
+    [SerializeField] private EnemyUnit m_EnemyUnit;
 
     [Header("References")]
     [SerializeField] private MapLogic m_MapLogic;
     [SerializeField] private Transform m_CameraLookAtPoint;
+    [SerializeField] private Transform m_MapBiomeParent;
 
+    #region Player Setup
     // for initial battlefield setup
     private PlayerUnitSetup m_PlayerUnitSetup;
+    #endregion
 
+    #region Turn Managers
     // turn managers for the player and enemy
     private PlayerTurnManager m_PlayerTurnManager;
     private EnemyTurnManager m_EnemyTurnManager;
 
-    // turn queue
+    public PlayerUnitSetup PlayerUnitSetup => m_PlayerUnitSetup;
+    public PlayerTurnManager PlayerTurnManager => m_PlayerTurnManager;
+    #endregion
+
+    #region Turn Queue
     private TurnQueue m_TurnQueue = new TurnQueue();
     private HashSet<Unit> m_EnemyUnits = new HashSet<Unit>();
     private HashSet<Unit> m_PlayerUnits = new HashSet<Unit>();
+    #endregion
 
+    #region State
     private bool m_BattleTick = false;
     private bool m_WithinBattle = false;
+    #endregion
 
-    // camera
+    #region Camera
     private Camera m_BattleCamera;
     private const float CAMERA_ROTATION_SPEED = 50f;
+    #endregion
 
     #region Initialisation
     private bool isBattleInitialised = false;
@@ -57,7 +57,6 @@ public class BattleManager : MonoBehaviour
         m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
         m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
 
-        // TODO: Handle this separately if need be
         m_BattleCamera = CameraManager.Instance.MainCamera;
         m_BattleCamera.transform.LookAt(m_CameraLookAtPoint);
         InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
@@ -66,18 +65,18 @@ public class BattleManager : MonoBehaviour
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
 
-        // TODO: This is test code
-        // InitialiseBattle(m_TestBattle, m_TestPlacement, m_TestStats, m_TestClasses);
         GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke(this);
     }
 
-    private void Awake()
+    protected override void HandleAwake()
     {
+        base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
     }
 
-    private void OnDestroy()
+    protected override void HandleDestroy()
     {
+        base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
         InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
     }
@@ -86,9 +85,8 @@ public class BattleManager : MonoBehaviour
     /// Initialise battle with the decided upon player units and the pre-placed enemy units
     /// </summary>
     /// <param name="battleSO"></param>
-    /// <param name="playerUnits"></param>
-    // TODO: Bundle the players in a better way OR intialise them in the level FIRST
-    public void InitialiseBattle(BattleSO battleSO, List<Unit> playerUnits, List<Stats> playerStats, List<ClassSO> playerClasses)
+    /// <param name="playerUnitData"></param>
+    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitData, GameObject mapBiome)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
@@ -96,17 +94,19 @@ public class BattleManager : MonoBehaviour
 
         m_MapLogic.ResetMap();
 
-        foreach (UnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
+        InstantiateBiome(mapBiome);
+
+        foreach (EnemyUnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
-            InstantiateUnit(unitPlacement, GridType.ENEMY);
+            InstantiateEnemyUnit(unitPlacement);
         }
 
-        if (playerUnits.Count > battleSO.m_PlayerStartingTiles.Count)
+        if (playerUnitData.Count > battleSO.m_PlayerStartingTiles.Count)
             Logger.Log(this.GetType().Name, "There are more player units than there are tiles to put them!", LogLevel.ERROR);
 
-        for (int i = 0; i < playerUnits.Count; ++i)
+        for (int i = 0; i < playerUnitData.Count; ++i)
         {
-            InstantiateUnit(new UnitPlacement {m_Coodinates = battleSO.m_PlayerStartingTiles[i], m_Unit = playerUnits[i], m_Stats = playerStats[i], m_Class = playerClasses[i]}, GridType.PLAYER);
+            InstantiatePlayerUnit(playerUnitData[i], battleSO.m_PlayerStartingTiles[i]);
         }
 
         m_TurnQueue.OrderTurnQueue();
@@ -115,25 +115,42 @@ public class BattleManager : MonoBehaviour
         isBattleInitialised = true;
     }
 
+    private void InstantiateBiome(GameObject biomeObj)
+    {
+        GameObject map = Instantiate(biomeObj, m_MapBiomeParent);
+        map.transform.localPosition = Vector3.zero;
+        map.transform.localRotation = Quaternion.identity;
+        map.transform.localScale = Vector3.one;
+    }
+
     /// <summary>
-    /// Instantiate the visual representation of the unit, placing it on the grid
+    /// Instantiate the visual representation of an enemy unit, placing it on the grid
     /// and initialising the unit
     /// </summary>
     /// <param name="unitPlacement"></param>
     /// <param name="gridType"></param>
-    private void InstantiateUnit(UnitPlacement unitPlacement, GridType gridType)
+    private void InstantiateEnemyUnit(EnemyUnitPlacement unitPlacement)
     {
-        Unit unit = Instantiate(unitPlacement.m_Unit);
-        if (gridType == GridType.PLAYER)
-            unit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class);
-        else
-            ((EnemyUnit) unit).Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions);
-        m_MapLogic.PlaceUnit(gridType, unit, unitPlacement.m_Coodinates);
-        m_TurnQueue.AddUnit(unit);
-        if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
-            m_PlayerUnits.Add(unit);
-        else
-            m_EnemyUnits.Add(unit);
+        EnemyUnit enemyUnit = Instantiate(m_EnemyUnit);
+        enemyUnit.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions, unitPlacement.m_EnemySprite, unitPlacement.GetUnitModelData());
+        m_MapLogic.PlaceUnit(GridType.ENEMY, enemyUnit, unitPlacement.m_Coodinates);
+        m_TurnQueue.AddUnit(enemyUnit);
+        m_EnemyUnits.Add(enemyUnit);
+    }
+
+    /// <summary>
+    /// Instantiate the visual representation of a player unit, placing it on the grid
+    /// and initialising the unit
+    /// </summary>
+    /// <param name="unitPlacement"></param>
+    /// <param name="gridType"></param>
+    private void InstantiatePlayerUnit(CharacterBattleData unitBattleData, CoordPair position)
+    {
+        PlayerUnit playerUnit = Instantiate(m_PlayerUnit);
+        playerUnit.Initialise(unitBattleData);
+        m_MapLogic.PlaceUnit(GridType.PLAYER, playerUnit, position);
+        m_TurnQueue.AddUnit(playerUnit);
+        m_PlayerUnits.Add(playerUnit);
     }
     #endregion
 
@@ -177,14 +194,12 @@ public class BattleManager : MonoBehaviour
         EndTurn(unit);
     }
 
-    // this might be responsible for actually destroying the g9ame object/ returning it to pool or whatever
-    // to be consistent
     private void OnUnitDeath(Unit unit)
     {
         m_TurnQueue.RemoveUnit(unit);
         // TODO: move this somewhere else
         unit.Die();
-        // Destroy(unit.gameObject);
+        Destroy(unit.gameObject);
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
@@ -207,13 +222,20 @@ public class BattleManager : MonoBehaviour
     private void OnCompleteSetup()
     {
         Logger.Log(this.GetType().Name, "Begin battle", LogLevel.LOG);
-        StartCoroutine(TestStart());
+        StartCoroutine(StartBattle());
+    }
+
+    private IEnumerator StartBattle()
+    {
+        yield return new WaitForEndOfFrame();
+        GlobalEvents.Battle.TurnOrderUpdatedEvent?.Invoke(m_TurnQueue.GetTurnOrder());
+        m_WithinBattle = true;
+        m_BattleTick = true;
     }
 
     private void OnRotateCamera(IInput input)
     {
-        var inputVector = input.GetValue<Vector2>();
-        var hAxis = inputVector.x;
+        var hAxis = input.GetValue<float>();
         m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -hAxis * CAMERA_ROTATION_SPEED * Time.deltaTime);
     }
     #endregion

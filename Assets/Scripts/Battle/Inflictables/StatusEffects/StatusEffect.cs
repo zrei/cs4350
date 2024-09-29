@@ -5,6 +5,7 @@ public class StatusEffect : IStatChange
     private StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
 
+    public int Id => m_StatusEffectSO.m_Id;
     public string Name => m_StatusEffectSO.name;
     public int StackRemaining => m_StackRemaining;
     public bool IsDepleted => m_StackRemaining <= 0;

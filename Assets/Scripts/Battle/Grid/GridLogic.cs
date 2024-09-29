@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 /// <summary>
 /// Class that maintains the internal representation of the grid (tile types, which tiles are occupied and with what units),
@@ -17,13 +18,44 @@ public class GridLogic : MonoBehaviour
     private MapData MapData => new MapData(m_TileData);
     #endregion
 
-    private const float SPAWN_HEIGHT_OFFSET = 1.0f;
+    public event MapInputEvent onTileSelect;
+    public event MapInputEvent onTileSubmit;
+
+    private CanvasGroup canvasGroup;
 
     #region Initialisation
     private void Start()
     {
         InitialiseTileData();
-        InitialiseTileVisuals();  
+        InitialiseTileVisuals();
+
+        canvasGroup = GetComponent<CanvasGroup>();
+        canvasGroup.interactable = false;
+    }
+
+    public void SetInteractable(bool interactable)
+    {
+        canvasGroup.interactable = interactable;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                m_TileVisuals[r, c].selectable.interactable = interactable;
+            }
+        }
+    }
+
+    public void SetInteractableWhere(bool interactable, Func<TileVisual, bool> condition)
+    {
+        canvasGroup.interactable = interactable;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tile = m_TileVisuals[r, c];
+                tile.selectable.interactable = condition(tile);
+            }
+        }
     }
 
     private void InitialiseTileData()
@@ -47,7 +79,19 @@ public class GridLogic : MonoBehaviour
                 Transform tileTrf = row.GetChild(c);
                 TileVisual tile = tileTrf.GetComponent<TileVisual>();
                 tile.Initialise(m_GridType, new CoordPair(r, c));
+                TileData data = m_TileData[r, c];
                 m_TileVisuals[r, c] = tile;
+
+                tile.selectable.onSelect.RemoveAllListeners();
+                tile.selectable.onSelect.AddListener(() =>
+                {
+                    onTileSelect?.Invoke(data, tile);
+                });
+                tile.selectable.onSubmit.RemoveAllListeners();
+                tile.selectable.onSubmit.AddListener(() =>
+                {
+                    onTileSubmit?.Invoke(data, tile);
+                });
             }
         }
     }
@@ -57,15 +101,74 @@ public class GridLogic : MonoBehaviour
     public void ColorReachablePoints(HashSet<PathNode> reachablePoints)
     {
         ResetPath();
+        canvasGroup.interactable = true;
         foreach (PathNode pathNode in reachablePoints)
         {
             CoordPair coordinates = pathNode.m_Coordinates;
-            m_TileVisuals[coordinates.m_Row, coordinates.m_Col].SetTileState(TileState.TRAVERSABLE);
+            var tile = m_TileVisuals[coordinates.m_Row, coordinates.m_Col];
+            tile.SetTileState(TileState.TRAVERSABLE);
+            tile.selectable.interactable = true;
+        }
+    }
+
+    public void ShowAttackRange(Unit currentUnit, ActiveSkillSO skill)
+    {
+        canvasGroup.interactable = true;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var isAttackable = skill.IsValidTargetTile(tileVisual.Coordinates, currentUnit, m_GridType);
+                if (isAttackable)
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.ATTACKABLE);
+                }
+            }
+        }
+    }
+
+    public void ShowInspectable(bool ignoreEmpty)
+    {
+        canvasGroup.interactable = true;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var tileData = m_TileData[r, c];
+                if (!ignoreEmpty || tileData.m_CurrUnit != null)
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.INSPECTABLE);
+                }
+            }
+        }
+    }
+
+    public void ShowSetupTiles(List<CoordPair> validTiles)
+    {
+        canvasGroup.interactable = true;
+        var set = new HashSet<CoordPair>(validTiles);
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var tileData = m_TileData[r, c];
+                if (set.Contains(tileVisual.Coordinates))
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.SWAPPABLE);
+                }
+            }
         }
     }
 
     public void ResetMap()
     {
+        canvasGroup.interactable = false;
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
@@ -140,7 +243,7 @@ public class GridLogic : MonoBehaviour
 
     public HashSet<PathNode> CalculateReachablePoints(Unit unit, int remainingMovementRange)
     {
-        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.Stat.m_CanSwapTiles, unit.Stat.m_TraversableTileTypes);
+        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.CanSwapTiles, unit.TraversableTileTypes);
     }
     #endregion
 
@@ -148,6 +251,7 @@ public class GridLogic : MonoBehaviour
     public void PlaceUnit(Unit unit, CoordPair coordinates)
     {
         unit.transform.parent = transform;
+        unit.transform.localRotation = Quaternion.identity;
         unit.PlaceUnit(coordinates, GetTilePosition(coordinates));
         Logger.Log(this.GetType().Name, unit.gameObject.name, $"Placed unit at tile {coordinates} with world position {unit.transform.position}", unit.gameObject, LogLevel.LOG);
         m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = true;
@@ -198,12 +302,49 @@ public class GridLogic : MonoBehaviour
     #region Helper
     private Vector3 GetTilePosition(CoordPair coordPair)
     {
-        return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position + new Vector3(0f, SPAWN_HEIGHT_OFFSET, 0f);
+        return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position;
     }
 
-    public bool IsTileOccupied(CoordPair tile)
+    private bool IsTileOccupied(CoordPair tile)
     {
         return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
+    }
+
+    /// <summary>
+    /// Checks that it's a valid target tile for the active skill and also checks that at least one square within the target is occupied
+    /// </summary>
+    /// <param name="activeSkillSO"></param>
+    /// <param name="unit"></param>
+    /// <param name="targetTile"></param>
+    /// <returns></returns>
+    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, bool checkOccupied)
+    {
+        if (!activeSkillSO.IsValidTargetTile(targetTile, unit, m_GridType))
+            return false;
+
+        if (!checkOccupied)
+            return true;
+
+        foreach (CoordPair tile in GetInBoundsTargetTiles(activeSkillSO, targetTile))
+        {
+            if (IsTileOccupied(tile))
+                return true;
+        }
+
+        return false;
+    }
+
+    private List<CoordPair> GetInBoundsTargetTiles(ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        List<CoordPair> targetTiles = new();
+        foreach (CoordPair coordPair in activeSkillSO.ConstructAttackTargetTiles(targetTile))
+        {
+            if (!MapData.WithinBounds(coordPair))
+                continue;
+
+            targetTiles.Add(coordPair);
+        }
+        return targetTiles;
     }
     #endregion
 
@@ -214,27 +355,23 @@ public class GridLogic : MonoBehaviour
     /// </summary>
     /// <param name="attackPoints"></param>
     /// <param name="damage"></param>
-    public void PerformSkill(Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
+    public void PerformSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
-        List<CoordPair> targetTiles = attack.ConstructAttackTargetTiles(targetTile);
         List<IHealth> targets = new();
-        foreach (CoordPair coordPair in targetTiles)
-        {
-            if (!MapData.WithinBounds(coordPair))
-                continue;
-            
-            if (m_TileData[coordPair.m_Row, coordPair.m_Col].m_IsOccupied)
+        foreach (CoordPair coordPair in GetInBoundsTargetTiles(activeSkill, targetTile))
+        {       
+            if (IsTileOccupied(coordPair))
             {
                 targets.Add(m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit);
             }
         }
 
-        attacker.PostAttackEvent += CompleteSkill;
-        attacker.PerformSKill(attack, targets);
+        attacker.PostSkillEvent += CompleteSkill;
+        attacker.PerformSKill(activeSkill, targets);
 
         void CompleteSkill()
         {
-            attacker.PostAttackEvent -= CompleteSkill;
+            attacker.PostSkillEvent -= CompleteSkill;
 
             // TODO: Clean this up further?
             List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
