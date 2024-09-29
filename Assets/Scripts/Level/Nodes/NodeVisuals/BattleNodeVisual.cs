@@ -9,9 +9,17 @@ public class BattleNodeVisual : NodeVisual
 {
     private BattleNode m_BattleNode;
     
+    // Star token model for goal nodes
+    [SerializeField] private GameObject m_starToken;
+    
     public override void Initialise()
     {
         m_BattleNode = GetComponent<BattleNode>();
+        
+        if (m_BattleNode.IsGoalNode)
+        {
+            m_starToken.SetActive(true);
+        }
     }
 
     #region Graphics
@@ -24,12 +32,6 @@ public class BattleNodeVisual : NodeVisual
         else
         {
             SetNodeState(m_BattleNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.BATTLE);
-       
-            if (m_BattleNode.IsGoalNode)
-            {
-                m_NodeStateText.text = "Final Battle";
-                m_NodeStateText.gameObject.SetActive(true);
-            }
         }
         
     }

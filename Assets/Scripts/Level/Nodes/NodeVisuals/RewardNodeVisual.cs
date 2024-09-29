@@ -11,9 +11,17 @@ public class RewardNodeVisual : NodeVisual
     // Chest token model
     [SerializeField] private GameObject m_chestToken;
     
+    // Star token model for goal nodes
+    [SerializeField] private GameObject m_starToken;
+    
     public override void Initialise()
     {
         m_RewardNode = GetComponent<RewardNode>();
+        
+        if (m_RewardNode.IsGoalNode)
+        {
+            m_starToken.SetActive(true);
+        }
     }
 
     #region Graphics

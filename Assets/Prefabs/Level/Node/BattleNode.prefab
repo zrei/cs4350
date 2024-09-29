@@ -8,6 +8,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3275376407779731911, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3923907466458843154, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4413340312365699752, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4413340312365699752, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       propertyPath: m_Name
@@ -76,6 +96,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 699115565003873301}
   m_SourcePrefab: {fileID: 100100000, guid: c9071d1592e7143be9c500ec030495ce, type: 3}
+--- !u!1 &3104569941532033256 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3923907466458843154, guid: c9071d1592e7143be9c500ec030495ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 2117009466897926394}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3503048923923455154 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3313651568230962248, guid: c9071d1592e7143be9c500ec030495ce,
@@ -139,6 +165,7 @@ MonoBehaviour:
   m_IsMovableText: {fileID: 3503048923923455154}
   m_MeshRenderer: {fileID: 7740498688442905005}
   m_NodeColorSO: {fileID: 11400000, guid: 2f776168475df475aa0bf14a7b49ae79, type: 2}
+  m_starToken: {fileID: 3104569941532033256}
 --- !u!23 &7740498688442905005 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 8505864211087440215, guid: c9071d1592e7143be9c500ec030495ce,
