@@ -22,9 +22,14 @@ MonoBehaviour:
     m_Stack: 2
   - m_StatusEffect: {fileID: 11400000, guid: f7716e8f1c22341649b914cee47d552f, type: 2}
     m_Stack: 1
-  m_Amount: 1
+  m_DamageModifier: 1
+  m_HealAmount: 1
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
+  m_TargetWillPlayHurtAnimation: 1
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
   m_TargetSquares: []
