@@ -13,8 +13,12 @@ namespace Game.UI
         [SerializeField]
         private UnitAllegiance displayType = UnitAllegiance.PLAYER;
 
+        #region Component References
         [SerializeField]
         private FormattedTextDisplay nameDisplay;
+
+        [SerializeField]
+        private Image characterArt;
 
         [SerializeField]
         private FormattedTextDisplay phyAtkDisplay;
@@ -36,6 +40,7 @@ namespace Game.UI
 
         [SerializeField]
         private ProgressBar mpBar;
+        #endregion
 
         private Animator animator;
         private bool isHidden;
@@ -128,8 +133,7 @@ namespace Game.UI
 
             if (isHidden) Show();
 
-            var totalStats = currentUnit.GetTotalStats();
-            switch(currentUnit.UnitAllegiance)
+            switch (currentUnit.UnitAllegiance)
             {
                 case UnitAllegiance.PLAYER:
                     var playerUnit = currentUnit as PlayerUnit;
@@ -140,6 +144,12 @@ namespace Game.UI
                     break;
             }
 
+            characterArt.sprite = currentUnit.Sprite;
+            var color = characterArt.color;
+            color.a = currentUnit.Sprite != null ? 1 : 0;
+            characterArt.color = color;
+
+            var totalStats = currentUnit.GetTotalStats();
             phyAtkDisplay?.SetValue(totalStats.m_PhysicalAttack);
             mgcAtkDisplay?.SetValue(totalStats.m_MagicAttack);
             phyDefDisplay?.SetValue(totalStats.m_PhysicalDefence);
