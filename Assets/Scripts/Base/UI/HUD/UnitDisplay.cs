@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.UI
 {
@@ -99,12 +98,24 @@ namespace Game.UI
             {
                 GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
             }
+
+            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         }
-        
+
+        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+
+            Hide();
+        }
+
         private void OnDestroy()
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         }
 
         private void OnPreviewUnit(Unit currentUnit)
@@ -112,8 +123,6 @@ namespace Game.UI
             if (currentUnit == null || currentUnit.UnitAllegiance != displayType)
             {
                 if (!isHidden) Hide();
-
-                TrackedUnit = null;
                 return;
             }
 
@@ -159,6 +168,8 @@ namespace Game.UI
 
         private void Hide()
         {
+            TrackedUnit = null;
+
             isHidden = true;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);

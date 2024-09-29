@@ -12,6 +12,8 @@ public class PlayerUnitSetup : MonoBehaviour
 
     private VoidEvent m_CompleteSetupEvent;
 
+    public bool IsSetupStarted { get; private set; }
+
     public void Initialise(MapLogic mapLogic, VoidEvent completeSetupEvent)
     {
         m_MapLogic = mapLogic;
@@ -22,13 +24,15 @@ public class PlayerUnitSetup : MonoBehaviour
     {
         Logger.Log(this.GetType().Name, "Begin player unit set up", LogLevel.LOG);
         m_PlayerSquares = playerBeginningSquares;
-        GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
 
         m_MapLogic.onTileSelect += OnTileSelect;
         m_MapLogic.onTileSubmit += OnTileSubmit;
         m_MapLogic.ResetMap();
         m_MapLogic.ShowSetupTiles(GridType.PLAYER, m_PlayerSquares);
         m_MapLogic.ShowInspectable(GridType.ENEMY, true);
+
+        IsSetupStarted = true;
+        GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
     }
 
     public void EndSetup()

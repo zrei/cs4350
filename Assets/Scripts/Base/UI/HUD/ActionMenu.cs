@@ -4,8 +4,11 @@ using UnityEngine;
 
 namespace Game.UI
 {
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public class ActionMenu : MonoBehaviour
     {
+        #region Component References
         [SerializeField]
         private FormattedTextDisplay skillHeader;
 
@@ -26,6 +29,7 @@ namespace Game.UI
 
         [SerializeField]
         private ActionButton passButton;
+        #endregion
 
         private ActiveSkillSO SelectedSkill
         {
@@ -37,9 +41,10 @@ namespace Game.UI
             }
         }
         private ActiveSkillSO selectedSkill;
-        private PlayerUnit playerUnit;
 
         private Animator animator;
+        private CanvasGroup canvasGroup;
+
         private bool isHidden;
 
         private void Awake()
@@ -47,11 +52,34 @@ namespace Game.UI
             animator = GetComponent<Animator>();
             animator.enabled = false;
 
-            GetComponent<CanvasGroup>().alpha = 0;
+            canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.alpha = 0;
             isHidden = true;
 
             GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
+            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
 
+            BindButtonEvents();
+        }
+        
+        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+
+            Hide();
+        }
+
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        }
+
+        private void BindButtonEvents()
+        {
             moveButton.onSubmit.RemoveAllListeners();
             moveButton.onSubmit.AddListener(() =>
             {
@@ -86,11 +114,6 @@ namespace Game.UI
             });
         }
 
-        private void OnDestroy()
-        {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
-        }
-
         private void OnPreviewCurrentUnit(Unit currentUnit)
         {
             if (currentUnit is not PlayerUnit playerUnit)
@@ -101,7 +124,6 @@ namespace Game.UI
 
             if (isHidden) Show();
 
-            this.playerUnit = playerUnit;
             var skills = playerUnit.GetAvailableActiveSkills();
             var hasMultiPage = false;
             int i = 0;
@@ -166,6 +188,8 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = false;
+            canvasGroup.interactable = !isHidden;
+            canvasGroup.blocksRaycasts = !isHidden;
         }
     }
 }
