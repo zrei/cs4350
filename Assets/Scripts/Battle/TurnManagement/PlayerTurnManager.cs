@@ -31,7 +31,7 @@ public class PlayerTurnManager : TurnManager
     /// Maps coordinates to nodes that track paths that end at those coordinates
     /// Used to store the moveable points which is calculated at the start of the turn
     /// </summary>
-    private Dictionary<CoordPair, PathNode> m_TileToPath;
+    private Dictionary<CoordPair, PathNode> m_TileToPath = new();
 
     /// <summary>
     /// All reachable path nodes
@@ -54,13 +54,6 @@ public class PlayerTurnManager : TurnManager
         }
     }
     private ActiveSkillSO selectedSkill;
-
-    #region Initialisation
-    private void Start()
-    {
-        m_TileToPath = new Dictionary<CoordPair, PathNode>();
-    }
-    #endregion
 
     #region Start Turn
     /// <summary>
@@ -103,13 +96,15 @@ public class PlayerTurnManager : TurnManager
         selectedTileData = data;
         selectedTileVisual = visual;
 
+        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(selectedTileData.m_CurrUnit);
+
         switch (m_CurrState)
         {
-            case PlayerTurnState.SELECTING_ACTION_TARGET:
-                UpdateActiveSkillState();
-                break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 UpdateMoveState();
+                break;
+            case PlayerTurnState.SELECTING_ACTION_TARGET:
+                UpdateActiveSkillState();
                 break;
         }
     }
@@ -214,13 +209,7 @@ public class PlayerTurnManager : TurnManager
 
     private bool TryInspect()
     {
-        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(selectedTileData.m_CurrUnit);
         return true;
-    }
-
-    private void StopInspect()
-    {
-        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
     }
     #endregion
 
@@ -258,12 +247,9 @@ public class PlayerTurnManager : TurnManager
     {
         m_MapLogic.ResetMap();
 
-        if (m_CurrState == PlayerTurnState.INSPECT && currAction != PlayerTurnState.INSPECT)
-        {
-            StopInspect();
-        }
-
         m_CurrState = currAction;
+
+        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
 
         switch (currAction)
         {
@@ -301,6 +287,9 @@ public class PlayerTurnManager : TurnManager
 
         m_MapLogic.onTileSelect -= OnTileSelect;
         m_MapLogic.onTileSubmit -= OnTileSubmit;
+        m_MapLogic.ResetMap();
+
+        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
     }
     #endregion
 }

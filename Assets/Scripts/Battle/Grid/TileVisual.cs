@@ -16,6 +16,17 @@ public enum TileState
 /// </summary>
 public class TileVisual : MonoBehaviour
 {
+    private readonly static Color SwappableColor = new(0.2f, 0.7f, 0.2f, 1);
+    private readonly static Color SwappableTargetColor = new(1, 1, 1, 1);
+
+    private readonly static Color TraversableColor = new(0.2f, 0.2f, 0.7f, 1);
+    private readonly static Color TraversablePathColor = new(0.3f, 0.3f, 1, 1);
+
+    private readonly static Color AttackableColor = new(0.7f, 0.2f, 0.2f, 1);
+    private readonly static Color AttackableTargetColor = new(1f, 0.3f, 0.3f, 1);
+
+    private readonly static Color InspectableColor = new(0.5f, 0.5f, 0, 1);
+
     [SerializeField] RawImage tileImage;
     public SelectableBase selectable;
 
@@ -53,10 +64,10 @@ public class TileVisual : MonoBehaviour
         tileImage.color = state switch
         {
             TileState.NONE => new(0, 0, 0, 0),
-            TileState.SWAPPABLE => new(0, 0.5f, 0, 1),
-            TileState.TRAVERSABLE => new(0.1f, 0.1f, 0.5f, 1),
-            TileState.ATTACKABLE => new(0.5f, 0.1f, 0.1f, 1),
-            TileState.INSPECTABLE => new(0.5f, 0.5f, 0, 1),
+            TileState.SWAPPABLE => SwappableColor,
+            TileState.TRAVERSABLE => TraversableColor,
+            TileState.ATTACKABLE => AttackableColor,
+            TileState.INSPECTABLE => InspectableColor,
             _ => new(0, 0, 0, 0)
         };
     }
@@ -65,21 +76,27 @@ public class TileVisual : MonoBehaviour
     {
         if (m_CurrState == TileState.NONE) return;
 
-        tileImage.color = isTarget ? new(0.5f, 1, 0.5f, 1) : new(0, 0.5f, 0, 1);
+        tileImage.color = isTarget
+            ? SwappableTargetColor
+            : SwappableColor;
     }
 
     public void TogglePath(bool isPartOfPath)
     {
         if (m_CurrState == TileState.NONE) return;
 
-        tileImage.color = isPartOfPath ? new(0, 1, 1, 1) : new(0.1f, 0.1f, 0.5f, 1);
+        tileImage.color = isPartOfPath
+            ? TraversablePathColor
+            : TraversableColor;
     }
 
     public void ToggleTarget(bool isTarget)
     {
         if (m_CurrState == TileState.NONE) return;
 
-        tileImage.color = isTarget ? new(1, 0.2f, 0.2f, 1) : new(0.5f, 0.1f, 0.1f, 1);
+        tileImage.color = isTarget
+            ? AttackableTargetColor
+            : AttackableColor;
     }
     #endregion
 }

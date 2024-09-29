@@ -60,7 +60,12 @@ public class PlayerUnitSetup : MonoBehaviour
             return;
 
         if (m_HasSelectedTile && visual.Equals(m_TileToSwap))
+        {
+            visual.ToggleSwapTarget(false);
+            m_HasSelectedTile = false;
+            m_TileToSwap = null;
             return;
+        }
 
         if (m_HasSelectedTile)
         {
@@ -69,6 +74,7 @@ public class PlayerUnitSetup : MonoBehaviour
             m_TileToSwap.ToggleSwapTarget(false);
             visual.ToggleSwapTarget(false);
             m_HasSelectedTile = false;
+            m_TileToSwap = null;
             Logger.Log(this.GetType().Name, $"Swap {m_TileToSwap} with {visual}", LogLevel.LOG);
         }
         else
