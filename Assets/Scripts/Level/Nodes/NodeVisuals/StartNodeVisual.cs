@@ -16,7 +16,7 @@ public class StartNodeVisual : NodeVisual
     #region Graphics
     public override void UpdateNodeVisualState()
     {
-        SetNodeState(m_StartNode.IsCurrent ? "Current" : "Start");
+        SetNodeState(m_StartNode.IsCurrent ? NodePuckType.CURRENT : NodePuckType.CLEARED);
     }
     #endregion
 }

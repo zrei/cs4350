@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Input;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public enum PlayerLevelSelectionState
 {
@@ -40,29 +41,28 @@ public class LevelManager : MonoBehaviour
     [Header("Test Settings")]
     [SerializeField] private LevelSO m_TestLevel;
     [SerializeField] private NodeInternal testStartNodeInternal;
+    [SerializeField] private NodeInternal testGoalNodeInternal;
+    
     // should be sent in in the future
     [SerializeField] private List<CharacterData> m_TestCharacterData;
+    
+    [SerializeField] private EventSystem m_TestLevelEventSystem;
     
     public void Start()
     {
         Initialise();
-
-        GlobalEvents.Level.NodeEnteredEvent(testStartNodeInternal);
         
-        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
-        
-        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        StartPlayerPhase();
     }
 
     public void OnDisable()
     {
-        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        if (InputManager.Instance)
+        {
+            DisableLevelGraphInput();
+        }
         
-        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        RemoveNodeEventCallbacks();
     }
     
     public void DisplayMovableNodes()
@@ -83,6 +83,7 @@ public class LevelManager : MonoBehaviour
         
         // Initialise the internal graph representation of the level
         m_LevelNodeManager.Initialise(levelNodes, levelEdges, timeLimit);
+        m_LevelNodeManager.SetGoalNode(testGoalNodeInternal);
         
         // Initialise the timer
         m_LevelTimerLogic.Initialise(timeLimit);
@@ -93,7 +94,20 @@ public class LevelManager : MonoBehaviour
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
         
-        DisplayMovableNodes();
+        AddNodeEventCallbacks();
+    }
+    
+    private void StartPlayerPhase()
+    {
+        if (m_LevelNodeManager.IsGoalNodeCleared())
+        {
+            GlobalEvents.Level.LevelEndEvent?.Invoke(LevelResultType.SUCCESS);
+        }
+        else
+        {
+            DisplayMovableNodes();
+            EnableLevelGraphInput();
+        }
     }
 
     #endregion
@@ -114,6 +128,18 @@ public class LevelManager : MonoBehaviour
         TryPerformAction();
         
         UpdateState();
+    }
+    
+    private void EnableLevelGraphInput()
+    {
+        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+    }
+    
+    private void DisableLevelGraphInput()
+    {
+        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
     }
 
     #endregion
@@ -187,6 +213,7 @@ public class LevelManager : MonoBehaviour
             return;
         }
         
+        DisableLevelGraphInput();
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
 
@@ -196,7 +223,7 @@ public class LevelManager : MonoBehaviour
 
         if (m_LevelNodeManager.IsCurrentNodeCleared())
         {
-            DisplayMovableNodes();
+            StartPlayerPhase();
         }
         else
         {
@@ -225,35 +252,62 @@ public class LevelManager : MonoBehaviour
     #endregion
 
     #region Callbacks
+    
+    private void AddNodeEventCallbacks()
+    {
+        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
+        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
+    }
+    
+    private void RemoveNodeEventCallbacks()
+    {
+        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
+        GlobalEvents.Battle.ReturnFromBattleEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
+    }
 
     private void OnBattleNodeStart(BattleNode battleNode)
     {
-        Debug.Log("Starting Battle Node");
+        Debug.Log("LevelManager: Starting Battle Node");
         
         // Disable inputs
-        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        DisableLevelGraphInput();
         
         m_LevelCamera.gameObject.SetActive(false);
+        m_TestLevelEventSystem.enabled = false;
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
     private void OnBattleNodeEnd()
     {
-        Debug.Log("Ending Battle Node");
+        Debug.Log("LevelManager: Ending Battle Node");
         
         m_LevelCamera.gameObject.SetActive(true);
         
         GameSceneManager.Instance.UnloadBattleScene();
         
+        m_TestLevelEventSystem.enabled = true;
+        
         // Update the level state
         m_LevelNodeManager.ClearCurrentNode();
         
-        DisplayMovableNodes();
+        StartPlayerPhase();
+    }
+    
+    private void OnRewardNodeStart(RewardNode rewardNode)
+    {
+        Debug.Log("LevelManager: Starting Reward Node");
         
-        // Enable inputs
-        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        // Disable inputs
+        DisableLevelGraphInput();
+        
+        // Maybe insert open chest animation here
+        
+        // Update the level state
+        m_LevelNodeManager.ClearCurrentNode();
+        
+        StartPlayerPhase();
     }
     
 

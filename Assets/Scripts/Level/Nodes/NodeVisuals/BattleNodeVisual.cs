@@ -9,9 +9,13 @@ public class BattleNodeVisual : NodeVisual
 {
     private BattleNode m_BattleNode;
     
+    
     public override void Initialise()
     {
         m_BattleNode = GetComponent<BattleNode>();
+        
+        if (m_BattleNode.IsGoalNode)
+            ToggleStarOn();
     }
 
     #region Graphics
@@ -19,12 +23,13 @@ public class BattleNodeVisual : NodeVisual
     {
         if (m_BattleNode.IsCurrent)
         {
-            SetNodeState("Current");
+            SetNodeState(NodePuckType.CURRENT);
         }
         else
         {
-            SetNodeState(m_BattleNode.IsCleared ? "Cleared" : "Battle");
+            SetNodeState(m_BattleNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.BATTLE);
         }
+        
     }
     #endregion
 }

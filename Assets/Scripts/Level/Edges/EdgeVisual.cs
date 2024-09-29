@@ -16,10 +16,15 @@ public class EdgeVisual : MonoBehaviour
         
         // Draws a line to connect the nodes
         m_LineRenderer.positionCount = 2;
-        m_LineRenderer.SetPosition(0, m_EdgeInternal.NodeInternalA.transform.position);
-        m_LineRenderer.SetPosition(1, m_EdgeInternal.NodeInternalB.transform.position);
+        var nodeAPosition = m_EdgeInternal.NodeInternalA.transform.position;
+        m_LineRenderer.SetPosition(0, nodeAPosition);
+        var nodeBPosition = m_EdgeInternal.NodeInternalB.transform.position;
+        m_LineRenderer.SetPosition(1, nodeBPosition);
         
+        // Set Text position to the middle of the line
+        m_CostText.transform.position = (nodeAPosition + nodeBPosition) / 2 + new Vector3(0f, 0.5f, 0f);
         m_CostText.text = m_EdgeInternal.Cost.ToString();
+        m_CostText.enabled = true;
     }
     
     #endregion

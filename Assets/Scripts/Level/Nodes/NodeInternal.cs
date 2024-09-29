@@ -19,6 +19,9 @@ public abstract class NodeInternal : MonoBehaviour
     // Static Node Information
     [SerializeField] private NodeInfo m_NodeInfo;
     
+    // Whether is goal node
+    private bool m_IsGoalNode = false;
+    
     // Whether the node has been cleared
     private bool m_IsCleared = false;
 
@@ -41,8 +44,14 @@ public abstract class NodeInternal : MonoBehaviour
     #endregion
 
     #region NodeState
+    public bool IsGoalNode => m_IsGoalNode;
     public bool IsCleared => m_IsCleared;
     public bool IsCurrent => m_IsCurrent;
+    
+    public void SetGoalNode()
+    {
+        m_IsGoalNode = true;
+    }
     
     public void SetCleared()
     {

@@ -11,6 +11,8 @@ public class LevelNodeManager : MonoBehaviour
     private List<NodeInternal> m_LevelNodes = new();
     public List<NodeInternal> LevelNodes => m_LevelNodes;
     
+    private NodeInternal m_GoalNode;
+    
     // Current State
     private NodeInternal m_CurrentNodeInternal;
 
@@ -32,6 +34,12 @@ public class LevelNodeManager : MonoBehaviour
         {
             levelNode.Initialise();
             m_LevelNodes.Add(levelNode);
+            
+            // Check if goal node
+            if (levelNode.IsGoalNode)
+            {
+                m_GoalNode = levelNode;
+            }
         }
         
         // Building the graph from the scene objects
@@ -118,7 +126,17 @@ public class LevelNodeManager : MonoBehaviour
     {
         m_CurrentNodeInternal.StartNodeEvent();
     }
+
+    public void SetGoalNode(NodeInternal goalNode)
+    {
+        m_GoalNode = goalNode;
+        m_GoalNode.SetGoalNode();
+    }
     
+    public bool IsGoalNodeCleared()
+    {
+        return m_GoalNode.IsCleared;
+    }
 
     #endregion
 }
