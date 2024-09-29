@@ -55,12 +55,15 @@ public class AttackAnimationManager : MonoBehaviour
 
     private IEnumerator PlayAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        attacker.PlayAttackAnimation(!activeSkill.DealsDamage);
+        int animationTrigger = 0;
+        animationTrigger += (int) (activeSkill.m_OverrideWeaponAnimationType ? activeSkill.m_OverriddenWeaponAnimationType : attacker.WeaponAnimationType);
+        animationTrigger += (int) activeSkill.m_SkillAnimationType;
+        attacker.PlaySkillAnimation(animationTrigger);
 
-        // for none damage dealing attacks and self attacks, there are no response animations, just VFX
-        if (!m_IsSelfTarget || !activeSkill.DealsDamage)
+        if (activeSkill.m_TargetWillPlayHurtAnimation)
         {
             yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
+
             foreach (Unit target in targets)
                 target.PlayAnimations(Unit.HurtAnimHash);
         }

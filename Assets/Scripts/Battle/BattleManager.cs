@@ -36,6 +36,8 @@ public class BattleManager : Singleton<BattleManager>
     private TurnQueue m_TurnQueue = new TurnQueue();
     private HashSet<Unit> m_EnemyUnits = new HashSet<Unit>();
     private HashSet<Unit> m_PlayerUnits = new HashSet<Unit>();
+
+    private const float DELAY_TILL_NEXT_TURN = 0.3f;
     #endregion
 
     #region State
@@ -191,6 +193,12 @@ public class BattleManager : Singleton<BattleManager>
     #region Callbacks
     private void OnCompleteTurn(Unit unit)
     {
+        StartCoroutine(DelayTillEndTurn(unit));
+    }
+
+    private IEnumerator DelayTillEndTurn(Unit unit)
+    {
+        yield return new WaitForSeconds(DELAY_TILL_NEXT_TURN);
         EndTurn(unit);
     }
 
