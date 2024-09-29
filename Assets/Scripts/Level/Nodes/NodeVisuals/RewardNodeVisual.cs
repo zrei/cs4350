@@ -18,15 +18,17 @@ public class RewardNodeVisual : NodeVisual
     {
         if (m_RewardNode.IsCurrent)
         {
-            SetNodeState("Current");
-        }
-        else if (m_RewardNode.IsGoalNode)
-        {
-            SetNodeState("Final Reward");
+            SetNodeState(NodePuckType.CURRENT);
         }
         else
         {
-            SetNodeState(m_RewardNode.IsCleared ? "Cleared" : "Reward");
+            SetNodeState(m_RewardNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
+        
+            if (m_RewardNode.IsGoalNode)
+            {
+                m_NodeStateText.text = "Final Reward";
+                m_NodeStateText.enabled = true;
+            }
         }
     }
     #endregion

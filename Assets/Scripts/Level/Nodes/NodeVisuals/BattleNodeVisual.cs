@@ -19,16 +19,19 @@ public class BattleNodeVisual : NodeVisual
     {
         if (m_BattleNode.IsCurrent)
         {
-            SetNodeState("Current");
-        }
-        else if (m_BattleNode.IsGoalNode)
-        {
-            SetNodeState("Final Battle");
+            SetNodeState(NodePuckType.CURRENT);
         }
         else
         {
-            SetNodeState(m_BattleNode.IsCleared ? "Cleared" : "Battle");
+            SetNodeState(m_BattleNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.BATTLE);
+       
+            if (m_BattleNode.IsGoalNode)
+            {
+                m_NodeStateText.text = "Final Battle";
+                m_NodeStateText.gameObject.SetActive(true);
+            }
         }
+        
     }
     #endregion
 }

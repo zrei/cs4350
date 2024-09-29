@@ -7,9 +7,13 @@ using UnityEngine;
 public abstract class NodeVisual : MonoBehaviour
 {
     
-    [SerializeField] TextMeshPro m_NodeStateText;
+    [SerializeField] public TextMeshPro m_NodeStateText;
     [SerializeField] TextMeshPro m_IsSelectedText;
     [SerializeField] TextMeshPro m_IsMovableText;
+    
+    // Puck Visuals
+    [SerializeField] MeshRenderer m_MeshRenderer;
+    [SerializeField] NodeColorSO m_NodeColorSO;
 
     #region Initialisation
     public abstract void Initialise();
@@ -21,9 +25,9 @@ public abstract class NodeVisual : MonoBehaviour
 
     #region Graphics
     
-    public void SetNodeState(string state)
+    public void SetNodeState(NodePuckType puckType)
     {
-        m_NodeStateText.text = state;
+        m_MeshRenderer.material = m_NodeColorSO.GetMaterial(puckType);
     }
 
     public void ToggleSelected(bool isSelected)
