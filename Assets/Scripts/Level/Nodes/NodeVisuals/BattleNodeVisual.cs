@@ -9,17 +9,13 @@ public class BattleNodeVisual : NodeVisual
 {
     private BattleNode m_BattleNode;
     
-    // Star token model for goal nodes
-    [SerializeField] private GameObject m_starToken;
     
     public override void Initialise()
     {
         m_BattleNode = GetComponent<BattleNode>();
         
         if (m_BattleNode.IsGoalNode)
-        {
-            m_starToken.SetActive(true);
-        }
+            ToggleStarOn();
     }
 
     #region Graphics
