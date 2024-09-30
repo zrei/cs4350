@@ -29,21 +29,17 @@ public delegate void TrackedValueEvent(float change, float current, float max);
 public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 {
     #region Animation
-    private const string DirXAnimParam = "DirX";
-    private const string DirYAnimParam = "DirY";
-    private const string IsMoveAnimParam = "IsMove";
+    private static readonly int DirXAnimParam = Animator.StringToHash("DirX");
+    private static readonly int DirYAnimParam = Animator.StringToHash("DirY");
+    private static readonly int IsMoveAnimParam = Animator.StringToHash("IsMove");
 
-    /*
-    public static readonly int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
-    public static readonly int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
-    public static readonly int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
-    */
+    private static readonly int AttackStartAnimParam = Animator.StringToHash("AttackStart");
+    private static readonly int AttackIDAnimParam = Animator.StringToHash("AttackID");
 
-    public static readonly int HurtAnimHash = Animator.StringToHash("Hurt");
-    private static readonly int DeathAnimHash = Animator.StringToHash("Death");
+    private static readonly int PoseIDAnimParam = Animator.StringToHash("PoseID");
 
-    private int m_AttackAnimHash;
-    private int m_SupportAnimHash;
+    public static readonly int HurtAnimParam = Animator.StringToHash("Hurt");
+    private static readonly int DeathAnimParam = Animator.StringToHash("IsDead");
  
     private Animator m_Animator;
     #endregion
@@ -86,6 +82,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
     #endregion
 
+    private WeaponModel weaponModel;
+
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData)
     {
@@ -109,10 +107,17 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
         equipArmor.Initialize(unitModelData.m_AttachItems);
         
-        GameObject weaponModel = weaponSO.m_WeaponModel;
-        if (weaponModel != null && equipArmor.RightArmBone != null)
+        WeaponModel weaponModelPrefab = weaponSO.m_WeaponModel;
+        if (weaponModelPrefab != null)
         {
-            Instantiate(weaponModel, equipArmor.RightArmBone);
+            weaponModel = Instantiate(weaponModelPrefab);
+            var attachPoint = weaponModel.attachmentType switch
+            {
+                WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                _ => null,
+            };
+            weaponModel.transform.SetParent(attachPoint, false);
         }
 
         m_Animator = model.GetComponentInChildren<Animator>();
@@ -121,10 +126,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
         }
 
-        m_AttackAnimHash = Animator.StringToHash(weaponSO.m_AttackAnimatorParam);
-        m_SupportAnimHash = Animator.StringToHash(weaponSO.m_SupportAnimatorParam);
-
         WeaponAnimationType = weaponSO.m_WeaponAnimationType;
+        m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
     }
@@ -323,41 +326,22 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     public void Die()
     {
-        PlayAnimations(DeathAnimHash);
-        Destroy(gameObject, 1f);
+        m_Animator.SetBool(DeathAnimParam, true);
+        Destroy(gameObject, 2f);
     }
     #endregion
 
     #region Attack Animations
-    public void PlayAnimations(int animationId)
+    public void PlayAnimations(int triggerID)
     {
-        m_Animator.Play(animationId);
+        m_Animator.SetTrigger(triggerID);
     }
 
-    public void PlaySkillAnimation(int triggerId)
+    public void PlaySkillAnimation(int attackID)
     {
-        /*PlayAnimations(isSupport ? m_SupportAnimHash : m_AttackAnimHash);*/
-        /*
-        Debug.Log("Is support: " + isSupport);
-        if (isSupport)
-        {
-            // support for other weapon types???
-            PlayAnimations(MagicSupportAnimHash);
-        }
-
-        switch (m_Class.m_Weapon.m_WeaponType)
-        {
-            case WeaponType.SWORD:
-            case WeaponType.AXE:
-            case WeaponType.LANCE:
-            case WeaponType.BOW:
-                PlayAnimations(SwordAttackAnimHash);
-                break;
-            case WeaponType.MAGIC:
-                PlayAnimations(MagicAttackAnimHash);
-                break;
-        }
-        */
+        m_Animator.SetInteger(AttackIDAnimParam, attackID);
+        m_Animator.SetTrigger(AttackStartAnimParam);
+        weaponModel.PlayAttackAnimation();
     }
     #endregion
 

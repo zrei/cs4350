@@ -24,7 +24,10 @@ namespace Game.UI
 
         private void OnDestroy()
         {
-            InputManager.Instance.CancelInput.OnPressEvent -= OnCancel;
+            if (InputManager.IsReady)
+            {
+                InputManager.Instance.CancelInput.OnPressEvent -= OnCancel;
+            }
         }
     }
 }

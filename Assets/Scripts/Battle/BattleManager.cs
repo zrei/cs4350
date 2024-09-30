@@ -80,7 +80,10 @@ public class BattleManager : Singleton<BattleManager>
     {
         base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
-        InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
+        if (InputManager.IsReady)
+        {
+            InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
+        }
     }
 
     /// <summary>
@@ -207,7 +210,6 @@ public class BattleManager : Singleton<BattleManager>
         m_TurnQueue.RemoveUnit(unit);
         // TODO: move this somewhere else
         unit.Die();
-        Destroy(unit.gameObject);
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {

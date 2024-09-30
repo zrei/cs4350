@@ -67,7 +67,8 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 2ca958d1cc6466f4297e82eab68fa976, type: 2}
+      objectReference: {fileID: 22100000, guid: 10669710c390b614a87b59977d789a74,
+        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -315,18 +316,18 @@ PrefabInstance:
       objectReference: {fileID: 3163466588262205596}
     - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
         type: 3}
+      propertyPath: m_LeftArmBone
+      value: 
+      objectReference: {fileID: 1148257641372423239}
+    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
+        type: 3}
       propertyPath: m_RightArmBone
       value: 
-      objectReference: {fileID: 4540441125744910534}
+      objectReference: {fileID: 6777703579804872787}
     - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
         type: 3}
       propertyPath: m_UnitBonesArray.Array.size
       value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.size
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
         type: 3}
@@ -378,56 +379,6 @@ PrefabInstance:
       propertyPath: m_UnitBonesArray.Array.data[9]
       value: 
       objectReference: {fileID: 1342617211987513113}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[0]
-      value: 
-      objectReference: {fileID: 4361057492341991318}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[1]
-      value: 
-      objectReference: {fileID: 4540441125744910534}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[2]
-      value: 
-      objectReference: {fileID: 293956556267667738}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[3]
-      value: 
-      objectReference: {fileID: 3657028778986111680}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[4]
-      value: 
-      objectReference: {fileID: 7418661752633448656}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[5]
-      value: 
-      objectReference: {fileID: 3163466588262205596}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[6]
-      value: 
-      objectReference: {fileID: 1431741470441077695}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[7]
-      value: 
-      objectReference: {fileID: 8857499954412112312}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[8]
-      value: 
-      objectReference: {fileID: 5352798619365887081}
-    - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
-        type: 3}
-      propertyPath: playerBonesArray.Array.data[9]
-      value: 
-      objectReference: {fileID: 5352798619365887081}
     - target: {fileID: 6992041457478203888, guid: e1526f8dadd964e059e88e8370a944ed,
         type: 3}
       propertyPath: m_UnitBonesArray.Array.data[10]

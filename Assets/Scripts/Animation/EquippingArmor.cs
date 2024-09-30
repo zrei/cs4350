@@ -7,8 +7,10 @@ public class EquippingArmor : MonoBehaviour
     public List<Transform> m_UnitBonesArray;
     [SerializeField] Transform m_RootBone;
     [SerializeField] Transform m_RightArmBone;
+    [SerializeField] Transform m_LeftArmBone;
 
     public Transform RightArmBone => m_RightArmBone;
+    public Transform LeftArmBone => m_LeftArmBone;
     
     private Dictionary<string, Transform> m_PlayerBonesDict;
 
