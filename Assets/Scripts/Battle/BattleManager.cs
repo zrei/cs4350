@@ -80,7 +80,10 @@ public class BattleManager : Singleton<BattleManager>
     {
         base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
-        InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
+        if (InputManager.IsReady)
+        {
+            InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
+        }
     }
 
     /// <summary>
