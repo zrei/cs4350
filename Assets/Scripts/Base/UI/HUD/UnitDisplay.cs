@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.UI
 {
@@ -14,8 +13,12 @@ namespace Game.UI
         [SerializeField]
         private UnitAllegiance displayType = UnitAllegiance.PLAYER;
 
+        #region Component References
         [SerializeField]
         private FormattedTextDisplay nameDisplay;
+
+        [SerializeField]
+        private Image characterArt;
 
         [SerializeField]
         private FormattedTextDisplay phyAtkDisplay;
@@ -37,6 +40,7 @@ namespace Game.UI
 
         [SerializeField]
         private ProgressBar mpBar;
+        #endregion
 
         private Animator animator;
         private bool isHidden;
@@ -99,12 +103,24 @@ namespace Game.UI
             {
                 GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
             }
+
+            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         }
-        
+
+        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+
+            Hide();
+        }
+
         private void OnDestroy()
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         }
 
         private void OnPreviewUnit(Unit currentUnit)
@@ -112,15 +128,12 @@ namespace Game.UI
             if (currentUnit == null || currentUnit.UnitAllegiance != displayType)
             {
                 if (!isHidden) Hide();
-
-                TrackedUnit = null;
                 return;
             }
 
             if (isHidden) Show();
 
-            var totalStats = currentUnit.GetTotalStats();
-            switch(currentUnit.UnitAllegiance)
+            switch (currentUnit.UnitAllegiance)
             {
                 case UnitAllegiance.PLAYER:
                     var playerUnit = currentUnit as PlayerUnit;
@@ -131,6 +144,12 @@ namespace Game.UI
                     break;
             }
 
+            characterArt.sprite = currentUnit.Sprite;
+            var color = characterArt.color;
+            color.a = currentUnit.Sprite != null ? 1 : 0;
+            characterArt.color = color;
+
+            var totalStats = currentUnit.GetTotalStats();
             phyAtkDisplay?.SetValue(totalStats.m_PhysicalAttack);
             mgcAtkDisplay?.SetValue(totalStats.m_MagicAttack);
             phyDefDisplay?.SetValue(totalStats.m_PhysicalDefence);
@@ -159,6 +178,8 @@ namespace Game.UI
 
         private void Hide()
         {
+            TrackedUnit = null;
+
             isHidden = true;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);

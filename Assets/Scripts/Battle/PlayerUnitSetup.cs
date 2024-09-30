@@ -12,6 +12,8 @@ public class PlayerUnitSetup : MonoBehaviour
 
     private VoidEvent m_CompleteSetupEvent;
 
+    public bool IsSetupStarted { get; private set; }
+
     public void Initialise(MapLogic mapLogic, VoidEvent completeSetupEvent)
     {
         m_MapLogic = mapLogic;
@@ -22,13 +24,15 @@ public class PlayerUnitSetup : MonoBehaviour
     {
         Logger.Log(this.GetType().Name, "Begin player unit set up", LogLevel.LOG);
         m_PlayerSquares = playerBeginningSquares;
-        GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
 
         m_MapLogic.onTileSelect += OnTileSelect;
         m_MapLogic.onTileSubmit += OnTileSubmit;
         m_MapLogic.ResetMap();
         m_MapLogic.ShowSetupTiles(GridType.PLAYER, m_PlayerSquares);
         m_MapLogic.ShowInspectable(GridType.ENEMY, true);
+
+        IsSetupStarted = true;
+        GlobalEvents.Battle.PlayerUnitSetupStartEvent?.Invoke();
     }
 
     public void EndSetup()
@@ -56,7 +60,12 @@ public class PlayerUnitSetup : MonoBehaviour
             return;
 
         if (m_HasSelectedTile && visual.Equals(m_TileToSwap))
+        {
+            visual.ToggleSwapTarget(false);
+            m_HasSelectedTile = false;
+            m_TileToSwap = null;
             return;
+        }
 
         if (m_HasSelectedTile)
         {
@@ -65,6 +74,7 @@ public class PlayerUnitSetup : MonoBehaviour
             m_TileToSwap.ToggleSwapTarget(false);
             visual.ToggleSwapTarget(false);
             m_HasSelectedTile = false;
+            m_TileToSwap = null;
             Logger.Log(this.GetType().Name, $"Swap {m_TileToSwap} with {visual}", LogLevel.LOG);
         }
         else

@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.UI
@@ -15,7 +13,9 @@ namespace Game.UI
         private Animator animator;
         private CanvasGroup canvasGroup;
 
-        private void Awake()
+        private bool isHidden;
+
+        private void Start()
         {
             animator = GetComponent<Animator>();
             animator.enabled = false;
@@ -24,16 +24,32 @@ namespace Game.UI
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0;
+            isHidden = true;
 
             button.onSubmit.RemoveAllListeners();
             button.onSubmit.AddListener(EndSetup);
 
-            GlobalEvents.Battle.PlayerUnitSetupStartEvent += OnSetupStart;
+            var playerUnitSetup = BattleManager.Instance.PlayerUnitSetup;
+            if (playerUnitSetup == null || !playerUnitSetup.IsSetupStarted)
+            {
+                GlobalEvents.Battle.PlayerUnitSetupStartEvent += OnSetupStart;
+            }
+            else
+            {
+                OnSetupStart();
+            }
         }
 
         private void OnSetupStart()
         {
+            GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
+
             Show();
+        }
+
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
         }
 
         private void EndSetup()
@@ -44,28 +60,23 @@ namespace Game.UI
 
         private void Show()
         {
+            isHidden = false;
             animator.enabled = true;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
             animator.Play(UIConstants.ShowAnimHash);
         }
 
         private void Hide()
         {
+            isHidden = true;
             animator.enabled = true;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
             animator.Play(UIConstants.HideAnimHash);
         }
 
         private void OnAnimationFinish()
         {
             animator.enabled = false;
-        }
-
-        private void OnDisable()
-        {
-            GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
+            canvasGroup.interactable = !isHidden;
+            canvasGroup.blocksRaycasts = !isHidden;
         }
     }
 }

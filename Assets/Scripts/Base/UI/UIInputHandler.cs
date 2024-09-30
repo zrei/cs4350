@@ -21,5 +21,10 @@ namespace Game.UI
 
             UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PauseScreen);
         }
+
+        private void OnDestroy()
+        {
+            InputManager.Instance.CancelInput.OnPressEvent -= OnCancel;
+        }
     }
 }
