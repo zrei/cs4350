@@ -129,9 +129,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
         }
 
-        m_AttackAnimHash = Animator.StringToHash(weaponSO.m_AttackAnimatorParam);
-        m_SupportAnimHash = Animator.StringToHash(weaponSO.m_SupportAnimatorParam);
-
         WeaponAnimationType = weaponSO.m_WeaponAnimationType;
         m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
