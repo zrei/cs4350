@@ -29,20 +29,17 @@ public delegate void TrackedValueEvent(float change, float current, float max);
 public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 {
     #region Animation
-    private const string DirXAnimParam = "DirX";
-    private const string DirYAnimParam = "DirY";
-    private const string IsMoveAnimParam = "IsMove";
+    private static readonly int DirXAnimParam = Animator.StringToHash("DirX");
+    private static readonly int DirYAnimParam = Animator.StringToHash("DirY");
+    private static readonly int IsMoveAnimParam = Animator.StringToHash("IsMove");
 
-    private const string AttackStartAnimParam = "AttackStart";
-    private const string AttackIDAnimParam = "AttackID";
+    private static readonly int AttackStartAnimParam = Animator.StringToHash("AttackStart");
+    private static readonly int AttackIDAnimParam = Animator.StringToHash("AttackID");
 
-    private const string PoseIDAnimParam = "PoseID";
+    private static readonly int PoseIDAnimParam = Animator.StringToHash("PoseID");
 
-    public static readonly int HurtAnimHash = Animator.StringToHash("Hurt");
-    private static readonly int DeathAnimHash = Animator.StringToHash("Death");
-
-    private int m_AttackAnimHash;
-    private int m_SupportAnimHash;
+    public static readonly int HurtAnimParam = Animator.StringToHash("Hurt");
+    private static readonly int DeathAnimParam = Animator.StringToHash("IsDead");
  
     private Animator m_Animator;
     #endregion
@@ -329,20 +326,20 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     public void Die()
     {
-        PlayAnimations(DeathAnimHash);
-        Destroy(gameObject, 1f);
+        m_Animator.SetBool(DeathAnimParam, true);
+        Destroy(gameObject, 2f);
     }
     #endregion
 
     #region Attack Animations
-    public void PlayAnimations(int animationId)
+    public void PlayAnimations(int triggerID)
     {
-        m_Animator.Play(animationId);
+        m_Animator.SetTrigger(triggerID);
     }
 
-    public void PlaySkillAnimation(int triggerId)
+    public void PlaySkillAnimation(int attackID)
     {
-        m_Animator.SetInteger(AttackIDAnimParam, triggerId);
+        m_Animator.SetInteger(AttackIDAnimParam, attackID);
         m_Animator.SetTrigger(AttackStartAnimParam);
         weaponModel.PlayAttackAnimation();
     }

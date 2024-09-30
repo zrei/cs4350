@@ -210,7 +210,6 @@ public class BattleManager : Singleton<BattleManager>
         m_TurnQueue.RemoveUnit(unit);
         // TODO: move this somewhere else
         unit.Die();
-        Destroy(unit.gameObject);
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {

@@ -65,7 +65,7 @@ public class AttackAnimationManager : MonoBehaviour
             yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
 
             foreach (Unit target in targets)
-                target.PlayAnimations(Unit.HurtAnimHash);
+                target.PlayAnimations(Unit.HurtAnimParam);
         }
 
         // need to account for hurt animation time and take the maximum of the end times
