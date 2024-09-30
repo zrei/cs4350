@@ -13,7 +13,8 @@ public enum WeaponAnimationType
 {
     STAFF = 100,
     SWORD = 200,
-    BOW = 300
+    HEAVY_SWORD = 300,
+    BOW = 400
 }
 
 public enum SkillAnimationType

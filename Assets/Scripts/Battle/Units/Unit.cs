@@ -33,11 +33,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     private const string DirYAnimParam = "DirY";
     private const string IsMoveAnimParam = "IsMove";
 
-    /*
-    public static readonly int SwordAttackAnimHash = Animator.StringToHash("SwordAttack");
-    public static readonly int MagicAttackAnimHash = Animator.StringToHash("MagicAttack");
-    public static readonly int MagicSupportAnimHash = Animator.StringToHash("MagicSupport");
-    */
+    private const string AttackStartAnimParam = "AttackStart";
+    private const string AttackIDAnimParam = "AttackID";
+
+    private const string PoseIDAnimParam = "PoseID";
 
     public static readonly int HurtAnimHash = Animator.StringToHash("Hurt");
     private static readonly int DeathAnimHash = Animator.StringToHash("Death");
@@ -86,6 +85,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
     #endregion
 
+    private WeaponModel weaponModel;
+
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData)
     {
@@ -109,10 +110,17 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
         equipArmor.Initialize(unitModelData.m_AttachItems);
         
-        GameObject weaponModel = weaponSO.m_WeaponModel;
-        if (weaponModel != null && equipArmor.RightArmBone != null)
+        WeaponModel weaponModelPrefab = weaponSO.m_WeaponModel;
+        if (weaponModelPrefab != null)
         {
-            Instantiate(weaponModel, equipArmor.RightArmBone);
+            weaponModel = Instantiate(weaponModelPrefab);
+            var attachPoint = weaponModel.attachmentType switch
+            {
+                WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                _ => null,
+            };
+            weaponModel.transform.SetParent(attachPoint, false);
         }
 
         m_Animator = model.GetComponentInChildren<Animator>();
@@ -125,6 +133,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_SupportAnimHash = Animator.StringToHash(weaponSO.m_SupportAnimatorParam);
 
         WeaponAnimationType = weaponSO.m_WeaponAnimationType;
+        m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
     }
@@ -336,28 +345,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
     public void PlaySkillAnimation(int triggerId)
     {
-        /*PlayAnimations(isSupport ? m_SupportAnimHash : m_AttackAnimHash);*/
-        /*
-        Debug.Log("Is support: " + isSupport);
-        if (isSupport)
-        {
-            // support for other weapon types???
-            PlayAnimations(MagicSupportAnimHash);
-        }
-
-        switch (m_Class.m_Weapon.m_WeaponType)
-        {
-            case WeaponType.SWORD:
-            case WeaponType.AXE:
-            case WeaponType.LANCE:
-            case WeaponType.BOW:
-                PlayAnimations(SwordAttackAnimHash);
-                break;
-            case WeaponType.MAGIC:
-                PlayAnimations(MagicAttackAnimHash);
-                break;
-        }
-        */
+        m_Animator.SetInteger(AttackIDAnimParam, triggerId);
+        m_Animator.SetTrigger(AttackStartAnimParam);
+        weaponModel.PlayAttackAnimation();
     }
     #endregion
 
