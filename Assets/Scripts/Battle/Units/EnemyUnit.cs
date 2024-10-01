@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class EnemyUnit : Unit
 {
-    [Header("Pass Action")]
-    [SerializeField] EnemyPassActionSO m_PassAction;
-
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
 
     //private EnemyActionSetSO m_Actions;
@@ -36,7 +33,8 @@ public class EnemyUnit : Unit
         m_OrderedActions.Sort((x, y) => x.Item1.CompareTo(y.Item1));
     }
 
-    public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
+    // can cache action
+    public EnemyActionSO GetActionToBePerformed(MapLogic mapLogic)
     {
         HashSet<EnemyActionSO> unperformableActions = new();
 
@@ -53,8 +51,7 @@ public class EnemyUnit : Unit
 
             if (condition.IsConditionMet(this, mapLogic))
             {
-                action.PerformAction(this, mapLogic, completeActionEvent);
-                return;
+                return action;
             }
         }
 
@@ -63,9 +60,15 @@ public class EnemyUnit : Unit
             if (unperformableActions.Contains(enemyActionSO))
                 continue;
             
-            enemyActionSO.PerformAction(this, mapLogic, completeActionEvent);
-            return;
+            return enemyActionSO;
         }
+
+        return default;
+    }
+
+    public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
+    {
+        GetActionToBePerformed(mapLogic).PerformAction(this, mapLogic, completeActionEvent);
         // m_Actions.PerformAction(this, mapLogic, completeActionEvent);
     }
 }
