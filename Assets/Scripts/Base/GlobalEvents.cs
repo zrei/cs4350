@@ -37,7 +37,9 @@ public static class GlobalEvents {
         public delegate void NodeEvent(NodeInternal _);
         public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
         public delegate void BattleNodeEvent(BattleNode _);
+        public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor);
         public delegate void RewardNodeEvent(RewardNode _);
+        public delegate void MassLevelUpEvent(List<LevelUpSummary> _);
         public delegate void LevelResultEvent(LevelResultType _);
         public static FloatEvent TimeRemainingUpdatedEvent;
         public static NodeEvent NodeEnteredEvent;
@@ -47,7 +49,11 @@ public static class GlobalEvents {
         public static NodeEvent NodeDeselectedEvent;
         public static NodeTransitionEvent NodeMovementEvent;
         public static BattleNodeEvent BattleNodeStartEvent;
+        public static BattleNodeResultEvent BattleNodeEndEvent;
         public static RewardNodeEvent RewardNodeStartEvent;
+        public static VoidEvent CloseRewardScreenEvent;
+        public static MassLevelUpEvent MassLevellingEvent;
+        public static VoidEvent CloseLevellingScreenEvent;
         public static LevelResultEvent LevelEndEvent;
         public static VoidEvent ReturnFromLevelEvent;
     }
