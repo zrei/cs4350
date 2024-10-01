@@ -50,6 +50,7 @@ public static class GlobalEvents {
         public static BattleNodeEvent BattleNodeStartEvent;
         public static BattleNodeResultEvent BattleNodeEndEvent;
         public static RewardNodeEvent RewardNodeStartEvent;
+        public static VoidEvent CloseRewardScreenEvent;
         public static LevelResultEvent LevelEndEvent;
         public static VoidEvent ReturnFromLevelEvent;
     }

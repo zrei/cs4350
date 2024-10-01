@@ -311,10 +311,15 @@ public class LevelManager : MonoBehaviour
         
         if (victor == UnitAllegiance.PLAYER)
         {
+            // Wait for the player to close the reward screen to resume
             m_LevelNodeManager.ClearCurrentNode();
+            GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
         }
-        
-        StartPlayerPhase();
+        else
+        {
+            // No reward screen, just resume
+            StartPlayerPhase();
+        }
     }
     
     private void OnRewardNodeStart(RewardNode rewardNode)
@@ -328,6 +333,13 @@ public class LevelManager : MonoBehaviour
         
         // Update the level state
         m_LevelNodeManager.ClearCurrentNode();
+        
+        GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+    }
+    
+    private void OnCloseRewardScreen()
+    {
+        GlobalEvents.Level.CloseRewardScreenEvent -= OnCloseRewardScreen;
         
         StartPlayerPhase();
     }
