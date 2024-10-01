@@ -39,6 +39,7 @@ public class PlayerUnitSetup : MonoBehaviour
     {
         Logger.Log(this.GetType().Name, "Complete player unit set up", LogLevel.LOG);
         m_CompleteSetupEvent?.Invoke();
+        GlobalEvents.Battle.PlayerUnitSetupEndEvent?.Invoke();
 
         GlobalEvents.Battle.PreviewUnitEvent(null);
 
