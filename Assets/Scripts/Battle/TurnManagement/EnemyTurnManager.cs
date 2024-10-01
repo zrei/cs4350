@@ -1,3 +1,6 @@
+using System.Collections;
+using UnityEngine;
+
 public class EnemyTurnManager : TurnManager
 {
     private EnemyUnit m_CurrUnit;
@@ -15,8 +18,14 @@ public class EnemyTurnManager : TurnManager
             return;
         }
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
+        GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
 
-        enemyUnit.PerformAction(m_MapLogic, CompleteTurn);
+        IEnumerator PerformTurn()
+        {
+            yield return new WaitForSeconds(2f);
+            enemyUnit.PerformAction(m_MapLogic, CompleteTurn);
+        }
+        StartCoroutine(PerformTurn());
     }
 
     private void CompleteTurn()
