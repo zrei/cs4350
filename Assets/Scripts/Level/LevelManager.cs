@@ -11,6 +11,12 @@ public enum PlayerLevelSelectionState
     RETRYING_NODE
 }
 
+public enum RewardType
+{
+    EXP,
+    GOLD
+}
+
 /// <summary>
 /// Main driver class of the level, manages the overall level and player interactions
 /// </summary>
@@ -26,10 +32,17 @@ public class LevelManager : MonoBehaviour
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
     [SerializeField] LevelTimerVisual m_LevelTimerVisual;
+    
+    // Unit Data
+    [SerializeField] LevellingManager m_LevellingManager;
 
     #region Current State
+    
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+    
+    private Dictionary<RewardType, int> m_PendingReward = new ();
+    
     #endregion
     
     #region Input and Selected Node
@@ -311,8 +324,13 @@ public class LevelManager : MonoBehaviour
         
         if (victor == UnitAllegiance.PLAYER)
         {
-            // Wait for the player to close the reward screen to resume
             m_LevelNodeManager.ClearCurrentNode();
+            
+            // Add reward to pending rewards
+            m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
+                                              + battleNode.BattleSO.m_ExpReward;
+            
+            // Wait for reward screen to close
             GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
         }
         else
@@ -334,6 +352,10 @@ public class LevelManager : MonoBehaviour
         // Update the level state
         m_LevelNodeManager.ClearCurrentNode();
         
+        // Add reward to pending rewards
+        m_PendingReward[RewardType.GOLD] = m_PendingReward.GetValueOrDefault(RewardType.GOLD, 0) + rewardNode.GoldReward;
+        
+        // Wait for reward screen to close
         GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
     }
     
@@ -341,9 +363,72 @@ public class LevelManager : MonoBehaviour
     {
         GlobalEvents.Level.CloseRewardScreenEvent -= OnCloseRewardScreen;
         
+        ProcessReward(out var hasEvent);
+
+        // If there are no further events, resume player phase
+        if (!hasEvent)
+        {
+            StartPlayerPhase();
+        }
+    }
+    
+    private void OnCloseLevellingScreen()
+    {
+        GlobalEvents.Level.CloseLevellingScreenEvent -= OnCloseLevellingScreen;
+        
         StartPlayerPhase();
     }
     
+    #endregion
+
+    #region Reward Handling
+
+    /// <summary>
+    /// Process the pending rewards (EXP, Gold) and apply them to the player
+    /// </summary>
+    /// <param name="hasEvent"> whether there are further events like levelling up </param>
+    private void ProcessReward(out bool hasEvent)
+    {
+        hasEvent = false;
+        
+        if (m_PendingReward.ContainsKey(RewardType.EXP))
+        {
+            AddCharacterExp(m_PendingReward[RewardType.EXP], out var levelledUpCharacters);
+            
+            m_PendingReward[RewardType.EXP] = 0;
+            
+            if (levelledUpCharacters.Count > 0)
+            {
+                GlobalEvents.Level.MassLevellingEvent?.Invoke(levelledUpCharacters);
+                GlobalEvents.Level.CloseLevellingScreenEvent += OnCloseLevellingScreen;
+                hasEvent = true;
+            }
+        }
+
+        if (m_PendingReward.ContainsKey(RewardType.GOLD))
+        {
+            // Add gold to player
+        }
+    }
+    
+    private void AddCharacterExp(int expAmount, out List<LevelUpSummary> levelledUpCharacters)
+    {
+        levelledUpCharacters = new List<LevelUpSummary>();
+            
+        // Add exp points to each character
+        foreach (var characterData in m_TestCharacterData)
+        {
+            var initialLevel = characterData.m_CurrLevel;
+                
+            m_LevellingManager.LevelCharacter(characterData, expAmount,
+                out var levelledUp, out var totalStatGrowth);
+                
+            if (levelledUp)
+            {
+                levelledUpCharacters.Add(new LevelUpSummary(characterData, initialLevel, totalStatGrowth));
+            }
+        }
+    }
 
     #endregion
 }
