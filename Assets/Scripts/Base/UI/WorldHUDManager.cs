@@ -1,6 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Game.UI
 {
@@ -30,7 +31,7 @@ namespace Game.UI
 
         private void Update()
         {
-            foreach (var kvp in huds)
+            foreach (var kvp in huds.ToList())
             {
                 kvp.Key.localPosition = kvp.Value();
             }
