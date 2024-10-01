@@ -7,6 +7,7 @@ public class EnemyActionSetSO : ScriptableObject
 {
     public List<EnemyAction> m_EnemyActions;
 
+    /*
     public EnemyActionSO GetChosenAction(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
         List<(EnemyActionSO, float)> finalWeights = new();
@@ -20,7 +21,7 @@ public class EnemyActionSetSO : ScriptableObject
             }
         }
 
-        return RandomHelper.GetRandomT(finalWeights);
+        /*return RandomHelper.GetRandomT(finalWeights);
     }
 
     public void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
@@ -39,7 +40,7 @@ public class EnemyActionSetSO : ScriptableObject
         if (sum != 1f)
             Logger.LogEditor(this.GetType().Name, $"Weights for enemy action set {name} do not add up to 1", LogLevel.WARNING);
     }
-#endif
+#endif*/
 }
 
 public static class RandomHelper
