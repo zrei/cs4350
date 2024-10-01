@@ -34,12 +34,15 @@ public class LevelManager : MonoBehaviour
     [SerializeField] LevelTimerVisual m_LevelTimerVisual;
     
     // Unit Data
+    [SerializeField] PlayerUnit m_PlayerUnit;
     [SerializeField] LevellingManager m_LevellingManager;
 
     #region Current State
     
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+
+    private PlayerUnit m_PlayerUnitToken;
     
     private Dictionary<RewardType, int> m_PendingReward = new ();
     
@@ -107,6 +110,8 @@ public class LevelManager : MonoBehaviour
         m_LevelTimerVisual.Initialise(m_LevelTimerLogic);
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
+
+        SetUpPlayerToken();
         
         AddNodeEventCallbacks();
     }
@@ -122,6 +127,16 @@ public class LevelManager : MonoBehaviour
             DisplayMovableNodes();
             EnableLevelGraphInput();
         }
+    }
+
+    private void SetUpPlayerToken()
+    {
+        // TODO: Create specialised controller for unit tokens
+        m_PlayerUnitToken = Instantiate(m_PlayerUnit);
+        m_PlayerUnitToken.Initialise(m_TestCharacterData[0].GetBattleData());
+        var tokenTransform = m_PlayerUnitToken.gameObject.transform;
+        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
+        tokenTransform.position = m_LevelNodeManager.CurrentNode.transform.position + Vector3.up * 0.1f;
     }
 
     #endregion
@@ -239,6 +254,8 @@ public class LevelManager : MonoBehaviour
 
         m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
         
+        MovePlayerTokenToNode(destNode);
+        
         m_LevelTimerLogic.AdvanceTimer(timeCost);
 
         if (m_LevelNodeManager.IsCurrentNodeCleared())
@@ -282,6 +299,26 @@ public class LevelManager : MonoBehaviour
         var selectedNode = m_CurrSelectedNode;
         m_CurrSelectedNode = null;
         GlobalEvents.Level.NodeDeselectedEvent(selectedNode);
+    }
+
+    #endregion
+
+    #region Player Token
+
+    private void MovePlayerTokenToNode(NodeInternal node)
+    {
+        var tokenTransform = m_PlayerUnitToken.transform;
+        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
+        tokenTransform.position = node.transform.position + Vector3.up * 0.1f;
+        tokenTransform.rotation = Quaternion.identity;
+    }
+    
+    private void MovePlayerTokenToBattleNode(BattleNode battleNode)
+    {
+        // TODO: Remove direct reference to BattleNodeVisual
+        var battleNodeVisual = battleNode.GetComponent<BattleNodeVisual>();
+        
+        battleNodeVisual.SetPlayerToken(m_PlayerUnitToken.gameObject);
     }
 
     #endregion
@@ -335,7 +372,11 @@ public class LevelManager : MonoBehaviour
         }
         else
         {
-            // No reward screen, just resume
+            // No reward screen
+            
+            // Set player token to facing off on the battle node
+            MovePlayerTokenToBattleNode(battleNode);
+            
             StartPlayerPhase();
         }
     }
