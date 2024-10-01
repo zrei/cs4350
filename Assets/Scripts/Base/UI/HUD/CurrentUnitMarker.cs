@@ -46,6 +46,12 @@ namespace Game.UI
             Hide();
         }
 
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        }
+
         private void OnPreviewCurrentUnit(Unit unit)
         {
             if (trackedUnit == unit) return;
@@ -87,9 +93,10 @@ namespace Game.UI
             {
                 //transform.localPosition = WorldHUDManager.Instance.WorldToHUDSpace(t.position + worldOffset);
                 transform.position = t.position + worldOffset;
-                transform.rotation = Quaternion.LookRotation(
-                    transform.position - CameraManager.Instance.MainCamera.transform.position,
-                    Vector3.up);
+                var rot = CameraManager.Instance.MainCamera.transform.rotation;
+                rot.x = 0;
+                rot.z = 0;
+                transform.rotation = rot;
                 yield return null;
             }
 
