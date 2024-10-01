@@ -7,7 +7,8 @@ using UnityEngine.EventSystems;
 public enum PlayerLevelSelectionState
 {
     SELECTING_NODE,
-    MOVING_NODE
+    MOVING_NODE,
+    RETRYING_NODE
 }
 
 /// <summary>
@@ -150,7 +151,9 @@ public class LevelManager : MonoBehaviour
     {
         if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
         {
-            m_CurrState = PlayerLevelSelectionState.MOVING_NODE;
+            m_CurrState = m_CurrSelectedNode != m_LevelNodeManager.CurrentNode 
+                ? PlayerLevelSelectionState.MOVING_NODE
+                : PlayerLevelSelectionState.RETRYING_NODE;
         }
         else
         {
@@ -173,6 +176,10 @@ public class LevelManager : MonoBehaviour
             case PlayerLevelSelectionState.MOVING_NODE:
                 Debug.Log("Player Action: Moving to Node");
                 TryMoveToNode();
+                break;
+            case PlayerLevelSelectionState.RETRYING_NODE:
+                Debug.Log("Player Action: Retrying Node");
+                TryRetryNode();
                 break;
             default:
                 Debug.Log("Player Action: Invalid State");
@@ -231,6 +238,21 @@ public class LevelManager : MonoBehaviour
         }
     }
     
+    private void TryRetryNode()
+    {
+        if (m_LevelNodeManager.IsCurrentNodeCleared())
+        {
+            Debug.Log("Node Retry: Current Node is already cleared");
+            return;
+        }
+        
+        DisableLevelGraphInput();
+        DeselectNode();
+        m_LevelNodeVisualManager.ClearMovableNodes();
+        
+        m_LevelNodeManager.StartCurrentNodeEvent();
+    }
+    
     private void SelectNode(NodeInternal node)
     {
         if (m_CurrSelectedNode)
@@ -256,14 +278,14 @@ public class LevelManager : MonoBehaviour
     private void AddNodeEventCallbacks()
     {
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
     }
     
     private void RemoveNodeEventCallbacks()
     {
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
     }
 
@@ -279,18 +301,18 @@ public class LevelManager : MonoBehaviour
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
-    private void OnBattleNodeEnd()
+    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor)
     {
         Debug.Log("LevelManager: Ending Battle Node");
         
-        m_LevelCamera.gameObject.SetActive(true);
-        
         GameSceneManager.Instance.UnloadBattleScene();
-        
+        m_LevelCamera.gameObject.SetActive(true);
         m_TestLevelEventSystem.enabled = true;
         
-        // Update the level state
-        m_LevelNodeManager.ClearCurrentNode();
+        if (victor == UnitAllegiance.PLAYER)
+        {
+            m_LevelNodeManager.ClearCurrentNode();
+        }
         
         StartPlayerPhase();
     }
