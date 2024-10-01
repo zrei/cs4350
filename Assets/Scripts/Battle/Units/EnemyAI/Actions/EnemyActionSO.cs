@@ -14,6 +14,8 @@ public struct EnemyAction
     public EnemyActionSO m_EnemyAction;
     // public float m_InitialWeight;
     public List<EnemyActionCondition> m_Conditions;
+    [Tooltip("This priority is taken into account when no condition is met at all. Higher number will mean higher priority.")]
+    public int m_BasePriority;
 
     public bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic) => m_EnemyAction.CanActionBePerformed(enemyUnit, mapLogic);
 
