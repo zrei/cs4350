@@ -311,6 +311,7 @@ public class PlayerTurnManager : TurnManager
         m_MapLogic.onTileSubmit -= OnTileSubmit;
         m_MapLogic.ResetMap();
 
+        GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(null);
         GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
     }
     #endregion
