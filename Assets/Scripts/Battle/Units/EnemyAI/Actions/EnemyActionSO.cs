@@ -12,11 +12,14 @@ public abstract class EnemyActionSO : ScriptableObject
 public struct EnemyAction
 {
     public EnemyActionSO m_EnemyAction;
-    public float m_InitialWeight;
-    public List<EnemyActionCondition> m_WeightedConditions;
+    // public float m_InitialWeight;
+    public List<EnemyActionCondition> m_Conditions;
+    [Tooltip("This priority is taken into account when no condition is met at all. Higher number will mean higher priority.")]
+    public int m_BasePriority;
 
     public bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic) => m_EnemyAction.CanActionBePerformed(enemyUnit, mapLogic);
 
+    /*
     public float GetFinalWeight(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
         float finalWeight = m_InitialWeight;
@@ -27,13 +30,15 @@ public struct EnemyAction
         }
         return finalWeight;
     }
+    */
 }
 
 [System.Serializable]
 public struct EnemyActionCondition
 {
     public EnemyActionConditionSO m_Condition;
-    public float m_MultProportion;
+    [Tooltip("The higher the number the greater priority this condition takes")]
+    public int m_Priority;
 
     public bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic) => m_Condition.IsConidtionMet(enemyUnit, mapLogic);
 }
