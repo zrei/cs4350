@@ -63,8 +63,6 @@ public class LevelManager : MonoBehaviour
     // should be sent in in the future
     [SerializeField] private List<CharacterData> m_TestCharacterData;
     
-    [SerializeField] private EventSystem m_TestLevelEventSystem;
-    
     public void Start()
     {
         Initialise();
@@ -347,7 +345,6 @@ public class LevelManager : MonoBehaviour
         DisableLevelGraphInput();
         
         m_LevelCamera.gameObject.SetActive(false);
-        m_TestLevelEventSystem.enabled = false;
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
@@ -357,7 +354,6 @@ public class LevelManager : MonoBehaviour
         
         GameSceneManager.Instance.UnloadBattleScene();
         m_LevelCamera.gameObject.SetActive(true);
-        m_TestLevelEventSystem.enabled = true;
         
         if (victor == UnitAllegiance.PLAYER)
         {
