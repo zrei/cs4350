@@ -29,6 +29,7 @@ public class UI_NodePreview : MonoBehaviour
     private void Awake()
     {
         m_NodePreviewPanel.SetActive(false);
+        m_BattlePreviewPanel.SetActive(false);
         GlobalEvents.Level.NodeHoverStartEvent += OnHoverStart;
         GlobalEvents.Level.NodeHoverEndEvent += OnHoverEnd;
         GlobalEvents.Level.BattleNodeHoverStartEvent += OnBattleHoverStart;

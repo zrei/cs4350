@@ -1,11 +1,13 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LevelTimerVisual : MonoBehaviour
 {
     LevelTimerLogic m_LevelTimerLogic;
     
-    [SerializeField] private TextMeshPro m_TimeRemainingText;
+    [SerializeField] private TextMeshProUGUI m_TimeRemainingText;
+    [SerializeField] private Image m_TimeRemainingFill;
     
     #region Initialisation
     
@@ -15,6 +17,7 @@ public class LevelTimerVisual : MonoBehaviour
         GlobalEvents.Level.TimeRemainingUpdatedEvent += OnTimeRemainingUpdate;
         
         SetTimeRemainingText(m_LevelTimerLogic.TimeRemaining);
+        m_TimeRemainingFill.fillAmount = 1;
     }
     
     #endregion
@@ -24,6 +27,7 @@ public class LevelTimerVisual : MonoBehaviour
     private void OnTimeRemainingUpdate(float timeRemaining)
     {
         SetTimeRemainingText(m_LevelTimerLogic.TimeRemaining);
+        m_TimeRemainingFill.fillAmount = m_LevelTimerLogic.TimeRemaining / m_LevelTimerLogic.TimeLimit;
     }
     
     #endregion
@@ -33,7 +37,7 @@ public class LevelTimerVisual : MonoBehaviour
     
     private void SetTimeRemainingText(float timeRemaining)
     {
-        m_TimeRemainingText.text = "Time Remaining: " + timeRemaining.ToString("F2");
+        m_TimeRemainingText.text = timeRemaining.ToString("F0");
     }
     
     #endregion

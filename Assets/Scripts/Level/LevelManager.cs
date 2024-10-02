@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Input;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public enum PlayerLevelSelectionState
 {
@@ -255,6 +254,8 @@ public class LevelManager : MonoBehaviour
         MovePlayerTokenToNode(destNode);
         
         m_LevelTimerLogic.AdvanceTimer(timeCost);
+        
+        if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
         if (m_LevelNodeManager.IsCurrentNodeCleared())
         {
