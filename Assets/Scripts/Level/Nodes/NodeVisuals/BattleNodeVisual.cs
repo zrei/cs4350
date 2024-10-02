@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Class for handling visuals for Battle Nodes
@@ -9,12 +10,16 @@ public class BattleNodeVisual : NodeVisual
 {
     private BattleNode m_BattleNode;
     
+    [Header("Tokens")]
     [SerializeField] EnemyUnit m_EnemyUnit;
     [SerializeField] Transform m_EnemyTokenTransform;
     [SerializeField] Transform m_PlayerTokenTransform;
     public Transform PlayerTokenTransform => m_PlayerTokenTransform;
     
     private EnemyUnit m_EnemyUnitTokenInstance;
+    
+    [Header("HoverPreview")]
+    [SerializeField] GameObject m_HoverPreview;
     
     
     public override void Initialise()
@@ -79,4 +84,16 @@ public class BattleNodeVisual : NodeVisual
         tokenTransform.rotation = m_PlayerTokenTransform.rotation;
     }
     #endregion
+    
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log("Pointer entered Battle Node");
+        GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_BattleNode);
+    }
+
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        Debug.Log("Pointer exited Battle Node");
+        GlobalEvents.Level.NodeHoverEndEvent?.Invoke(m_BattleNode);
+    }
 }

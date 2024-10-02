@@ -56,6 +56,8 @@ public static class GlobalEvents {
         public static VoidEvent CloseLevellingScreenEvent;
         public static LevelResultEvent LevelEndEvent;
         public static VoidEvent ReturnFromLevelEvent;
+        public static NodeEvent NodeHoverStartEvent;
+        public static NodeEvent NodeHoverEndEvent;
     }
 
     public static class Scene
