@@ -7,7 +7,14 @@ using UnityEngine.EventSystems;
 public enum PlayerLevelSelectionState
 {
     SELECTING_NODE,
-    MOVING_NODE
+    MOVING_NODE,
+    RETRYING_NODE
+}
+
+public enum RewardType
+{
+    EXP,
+    GOLD
 }
 
 /// <summary>
@@ -25,10 +32,20 @@ public class LevelManager : MonoBehaviour
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
     [SerializeField] LevelTimerVisual m_LevelTimerVisual;
+    
+    // Unit Data
+    [SerializeField] PlayerUnit m_PlayerUnit;
+    [SerializeField] LevellingManager m_LevellingManager;
 
     #region Current State
+    
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+
+    private PlayerUnit m_PlayerUnitToken;
+    
+    private Dictionary<RewardType, int> m_PendingReward = new ();
+    
     #endregion
     
     #region Input and Selected Node
@@ -93,6 +110,8 @@ public class LevelManager : MonoBehaviour
         m_LevelTimerVisual.Initialise(m_LevelTimerLogic);
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
+
+        SetUpPlayerToken();
         
         AddNodeEventCallbacks();
     }
@@ -108,6 +127,16 @@ public class LevelManager : MonoBehaviour
             DisplayMovableNodes();
             EnableLevelGraphInput();
         }
+    }
+
+    private void SetUpPlayerToken()
+    {
+        // TODO: Create specialised controller for unit tokens
+        m_PlayerUnitToken = Instantiate(m_PlayerUnit);
+        m_PlayerUnitToken.Initialise(m_TestCharacterData[0].GetBattleData());
+        var tokenTransform = m_PlayerUnitToken.gameObject.transform;
+        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
+        tokenTransform.position = m_LevelNodeManager.CurrentNode.transform.position + Vector3.up * 0.1f;
     }
 
     #endregion
@@ -150,7 +179,9 @@ public class LevelManager : MonoBehaviour
     {
         if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
         {
-            m_CurrState = PlayerLevelSelectionState.MOVING_NODE;
+            m_CurrState = m_CurrSelectedNode != m_LevelNodeManager.CurrentNode 
+                ? PlayerLevelSelectionState.MOVING_NODE
+                : PlayerLevelSelectionState.RETRYING_NODE;
         }
         else
         {
@@ -173,6 +204,10 @@ public class LevelManager : MonoBehaviour
             case PlayerLevelSelectionState.MOVING_NODE:
                 Debug.Log("Player Action: Moving to Node");
                 TryMoveToNode();
+                break;
+            case PlayerLevelSelectionState.RETRYING_NODE:
+                Debug.Log("Player Action: Retrying Node");
+                TryRetryNode();
                 break;
             default:
                 Debug.Log("Player Action: Invalid State");
@@ -219,6 +254,8 @@ public class LevelManager : MonoBehaviour
 
         m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
         
+        MovePlayerTokenToNode(destNode);
+        
         m_LevelTimerLogic.AdvanceTimer(timeCost);
 
         if (m_LevelNodeManager.IsCurrentNodeCleared())
@@ -229,6 +266,21 @@ public class LevelManager : MonoBehaviour
         {
             m_LevelNodeManager.StartCurrentNodeEvent();
         }
+    }
+    
+    private void TryRetryNode()
+    {
+        if (m_LevelNodeManager.IsCurrentNodeCleared())
+        {
+            Debug.Log("Node Retry: Current Node is already cleared");
+            return;
+        }
+        
+        DisableLevelGraphInput();
+        DeselectNode();
+        m_LevelNodeVisualManager.ClearMovableNodes();
+        
+        m_LevelNodeManager.StartCurrentNodeEvent();
     }
     
     private void SelectNode(NodeInternal node)
@@ -251,19 +303,39 @@ public class LevelManager : MonoBehaviour
 
     #endregion
 
+    #region Player Token
+
+    private void MovePlayerTokenToNode(NodeInternal node)
+    {
+        var tokenTransform = m_PlayerUnitToken.transform;
+        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
+        tokenTransform.position = node.transform.position + Vector3.up * 0.1f;
+        tokenTransform.rotation = Quaternion.identity;
+    }
+    
+    private void MovePlayerTokenToBattleNode(BattleNode battleNode)
+    {
+        // TODO: Remove direct reference to BattleNodeVisual
+        var battleNodeVisual = battleNode.GetComponent<BattleNodeVisual>();
+        
+        battleNodeVisual.SetPlayerToken(m_PlayerUnitToken.gameObject);
+    }
+
+    #endregion
+
     #region Callbacks
     
     private void AddNodeEventCallbacks()
     {
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent += OnBattleNodeEnd;
+        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
     }
     
     private void RemoveNodeEventCallbacks()
     {
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Battle.ReturnFromBattleEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
     }
 
@@ -279,20 +351,34 @@ public class LevelManager : MonoBehaviour
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
-    private void OnBattleNodeEnd()
+    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor)
     {
         Debug.Log("LevelManager: Ending Battle Node");
         
-        m_LevelCamera.gameObject.SetActive(true);
-        
         GameSceneManager.Instance.UnloadBattleScene();
-        
+        m_LevelCamera.gameObject.SetActive(true);
         m_TestLevelEventSystem.enabled = true;
         
-        // Update the level state
-        m_LevelNodeManager.ClearCurrentNode();
-        
-        StartPlayerPhase();
+        if (victor == UnitAllegiance.PLAYER)
+        {
+            m_LevelNodeManager.ClearCurrentNode();
+            
+            // Add reward to pending rewards
+            m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
+                                              + battleNode.BattleSO.m_ExpReward;
+            
+            // Wait for reward screen to close
+            GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+        }
+        else
+        {
+            // No reward screen
+            
+            // Set player token to facing off on the battle node
+            MovePlayerTokenToBattleNode(battleNode);
+            
+            StartPlayerPhase();
+        }
     }
     
     private void OnRewardNodeStart(RewardNode rewardNode)
@@ -307,9 +393,83 @@ public class LevelManager : MonoBehaviour
         // Update the level state
         m_LevelNodeManager.ClearCurrentNode();
         
+        // Add reward to pending rewards
+        m_PendingReward[RewardType.GOLD] = m_PendingReward.GetValueOrDefault(RewardType.GOLD, 0) + rewardNode.GoldReward;
+        
+        // Wait for reward screen to close
+        GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+    }
+    
+    private void OnCloseRewardScreen()
+    {
+        GlobalEvents.Level.CloseRewardScreenEvent -= OnCloseRewardScreen;
+        
+        ProcessReward(out var hasEvent);
+
+        // If there are no further events, resume player phase
+        if (!hasEvent)
+        {
+            StartPlayerPhase();
+        }
+    }
+    
+    private void OnCloseLevellingScreen()
+    {
+        GlobalEvents.Level.CloseLevellingScreenEvent -= OnCloseLevellingScreen;
+        
         StartPlayerPhase();
     }
     
+    #endregion
+
+    #region Reward Handling
+
+    /// <summary>
+    /// Process the pending rewards (EXP, Gold) and apply them to the player
+    /// </summary>
+    /// <param name="hasEvent"> whether there are further events like levelling up </param>
+    private void ProcessReward(out bool hasEvent)
+    {
+        hasEvent = false;
+        
+        if (m_PendingReward.ContainsKey(RewardType.EXP))
+        {
+            AddCharacterExp(m_PendingReward[RewardType.EXP], out var levelledUpCharacters);
+            
+            m_PendingReward[RewardType.EXP] = 0;
+            
+            if (levelledUpCharacters.Count > 0)
+            {
+                GlobalEvents.Level.MassLevellingEvent?.Invoke(levelledUpCharacters);
+                GlobalEvents.Level.CloseLevellingScreenEvent += OnCloseLevellingScreen;
+                hasEvent = true;
+            }
+        }
+
+        if (m_PendingReward.ContainsKey(RewardType.GOLD))
+        {
+            // Add gold to player
+        }
+    }
+    
+    private void AddCharacterExp(int expAmount, out List<LevelUpSummary> levelledUpCharacters)
+    {
+        levelledUpCharacters = new List<LevelUpSummary>();
+            
+        // Add exp points to each character
+        foreach (var characterData in m_TestCharacterData)
+        {
+            var initialLevel = characterData.m_CurrLevel;
+                
+            m_LevellingManager.LevelCharacter(characterData, expAmount,
+                out var levelledUp, out var totalStatGrowth);
+                
+            if (levelledUp)
+            {
+                levelledUpCharacters.Add(new LevelUpSummary(characterData, initialLevel, totalStatGrowth));
+            }
+        }
+    }
 
     #endregion
 }
