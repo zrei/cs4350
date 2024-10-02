@@ -5,8 +5,6 @@ public class EnemyUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
 
-    //private EnemyActionSetSO m_Actions;
-
     private List<(EnemyActionCondition, EnemyActionSO)> m_OrderedConditions;
     private List<(int, EnemyActionSO)> m_OrderedActions;
 
@@ -14,7 +12,6 @@ public class EnemyUnit : Unit
     {
         base.Initialise(stats, enemyClass, enemySprite, unitModelData);
         InitialiseActions(actionSet);
-        //m_Actions = actionSet;
     }
 
     private void InitialiseActions(EnemyActionSetSO enemyActionSetSO)
@@ -29,8 +26,8 @@ public class EnemyUnit : Unit
             }
             m_OrderedActions.Add((enemyAction.m_BasePriority, enemyAction.m_EnemyAction));
         }
-        m_OrderedConditions.Sort((x, y) => x.Item1.m_Priority.CompareTo(y.Item1.m_Priority));
-        m_OrderedActions.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+        m_OrderedConditions.Sort((x, y) => y.Item1.m_Priority.CompareTo(x.Item1.m_Priority));
+        m_OrderedActions.Sort((x, y) => y.Item1.CompareTo(x.Item1));
     }
 
     // can cache action
@@ -55,10 +52,17 @@ public class EnemyUnit : Unit
             }
         }
 
+        // if no condition has been met, retrieve an action according to their base priority and if it can be performed
+        // Pass action can always be performed
         foreach ((int priority, EnemyActionSO enemyActionSO) in m_OrderedActions)
         {
             if (unperformableActions.Contains(enemyActionSO))
                 continue;
+
+            if (!enemyActionSO.CanActionBePerformed(this, mapLogic))
+            {
+                continue;
+            }
             
             return enemyActionSO;
         }
@@ -69,6 +73,5 @@ public class EnemyUnit : Unit
     public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
     {
         GetActionToBePerformed(mapLogic).PerformAction(this, mapLogic, completeActionEvent);
-        // m_Actions.PerformAction(this, mapLogic, completeActionEvent);
     }
 }

@@ -19,8 +19,6 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
         if (m_ActiveSkill.IsSelfTarget)
             return true;
-        
-        GridType targetGridType = TargetGridType;
 
         m_PossibleAttackPositions = new();
         bool hasPossibleAttackPosition = false;
@@ -36,7 +34,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
                 }
             }
         }
-
+        Debug.Log("Number attack positions: " + m_PossibleAttackPositions.Count);
         return hasPossibleAttackPosition;
     }
 
@@ -51,6 +49,8 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
         float baseWeight = 1f / m_PossibleAttackPositions.Count;
 
         List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
+
+        Debug.Log(targetWeights.Count);
 
         for (int i = 0; i < targetWeights.Count; ++i)
         {

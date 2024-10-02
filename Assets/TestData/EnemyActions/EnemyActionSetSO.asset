@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EnemyActions:
   - m_EnemyAction: {fileID: 11400000, guid: d090e2269a7c94015a952c51150634ff, type: 2}
-    m_InitialWeight: 0.8
-    m_WeightedConditions: []
+    m_Conditions: []
+    m_BasePriority: 2
   - m_EnemyAction: {fileID: 11400000, guid: 5ceb6fc36f41c41b59db70661059948e, type: 2}
-    m_InitialWeight: 0.1
-    m_WeightedConditions: []
+    m_Conditions: []
+    m_BasePriority: 1
   - m_EnemyAction: {fileID: 11400000, guid: 19fbf2d1377d0479987d1b82c8a7eca7, type: 2}
-    m_InitialWeight: 0.1
-    m_WeightedConditions: []
+    m_Conditions: []
+    m_BasePriority: 0
