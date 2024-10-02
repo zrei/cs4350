@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Game.Input;
-using System.Collections;
+using Unity.VisualScripting;
 
 public enum PlayerTurnState
 {
@@ -78,7 +75,7 @@ public class PlayerTurnManager : TurnManager
 
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
 
-        m_TotalMovementRange = (int) m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);
+        m_TotalMovementRange = (int)m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);
         m_MovementRangeRemaining = m_TotalMovementRange;
 
         FillTraversablePoints();
@@ -93,13 +90,41 @@ public class PlayerTurnManager : TurnManager
     #region Update State
     private void OnTileSelect(TileData data, TileVisual visual)
     {
+        var prevUnit = selectedTileData?.m_CurrUnit;
+        if (prevUnit != null && prevUnit.UnitAllegiance == UnitAllegiance.ENEMY)
+        {
+            var enemyUnit = prevUnit as EnemyUnit;
+            var nextAction = enemyUnit.NextAction;
+            if (nextAction is EnemyActiveSkillActionSO enemyActiveSkillAction)
+            {
+                m_MapLogic.ShowAttackForecast(
+                    enemyActiveSkillAction.TargetGridType,
+                    new CoordPair[] { });
+            }
+        }
+
         selectedTileData = data;
         selectedTileVisual = visual;
 
-        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(selectedTileData.m_CurrUnit);
+        var currentUnit = selectedTileData.m_CurrUnit;
+        GlobalEvents.Battle.PreviewUnitEvent?.Invoke(currentUnit);
 
         switch (m_CurrState)
         {
+            case PlayerTurnState.SELECTING_ACTION:
+            case PlayerTurnState.INSPECT:
+                if (currentUnit != null && currentUnit.UnitAllegiance == UnitAllegiance.ENEMY)
+                {
+                    var enemyUnit = currentUnit as EnemyUnit;
+                    var nextAction = enemyUnit.NextAction;
+                    if (nextAction is EnemyActiveSkillActionSO enemyActiveSkillAction)
+                    {
+                        m_MapLogic.ShowAttackForecast(
+                            enemyActiveSkillAction.TargetGridType,
+                            enemyActiveSkillAction.PossibleAttackPositions);
+                    }
+                }
+                break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 UpdateMoveState();
                 break;
@@ -120,7 +145,7 @@ public class PlayerTurnManager : TurnManager
         else
         {
             m_MapLogic.ResetPath();
-        }            
+        }
     }
 
     private void UpdateActiveSkillState()
@@ -195,7 +220,7 @@ public class PlayerTurnManager : TurnManager
         {
             return false;
         }
-        
+
         void CompleteSkill()
         {
             EndTurn();
@@ -254,8 +279,9 @@ public class PlayerTurnManager : TurnManager
         switch (currAction)
         {
             case PlayerTurnState.SELECTING_ACTION:
-                //m_MapLogic.SetGridInteractable(GridType.PLAYER, false);
-                //m_MapLogic.SetGridInteractable(GridType.ENEMY, false);
+            case PlayerTurnState.INSPECT:
+                m_MapLogic.ShowInspectable(GridType.PLAYER);
+                m_MapLogic.ShowInspectable(GridType.ENEMY);
                 break;
             case PlayerTurnState.SELECTING_ACTION_TARGET:
                 if (SelectedSkill == null)
@@ -268,10 +294,6 @@ public class PlayerTurnManager : TurnManager
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);
-                break;
-            case PlayerTurnState.INSPECT:
-                m_MapLogic.ShowInspectable(GridType.PLAYER);
-                m_MapLogic.ShowInspectable(GridType.ENEMY);
                 break;
         }
 

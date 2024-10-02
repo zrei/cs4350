@@ -162,7 +162,10 @@ namespace Game.UI
             leftScrollButton.gameObject.SetActive(hasMultiPage);
             rightScrollButton.gameObject.SetActive(hasMultiPage);
 
-            attackButtons[0].Select();
+            if (canvasGroup.interactable)
+            {
+                inspectButton.Select();
+            }
         }
 
         private void PreviewMove()
@@ -190,6 +193,11 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
+
+            if (!isHidden)
+            {
+                inspectButton.Select();
+            }
         }
     }
 }

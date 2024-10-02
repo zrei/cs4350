@@ -155,7 +155,7 @@ namespace Game.UI
 
             isHidden = true;
             animator.enabled = true;
-            animator.CrossFade(UIConstants.HideAnimHash, 0.1f);
+            animator.Play(UIConstants.HideAnimHash);
         }
 
         private void OnAnimationFinish()

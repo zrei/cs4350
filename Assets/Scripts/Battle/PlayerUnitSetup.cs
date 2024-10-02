@@ -8,7 +8,8 @@ public class PlayerUnitSetup : MonoBehaviour
     private List<CoordPair> m_PlayerSquares;
 
     private TileVisual m_TileToSwap;
-    private bool m_HasSelectedTile = false;
+
+    private TileVisual selectedTileVisual;
 
     private VoidEvent m_CompleteSetupEvent;
 
@@ -50,7 +51,16 @@ public class PlayerUnitSetup : MonoBehaviour
 
     private void OnTileSelect(TileData data, TileVisual visual)
     {
+        if (selectedTileVisual != null && selectedTileVisual != m_TileToSwap)
+        {
+            selectedTileVisual.ToggleSwapTarget(false);
+        }
         GlobalEvents.Battle.PreviewUnitEvent(data.m_CurrUnit);
+        selectedTileVisual = visual;
+        if (selectedTileVisual != null && m_PlayerSquares.Contains(selectedTileVisual.Coordinates))
+        {
+            selectedTileVisual.ToggleSwapTarget(true);
+        }
     }
 
     private void OnTileSubmit(TileData data, TileVisual visual)
@@ -60,27 +70,23 @@ public class PlayerUnitSetup : MonoBehaviour
         if (visual.GridType != GridType.PLAYER || !m_PlayerSquares.Contains(visual.Coordinates))
             return;
 
-        if (m_HasSelectedTile && visual.Equals(m_TileToSwap))
+        if (visual.Equals(m_TileToSwap))
         {
             visual.ToggleSwapTarget(false);
-            m_HasSelectedTile = false;
             m_TileToSwap = null;
             return;
         }
 
-        if (m_HasSelectedTile)
+        if (m_TileToSwap != null)
         {
-
             m_MapLogic.SwapTiles(GridType.PLAYER, m_TileToSwap.Coordinates, visual.Coordinates);
             m_TileToSwap.ToggleSwapTarget(false);
             visual.ToggleSwapTarget(false);
-            m_HasSelectedTile = false;
             m_TileToSwap = null;
             Logger.Log(this.GetType().Name, $"Swap {m_TileToSwap} with {visual}", LogLevel.LOG);
         }
         else
         {
-            m_HasSelectedTile = true;
             visual.ToggleSwapTarget(true);
             m_TileToSwap = visual;
             Logger.Log(this.GetType().Name, $"Select initial tile {m_TileToSwap}", LogLevel.LOG);
