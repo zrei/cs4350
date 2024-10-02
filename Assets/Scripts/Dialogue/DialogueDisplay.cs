@@ -1,6 +1,9 @@
 using Game.Input;
-using Game.UI;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
+using UnityEngine.UI;
 
 namespace Game.UI
 {
@@ -8,7 +11,16 @@ namespace Game.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class DialogueDisplay : Singleton<DialogueDisplay>
     {
-        public AnimatableTextDisplay text;
+        private const int MaxOptions = 5;
+
+        [SerializeField]
+        private DialogueButton dialogueButtonPrefab;
+
+        [SerializeField]
+        private AnimatableTextDisplay text;
+
+        [SerializeField]
+        private LayoutGroup buttonsLayout;
 
         private Animator animator;
         private CanvasGroup canvasGroup;
@@ -16,6 +28,10 @@ namespace Game.UI
         private bool isHidden;
 
         private Dialogue currentDialogue;
+
+        private HashSet<DialogueButton> activeDisplays = new();
+
+        private ObjectPool<DialogueButton> displayPool;
 
         protected override void HandleAwake()
         {
@@ -29,6 +45,16 @@ namespace Game.UI
             isHidden = true;
 
             text.onTextComplete += OnTextComplete;
+
+            displayPool = new(
+                createFunc: () => Instantiate(dialogueButtonPrefab, buttonsLayout.transform),
+                actionOnGet: display => { activeDisplays.Add(display); display.gameObject.SetActive(true); },
+                actionOnRelease: display => { activeDisplays.Remove(display); display.gameObject.SetActive(false); },
+                actionOnDestroy: display => Destroy(display.gameObject),
+                collectionCheck: true,
+                defaultCapacity: 3,
+                maxSize: MaxOptions
+            );
         }
 
         public void StartDialogue(Dialogue dialogue)
@@ -84,19 +110,22 @@ namespace Game.UI
             {
                 foreach (var option in currentDialogue.options)
                 {
-                    // create button (pooled) and bind event
+                    var button = displayPool.Get();
+                    button.text.text = option.text;
+                    var nextState = option.nextState;
+                    button.onSubmit.RemoveAllListeners();
+                    button.onSubmit.AddListener(() =>
+                    {
+                        TryNextDialogue(nextState);
+                        foreach (var active in activeDisplays.ToList())
+                        {
+                            displayPool.Release(active);
+                        }
+                    });
                 }
             }
             else
             {
-                // display tap to continue
-                if (currentDialogue.defaultNextState != null)
-                {
-
-                }
-                else
-                {
-                }
             }
         }
 
