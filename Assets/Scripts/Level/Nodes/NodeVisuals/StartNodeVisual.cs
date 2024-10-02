@@ -30,6 +30,6 @@ public class StartNodeVisual : NodeVisual
     public override void OnPointerExit(PointerEventData eventData)
     {
         Debug.Log("Pointer exited Start Node");
-        GlobalEvents.Level.NodeHoverEndEvent?.Invoke(m_StartNode);
+        GlobalEvents.Level.NodeHoverEndEvent?.Invoke();
     }
 }

@@ -57,7 +57,8 @@ public static class GlobalEvents {
         public static LevelResultEvent LevelEndEvent;
         public static VoidEvent ReturnFromLevelEvent;
         public static NodeEvent NodeHoverStartEvent;
-        public static NodeEvent NodeHoverEndEvent;
+        public static BattleNodeEvent BattleNodeHoverStartEvent;
+        public static VoidEvent NodeHoverEndEvent;
     }
 
     public static class Scene

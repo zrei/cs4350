@@ -48,6 +48,6 @@ public class RewardNodeVisual : NodeVisual
     public override void OnPointerExit(PointerEventData eventData)
     {
         Debug.Log("Pointer exited Reward Node");
-        GlobalEvents.Level.NodeHoverEndEvent?.Invoke(m_RewardNode);
+        GlobalEvents.Level.NodeHoverEndEvent?.Invoke();
     }
 }
