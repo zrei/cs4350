@@ -12,6 +12,7 @@ public abstract class StatusEffectSO : ScriptableObject
     public string m_StatusEffectName;
     public string m_Description;
     public Sprite m_Sprite;
+    public string m_DisplayStacksFormat = "{0:F0}";
     public virtual StatusEffectType StatusEffectType => StatusEffectType.INFLICT_DAMAGE;
     public int m_MaxStack;
 }

@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace Game.UI
 {
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public class CondensedUnitDisplay : MonoBehaviour
     {
         [SerializeField]
@@ -10,6 +13,9 @@ namespace Game.UI
 
         [SerializeField]
         private ProgressBar hpBar;
+
+        [SerializeField]
+        private StatusDisplay tokenDisplay;
 
         private Unit TrackedUnit
         {
@@ -21,21 +27,63 @@ namespace Game.UI
                 if (trackedUnit != null)
                 {
                     trackedUnit.OnHealthChange -= OnHealthChange;
+                    trackedUnit.OnDeath -= OnDeath;
                 }
 
                 trackedUnit = value;
                 if (trackedUnit != null)
                 {
                     trackedUnit.OnHealthChange += OnHealthChange;
+                    trackedUnit.OnDeath += OnDeath;
 
                     if (hpBar != null)
                     {
                         hpBar.SetValue(trackedUnit.CurrentHealth, trackedUnit.MaxHealth, 0);
                     }
+
+                    tokenDisplay.TrackedStatusManager = trackedUnit.StatusManager;
+                    Show();
+                }
+                else
+                {
+                    Hide();
                 }
             }
         }
         private Unit trackedUnit;
+
+        private Animator animator;
+        private CanvasGroup canvasGroup;
+
+        private bool isHidden;
+        private event Action OnAnimationFinishEvent;
+
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+            animator.enabled = false;
+
+            canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.alpha = 0;
+            isHidden = true;
+
+            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+        }
+
+        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        {
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+
+            TrackedUnit = null;
+            Hide();
+        }
+
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        }
 
         private void Start()
         {
@@ -71,6 +119,44 @@ namespace Game.UI
             }
             StopAllCoroutines();
             StartCoroutine(ExecuteWithDelay());
+        }
+
+        private void OnDeath()
+        {
+            void Dispose()
+            {
+                OnAnimationFinishEvent -= Dispose;
+                WorldHUDManager.Instance.RemoveHUD(transform);
+                Destroy(gameObject);
+            }
+            OnAnimationFinishEvent += Dispose;
+            TrackedUnit = null;
+        }
+
+        public void Show()
+        {
+            if (!isHidden) return;
+
+            isHidden = false;
+            animator.enabled = true;
+            animator.Play(UIConstants.ShowAnimHash);
+        }
+
+        public void Hide()
+        {
+            if (isHidden) return;
+
+            isHidden = true;
+            animator.enabled = true;
+            animator.CrossFade(UIConstants.HideAnimHash, 0.1f);
+        }
+
+        private void OnAnimationFinish()
+        {
+            animator.enabled = false;
+            canvasGroup.interactable = !isHidden;
+            canvasGroup.blocksRaycasts = !isHidden;
+            OnAnimationFinishEvent?.Invoke();
         }
     }
 }
