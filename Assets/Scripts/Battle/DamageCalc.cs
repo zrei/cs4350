@@ -20,4 +20,15 @@ public static class DamageCalc
         Logger.Log("Damage calc", $"Damage: {damage}", LogLevel.LOG);
         return damage;
     }
+
+    public static float CalculateDamage(ICanAttack attacker, ActiveSkillSO attackSO)
+    {
+        // accounting for support somehow getting in here?
+        bool isMagic = attackSO.IsMagic;
+
+        float totalAttackStat = attacker.GetTotalStat(isMagic ? StatType.MAG_ATTACK : StatType.PHYS_ATTACK, attackSO.m_DamageModifier);
+
+        float damage = Mathf.Max(0f, totalAttackStat);
+        return damage;
+    }
 }
