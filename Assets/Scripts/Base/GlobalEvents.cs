@@ -22,6 +22,7 @@ public static class GlobalEvents {
         public static TurnOrderEvent TurnOrderUpdatedEvent;
         public static PhaseEvent PlayerPhaseUpdateEvent;
         public static VoidEvent PlayerUnitSetupStartEvent;
+        public static VoidEvent PlayerUnitSetupEndEvent;
         public static VoidEvent PlayerTurnStartEvent;
         public static VoidEvent EnemyTurnStartEvent;
         public static UnitAllegianceEvent BattleEndEvent;

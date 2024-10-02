@@ -1,14 +1,32 @@
+using System;
 using UnityEngine;
 
-public class StatusEffect : IStatChange
+public class StatusEffect :
+    IStatChange,
+    IStatus
 {
+    private static readonly Color InflictDamageColor = new(1, 0, 0, 1);
+    private static readonly Color StatChangeColor = new(0.5f, 0, 1, 1);
+
     private StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
 
     public int Id => m_StatusEffectSO.m_Id;
-    public string Name => m_StatusEffectSO.name;
     public int StackRemaining => m_StackRemaining;
     public bool IsDepleted => m_StackRemaining <= 0;
+
+    public Sprite Icon => m_StatusEffectSO.m_Sprite;
+    public Color Color => m_StatusEffectSO.StatusEffectType switch
+    {
+        StatusEffectType.INFLICT_DAMAGE => InflictDamageColor,
+        StatusEffectType.STAT_CHANGE => StatChangeColor,
+        _ => Color.white,
+    };
+    public string DisplayAmount => !string.IsNullOrEmpty(m_StatusEffectSO.m_DisplayStacksFormat)
+        ? string.Format(m_StatusEffectSO.m_DisplayStacksFormat, m_StackRemaining)
+        : string.Empty;
+    public string Name => m_StatusEffectSO.name;
+    public string Description => m_StatusEffectSO.m_Description;
 
     public StatusEffect(StatusEffectSO statusEffect, int initialStack)
     {

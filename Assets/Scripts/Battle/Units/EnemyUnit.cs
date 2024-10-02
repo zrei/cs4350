@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,20 @@ public class EnemyUnit : Unit
 
     private List<(EnemyActionCondition, EnemyActionSO)> m_OrderedConditions;
     private List<(int, EnemyActionSO)> m_OrderedActions;
+
+    public event Action<EnemyActionSO> OnDecideAction;
+    public EnemyActionSO NextAction
+    {
+        get => nextAction;
+        private set
+        {
+            if (nextAction == value) return;
+
+            nextAction = value;
+            OnDecideAction?.Invoke(nextAction);
+        }
+    }
+    private EnemyActionSO nextAction;
 
     public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet, Sprite enemySprite, UnitModelData unitModelData)
     {
@@ -48,6 +63,7 @@ public class EnemyUnit : Unit
 
             if (condition.IsConditionMet(this, mapLogic))
             {
+                NextAction = action;
                 return action;
             }
         }
@@ -63,15 +79,17 @@ public class EnemyUnit : Unit
             {
                 continue;
             }
-            
+
+            NextAction = enemyActionSO;
             return enemyActionSO;
         }
 
+        NextAction = default;
         return default;
     }
 
     public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
     {
-        GetActionToBePerformed(mapLogic).PerformAction(this, mapLogic, completeActionEvent);
+        NextAction.PerformAction(this, mapLogic, completeActionEvent);
     }
 }

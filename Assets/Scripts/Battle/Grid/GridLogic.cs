@@ -147,7 +147,7 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    public void ShowSetupTiles(List<CoordPair> validTiles)
+    public void ShowSetupTiles(IEnumerable<CoordPair> validTiles)
     {
         canvasGroup.interactable = true;
         var set = new HashSet<CoordPair>(validTiles);
@@ -162,6 +162,20 @@ public class GridLogic : MonoBehaviour
                     tileVisual.selectable.interactable = true;
                     tileVisual.SetTileState(TileState.SWAPPABLE);
                 }
+            }
+        }
+    }
+
+    public void ShowAttackForecast(IEnumerable<CoordPair> validTiles)
+    {
+        var set = new HashSet<CoordPair>(validTiles);
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var tileData = m_TileData[r, c];
+                tileVisual.ToggleAttackForecast(set.Contains(tileVisual.Coordinates));
             }
         }
     }

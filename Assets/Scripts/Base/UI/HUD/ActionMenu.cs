@@ -1,5 +1,7 @@
+using Game.Input;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Game.UI
@@ -11,6 +13,9 @@ namespace Game.UI
         #region Component References
         [SerializeField]
         private FormattedTextDisplay skillHeader;
+
+        [SerializeField]
+        private TextMeshProUGUI skillDescription;
 
         [SerializeField]
         private ActionButton leftScrollButton;
@@ -31,6 +36,7 @@ namespace Game.UI
         private ActionButton passButton;
         #endregion
 
+        private Unit currentUnit;
         private ActiveSkillSO SelectedSkill
         {
             get => selectedSkill;
@@ -38,6 +44,18 @@ namespace Game.UI
             {
                 selectedSkill = value;
                 skillHeader.SetValue(selectedSkill.m_SkillName);
+                if (selectedSkill.IsPhysicalAttack)
+                {
+                    skillDescription.text = $"DMG: {DamageCalc.CalculateDamage(currentUnit, selectedSkill):F0} <sprite name=\"PhysicalAttack\">";
+                }
+                else if (selectedSkill.IsMagicAttack)
+                {
+                    skillDescription.text = $"DMG: {DamageCalc.CalculateDamage(currentUnit, selectedSkill):F0} <sprite name=\"MagicAttack\">";
+                }
+                else
+                {
+                    skillDescription.text = selectedSkill.m_Description;
+                }
             }
         }
         private ActiveSkillSO selectedSkill;
@@ -78,6 +96,38 @@ namespace Game.UI
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         }
 
+        private void BindInputEvents(bool active)
+        {
+            if (active)
+            {
+                InputManager.Instance.Action1Input.OnPressEvent += OnAction1;
+                InputManager.Instance.Action2Input.OnPressEvent += OnAction2;
+                InputManager.Instance.Action3Input.OnPressEvent += OnAction3;
+                InputManager.Instance.Action4Input.OnPressEvent += OnAction4;
+                InputManager.Instance.Action5Input.OnPressEvent += OnAction5;
+                InputManager.Instance.Action6Input.OnPressEvent += OnAction6;
+                InputManager.Instance.Action7Input.OnPressEvent += OnAction7;
+            }
+            else
+            {
+                InputManager.Instance.Action1Input.OnPressEvent -= OnAction1;
+                InputManager.Instance.Action2Input.OnPressEvent -= OnAction2;
+                InputManager.Instance.Action3Input.OnPressEvent -= OnAction3;
+                InputManager.Instance.Action4Input.OnPressEvent -= OnAction4;
+                InputManager.Instance.Action5Input.OnPressEvent -= OnAction5;
+                InputManager.Instance.Action6Input.OnPressEvent -= OnAction6;
+                InputManager.Instance.Action7Input.OnPressEvent -= OnAction7;
+            }
+        }
+
+        private void OnAction1(IInput input) { attackButtons[0].Select(); attackButtons[0].OnSubmit(null); }
+        private void OnAction2(IInput input) { attackButtons[1].Select(); attackButtons[1].OnSubmit(null); }
+        private void OnAction3(IInput input) { attackButtons[2].Select(); attackButtons[2].OnSubmit(null); }
+        private void OnAction4(IInput input) { attackButtons[3].Select(); attackButtons[3].OnSubmit(null); }
+        private void OnAction5(IInput input) { moveButton.Select(); moveButton.OnSubmit(null); }
+        private void OnAction6(IInput input) { inspectButton.Select(); inspectButton.OnSubmit(null); }
+        private void OnAction7(IInput input) { passButton.Select(); passButton.OnSubmit(null); }
+
         private void BindButtonEvents()
         {
             moveButton.onSubmit.RemoveAllListeners();
@@ -89,6 +139,7 @@ namespace Game.UI
             moveButton.onSelect.AddListener(() =>
             {
                 skillHeader.SetValue("Move");
+                skillDescription.text = $"<sprite name=\"Steps\">: {currentUnit.Stat.m_MovementRange}";
             });
 
             inspectButton.onSubmit.RemoveAllListeners();
@@ -100,6 +151,7 @@ namespace Game.UI
             inspectButton.onSelect.AddListener(() =>
             {
                 skillHeader.SetValue("Inspect");
+                skillDescription.text = string.Empty;
             });
 
             passButton.onSubmit.RemoveAllListeners();
@@ -111,6 +163,7 @@ namespace Game.UI
             passButton.onSelect.AddListener(() =>
             {
                 skillHeader.SetValue("End Turn");
+                skillDescription.text = string.Empty;
             });
         }
 
@@ -124,6 +177,7 @@ namespace Game.UI
 
             if (isHidden) Show();
 
+            this.currentUnit = currentUnit;
             var skills = playerUnit.GetAvailableActiveSkills();
             var hasMultiPage = false;
             int i = 0;
@@ -162,7 +216,10 @@ namespace Game.UI
             leftScrollButton.gameObject.SetActive(hasMultiPage);
             rightScrollButton.gameObject.SetActive(hasMultiPage);
 
-            attackButtons[0].Select();
+            if (canvasGroup.interactable)
+            {
+                inspectButton.Select();
+            }
         }
 
         private void PreviewMove()
@@ -190,6 +247,12 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
+
+            if (!isHidden)
+            {
+                inspectButton.Select();
+            }
+            BindInputEvents(!isHidden);
         }
     }
 }

@@ -121,16 +121,24 @@ namespace Game.Input
 
         private Dictionary<string, Input> inputs = new();
 
-        #region [ Game Input ]
+        #region Game Input
         public IInput SwitchActionInput => GetInput("SwitchAction");
         public IInput EndTurnInput => GetInput("EndTurn");
         public IInput PrimaryAxisInput => GetInput("PrimaryAxis");
         public IInput PointerPositionInput => GetInput("PointerPosition");
         public IInput PointerSelectInput => GetInput("PointerSelect");
+        public IInput Action1Input => GetInput("Action1");
+        public IInput Action2Input => GetInput("Action2");
+        public IInput Action3Input => GetInput("Action3");
+        public IInput Action4Input => GetInput("Action4");
+        public IInput Action5Input => GetInput("Action5");
+        public IInput Action6Input => GetInput("Action6");
+        public IInput Action7Input => GetInput("Action7");
+        public IInput Action8Input => GetInput("Action8");
         #endregion
 
         // Input actions used by Unity's event system input module
-        #region [ UI Input ]
+        #region UI Input
         public IInput PointInput => GetInput("Point");
         public IInput ClickInput => GetInput("Click");
         public IInput MiddleClickInput => GetInput("MiddleClick");

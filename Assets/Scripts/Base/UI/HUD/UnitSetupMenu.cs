@@ -77,6 +77,11 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
+
+            if (!isHidden)
+            {
+                button.Select();
+            }
         }
     }
 }

@@ -8,9 +8,11 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
     public ActiveSkillSO m_ActiveSkill;
     public List<EnemyTileCondition> m_TargetConditions;
 
-    private GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
+    public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
+    public IEnumerable<CoordPair> PossibleAttackPositions => m_PossibleAttackPositionsIgnoreOccupied;
 
     private List<CoordPair> m_PossibleAttackPositions;
+    private List<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
 
     private CoordPair m_Target;
 
@@ -33,6 +35,10 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
                 {
                     m_PossibleAttackPositions.Add(coordinates);
                     hasPossibleAttackPosition = true;
+                }
+                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, false))
+                {
+                    m_PossibleAttackPositionsIgnoreOccupied.Add(coordinates);
                 }
             }
         }

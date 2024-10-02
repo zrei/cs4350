@@ -1,24 +1,39 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class StatusManager : IStatChange
+public class StatusManager :
+    IStatChange,
+    IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
     private List<Token> m_Tokens = new List<Token>();
+
+    public IEnumerable<Token> Tokens => m_Tokens.AsEnumerable();
+    public IEnumerable<StatusEffect> StatusEffects => m_StatusEffects.Values;
+    public event StatusEvent OnAdd;
+    public event StatusEvent OnChange;
+    public event StatusEvent OnRemove;
 
     #region Add Inflictable
     public void AddEffect(StatusEffect statusEffect)
     {
         if (m_StatusEffects.ContainsKey(statusEffect.Id))
+        {
             m_StatusEffects[statusEffect.Id].AddStack(statusEffect.StackRemaining);
+            OnChange?.Invoke(statusEffect);
+        }
         else
+        {
             m_StatusEffects[statusEffect.Id] = statusEffect;
+            OnAdd?.Invoke(statusEffect);
+        }
         Logger.Log(this.GetType().Name, "ADD STATUS EFFECT", LogLevel.LOG);
     }
 
     public void AddToken(Token token)
     {
         m_Tokens.Add(token);
+        OnAdd?.Invoke(token);
     }
     #endregion
 
@@ -29,14 +44,21 @@ public class StatusManager : IStatChange
             return;
 
         statusEffect.ReduceStack(reduceAmount);
+        OnChange?.Invoke(statusEffect);
         if (statusEffect.IsDepleted)
+        {
+            OnRemove?.Invoke(statusEffect);
             m_StatusEffects.Remove(statusEffectId);
+        }
     }
 
     public void ClearStatusEffect(int statusEffectId)
     {
         if (m_StatusEffects.ContainsKey(statusEffectId))
+        {
+            OnRemove?.Invoke(m_StatusEffects[statusEffectId]);
             m_StatusEffects.Remove(statusEffectId);
+        }
     }
     #endregion
 
@@ -48,6 +70,7 @@ public class StatusManager : IStatChange
         {
             Logger.Log(this.GetType().Name, $"Afflicting status effect {statusEffect.Name}", LogLevel.LOG);
             statusEffect.Tick(unit);
+            OnChange?.Invoke(statusEffect);
 
             if (statusEffect.IsDepleted)
                 toRemove.Add(statusEffect);
@@ -55,6 +78,7 @@ public class StatusManager : IStatChange
 
         foreach (StatusEffect statusEffect in toRemove)
         {
+            OnRemove?.Invoke(statusEffect);
             m_StatusEffects.Remove(statusEffect.Id);
         }
     }
@@ -100,7 +124,12 @@ public class StatusManager : IStatChange
 
     public void ClearTokens(ConsumeType consumeType)
     {
-        m_Tokens = m_Tokens.Where(x => !x.ContainsConsumptionType(consumeType)).ToList();
+        m_Tokens = m_Tokens.Where(token =>
+        {
+            var isConsumed = token.ContainsConsumptionType(consumeType);
+            if (isConsumed) OnRemove?.Invoke(token);
+            return !isConsumed;
+        }).ToList();
     }
     #endregion
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,6 +63,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public CoordPair CurrPosition => m_CurrPosition;
 
     protected StatusManager m_StatusManager = new StatusManager();
+    public IStatusManager StatusManager => m_StatusManager;
     #endregion
 
     #region Static Data
@@ -322,10 +324,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Death
+    public event VoidEvent OnDeath;
     public bool IsDead => m_CurrHealth <= 0;
 
     public void Die()
     {
+        OnDeath?.Invoke();
         m_Animator.SetBool(DeathAnimParam, true);
         Destroy(gameObject, 2f);
     }

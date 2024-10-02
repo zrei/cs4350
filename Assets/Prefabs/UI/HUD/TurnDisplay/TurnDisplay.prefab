@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 575862453054668510}
   - component: {fileID: 7675681574170691674}
+  - component: {fileID: 3651506114204494337}
+  - component: {fileID: 4744883154501141305}
   m_Layer: 0
   m_Name: TurnDisplay
   m_TagString: Untagged
@@ -52,6 +54,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 111
+--- !u!95 &3651506114204494337
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681784416603007389}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6a58d2d7a8ca77241a9910560b17414d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!225 &4744883154501141305
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681784416603007389}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3761627381842694032
 GameObject:
   m_ObjectHideFlags: 0

@@ -121,9 +121,14 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).ShowInspectable(ignoreEmpty);
     }
 
-    public void ShowSetupTiles(GridType gridType, List<CoordPair> validTiles)
+    public void ShowSetupTiles(GridType gridType, IEnumerable<CoordPair> validTiles)
     {
         RetrieveGrid(gridType).ShowSetupTiles(validTiles);
+    }
+
+    public void ShowAttackForecast(GridType gridType, IEnumerable<CoordPair> validTiles)
+    {
+        RetrieveGrid(gridType).ShowAttackForecast(validTiles);
     }
     #endregion
 

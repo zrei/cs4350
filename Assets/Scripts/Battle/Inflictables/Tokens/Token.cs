@@ -1,14 +1,35 @@
+using System;
 using UnityEngine;
 
 [System.Serializable]
-public class Token : IStatChange
+public class Token :
+    IStatChange,
+    IStatus
 {
+    private static readonly Color InflictStatusColor = new(0, 0.8f, 0, 1);
+    private static readonly Color StatChangeColor = new(0.5f, 0, 1, 1);
+    private static readonly Color SupportEffectUpColor = new(1, 0.87f, 0, 1);
+
     [SerializeField] TokenSO m_TokenData;
 
     // represents different things for different token types
     [SerializeField] float m_Amount;
 
     public TokenType TokenType => m_TokenData.TokenType;
+
+    public Sprite Icon => m_TokenData.m_Icon;
+    public Color Color => TokenType switch
+    {
+        TokenType.INFLICT_STATUS => InflictStatusColor,
+        TokenType.STAT_CHANGE => StatChangeColor,
+        TokenType.SUPPORT_EFFECT_UP => SupportEffectUpColor,
+        _ => Color.white,
+    };
+    public string DisplayAmount => !string.IsNullOrEmpty(m_TokenData.m_DisplayAmountFormat) 
+        ? string.Format(m_TokenData.m_DisplayAmountFormat, m_Amount)
+        : string.Empty;
+    public string Name => m_TokenData.m_TokenName;
+    public string Description => m_TokenData.m_Description;
 
     public float GetFlatStatChange(StatType statType)
     {

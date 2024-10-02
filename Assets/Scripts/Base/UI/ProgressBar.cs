@@ -15,7 +15,7 @@ namespace Game.UI
 
         private Coroutine animateCoroutine;
 
-        public void SetValue(float targetValue, float maxValue, float transitionDuration = 0.25f)
+        public void SetValue(float targetValue, float maxValue, float transitionDuration = 0.5f)
         {
             if (maxValue == 0) return;
 

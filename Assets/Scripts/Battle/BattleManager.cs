@@ -165,6 +165,7 @@ public class BattleManager : Singleton<BattleManager>
         m_MapLogic.ResetMap();
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
+            EvaluateEnemyDecisions();
             m_PlayerTurnManager.BeginTurn((PlayerUnit) unit);
         }
         else
@@ -181,6 +182,17 @@ public class BattleManager : Singleton<BattleManager>
         m_TurnQueue.OrderTurnQueue();
         GlobalEvents.Battle.TurnOrderUpdatedEvent?.Invoke(m_TurnQueue.GetTurnOrder());
         m_BattleTick = true;
+
+        EvaluateEnemyDecisions();
+    }
+
+    private void EvaluateEnemyDecisions()
+    {
+        foreach (var u in m_EnemyUnits)
+        {
+            var enemyUnit = u as EnemyUnit;
+            enemyUnit.GetActionToBePerformed(m_MapLogic);
+        }
     }
     #endregion
 

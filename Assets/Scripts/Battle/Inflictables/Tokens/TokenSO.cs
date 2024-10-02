@@ -22,6 +22,7 @@ public abstract class TokenSO : ScriptableObject
     public string m_TokenName;
     public string m_Description;
     public Sprite m_Icon;
+    public string m_DisplayAmountFormat = "{0:F0}";
     public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 
     [Tooltip("When to consume this token")]

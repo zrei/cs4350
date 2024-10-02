@@ -17,6 +17,7 @@ namespace Game.UI
             rectTransform = GetComponent<RectTransform>();
             image = GetComponent<Image>();
             GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDefeated;
+            GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
         }
 
         private void OnUnitDefeated(Unit defeatedUnit)
@@ -24,9 +25,51 @@ namespace Game.UI
             if (defeatedUnit == unit)
             {
                 GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDefeated;
+                GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
                 TurnDisplay.Instance.RemoveTurnDisplayUnit(unit);
                 Destroy(gameObject);
             }
+        }
+
+        private void OnPreviewUnit(Unit unit)
+        {
+            if (unit == this.unit)
+            {
+                if (animateCo != null) StopCoroutine(animateCo);
+                animateCo = StartCoroutine(Animate(Vector3.one * 2, Color.yellow));
+            }
+            else
+            {
+                var targetColor = this.unit.UnitAllegiance switch
+                {
+                    UnitAllegiance.PLAYER => Color.cyan,
+                    UnitAllegiance.ENEMY => Color.red,
+                    _ => Color.white
+                };
+                if (animateCo != null) StopCoroutine(animateCo);
+                animateCo = StartCoroutine(Animate(Vector3.one, targetColor));
+            }
+        }
+
+        Coroutine animateCo;
+        IEnumerator Animate(Vector3 targetScale, Color targetColor)
+        {
+            var scale = transform.localScale;
+            var color = image.color;
+            var t = 0f;
+            var duration = 0.25f;
+            var p = t / duration;
+            while (t < duration)
+            {
+                transform.localScale = Vector3.Lerp(scale, targetScale, p);
+                image.color = Color.Lerp(color, targetColor, p);
+                t += Time.deltaTime;
+                p = t / duration;
+                yield return null;
+            }
+            transform.localScale = targetScale;
+            image.color = targetColor;
+            animateCo = null;
         }
 
         public void Initialize(Unit unit)
