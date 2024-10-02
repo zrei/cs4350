@@ -8,7 +8,7 @@ public class EnemyPassActionSO : EnemyActionSO
         return true;
     }
 
-    public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public void PassTurn(VoidEvent completeActionEvent)
     {
         completeActionEvent?.Invoke();
     }

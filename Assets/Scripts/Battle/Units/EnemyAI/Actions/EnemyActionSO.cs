@@ -1,11 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EnemyActionType
+{
+    PASS,
+    SKILL,
+    MOVE
+}
+
 public abstract class EnemyActionSO : ScriptableObject
 {
+    public virtual EnemyActionType EnemyActionType => EnemyActionType.PASS;
     public abstract bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic);
-
-    public abstract void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
+    // public abstract void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
 }
 
 [System.Serializable]

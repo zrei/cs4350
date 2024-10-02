@@ -6,7 +6,15 @@ public class EnemyUnit : Unit
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
 
     private List<(EnemyActionCondition, EnemyActionSO)> m_OrderedConditions;
-    private List<(int, EnemyActionSO)> m_OrderedActions;
+    private List<EnemyAction> m_OrderedActions;
+
+    #region Caching
+    private EnemyActionSO m_CachedAction;
+    // cached attack targets
+    private Dictionary<EnemyActiveSkillActionSO, CoordPair> m_CachedAttackTargets;
+    // cached movement target
+    private PathNode m_CachedMoveTarget = null!;
+    #endregion
 
     public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet, Sprite enemySprite, UnitModelData unitModelData)
     {
@@ -24,10 +32,10 @@ public class EnemyUnit : Unit
             {
                 m_OrderedConditions.Add((condition, enemyAction.m_EnemyAction));
             }
-            m_OrderedActions.Add((enemyAction.m_BasePriority, enemyAction.m_EnemyAction));
+            m_OrderedActions.Add(enemyAction);
         }
         m_OrderedConditions.Sort((x, y) => y.Item1.m_Priority.CompareTo(x.Item1.m_Priority));
-        m_OrderedActions.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+        m_OrderedActions.Sort((x, y) => y.m_BasePriority.CompareTo(x.m_BasePriority));
     }
 
     // can cache action
@@ -54,8 +62,9 @@ public class EnemyUnit : Unit
 
         // if no condition has been met, retrieve an action according to their base priority and if it can be performed
         // Pass action can always be performed
-        foreach ((int priority, EnemyActionSO enemyActionSO) in m_OrderedActions)
+        foreach (EnemyAction action in m_OrderedActions)
         {
+            EnemyActionSO enemyActionSO = action.m_EnemyAction;
             if (unperformableActions.Contains(enemyActionSO))
                 continue;
 
@@ -72,6 +81,26 @@ public class EnemyUnit : Unit
 
     public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
     {
-        GetActionToBePerformed(mapLogic).PerformAction(this, mapLogic, completeActionEvent);
+        EnemyActionSO enemyActionSO = GetActionToBePerformed(mapLogic);
+        
+        switch (enemyActionSO.EnemyActionType)
+        {
+            case EnemyActionType.PASS:
+                ((EnemyPassActionSO) enemyActionSO).PassTurn(completeActionEvent);
+                break;
+            case EnemyActionType.SKILL:
+                EnemyActiveSkillActionSO skill = (EnemyActiveSkillActionSO) enemyActionSO;
+                // it's this convoluted cos the caching hasn't been put into place yet
+                CoordPair targetTile = skill.CalculateAttackPosition(this, mapLogic);
+                skill.PerformSkill(this, mapLogic, targetTile, completeActionEvent);
+                break;
+            case EnemyActionType.MOVE:
+                EnemyMoveActionSO move = (EnemyMoveActionSO) enemyActionSO;
+                PathNode movementTarget = move.CalculateMovementPosition(this, mapLogic);
+                move.PerformMove(this, mapLogic, movementTarget, completeActionEvent);
+                break;
+        }
+        
+        //.PerformAction(this, mapLogic, completeActionEvent);
     }
 }

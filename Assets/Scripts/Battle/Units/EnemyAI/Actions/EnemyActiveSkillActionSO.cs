@@ -8,11 +8,28 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
     public ActiveSkillSO m_ActiveSkill;
     public List<EnemyTileCondition> m_TargetConditions;
 
-    private GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
+    public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
 
-    private List<CoordPair> m_PossibleAttackPositions;
+    public override EnemyActionType EnemyActionType => EnemyActionType.SKILL;
+    
+    public List<CoordPair> GetPossibleAttackPositions(EnemyUnit enemyUnit, MapLogic mapLogic)
+    {
+        List<CoordPair> possibleAttackPositions = new();
 
-    private CoordPair m_Target;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                CoordPair coordinates = new CoordPair(r, c);
+                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, true))
+                {
+                    possibleAttackPositions.Add(coordinates);
+                }
+            }
+        }
+
+        return possibleAttackPositions;
+    }   
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
@@ -22,36 +39,21 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
         if (m_ActiveSkill.IsSelfTarget)
             return true;
 
-        m_PossibleAttackPositions = new();
-        bool hasPossibleAttackPosition = false;
-        for (int r = 0; r < MapData.NUM_ROWS; ++r)
-        {
-            for (int c = 0; c < MapData.NUM_COLS; ++c)
-            {
-                CoordPair coordinates = new CoordPair(r, c);
-                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, true))
-                {
-                    m_PossibleAttackPositions.Add(coordinates);
-                    hasPossibleAttackPosition = true;
-                }
-            }
-        }
-
-        return hasPossibleAttackPosition;
+        return GetPossibleAttackPositions(enemyUnit, mapLogic).Count > 0;
     }
 
     // preparation for caching
-    public void CalculateMovementPosition(EnemyUnit enemyUnit, MapLogic mapLogic)
+    public CoordPair CalculateAttackPosition(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
         if (m_ActiveSkill.IsSelfTarget)
         {
-            m_Target = enemyUnit.CurrPosition;
-            return;
+            return enemyUnit.CurrPosition;
         }
 
-        float baseWeight = 1f / m_PossibleAttackPositions.Count;
+        List<CoordPair> possibleAttackPositions = GetPossibleAttackPositions(enemyUnit, mapLogic);
+        float baseWeight = 1f / possibleAttackPositions.Count;
 
-        List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
+        List<(CoordPair, float)> targetWeights = possibleAttackPositions.Select(x => (x, baseWeight)).ToList();
 
         for (int i = 0; i < targetWeights.Count; ++i)
         {
@@ -67,37 +69,11 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             targetWeights[i] = (target, finalNodeWeight);
         }
 
-        m_Target = RandomHelper.GetRandomT(targetWeights);
+        return RandomHelper.GetRandomT(targetWeights);
     }
 
-    public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public void PerformSkill(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair targetTile, VoidEvent completeActionEvent)
     {
-        if (m_ActiveSkill.IsSelfTarget)
-        {
-            mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
-            return;
-        }
-
-        float baseWeight = 1f / m_PossibleAttackPositions.Count;
-
-        List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
-
-        for (int i = 0; i < targetWeights.Count; ++i)
-        {
-            (CoordPair target, float weight) = targetWeights[i];
-            float finalNodeWeight = weight;
-
-            foreach (EnemyTileCondition targetCondition in m_TargetConditions)
-            {
-                if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
-                    finalNodeWeight *= targetCondition.m_MultProportion;
-            }
-
-            targetWeights[i] = (target, finalNodeWeight);
-        }
-
-        CoordPair targetTile = RandomHelper.GetRandomT(targetWeights);
-
         mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, targetTile, completeActionEvent);
     }
 
