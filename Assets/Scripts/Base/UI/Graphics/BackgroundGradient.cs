@@ -28,7 +28,8 @@ namespace Game.UI
                 colors = new Color32[totalVerts];
             }
 
-            var rotationVector = new Vector2(Mathf.Cos(rotation), Mathf.Sin(rotation));
+            var radians = rotation / 180 * Mathf.PI;
+            var rotationVector = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
             var center = new Vector2(0.5f, 0.5f);
 
             vh.Clear();
@@ -45,7 +46,7 @@ namespace Game.UI
                     var gradientPos = Vector2.Dot(uv - center, rotationVector) + 0.5f;
                     var col = gradient.Evaluate(gradientPos);
 
-                    col.a *= color.a;
+                    col *= color;
                     colors[index] = col;
                     vh.AddVert(pos, col, uv);
 
@@ -82,7 +83,7 @@ namespace Game.UI
                     var gradientPos = Vector2.Dot(uv - center, rotationVector) + 0.5f;
                     var col = gradient.Evaluate(gradientPos);
 
-                    col.a *= color.a;
+                    col *= color;
                     colors[index] = col;
                 }
             }

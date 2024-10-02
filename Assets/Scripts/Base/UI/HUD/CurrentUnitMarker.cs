@@ -18,8 +18,6 @@ namespace Game.UI
 
         private bool isHidden;
 
-        private event Action onAnimationFinish;
-
         private Coroutine followCoroutine;
 
         private void Awake()
@@ -126,7 +124,6 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = !isHidden;
-            onAnimationFinish?.Invoke();
             
             if (trackedUnit != null)
             {
