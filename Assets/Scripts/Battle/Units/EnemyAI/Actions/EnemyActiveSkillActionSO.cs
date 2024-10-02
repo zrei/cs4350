@@ -12,6 +12,8 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
     private List<CoordPair> m_PossibleAttackPositions;
 
+    private CoordPair m_Target;
+
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
         if (m_ActiveSkill is MagicActiveSkillSO && enemyUnit.CurrentMana < ((MagicActiveSkillSO) m_ActiveSkill).m_ConsumedManaAmount)
@@ -34,8 +36,38 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
                 }
             }
         }
-        Debug.Log("Number attack positions: " + m_PossibleAttackPositions.Count);
+
         return hasPossibleAttackPosition;
+    }
+
+    // preparation for caching
+    public void CalculateMovementPosition(EnemyUnit enemyUnit, MapLogic mapLogic)
+    {
+        if (m_ActiveSkill.IsSelfTarget)
+        {
+            m_Target = enemyUnit.CurrPosition;
+            return;
+        }
+
+        float baseWeight = 1f / m_PossibleAttackPositions.Count;
+
+        List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
+
+        for (int i = 0; i < targetWeights.Count; ++i)
+        {
+            (CoordPair target, float weight) = targetWeights[i];
+            float finalNodeWeight = weight;
+
+            foreach (EnemyTileCondition targetCondition in m_TargetConditions)
+            {
+                if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
+                    finalNodeWeight *= targetCondition.m_MultProportion;
+            }
+
+            targetWeights[i] = (target, finalNodeWeight);
+        }
+
+        m_Target = RandomHelper.GetRandomT(targetWeights);
     }
 
     public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
@@ -49,8 +81,6 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
         float baseWeight = 1f / m_PossibleAttackPositions.Count;
 
         List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
-
-        Debug.Log(targetWeights.Count);
 
         for (int i = 0; i < targetWeights.Count; ++i)
         {
