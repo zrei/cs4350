@@ -12,6 +12,8 @@ namespace Game.UI
 
         private Unit unit;
 
+        private Coroutine animateCoroutine;
+
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
@@ -20,10 +22,17 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
         }
 
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDefeated;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+        }
+
         private void OnUnitDefeated(Unit defeatedUnit)
         {
             if (defeatedUnit == unit)
             {
+                if (animateCoroutine != null) StopCoroutine(animateCoroutine);
                 GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDefeated;
                 GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
                 TurnDisplay.Instance.RemoveTurnDisplayUnit(unit);
@@ -35,8 +44,8 @@ namespace Game.UI
         {
             if (unit == this.unit)
             {
-                if (animateCo != null) StopCoroutine(animateCo);
-                animateCo = StartCoroutine(Animate(Vector3.one * 2, Color.yellow));
+                if (animateCoroutine != null) StopCoroutine(animateCoroutine);
+                animateCoroutine = StartCoroutine(Animate(Vector3.one * 2, Color.yellow));
             }
             else
             {
@@ -46,13 +55,12 @@ namespace Game.UI
                     UnitAllegiance.ENEMY => Color.red,
                     _ => Color.white
                 };
-                if (animateCo != null) StopCoroutine(animateCo);
-                animateCo = StartCoroutine(Animate(Vector3.one, targetColor));
+                if (animateCoroutine != null) StopCoroutine(animateCoroutine);
+                animateCoroutine = StartCoroutine(Animate(Vector3.one, targetColor));
             }
         }
 
-        Coroutine animateCo;
-        IEnumerator Animate(Vector3 targetScale, Color targetColor)
+        private IEnumerator Animate(Vector3 targetScale, Color targetColor)
         {
             var scale = transform.localScale;
             var color = image.color;
@@ -69,7 +77,7 @@ namespace Game.UI
             }
             transform.localScale = targetScale;
             image.color = targetColor;
-            animateCo = null;
+            animateCoroutine = null;
         }
 
         public void Initialize(Unit unit)
