@@ -1,11 +1,13 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 
 /// <summary>
 /// Base class that handles the visuals of a node, e.g. highlighting the node
 /// </summary>
-public abstract class NodeVisual : MonoBehaviour
+public abstract class NodeVisual : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     // Puck Visuals
     [SerializeField] MeshRenderer m_MeshRenderer;
@@ -26,6 +28,13 @@ public abstract class NodeVisual : MonoBehaviour
     
     #region State
     public abstract void UpdateNodeVisualState();
+    #endregion
+    
+    #region Pointer Events
+    
+    public abstract void OnPointerEnter(PointerEventData eventData);
+    public abstract void OnPointerExit(PointerEventData eventData);
+    
     #endregion
 
     #region Graphics

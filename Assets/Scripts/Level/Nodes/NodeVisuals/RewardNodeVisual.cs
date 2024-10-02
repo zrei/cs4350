@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Class for handling visuals for Reward Nodes
@@ -18,6 +19,8 @@ public class RewardNodeVisual : NodeVisual
         if (m_RewardNode.IsGoalNode)
             ToggleStarOn();
     }
+    
+    
 
     #region Graphics
     public override void UpdateNodeVisualState()
@@ -33,5 +36,18 @@ public class RewardNodeVisual : NodeVisual
             m_chestToken.SetActive(!m_RewardNode.IsCleared);
         }
     }
+
     #endregion
+
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log("Pointer entered Reward Node");
+        GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_RewardNode);
+    }
+
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        Debug.Log("Pointer exited Reward Node");
+        GlobalEvents.Level.NodeHoverEndEvent?.Invoke();
+    }
 }

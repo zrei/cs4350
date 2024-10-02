@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Input;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public enum PlayerLevelSelectionState
 {
@@ -62,8 +61,6 @@ public class LevelManager : MonoBehaviour
     
     // should be sent in in the future
     [SerializeField] private List<CharacterData> m_TestCharacterData;
-    
-    [SerializeField] private EventSystem m_TestLevelEventSystem;
     
     public void Start()
     {
@@ -257,6 +254,8 @@ public class LevelManager : MonoBehaviour
         MovePlayerTokenToNode(destNode);
         
         m_LevelTimerLogic.AdvanceTimer(timeCost);
+        
+        if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
         if (m_LevelNodeManager.IsCurrentNodeCleared())
         {
@@ -347,7 +346,6 @@ public class LevelManager : MonoBehaviour
         DisableLevelGraphInput();
         
         m_LevelCamera.gameObject.SetActive(false);
-        m_TestLevelEventSystem.enabled = false;
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
@@ -357,7 +355,6 @@ public class LevelManager : MonoBehaviour
         
         GameSceneManager.Instance.UnloadBattleScene();
         m_LevelCamera.gameObject.SetActive(true);
-        m_TestLevelEventSystem.enabled = true;
         
         if (victor == UnitAllegiance.PLAYER)
         {

@@ -29,6 +29,11 @@ public class LevelTimerLogic : MonoBehaviour
         m_TimeRemaining = Mathf.Max(0, m_TimeRemaining);
         
         GlobalEvents.Level.TimeRemainingUpdatedEvent(m_TimeRemaining);
+        
+        if (m_TimeRemaining <= 0)
+        {
+            GlobalEvents.Level.LevelEndEvent(LevelResultType.OUT_OF_TIME);
+        }
     }
     
     #endregion
