@@ -87,6 +87,13 @@ namespace Game.UI
 
         private void Start()
         {
+            // if the Unit prefab is not instantiated in the battle scene, don't show this UI
+            if (!WorldHUDManager.IsReady)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             var parentUnit = transform.parent.GetComponent<Unit>();
             if (parentUnit == null)
             {
