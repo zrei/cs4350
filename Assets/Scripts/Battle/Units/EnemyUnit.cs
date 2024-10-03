@@ -23,10 +23,10 @@ public class EnemyUnit : Unit
     }
     private EnemyActionSO nextAction;
 
-    public void Initialise(Stats stats, ClassSO enemyClass, EnemyActionSetSO actionSet, Sprite enemySprite, UnitModelData unitModelData)
+    public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO)
     {
-        base.Initialise(stats, enemyClass, enemySprite, unitModelData);
-        InitialiseActions(actionSet);
+        base.Initialise(enemyCharacterSO.m_StartingStats.FlatAugment(statAugments), enemyCharacterSO.m_StartingClass, enemyCharacterSO.m_CharacterSprite, enemyCharacterSO.GetUnitModelData());
+        InitialiseActions(enemyCharacterSO.m_Actions);
     }
 
     private void InitialiseActions(EnemyActionSetSO enemyActionSetSO)
@@ -84,12 +84,16 @@ public class EnemyUnit : Unit
             return enemyActionSO;
         }
 
-        NextAction = default;
-        return default;
+        NextAction = new EnemyPassActionSO();
+        return NextAction;
     }
 
     public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
     {
+        if (NextAction == null)
+        {
+            GetActionToBePerformed(mapLogic);
+        }
         NextAction.PerformAction(this, mapLogic, completeActionEvent);
     }
 }

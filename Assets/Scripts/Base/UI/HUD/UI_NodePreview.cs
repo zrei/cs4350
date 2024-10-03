@@ -118,8 +118,8 @@ public class UI_NodePreview : MonoBehaviour
         Dictionary<string, int> enemyClassCount = new Dictionary<string, int>();
         foreach (var enemy in node.BattleSO.m_EnemyUnitsToSpawn)
         {
-            if (!enemyClassCount.TryAdd(enemy.m_Class.m_ClassName, 1))
-                enemyClassCount[enemy.m_Class.m_ClassName]++;
+            if (!enemyClassCount.TryAdd(enemy.m_EnemyCharacterData.m_StartingClass.m_ClassName, 1))
+                enemyClassCount[enemy.m_EnemyCharacterData.m_StartingClass.m_ClassName]++;
         }
         
         // List enemies by their classes
