@@ -213,6 +213,7 @@ public class PlayerTurnManager : TurnManager
                 SelectedSkill,
                 selectedTileVisual.Coordinates,
                 CompleteSkill);
+            m_MapLogic.ResetMap();
             Logger.Log(this.GetType().Name, "Attack!", LogLevel.LOG);
             return true;
         }
