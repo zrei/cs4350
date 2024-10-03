@@ -5,7 +5,9 @@ public enum TokenType
 {
     INFLICT_STATUS,
     STAT_CHANGE,
-    SUPPORT_EFFECT_UP
+    SUPPORT_EFFECT_UP,
+    CRIT,
+    TAUNT
 }
 
 public enum ConsumeType
@@ -19,9 +21,11 @@ public enum ConsumeType
 
 public abstract class TokenSO : ScriptableObject
 {
+    [Header("Details")]
     public string m_TokenName;
     public string m_Description;
     public Sprite m_Icon;
+    public float m_Amount;
     public string m_DisplayAmountFormat = "{0:F0}";
     public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 

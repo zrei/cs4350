@@ -15,6 +15,7 @@ public enum WeaponType
 public class WeaponSO : ScriptableObject
 {
     public WeaponAnimationType m_WeaponAnimationType;
+
+    // tier 1 weapon model?
     public WeaponModel m_WeaponModel;
-    public ActiveSkillSO[] m_WeaponActiveSkills;
 }

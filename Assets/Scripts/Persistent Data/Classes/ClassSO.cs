@@ -8,6 +8,8 @@ public class ClassSO : ScriptableObject
     public string m_ClassName;
     public Sprite m_Icon;
     public OutfitType m_OutfitType;
+
+    [Header("Unlock Details")]
     [Tooltip("Level at which this class is unlocked")]
     public int m_LevelLock;
     [Tooltip("Amount that character's base stats are augmented")]
@@ -15,7 +17,12 @@ public class ClassSO : ScriptableObject
     [Tooltip("Amount that character's growth rate is augmented")]
     public GrowthRate m_GrowthRateAugments;
     public WeaponSO m_Weapon;
+
+    [Header("Skills")]
     public PassiveSkillSO[] m_PassiveSkills;
+    public ActiveSkillSO[] m_ActiveSkills;
+
+    [Header("Movement Details")]
     public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
     public bool m_CanSwapTiles = false;
 }

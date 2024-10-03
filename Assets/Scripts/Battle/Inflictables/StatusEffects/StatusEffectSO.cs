@@ -3,7 +3,8 @@ using UnityEngine;
 public enum StatusEffectType
 {
     INFLICT_DAMAGE,
-    STAT_CHANGE
+    STAT_CHANGE,
+    TAUNT
 }
 
 public abstract class StatusEffectSO : ScriptableObject

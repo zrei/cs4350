@@ -1,6 +1,19 @@
 using System;
 using UnityEngine;
 
+public class Token
+{
+    [SerializeField] TokenSO m_TokenData;
+    private int m_TokenId;
+    private int m_Tier;
+}
+
+public class TauntToken : Token
+{
+    private Unit m_TauntedUnit;
+}
+
+/*
 [System.Serializable]
 public class Token :
     IStatChange,
@@ -13,7 +26,6 @@ public class Token :
     [SerializeField] TokenSO m_TokenData;
 
     // represents different things for different token types
-    [SerializeField] float m_Amount;
 
     public TokenType TokenType => m_TokenData.TokenType;
 
@@ -81,3 +93,4 @@ public class Token :
         return true;
     }
 }
+*/
