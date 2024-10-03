@@ -1,8 +1,11 @@
 // TODO: This also shouldn't be serializable once data is being passed from persistent manager to level
+using UnityEngine;
+
 [System.Serializable]
 public class CharacterData
 {
     public CharacterSO m_BaseData;
+    [HideInInspector]
     public ClassSO m_CurrClass;
     public int m_CurrLevel;
     public int m_CurrExp;
@@ -10,6 +13,7 @@ public class CharacterData
     /// <summary>
     /// Current base stats accounting for all levelling but not classes
     /// </summary>
+    [HideInInspector]
     public Stats m_CurrStats;
 
     /// <summary>

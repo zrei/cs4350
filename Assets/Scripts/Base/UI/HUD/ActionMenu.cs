@@ -52,6 +52,10 @@ namespace Game.UI
                 {
                     skillDescription.text = $"DMG: {DamageCalc.CalculateDamage(currentUnit, selectedSkill):F0} <sprite name=\"MagicAttack\">";
                 }
+                else if (selectedSkill.IsHeal)
+                {
+                    skillDescription.text = $"HEAL: {selectedSkill.m_HealAmount:F0}";
+                }
                 else
                 {
                     skillDescription.text = selectedSkill.m_Description;

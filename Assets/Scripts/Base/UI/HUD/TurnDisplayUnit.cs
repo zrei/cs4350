@@ -65,7 +65,7 @@ namespace Game.UI
             var scale = transform.localScale;
             var color = image.color;
             var t = 0f;
-            var duration = 0.25f;
+            var duration = 0.1f;
             var p = t / duration;
             while (t < duration)
             {

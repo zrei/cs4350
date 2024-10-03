@@ -13,26 +13,50 @@ MonoBehaviour:
   m_Name: Node1BattleSO
   m_EditorClassIdentifier: 
   m_EnemyUnitsToSpawn:
-  - m_Gender: 0
-    m_Coodinates:
-      m_Row: 4
+  - m_Coordinates:
+      m_Row: 2
       m_Col: 2
-    m_Stats:
-      m_Health: 5
+    m_EnemyCharacterData: {fileID: 11400000, guid: c3c2e1ad391594d4091b962190bff0ac,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
       m_Mana: 0
-      m_PhysicalAttack: 30
-      m_MagicAttack: 2
-      m_PhysicalDefence: 1
-      m_MagicDefence: 1
-      m_Speed: 3
-      m_MovementRange: 2
-    m_Class: {fileID: 11400000, guid: 7d5c80fd76bdc41aca89a6e9f82fb74d, type: 2}
-    m_Race: {fileID: 11400000, guid: b1f1db96095384d6fabce47618260e88, type: 2}
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
     m_Actions: {fileID: 11400000, guid: 686cfd3a9b5664927965009b5a367b39, type: 2}
-    m_EnemySprite: {fileID: 0}
   m_PlayerStartingTiles:
+  - m_Row: 1
+    m_Col: 0
+  - m_Row: 1
+    m_Col: 1
+  - m_Row: 1
+    m_Col: 2
+  - m_Row: 1
+    m_Col: 3
+  - m_Row: 1
+    m_Col: 4
   - m_Row: 2
+    m_Col: 0
+  - m_Row: 2
+    m_Col: 1
+  - m_Row: 2
+    m_Col: 2
+  - m_Row: 2
+    m_Col: 3
+  - m_Row: 2
+    m_Col: 4
+  - m_Row: 3
+    m_Col: 0
+  - m_Row: 3
+    m_Col: 1
+  - m_Row: 3
     m_Col: 2
   - m_Row: 3
     m_Col: 3
+  - m_Row: 3
+    m_Col: 4
   m_ExpReward: 100

@@ -4,17 +4,14 @@ using UnityEngine;
 [System.Serializable]
 public struct EnemyUnitPlacement
 {
-    public Gender m_Gender;
-    public CoordPair m_Coodinates;
-    public Stats m_Stats;
-    public ClassSO m_Class;
-    public RaceSO m_Race;
+    public CoordPair m_Coordinates;
+    public EnemyCharacterSO m_EnemyCharacterData;
+    public Stats m_StatAugments;
     public EnemyActionSetSO m_Actions;
-    public Sprite m_EnemySprite;
 
     public UnitModelData GetUnitModelData()
     {
-        return m_Race.GetUnitModelData(m_Gender, m_Class.m_OutfitType);
+        return m_EnemyCharacterData.GetUnitModelData();
     }
 }
 

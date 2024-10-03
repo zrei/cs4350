@@ -32,7 +32,7 @@ public class BattleNodeVisual : NodeVisual
         var unitPlacement = m_BattleNode.BattleSO.m_EnemyUnitsToSpawn[0];
         
         m_EnemyUnitTokenInstance = Instantiate(m_EnemyUnit);
-        m_EnemyUnitTokenInstance.Initialise(unitPlacement.m_Stats, unitPlacement.m_Class, unitPlacement.m_Actions, unitPlacement.m_EnemySprite, unitPlacement.GetUnitModelData());
+        m_EnemyUnitTokenInstance.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData);
         var tokenTransform = m_EnemyUnitTokenInstance.transform;
         tokenTransform.localScale = Vector3.one * 0.45f;
         tokenTransform.SetParent(transform);

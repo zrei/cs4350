@@ -52,6 +52,16 @@ public class TileVisual : MonoBehaviour
 
     private TileState m_CurrState = TileState.NONE;
 
+    private Color CurrentStateDefaultColor => m_CurrState switch
+    {
+        TileState.NONE => new(0, 0, 0, 0),
+        TileState.SWAPPABLE => SwappableColor,
+        TileState.TRAVERSABLE => TraversableColor,
+        TileState.ATTACKABLE => AttackableColor,
+        TileState.INSPECTABLE => InspectableColor,
+        _ => new(0, 0, 0, 0)
+    };
+
     public GridType GridType { get; private set;}
     public CoordPair Coordinates { get; private set;}
 
@@ -81,15 +91,7 @@ public class TileVisual : MonoBehaviour
     #region Graphics
     private void ToggleState(TileState state)
     {
-        outline.color = state switch
-        {
-            TileState.NONE => new(0, 0, 0, 0),
-            TileState.SWAPPABLE => SwappableColor,
-            TileState.TRAVERSABLE => TraversableColor,
-            TileState.ATTACKABLE => AttackableColor,
-            TileState.INSPECTABLE => InspectableColor,
-            _ => new(0, 0, 0, 0)
-        };
+        outline.color = CurrentStateDefaultColor;
 
         switch (state)
         {
@@ -103,33 +105,27 @@ public class TileVisual : MonoBehaviour
 
     public void ToggleSwapTarget(bool isTarget)
     {
-        if (m_CurrState != TileState.SWAPPABLE) return;
-
         outline.color = isTarget
             ? SwappableTargetColor
-            : SwappableColor;
+            : CurrentStateDefaultColor;
         icon.sprite = isTarget ? swapIcon : null;
         icon.color = icon.sprite != null ? IconActiveColor : Color.clear;
     }
 
     public void TogglePath(bool isPartOfPath)
     {
-        if (m_CurrState != TileState.TRAVERSABLE) return;
-
         outline.color = isPartOfPath
             ? TraversablePathColor
-            : TraversableColor;
+            : CurrentStateDefaultColor;
         icon.sprite = isPartOfPath ? moveIcon : null;
         icon.color = icon.sprite != null ? IconActiveColor : Color.clear;
     }
 
     public void ToggleTarget(bool isTarget)
     {
-        if (m_CurrState != TileState.ATTACKABLE) return;
-
         outline.color = isTarget
             ? AttackableTargetColor
-            : AttackableColor;
+            : CurrentStateDefaultColor;
         icon.sprite = isTarget ? attackIcon : null;
         icon.color = icon.sprite != null ? IconActiveColor : Color.clear;
     }

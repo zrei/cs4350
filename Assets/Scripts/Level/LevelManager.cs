@@ -91,6 +91,12 @@ public class LevelManager : MonoBehaviour
 
     public void Initialise()
     {
+        for (int i = 0; i < m_TestCharacterData.Count; i++)
+        {
+            m_TestCharacterData[i].m_CurrStats = m_TestCharacterData[i].m_BaseData.m_StartingStats;
+            m_TestCharacterData[i].m_CurrClass = m_TestCharacterData[i].m_BaseData.m_StartingClass;
+        }
+
         var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
         var timeLimit = m_TestLevel.m_TimeLimit;
