@@ -93,6 +93,7 @@ public class ActiveSkillSO : ScriptableObject
     #region Helpers
     public bool IsAoe => m_TargetSquares.Count > 0;
     public bool DealsDamage => ContainsSkillType(SkillEffectType.DEALS_DAMAGE);
+    public bool IsHeal => ContainsSkillType(SkillEffectType.HEAL);
     public virtual bool IsMagic => true;
     public bool IsPhysicalAttack => !IsMagic && DealsDamage;
     public bool IsMagicAttack => IsMagic && DealsDamage;
