@@ -11,8 +11,9 @@ public struct CharacterSaveData
     public int m_CurrExp;
     public Stats m_CurrStats;
     public StatProgress m_CurrStatProgress;
+    public int? m_CurrEquippedWeaponId;
 
-    public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress)
+    public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int? currEquippedWeaponId = null)
     {
         m_CharacterId = characterId;
         m_ClassId = classId;
@@ -20,6 +21,7 @@ public struct CharacterSaveData
         m_CurrExp = currExp;
         m_CurrStats = currStats;
         m_CurrStatProgress = currStatProgress;
+        m_CurrEquippedWeaponId = null;
     }
 }
 
@@ -29,6 +31,7 @@ public struct CharacterSaveData
 public class SaveManager : Singleton<SaveManager>
 {
     private const string UnitDataKey = "UnitData";
+    private const string InventoryDataKey = "InventoryData";
 
     protected override void HandleAwake()
     {
@@ -61,34 +64,5 @@ public class SaveManager : Singleton<SaveManager>
             finalString.Append(JsonUtility.ToJson(saveData) + "\t");
         }
         PlayerPrefs.SetString(UnitDataKey, finalString.ToString());
-    }
-}
-
-public static class JsonHelper
-{
-    public static T[] FromJson<T>(string json)
-    {
-        Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
-        return wrapper.Items;
-    }
-
-    public static string ToJson<T>(T[] array)
-    {
-        Wrapper<T> wrapper = new Wrapper<T>();
-        wrapper.Items = array;
-        return JsonUtility.ToJson(wrapper);
-    }
-
-    public static string ToJson<T>(T[] array, bool prettyPrint)
-    {
-        Wrapper<T> wrapper = new Wrapper<T>();
-        wrapper.Items = array;
-        return JsonUtility.ToJson(wrapper, prettyPrint);
-    }
-
-    [System.Serializable]
-    private class Wrapper<T>
-    {
-        public T[] Items;
     }
 }

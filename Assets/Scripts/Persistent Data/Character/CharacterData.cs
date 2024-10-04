@@ -33,6 +33,11 @@ public class CharacterData
     /// </summary>
     public Stats TotalBaseStats => m_CurrStats.FlatAugment(m_CurrClass.m_StatAugments);
 
+    /// <summary>
+    /// Note: This can be null. If so, it uses the base weapons
+    /// </summary>
+    public WeaponSO m_CurrEquippedWeapon;
+
     public CharacterBattleData GetBattleData()
     {
         return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass);
@@ -50,6 +55,8 @@ public struct CharacterBattleData
     /// </summary>
     public Stats m_CurrStats;
     public ClassSO m_ClassSO;
+
+    public WeaponSO m_CurrEquippedWeapon;
 
     public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO)
     {

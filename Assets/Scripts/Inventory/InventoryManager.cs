@@ -7,7 +7,25 @@ public class WeaponStack
     public int m_NumEquipped;
     public WeaponSO m_Weapon;
 
-    public int WeaponId => m_Weapon.m_WeaponId;
+    public WeaponStackSaveData Serialize()
+    {
+        return new WeaponStackSaveData(m_OwnedStack, m_NumEquipped, m_Weapon.m_WeaponId);
+    }
+}
+
+[System.Serializable]
+public struct WeaponStackSaveData
+{
+    public int m_OwnedStack;
+    public int m_NumEquipped;
+    public int m_WeaponId;
+
+    public WeaponStackSaveData(int ownedStack, int numEquipped, int weaponId)
+    {
+        m_OwnedStack = ownedStack;
+        m_NumEquipped = numEquipped;
+        m_WeaponId = weaponId;
+    }
 }
 
 public class InventoryManager : Singleton<InventoryManager>
@@ -36,6 +54,6 @@ public class InventoryManager : Singleton<InventoryManager>
 
     public void SaveWeapons()
     {
-        
+
     }
 }
