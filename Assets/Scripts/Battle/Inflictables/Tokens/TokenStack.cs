@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class TokenStack 
 {
-    public TokenTierSO m_TokenTierData;
-    public bool IsEmpty => false;
-    public bool AllowStack = false;
+    private TokenTierSO m_TokenTierData;
+    public bool AllowStack = m_TokenTierData.m_AllowStack;
     private List<int> m_NumTokensOfEachTier;
-    private int m_NumTiers;
-    private bool m_HasStack => m_NumTokensOfEachTier.Any(x => x > 0);
+    private int NumTiers => m_TokenTierData.NumTiers;
+    public bool IsEmpty => m_TokenTierData.All(x => x <= 0);
+    private bool HasStack => m_NumTokensOfEachTier.Any(x => x > 0);
     public int Id => m_TokenTierData.m_Id;
 
     public TokenStack(TokenTierSO tokenTier)
@@ -31,8 +31,11 @@ public class TokenStack
         {
             if (m_NumTokensOfEachTier[i] > 0)
             {
-                m_NumTokensOfEachTier[i]--;
-                return m_TokenTierData.m_TieredTokens[i];
+                if (m_TokenTierData.TryRetreiveTier(out TokenSO tokenSO))
+                {
+                    m_NumTokensOfEachTier[i]--;
+                    return tokenSO;
+                }
             }
         }
         return default;
@@ -45,9 +48,19 @@ public class TokenStack
     /// <param name="number"></param>
     public void AddToken(int tier, int number = 1)
     {
-        if (!AllowStack && m_HasStack)
+        if (!AllowStack && HasStack)
             return;
         
         m_NumTokensOfEachTier[tier - 1] += number;
+    }
+}
+
+public class TauntTokenStack : TokenStack
+{
+    public Unit TauntedUnit {get; private set;}
+
+    public TauntTokenStack(Unit targetedUnit, TokenTierSO tokenTierSO) : base(tokenTierSO)
+    {
+        TauntedUnit = targetedUnit;
     }
 }

@@ -232,10 +232,13 @@ public enum StatType
     MOVEMENT_RANGE
 }
 
-public interface IStatChange
+public interface IFlatStatChange
 {
-    public float GetFlatStatChange(StatType statType);
+    public int GetFlatStatChange(StatType statType);
+}
 
+public interface IMultStatChange
+{
     public float GetMultStatChange(StatType statType);
 }
 

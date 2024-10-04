@@ -2,15 +2,12 @@ using System;
 using UnityEngine;
 
 [System.Serializable]
-public class Token
+public class InflictedToken
 {
     public TokenTierSO m_TokenTierData;
     public int m_Tier;
-}
-
-public class TauntToken : Token
-{
-    private Unit m_TauntedUnit;
+    [Tooltip("Number of this token to inflict at once")]
+    public int m_Number = 1;
 }
 
 /*

@@ -2,11 +2,17 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum SkillType
+public enum SkillEffectType
 {
     DEALS_DAMAGE,
     DEALS_STATUS_OR_TOKENS,
     HEAL
+}
+
+public enum SkillType
+{
+    MAGIC,
+    PHYSICAL
 }
 
 public enum WeaponAnimationType
@@ -31,21 +37,25 @@ public struct InflictedStatusEffect
     public int m_Stack;
 }
 
-public abstract class ActiveSkillSO : ScriptableObject
+public class ActiveSkillSO : ScriptableObject
 {
     [Header("Details")]
     public string m_SkillName;
     public string m_Description;
     public Sprite m_Icon;
+    [Tooltip("Will determine which stats to use in calculating damage")]
+    public SkillType m_SkillType;
+    [Tooltip("Amount of mana to consume to utilise this skill. Leave as 0 if this does not consume mana")]
+    public float m_ConsumedMana = 0f;
 
     [Header("Effects")]
     [Tooltip("Determines what the skill does upon being activated")]
-    public SkillType[] m_SkillTypes;
+    public SkillEffectType[] m_SkillTypes;
 
     [Space]
     // status
     [Tooltip("Tokens to inflict on target - only used if skill inflicts status or token")]
-    public List<Token> m_InflictedTokens;
+    public List<InflictedToken> m_InflictedTokens;
     // TODO: If status effects cannot be inflicted at all without a token already being applied, then this can be removed
     [Tooltip("Status effects to inflict on target - only used if skill inflicts status or token")]
     public List<InflictedStatusEffect> m_InflictedStatusEffects;
@@ -58,7 +68,7 @@ public abstract class ActiveSkillSO : ScriptableObject
 
     [Space]
     // healing
-    [Tooltip("Determines the flat amount of health to heal - only used if skill heals")]
+    [Tooltip("Determines the proportion of health to heal from magic attack - only used if skill heals")]
     public float m_HealAmount = 1f;
     
     [Header("Animations")]
@@ -82,7 +92,7 @@ public abstract class ActiveSkillSO : ScriptableObject
 
     #region Helpers
     public bool IsAoe => m_TargetSquares.Count > 0;
-    public bool DealsDamage => ContainsSkillType(SkillType.DEALS_DAMAGE);
+    public bool DealsDamage => ContainsSkillType(SkillEffectType.DEALS_DAMAGE);
     public virtual bool IsMagic => true;
     public bool IsPhysicalAttack => !IsMagic && DealsDamage;
     public bool IsMagicAttack => IsMagic && DealsDamage;
@@ -92,17 +102,17 @@ public abstract class ActiveSkillSO : ScriptableObject
     // public bool WillPlaySupportAnimation => !DealsDamage && !m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     #endregion
 
-    public bool ContainsSkillType(SkillType skillType)
+    public bool ContainsSkillType(SkillEffectType skillType)
     {
         return m_SkillTypes.Contains(skillType);
     }
 
-    public bool ContainsAllSkillTypes(params SkillType[] skillTypes)
+    public bool ContainsAllSkillTypes(params SkillEffectType[] skillTypes)
     {
         return skillTypes.All(x => ContainsSkillType(x));
     }
 
-    public bool ContainsAnyAttackType(params SkillType[] skillTypes)
+    public bool ContainsAnyAttackType(params SkillEffectType[] skillTypes)
     {
         return skillTypes.Any(x => ContainsSkillType(x));
     }

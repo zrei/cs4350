@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 [CreateAssetMenu(fileName="StatStatusEffectSO", menuName = "ScriptableObject/Classes/ActiveSkills/StatusEffect/StatStatusEffectSO")]
@@ -9,3 +10,4 @@ public class StatStatusEffectSO : StatusEffectSO
 
     public override StatusEffectType StatusEffectType => StatusEffectType.STAT_CHANGE;
 }
+*/

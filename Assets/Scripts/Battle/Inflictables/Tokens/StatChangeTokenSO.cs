@@ -5,5 +5,7 @@ public class StatChangeTokenSO : TokenSO
 {
     public StatType m_AffectedStat;
     public StatChangeType m_StatChangeType;
+    [Tooltip("Will be either flat or a proportion")]
+    public float m_StatChangeAmount;
     public override TokenType TokenType => TokenType.STAT_CHANGE;
 }
