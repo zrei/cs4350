@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class DamageCalc
 {
-    private const float ALPHA = 0.5f;
+    private const float ALPHA = 10;
 
     public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO)
     {
@@ -14,7 +14,7 @@ public static class DamageCalc
 
         float totalDefenceStat = target.GetTotalStat(isMagic ? StatType.MAG_DEFENCE : StatType.PHYS_DEFENCE);
 
-        float damage = Mathf.Max(0f, totalAttackStat - (1 - totalDefenceStat / (totalDefenceStat + ALPHA)));
+        float damage = Mathf.Max(0f, totalAttackStat * (ALPHA / (totalDefenceStat + ALPHA)));
         Logger.Log("Damage calc", $"Attack: {totalAttackStat}", LogLevel.LOG);
         Logger.Log("Damage calc", $"Defence: {totalDefenceStat}", LogLevel.LOG);
         Logger.Log("Damage calc", $"Damage: {damage}", LogLevel.LOG);

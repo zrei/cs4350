@@ -1,6 +1,7 @@
 using Game.Input;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -39,30 +40,33 @@ namespace Game.UI
         private Unit currentUnit;
         private ActiveSkillSO SelectedSkill
         {
-            get => selectedSkill;
             set
             {
+                if (selectedSkill == value) return;
+
                 selectedSkill = value;
-                skillHeader.SetValue(selectedSkill.m_SkillName);
-                if (selectedSkill.IsPhysicalAttack)
-                {
-                    skillDescription.text = $"DMG: {DamageCalc.CalculateDamage(currentUnit, selectedSkill):F0} <sprite name=\"PhysicalAttack\">";
-                }
-                else if (selectedSkill.IsMagicAttack)
-                {
-                    skillDescription.text = $"DMG: {DamageCalc.CalculateDamage(currentUnit, selectedSkill):F0} <sprite name=\"MagicAttack\">";
-                }
-                else if (selectedSkill.IsHeal)
-                {
-                    skillDescription.text = $"HEAL: {selectedSkill.m_HealAmount:F0}";
-                }
-                else
-                {
-                    skillDescription.text = selectedSkill.m_Description;
-                }
+                UpdateSkillDisplay(selectedSkill);
             }
         }
         private ActiveSkillSO selectedSkill;
+        private ActionButton SelectedActionButton
+        {
+            set
+            {
+                if (selectedActionButton == value) return;
+
+                if (selectedActionButton != null)
+                {
+                    selectedActionButton.glow.CrossFadeAlpha(0, 0.2f, false);
+                }
+                selectedActionButton = value;
+                if (selectedActionButton != null)
+                {
+                    selectedActionButton.glow.CrossFadeAlpha(1f, 0.2f, false);
+                }
+            }
+        }
+        private ActionButton selectedActionButton;
 
         private Animator animator;
         private CanvasGroup canvasGroup;
@@ -81,6 +85,7 @@ namespace Game.UI
             isHidden = true;
 
             GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
 
             BindButtonEvents();
@@ -89,6 +94,7 @@ namespace Game.UI
         private void OnBattleEnd(UnitAllegiance unitAllegiance)
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
 
             Hide();
@@ -97,6 +103,7 @@ namespace Game.UI
         private void OnDestroy()
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         }
 
@@ -134,41 +141,74 @@ namespace Game.UI
 
         private void BindButtonEvents()
         {
-            moveButton.onSubmit.RemoveAllListeners();
-            moveButton.onSubmit.AddListener(() =>
-            {
-                BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
-            });
             moveButton.onSelect.RemoveAllListeners();
             moveButton.onSelect.AddListener(() =>
             {
+                if (selectedActionButton == null)
+                {
+                    SelectedSkill = null;
+                    skillHeader.SetValue("Move");
+                    skillDescription.gameObject.SetActive(true);
+                    skillDescription.text = $"<sprite name=\"Steps\">: {currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+                }
+            });
+            moveButton.onSubmit.RemoveAllListeners();
+            moveButton.onSubmit.AddListener(() =>
+            {
+                SelectedSkill = null;
                 skillHeader.SetValue("Move");
-                skillDescription.text = $"<sprite name=\"Steps\">: {currentUnit.Stat.m_MovementRange}";
+                skillDescription.gameObject.SetActive(true);
+                skillDescription.text = $"<sprite name=\"Steps\">: {currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+
+                BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
+                SelectedActionButton = moveButton;
             });
 
-            inspectButton.onSubmit.RemoveAllListeners();
-            inspectButton.onSubmit.AddListener(() =>
-            {
-                BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.INSPECT);
-            });
             inspectButton.onSelect.RemoveAllListeners();
             inspectButton.onSelect.AddListener(() =>
             {
+                if (selectedActionButton == null)
+                {
+                    SelectedSkill = null;
+                    skillHeader.SetValue("Inspect");
+                    skillDescription.gameObject.SetActive(false);
+                }
+            });
+            inspectButton.onSubmit.RemoveAllListeners();
+            inspectButton.onSubmit.AddListener(() =>
+            {
+                SelectedSkill = null;
                 skillHeader.SetValue("Inspect");
-                skillDescription.text = string.Empty;
+                skillDescription.gameObject.SetActive(false);
+
+                BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.INSPECT);
+                SelectedActionButton = inspectButton;
             });
 
-            passButton.onSubmit.RemoveAllListeners();
-            passButton.onSubmit.AddListener(() =>
-            {
-                BattleManager.Instance.PlayerTurnManager.EndTurn();
-            });
             passButton.onSelect.RemoveAllListeners();
             passButton.onSelect.AddListener(() =>
             {
-                skillHeader.SetValue("End Turn");
-                skillDescription.text = string.Empty;
+                if (selectedActionButton == null)
+                {
+                    SelectedSkill = null;
+                    skillHeader.SetValue("End Turn");
+                    skillDescription.gameObject.SetActive(false);
+                }
             });
+            passButton.onSubmit.RemoveAllListeners();
+            passButton.onSubmit.AddListener(() =>
+            {
+                SelectedSkill = null;
+                skillHeader.SetValue("End Turn");
+                skillDescription.gameObject.SetActive(false);
+
+                BattleManager.Instance.PlayerTurnManager.EndTurn();
+            });
+        }
+
+        private void OnPreviewUnit(Unit unit)
+        {
+            UpdateSkillDisplay(selectedSkill, unit);
         }
 
         private void OnPreviewCurrentUnit(Unit currentUnit)
@@ -201,11 +241,20 @@ namespace Game.UI
                 button.onSelect.RemoveAllListeners();
                 button.onSelect.AddListener(() =>
                 {
-                    SelectedSkill = skill;
+                    if (selectedActionButton == null)
+                    {
+                        UpdateSkillDisplay(skill);
+                    }
                 });
 
                 button.onSubmit.RemoveAllListeners();
-                button.onSubmit.AddListener(PreviewMove);
+                button.onSubmit.AddListener(() =>
+                {
+                    BattleManager.Instance.PlayerTurnManager.SelectedSkill = skill;
+                    BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_ACTION_TARGET);
+                    SelectedSkill = skill;
+                    SelectedActionButton = button;
+                });
             }
 
             if (!hasMultiPage)
@@ -226,10 +275,53 @@ namespace Game.UI
             }
         }
 
-        private void PreviewMove()
+        private void UpdateSkillDisplay(ActiveSkillSO skill, IHealth target = null)
         {
-            BattleManager.Instance.PlayerTurnManager.SelectedSkill = SelectedSkill;
-            BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_ACTION_TARGET);
+            if (skill == null) return;
+
+            skillHeader.SetValue(skill.m_SkillName);
+            var builder = new StringBuilder();
+            if (skill.IsPhysicalAttack)
+            {
+                if (target != null)
+                {
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):G5} <sprite name=\"PhysicalAttack\">");
+                }
+                else
+                {
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):G5} <sprite name=\"PhysicalAttack\">");
+                }
+            }
+            if (skill.IsMagicAttack)
+            {
+                if (target != null)
+                {
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):G5} <sprite name=\"MagicAttack\">");
+                }
+                else
+                {
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):G5} <sprite name=\"MagicAttack\">");
+                }
+            }
+            if (skill.IsHeal)
+            {
+                builder.AppendLine($"HEAL: {skill.m_HealAmount:G5}");
+            }
+            if (!string.IsNullOrEmpty(skill.m_Description))
+            {
+                builder.AppendLine(skill.m_Description);
+            }
+
+            var descriptionText = builder.ToString();
+            if (string.IsNullOrEmpty(descriptionText))
+            {
+                skillDescription.gameObject.SetActive(false);
+            }
+            else
+            {
+                skillDescription.gameObject.SetActive(true);
+                skillDescription.text = descriptionText;
+            }
         }
 
         private void Show()
@@ -244,6 +336,9 @@ namespace Game.UI
             isHidden = true;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);
+
+            SelectedActionButton = null;
+            SelectedSkill = null;
         }
 
         private void OnAnimationFinish()

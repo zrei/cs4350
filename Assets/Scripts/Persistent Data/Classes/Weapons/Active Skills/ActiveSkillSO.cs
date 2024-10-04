@@ -35,6 +35,7 @@ public abstract class ActiveSkillSO : ScriptableObject
 {
     [Header("Details")]
     public string m_SkillName;
+    [TextArea]
     public string m_Description;
     public Sprite m_Icon;
 
