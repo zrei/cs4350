@@ -10,12 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de9244fbea26142ed9992d77603cbb83, type: 3}
-  m_Name: Smited
+  m_Name: MultiplySpeed
   m_EditorClassIdentifier: 
-  m_TokenName: Attack Down
+  m_TokenName: Speed Down
   m_Description: 
-  m_Icon: {fileID: 21300000, guid: b7ba46605f464634091b6169003ff84a, type: 3}
-  m_DisplayAmountFormat: '{0:F0}'
-  m_Consumption: 02000000
-  m_AffectedStat: 2
+  m_Icon: {fileID: 21300000, guid: 93ef1fad307cfb34eb4ba85b74399247, type: 3}
+  m_DisplayAmountFormat: x{0:G5}
+  m_Color: {r: 0, g: 0.6117647, b: 1, a: 1}
+  m_Consumption: 0200000001000000000000000400000003000000
+  m_AffectedStat: 6
   m_StatChangeType: 1

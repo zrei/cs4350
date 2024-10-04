@@ -9,16 +9,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6af11d4b964ca407badd67c48cd81687, type: 3}
+  m_Script: {fileID: 11500000, guid: 305f67ef624e44e368f072c09ad00dbc, type: 3}
   m_Name: Rally
   m_EditorClassIdentifier: 
   m_SkillName: Rally
-  m_Description: 
+  m_Description: 'Buff self and nearby allies:
+
+    Increased damage on next attack.
+
+    Increased
+    speed until next skill action.'
   m_Icon: {fileID: 21300000, guid: 67d58b2a6596df6489f8cb4169ef76fc, type: 3}
   m_SkillTypes: 01000000
   m_InflictedTokens:
   - m_TokenData: {fileID: 11400000, guid: adb136c0ebdd10d43bee6e5a94399a78, type: 2}
     m_Amount: 2
+  - m_TokenData: {fileID: 11400000, guid: 0fb8540e00dde814e884e409f1799a8d, type: 2}
+    m_Amount: 2
+  - m_TokenData: {fileID: 11400000, guid: ec938c964e9e525468059329c97f881c, type: 2}
+    m_Amount: 6
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealAmount: 1
@@ -29,5 +38,22 @@ MonoBehaviour:
   m_OverriddenWeaponAnimationType: 0
   m_SkillAnimationType: 1
   m_TargetRules:
-  - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
-  m_TargetSquares: []
+  - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
+  m_TargetSquares:
+  - m_Row: -1
+    m_Col: -1
+  - m_Row: -1
+    m_Col: 0
+  - m_Row: -1
+    m_Col: 1
+  - m_Row: 0
+    m_Col: -1
+  - m_Row: 0
+    m_Col: 1
+  - m_Row: 1
+    m_Col: -1
+  - m_Row: 1
+    m_Col: 0
+  - m_Row: 1
+    m_Col: 1
+  m_ConsumedManaAmount: 2

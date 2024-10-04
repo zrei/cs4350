@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6af11d4b964ca407badd67c48cd81687, type: 3}
-  m_Name: BowShot
+  m_Name: CloseRangeShot
   m_EditorClassIdentifier: 
-  m_SkillName: Bow Shot
+  m_SkillName: 
   m_Description: 
-  m_Icon: {fileID: 21300000, guid: 5cb6943d47b604b4da54ca0d459d70ac, type: 3}
+  m_Icon: {fileID: 0}
   m_SkillTypes: 00000000
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
-  m_DamageModifier: 1
+  m_DamageModifier: 0.8
   m_HealAmount: 1
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
@@ -28,4 +28,5 @@ MonoBehaviour:
   m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
+  - {fileID: 11400000, guid: bafa5c363338c0849bc028b7798a2cd0, type: 2}
   m_TargetSquares: []
