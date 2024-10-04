@@ -58,11 +58,12 @@ public struct CharacterBattleData
 
     public WeaponSO m_CurrEquippedWeapon;
 
-    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO)
+    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO, WeaponSO currEquippedWeapon)
     {
         m_BaseData = baseData;
         m_CurrStats = currStats;
         m_ClassSO = classSO;
+        m_CurrEquippedWeapon = currEquippedWeapon;
     }
 
     public UnitModelData GetUnitModelData()
