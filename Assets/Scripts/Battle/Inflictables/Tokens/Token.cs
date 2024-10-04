@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 
+[System.Serializable]
 public class Token
 {
-    [SerializeField] TokenSO m_TokenData;
-    private int m_TokenId;
-    private int m_Tier;
+    public TokenTierSO m_TokenTierData;
+    public int m_Tier;
 }
 
 public class TauntToken : Token

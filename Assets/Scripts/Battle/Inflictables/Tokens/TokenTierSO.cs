@@ -7,4 +7,5 @@ public class TokenTierSO
     public List<TokenSO> m_TieredTokens;
     public bool m_AllowStack;
     public int m_Id;
+    public int NumTiers => m_TieredTokens.Count;
 }
