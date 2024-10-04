@@ -84,6 +84,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
     #endregion
 
+    private WeaponSO m_EquippedWeapon;
     private WeaponModel weaponModel;
 
     #region Initialisation
@@ -234,10 +235,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Tokens
+    /*
     public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
     {
         return m_StatusManager.GetTokens(consumeType, tokenType);
     }
+    */
 
     public void ClearTokens(ConsumeType consumeType)
     {
@@ -262,7 +265,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         return new Stats(GetTotalStat(StatType.HEALTH), GetTotalStat(StatType.MANA), GetTotalStat(StatType.PHYS_ATTACK), GetTotalStat(StatType.MAG_ATTACK), GetTotalStat(StatType.PHYS_DEFENCE), GetTotalStat(StatType.MAG_DEFENCE), GetTotalStat(StatType.SPEED), (int) GetTotalStat(StatType.MOVEMENT_RANGE));
     }
 
-    // for preview purposes
+    // for preview purposes: ADD THE WEAPON STUFF
     public float GetFlatStatChange(StatType statType)
     {
         return m_StatusManager.GetFlatStatChange(statType);

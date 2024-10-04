@@ -5,10 +5,10 @@ using UnityEngine;
 public class TokenStack 
 {
     private TokenTierSO m_TokenTierData;
-    public bool AllowStack = m_TokenTierData.m_AllowStack;
+    public bool AllowStack => m_TokenTierData.m_AllowStack;
     private List<int> m_NumTokensOfEachTier;
     private int NumTiers => m_TokenTierData.NumTiers;
-    public bool IsEmpty => m_TokenTierData.All(x => x <= 0);
+    public bool IsEmpty => m_NumTokensOfEachTier.All(x => x <= 0);
     private bool HasStack => m_NumTokensOfEachTier.Any(x => x > 0);
     public int Id => m_TokenTierData.m_Id;
 
@@ -27,11 +27,11 @@ public class TokenStack
     /// <returns></returns>
     public TokenSO ConsumeToken()
     {
-        for (int i = m_NumTiers - 1; i >= 0; --i)
+        for (int i = NumTiers - 1; i >= 0; --i)
         {
             if (m_NumTokensOfEachTier[i] > 0)
             {
-                if (m_TokenTierData.TryRetreiveTier(out TokenSO tokenSO))
+                if (m_TokenTierData.TryRetreiveTier(i, out TokenSO tokenSO))
                 {
                     m_NumTokensOfEachTier[i]--;
                     return tokenSO;

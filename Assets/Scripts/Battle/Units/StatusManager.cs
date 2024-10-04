@@ -6,9 +6,9 @@ public class StatusManager :
     IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
-    private List<Token> m_Tokens = new List<Token>();
+    private readonly Dictionary<int, TokenStack> m_TokenStack = new();
 
-    public IEnumerable<Token> Tokens => m_Tokens.AsEnumerable();
+    // public IEnumerable<Token> Tokens => m_Tokens.AsEnumerable();
     public IEnumerable<StatusEffect> StatusEffects => m_StatusEffects.Values;
     public event StatusEvent OnAdd;
     public event StatusEvent OnChange;
@@ -30,10 +30,19 @@ public class StatusManager :
         Logger.Log(this.GetType().Name, "ADD STATUS EFFECT", LogLevel.LOG);
     }
 
-    public void AddToken(Token token)
+    public void AddToken(TokenTierSO tokenData, int tier, int number = 1)
     {
-        m_Tokens.Add(token);
-        OnAdd?.Invoke(token);
+        if (m_TokenStack.ContainsKey(tokenData.m_Id))
+        {
+            m_TokenStack[tokenData.m_Id].AddToken(tier, number);
+            // :(
+        }
+        else
+        {
+            m_TokenStack[tokenData.m_Id] = new TokenStack(tokenData);
+            m_TokenStack[tokenData.m_Id].AddToken(tier, number);
+        }
+        // OnAdd?.Invoke(token);
     }
     #endregion
 
@@ -168,6 +177,28 @@ public class StatusManager :
         }
 
         return totalFlatStatChange;
+    }
+    #endregion
+
+    #region Special Handle
+    public bool IsTaunted(out Unit forceTarget)
+    {
+
+    }
+
+    public float GetCritAmount()
+    {
+
+    }
+
+    public float GetLifestealAmount(float dealtDamageThisTurn)
+    {
+
+    }
+
+    public float GetReflectDamage(float damageReceived)
+    {
+        
     }
     #endregion
 }

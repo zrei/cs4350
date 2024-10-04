@@ -2,11 +2,10 @@ using System;
 using UnityEngine;
 
 public class StatusEffect :
-    IStatChange,
     IStatus
 {
     private static readonly Color InflictDamageColor = new(1, 0, 0, 1);
-    private static readonly Color StatChangeColor = new(0.5f, 0, 1, 1);
+    // private static readonly Color StatChangeColor = new(0.5f, 0, 1, 1);
 
     private StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
@@ -19,7 +18,7 @@ public class StatusEffect :
     public Color Color => m_StatusEffectSO.StatusEffectType switch
     {
         StatusEffectType.INFLICT_DAMAGE => InflictDamageColor,
-        StatusEffectType.STAT_CHANGE => StatChangeColor,
+        //StatusEffectType.STAT_CHANGE => StatChangeColor,
         _ => Color.white,
     };
     public string DisplayAmount => !string.IsNullOrEmpty(m_StatusEffectSO.m_DisplayStacksFormat)
@@ -60,6 +59,7 @@ public class StatusEffect :
         }
     }
 
+    /*
     public float GetFlatStatChange(StatType statType)
     {
         if (m_StatusEffectSO.StatusEffectType != StatusEffectType.STAT_CHANGE)
@@ -91,4 +91,5 @@ public class StatusEffect :
 
         return statStatusEffectSO.m_AffectAmount;
     }
+    */
 }

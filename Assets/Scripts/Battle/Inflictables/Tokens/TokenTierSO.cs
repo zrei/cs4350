@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-// can move token type here
 public class TokenTierSO
 {
     [Header("Details")]
@@ -25,7 +25,16 @@ public class TokenTierSO
         token = m_TieredTokens[tier - 1];
         return true;
     }
-}
 
-// some code to check that all tokens are. the same type. at the very least.
-// sigh
+    [Header("Consumption")]
+    [Tooltip("When to consume this token")]
+    public ConsumeType[] m_Consumption;
+    public bool ContainsConsumptionType(ConsumeType consumeType) => m_Consumption.Contains(consumeType);
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+
+    }
+#endif
+}

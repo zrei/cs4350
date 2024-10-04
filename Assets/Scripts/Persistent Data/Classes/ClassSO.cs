@@ -13,16 +13,20 @@ public class ClassSO : ScriptableObject
     [Tooltip("Level at which this class is unlocked")]
     public int m_LevelLock;
     [Tooltip("Amount that character's base stats are augmented")]
+
+    [Header("Stats and Growth Rates")]
     public Stats m_StatAugments;
     [Tooltip("Amount that character's growth rate is augmented")]
     public GrowthRate m_GrowthRateAugments;
-    public WeaponSO m_Weapon;
+
+    [Header("Weapon")]
+    public WeaponType m_WeaponType;
 
     [Header("Skills")]
     public PassiveSkillSO[] m_PassiveSkills;
     public ActiveSkillSO[] m_ActiveSkills;
 
-    [Header("Movement Details")]
+    [Header("Movement")]
     public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
     public bool m_CanSwapTiles = false;
 }

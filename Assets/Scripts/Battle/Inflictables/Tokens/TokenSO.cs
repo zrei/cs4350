@@ -34,13 +34,5 @@ public abstract class TokenSO : ScriptableObject
     public float m_Amount;
     public string m_DisplayAmountFormat = "{0:F0}";
     */
-    public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
-
-    [Tooltip("When to consume this token")]
-    public ConsumeType[] m_Consumption;
-
-    public bool ContainsConsumptionType(ConsumeType consumeType)
-    {
-        return m_Consumption.Contains(consumeType);
-    }
+    // public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 }
