@@ -24,6 +24,8 @@ public class ClassSO : ScriptableObject
 
     [Header("Weapon")]
     public WeaponTypeSO m_WeaponType;
+    public WeaponAnimationType WeaponAnimationType => m_WeaponType.m_WeaponAnimationType;
+    public WeaponInstanceSO DefaultWeapon => m_WeaponType.m_BeginnerWeapon;
 
     [Header("Skills")]
     public PassiveSkillSO[] m_PassiveSkills;
@@ -32,20 +34,6 @@ public class ClassSO : ScriptableObject
     [Header("Movement")]
     public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
     public bool m_CanSwapTiles = false;
-}
-
-/// <summary>
-/// Packages information on a weapon TYPE, e.g. the entire archetype of bows
-/// </summary>
-public class WeaponTypeSO : ScriptableObject
-{
-    public WeaponType m_WeaponType;
-    public WeaponAnimationType m_WeaponAnimationType;
-
-    /// <summary>
-    /// The beginner weapon to be assigned for this weapon type if the unit has not equipped a weapon
-    /// </summary>
-    public WeaponInstanceSO m_BeginnerWeapon;
 }
 
 public enum OutfitType

@@ -36,6 +36,7 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
 
     public TokenStack(TokenTierSO tokenTier, int initialTier, int initialNumber = 1)
     {
+        m_TokenTierData = tokenTier;
         m_NumTiers = m_TokenTierData.NumTiers;
         m_NumTokensOfEachTier = new List<int>(m_NumTiers);
         for (int i = 0; i < tokenTier.NumTiers; ++i)

@@ -41,7 +41,7 @@ public class ActiveSkillSO : ScriptableObject
     [Space]
     // healing
     [Tooltip("Determines the proportion of health to heal from magic attack - only used if skill heals")]
-    public float m_HealAmount = 1f;
+    public float m_HealProportion = 1f;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -66,7 +66,7 @@ public class ActiveSkillSO : ScriptableObject
     public bool IsAoe => m_TargetSquares.Count > 0;
     public bool DealsDamage => ContainsSkillType(SkillEffectType.DEALS_DAMAGE);
     public bool IsHeal => ContainsSkillType(SkillEffectType.HEAL);
-    public virtual bool IsMagic => true;
+    public bool IsMagic => m_SkillType == SkillType.MAGIC;
     public bool IsPhysicalAttack => !IsMagic && DealsDamage;
     public bool IsMagicAttack => IsMagic && DealsDamage;
     public bool IsSelfTarget => m_TargetRules.Any(x => x is LockToSelfTargetRuleSO);
@@ -93,6 +93,8 @@ public class ActiveSkillSO : ScriptableObject
     // does not check for occupied tiles, that is the responsibility of the grid logic
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
+        if (unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
+            return false;
         return m_TargetRules.All(x => x.IsValidTargetTile(targetTile, unit, targetGridType));
     }
 

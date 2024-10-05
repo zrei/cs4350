@@ -5,16 +5,18 @@ public static class DamageCalc
 {
     private const float ALPHA = 0.5f;
 
-    public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO)
+    public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO, float weaponModifier)
     {
         // accounting for support somehow getting in here?
         bool isMagic = attackSO.IsMagic;
         
-        float totalAttackStat = attacker.GetTotalStat(isMagic ? StatType.MAG_ATTACK : StatType.PHYS_ATTACK, attackSO.m_DamageModifier);
+        float totalAttackStat = attacker.GetTotalStat(isMagic ? StatType.MAG_ATTACK : StatType.PHYS_ATTACK, attackSO.m_DamageModifier * weaponModifier);
 
         float totalDefenceStat = target.GetTotalStat(isMagic ? StatType.MAG_DEFENCE : StatType.PHYS_DEFENCE);
 
         float damage = Mathf.Max(0f, totalAttackStat - (1 - totalDefenceStat / (totalDefenceStat + ALPHA)));
+
+        damage *= attacker.GetFinalCritProportion();
         Logger.Log("Damage calc", $"Attack: {totalAttackStat}", LogLevel.LOG);
         Logger.Log("Damage calc", $"Defence: {totalDefenceStat}", LogLevel.LOG);
         Logger.Log("Damage calc", $"Damage: {damage}", LogLevel.LOG);
@@ -30,5 +32,14 @@ public static class DamageCalc
 
         float damage = Mathf.Max(0f, totalAttackStat);
         return damage;
+    }
+
+    public static float CalculateHealAmount(ICanAttack healer, ActiveSkillSO attackSO, float weaponModifier)
+    {
+        float totalHealStat = healer.GetTotalStat(StatType.MAG_ATTACK);
+
+        float finalHealAmount = totalHealStat * attackSO.m_HealProportion * weaponModifier * healer.GetFinalCritProportion();
+
+        return finalHealAmount;
     }
 }

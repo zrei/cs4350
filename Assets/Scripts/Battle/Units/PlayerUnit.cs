@@ -15,14 +15,14 @@ public class PlayerUnit : Unit
     public void Initialise(CharacterBattleData characterBattleData)
     {
         CharacterName = characterBattleData.m_BaseData.m_CharacterName;
-        base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData());
+        base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData(), characterBattleData.m_CurrEquippedWeapon);
     }
     #endregion
 
     #region Active Skills
     public List<ActiveSkillSO> GetAvailableActiveSkills()
     {
-        return m_Class.m_Weapon.m_WeaponActiveSkills.ToList();
+        return m_Class.m_ActiveSkills.ToList();
     }
     #endregion
 }

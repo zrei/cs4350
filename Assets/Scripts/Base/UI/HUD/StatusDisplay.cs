@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public interface IStatusManager
 {
-    IEnumerable<Token> Tokens { get; }
+    IEnumerable<TokenStack> TokenStacks { get; }
     IEnumerable<StatusEffect> StatusEffects { get; }
     event StatusEvent OnAdd;
     event StatusEvent OnRemove;
@@ -53,9 +53,9 @@ namespace Game.UI
                     trackedStatusManager.OnRemove += OnRemove;
                     trackedStatusManager.OnChange += OnChange;
 
-                    foreach (var status in trackedStatusManager.Tokens)
+                    foreach (var status in trackedStatusManager.TokenStacks)
                     {
-                        OnAdd(status);
+                        //OnAdd(status);
                     }
                     foreach (var status in trackedStatusManager.StatusEffects)
                     {

@@ -8,6 +8,9 @@ public class InflictedToken
     public int m_Tier = 1;
     [Tooltip("Number of this token to inflict at once")]
     public int m_Number = 1;
+
+    public int Id => m_TokenTierData.m_Id;
+    public TokenType TokenType => m_TokenTierData.TokenType;
 }
 
 /*

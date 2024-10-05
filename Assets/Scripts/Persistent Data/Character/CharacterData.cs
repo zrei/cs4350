@@ -44,7 +44,7 @@ public class CharacterData
 
     public CharacterBattleData GetBattleData()
     {
-        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, m_CurrEquippedWeapon == null ? WeaponManager.Instance.);
+        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, m_CurrEquippedWeapon ?? m_CurrClass.DefaultWeapon);
     }
 }
 

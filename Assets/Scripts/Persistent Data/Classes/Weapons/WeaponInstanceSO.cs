@@ -22,5 +22,6 @@ public class WeaponInstanceSO : ScriptableObject
     /// How much this weapon affects base attack stat
     /// </summary>
     public float m_BaseAttackModifier = 1f;
+    public float m_BaseHealModifier = 1f;
 
 }

@@ -18,7 +18,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        if (m_ActiveSkill is MagicActiveSkillSO && enemyUnit.CurrentMana < ((MagicActiveSkillSO) m_ActiveSkill).m_ConsumedManaAmount)
+        if (m_ActiveSkill.m_ConsumedMana > enemyUnit.CurrentMana)
             return false;
 
         if (m_ActiveSkill.IsSelfTarget)

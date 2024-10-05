@@ -6,7 +6,8 @@ public enum TokenType
     MULT_STAT_CHANGE,
     SUPPORT_EFFECT_UP,
     CRIT,
-    TAUNT
+    TAUNT,
+    STUN
 }
 
 public enum TokenConsumptionType
@@ -16,8 +17,7 @@ public enum TokenConsumptionType
     CONSUME_ON_PHYS_ATTACK,
     CONSUME_ON_MAG_DEFEND,
     CONSUME_ON_PHYS_DEFEND,
+    CONSUME_ON_HEAL,
     CONSUME_ON_MOVE,
-    CONSUME_ON_SKILL,
-    CONSUME_POST_DAMAGE,
-    CONSUME_POST_DEFENCE
+    CONSUME_ON_NEXT_TURN
 }

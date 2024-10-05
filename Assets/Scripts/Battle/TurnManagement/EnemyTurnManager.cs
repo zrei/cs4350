@@ -17,6 +17,10 @@ public class EnemyTurnManager : TurnManager
             GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
             return;
         }
+
+        if (!PreTurn(enemyUnit))
+            return;
+
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
         GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
 

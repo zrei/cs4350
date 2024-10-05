@@ -54,7 +54,7 @@ namespace Game.UI
                 }
                 else if (selectedSkill.IsHeal)
                 {
-                    skillDescription.text = $"HEAL: {selectedSkill.m_HealAmount:F0}";
+                    skillDescription.text = $"HEAL: {selectedSkill.m_HealProportion:F0}";
                 }
                 else
                 {

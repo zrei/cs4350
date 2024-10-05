@@ -10,4 +10,16 @@ public abstract class TurnManager : MonoBehaviour
         m_CompleteTurnEvent = completeTurnEvent;
         m_MapLogic = mapLogic;
     }
+
+    /// <summary>
+    /// Performs any pre-turn logic and returns whether the turn can be performed
+    /// </summary>
+    /// <param name="unit"></param>
+    /// <returns></returns>
+    protected bool PreTurn(Unit unit)
+    {
+        bool canPerformTurn = unit.CanPerformTurn();
+        unit.ClearTokens(TokenConsumptionType.CONSUME_ON_NEXT_TURN);
+        return canPerformTurn;
+    }
 }

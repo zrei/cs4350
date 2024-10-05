@@ -73,6 +73,11 @@ public class PlayerTurnManager : TurnManager
             return;
         }
 
+        if (!PreTurn(playerUnit))
+        {
+            return;
+        }
+
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
 
         m_TotalMovementRange = (int)m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);

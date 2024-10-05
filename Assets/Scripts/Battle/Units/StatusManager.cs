@@ -32,15 +32,22 @@ public class StatusManager :
         Logger.Log(this.GetType().Name, $"ADD STATUS EFFECT {statusEffect.Name}", LogLevel.LOG);
     }
 
-    public void AddToken(TokenTierSO tokenData, int tier, int number = 1)
+    public void AddToken(InflictedToken inflictedToken, Unit inflicter)
     {
-        if (m_TokenStacks.ContainsKey(tokenData.m_Id))
+        // special handling for taunt
+        if (inflictedToken.TokenType == TokenType.TAUNT)
         {
-            m_TokenStacks[tokenData.m_Id].AddToken(tier, number);
+            AddTauntToken(inflictedToken.m_TokenTierData, inflicter, inflictedToken.m_Number);
+            return;
+        }
+
+        if (m_TokenStacks.ContainsKey(inflictedToken.Id))
+        {
+            m_TokenStacks[inflictedToken.Id].AddToken(inflictedToken.m_Tier, inflictedToken.m_Number);
         }
         else
         {
-            m_TokenStacks[tokenData.m_Id] = new TokenStack(tokenData, tier, number);
+            m_TokenStacks[inflictedToken.Id] = new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number);
         }
         // OnAdd?.Invoke(token);
     }
@@ -107,6 +114,10 @@ public class StatusManager :
     #endregion
 
     #region Getters
+    public bool HasTokenType(TokenType tokenType)
+    {
+        return m_TokenStacks.Any(x => x.Value.TokenType == tokenType);
+    }
     /*
     public IEnumerable<Token> GetTokens(TokenType tokenType)
     {
@@ -216,6 +227,11 @@ public class StatusManager :
             finalCritProportion *= tokenStack.GetFinalCritProportion();
         }
         return finalCritProportion;
+    }
+
+    public bool IsStunned()
+    {
+        return HasTokenType(TokenType.STUN);
     }
 
     /*
