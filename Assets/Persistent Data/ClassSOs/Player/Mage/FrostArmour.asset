@@ -9,21 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 305f67ef624e44e368f072c09ad00dbc, type: 3}
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
   m_Name: FrostArmour
   m_EditorClassIdentifier: 
   m_SkillName: Frost Armour
   m_Description: 'Buff target:
 
     Increased physical defence on next hit taken.'
-  m_Icon: {fileID: 21300000, guid: 64be4ace0f953694d9e1d217cb138ff8, type: 3}
+  m_Icon: {fileID: 21300000, guid: c18b56962c63dc54ba8d1a0a94e370fa, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 2
   m_SkillTypes: 01000000
-  m_InflictedTokens:
-  - m_TokenData: {fileID: 11400000, guid: dd11e7ded47c4de4788e12e78a97a165, type: 2}
-    m_Amount: 10
+  m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_HealAmount: 1
+  m_HealProportion: 1
+  m_Summons: []
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
   m_TargetWillPlayHurtAnimation: 0
@@ -33,4 +34,3 @@ MonoBehaviour:
   m_TargetRules:
   - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
   m_TargetSquares: []
-  m_ConsumedManaAmount: 2

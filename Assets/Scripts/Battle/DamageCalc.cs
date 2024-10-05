@@ -7,7 +7,6 @@ public static class DamageCalc
 
     public static float CalculateDamage(ICanAttack attacker, IHealth target, ActiveSkillSO attackSO)
     {
-        // accounting for support somehow getting in here?
         bool isMagic = attackSO.IsMagic;
         
         float totalAttackStat = attacker.GetTotalStat(isMagic ? StatType.MAG_ATTACK : StatType.PHYS_ATTACK, attackSO.m_DamageModifier * attacker.GetBaseAttackModifier());
@@ -26,12 +25,14 @@ public static class DamageCalc
 
     public static float CalculateDamage(ICanAttack attacker, ActiveSkillSO attackSO)
     {
-        // accounting for support somehow getting in here?
         bool isMagic = attackSO.IsMagic;
 
         float totalAttackStat = attacker.GetTotalStat(isMagic ? StatType.MAG_ATTACK : StatType.PHYS_ATTACK, attackSO.m_DamageModifier * attacker.GetBaseAttackModifier());
 
         float damage = Mathf.Max(0f, totalAttackStat);
+        
+        damage *= attacker.GetFinalCritProportion();
+
         return damage;
     }
 

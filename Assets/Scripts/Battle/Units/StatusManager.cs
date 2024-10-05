@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class StatusManager :
     IFlatStatChange,
@@ -41,6 +42,8 @@ public class StatusManager :
             return;
         }
 
+        Logger.Log(this.GetType().Name, $"Add token: {inflictedToken.m_TokenTierData.name} of tier: {inflictedToken.m_Tier}", LogLevel.LOG);
+
         if (m_TokenStacks.ContainsKey(inflictedToken.Id))
         {
             m_TokenStacks[inflictedToken.Id].AddToken(inflictedToken.m_Tier, inflictedToken.m_Number);
@@ -61,6 +64,7 @@ public class StatusManager :
         }
         else
         {
+            Logger.Log(this.GetType().Name, $"Add taunt token, force target: {forceTarget.name}", LogLevel.LOG);
             m_TokenStacks[tokenData.m_Id] = new TauntTokenStack(forceTarget, tokenData, number);
         }
     }
@@ -159,7 +163,7 @@ public class StatusManager :
 
     public void ClearTokens(TokenConsumptionType consumeType)
     {
-        IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values;
+        IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values.ToList();
 
         foreach (TokenStack tokenStack in tokenStacks)
         {
@@ -212,6 +216,7 @@ public class StatusManager :
                 forceTarget = ((TauntTokenStack) tokenStack).TauntedUnit;
                 if (forceTarget == null || forceTarget.IsDead)
                     return false;
+                Logger.Log(this.GetType().Name, $"Is being taunted by {forceTarget.name}", LogLevel.LOG);
                 return true;
             }
         }

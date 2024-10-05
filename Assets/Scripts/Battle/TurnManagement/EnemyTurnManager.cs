@@ -20,7 +20,10 @@ public class EnemyTurnManager : TurnManager
         }
 
         if (!PreTurn(enemyUnit))
+        {
+            CompleteTurn();
             return;
+        }   
 
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
         GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);

@@ -418,7 +418,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             }
         }
 
-        AlterMana(- attackSO.m_ConsumedMana);
+        AlterMana(-attackSO.m_ConsumedMana);
 
         if (attackSO.IsMagicAttack)
             ClearTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
@@ -437,9 +437,4 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public VoidEvent PostSkillEvent;
     #endregion
-}
-
-public interface ITauntTarget
-{
-    public bool IsTaunted(out Unit forceTarget);
 }

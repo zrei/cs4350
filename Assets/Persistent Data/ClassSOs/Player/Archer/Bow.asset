@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11ffc2816b1267840b24121dcb4ecb9f, type: 3}
   m_Name: Bow
   m_EditorClassIdentifier: 
-  m_WeaponAnimationType: 400
+  m_WeaponId: 0
+  m_WeaponName: Bow
+  m_WeaponType: 3
   m_WeaponModel: {fileID: 6864333226191906120, guid: dc20b8ebbcb463942b4bf91400e5b580,
     type: 3}
-  m_WeaponActiveSkills:
-  - {fileID: 11400000, guid: dc73f333cf69f164d8e46421b739c84a, type: 2}
-  - {fileID: 11400000, guid: 8922292bfebb874419400c56808a561d, type: 2}
-  - {fileID: 11400000, guid: 4f7ad43bf3841124e9917656545e836c, type: 2}
-  - {fileID: 11400000, guid: 3d362401339d5c245ab8af1c27921de7, type: 2}
+  m_PassiveTokens: []
+  m_BaseAttackModifier: 1
+  m_BaseHealModifier: 1

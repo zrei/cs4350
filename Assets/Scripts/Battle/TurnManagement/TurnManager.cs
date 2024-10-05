@@ -20,6 +20,7 @@ public abstract class TurnManager : MonoBehaviour
     {
         bool canPerformTurn = unit.CanPerformTurn();
         unit.ClearTokens(TokenConsumptionType.CONSUME_ON_NEXT_TURN);
+        Logger.Log(this.GetType().Name, $"Unit {unit.name} can perform turn: {canPerformTurn}", LogLevel.LOG);
         return canPerformTurn;
     }
 }

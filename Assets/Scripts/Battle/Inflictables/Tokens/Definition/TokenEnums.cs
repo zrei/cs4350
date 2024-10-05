@@ -7,12 +7,14 @@ public enum TokenType
     SUPPORT_EFFECT_UP,
     CRIT,
     TAUNT,
-    STUN
+    STUN,
+    EVADE
 }
 
 public enum TokenConsumptionType
 {
     CONSUME_ON_SUPPORT,
+    CONSUME_PRE_ATTACK,
     CONSUME_ON_MAG_ATTACK,
     CONSUME_ON_PHYS_ATTACK,
     CONSUME_ON_MAG_DEFEND,

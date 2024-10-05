@@ -1,16 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public interface IInflictStatus
-{
-    public bool TryGetInflictedStatusEffect(out StatusEffect statusEffect);
-}
-
-public interface ICritModifier
-{
-    public float GetFinalCritProportion();
-}
-
 /// <summary>
 /// An instance, in-battle, of a stack of tokens coming from the same group
 /// </summary>
@@ -30,8 +20,7 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
     #endregion
     
     #region State
-    public bool IsEmpty => m_NumTokensOfEachTier.All(x => x <= 0);
-    private bool HasStack => m_NumTokensOfEachTier.Any(x => x > 0);
+    public virtual bool IsEmpty => m_NumTokensOfEachTier.All(x => x <= 0);
     #endregion
 
     public TokenStack(TokenTierSO tokenTier, int initialTier, int initialNumber = 1)
@@ -85,7 +74,7 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
     /// <param name="number"></param>
     public void AddToken(int tier, int number = 1)
     {
-        if (!AllowStack && HasStack)
+        if (!AllowStack && !IsEmpty)
         {
             Logger.Log(this.GetType().Name, $"No stacking allowed for token tier {Id}", LogLevel.LOG);
             return;
@@ -164,6 +153,7 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
 public class TauntTokenStack : TokenStack
 {
     public Unit TauntedUnit {get; private set;}
+    public override bool IsEmpty => base.IsEmpty && TauntedUnit != null && !TauntedUnit.IsDead;
 
     public TauntTokenStack(Unit targetedUnit, TokenTierSO tokenTierSO, int initialNumber = 1) : base(tokenTierSO, 1, initialNumber)
     {

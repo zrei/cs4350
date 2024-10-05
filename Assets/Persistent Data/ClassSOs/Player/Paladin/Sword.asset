@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11ffc2816b1267840b24121dcb4ecb9f, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: 
-  m_WeaponAnimationType: 200
+  m_WeaponId: 0
+  m_WeaponName: Sword
+  m_WeaponType: 0
   m_WeaponModel: {fileID: 8781095038370681472, guid: a0a879c891d7de547b2d5df6fb1c13bb,
     type: 3}
-  m_WeaponActiveSkills:
-  - {fileID: 11400000, guid: b87bfeb7404b9a44ab84d46df7409b71, type: 2}
-  - {fileID: 11400000, guid: 5574b99379703364c9f356870c8fb612, type: 2}
-  - {fileID: 11400000, guid: effe3aa622f93d04ab2d6ea4eab25a44, type: 2}
-  - {fileID: 11400000, guid: 2b6e671b73687a04f9bd43a15d2e66fe, type: 2}
+  m_PassiveTokens: []
+  m_BaseAttackModifier: 1
+  m_BaseHealModifier: 1

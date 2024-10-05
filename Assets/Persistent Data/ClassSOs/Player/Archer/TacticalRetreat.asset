@@ -9,30 +9,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 305f67ef624e44e368f072c09ad00dbc, type: 3}
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
   m_Name: TacticalRetreat
   m_EditorClassIdentifier: 
   m_SkillName: Tactical Retreat
-  m_Description: 'Buff self:
+  m_Description: 'Buff self: Increased speed, movement and damage.
 
-    Increased speed, movement and damage.
-
-    Expires
-    on next skill action or hit taken.'
+    Expires on
+    next skill action or hit taken.'
   m_Icon: {fileID: 21300000, guid: cbfaf7128a0e9be45a3f9f76b8fbc6e3, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 1
   m_SkillTypes: 01000000
-  m_InflictedTokens:
-  - m_TokenData: {fileID: 11400000, guid: 04f9fe2769e351f4f9998d20325b96f9, type: 2}
-    m_Amount: 6
-  - m_TokenData: {fileID: 11400000, guid: 79b3feceb1220564db396d51c06435ad, type: 2}
-    m_Amount: 3
-  - m_TokenData: {fileID: 11400000, guid: ae9899b13b2aa3048bf789c134d84ba4, type: 2}
-    m_Amount: 2
-  - m_TokenData: {fileID: 11400000, guid: af74a01f06008a44097afab0821453f5, type: 2}
-    m_Amount: 2
+  m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_HealAmount: 1
+  m_HealProportion: 1
+  m_Summons: []
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
   m_TargetWillPlayHurtAnimation: 0
@@ -42,4 +35,3 @@ MonoBehaviour:
   m_TargetRules:
   - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
   m_TargetSquares: []
-  m_ConsumedManaAmount: 1

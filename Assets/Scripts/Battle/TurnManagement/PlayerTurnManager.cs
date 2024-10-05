@@ -70,11 +70,13 @@ public class PlayerTurnManager : TurnManager
         if (m_CurrUnit.IsDead)
         {
             GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
+            EndTurn();
             return;
         }
 
         if (!PreTurn(playerUnit))
         {
+            EndTurn();
             return;
         }
 

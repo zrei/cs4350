@@ -9,17 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 305f67ef624e44e368f072c09ad00dbc, type: 3}
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
   m_Name: HandOfLight
   m_EditorClassIdentifier: 
-  m_SkillName: Hand Of Light
+  m_SkillName: Hand of Light
   m_Description: 
-  m_Icon: {fileID: 21300000, guid: 3e65f9b0a5b01df42af8955859bf9a07, type: 3}
+  m_Icon: {fileID: 21300000, guid: 3ba9384406cc9054ab14dd6683acd8b5, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 2
   m_SkillTypes: 02000000
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_HealAmount: 5
+  m_HealProportion: 1.5
+  m_Summons: []
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
   m_TargetWillPlayHurtAnimation: 0
@@ -29,4 +32,3 @@ MonoBehaviour:
   m_TargetRules:
   - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
   m_TargetSquares: []
-  m_ConsumedManaAmount: 2
