@@ -25,7 +25,7 @@ public class EnemyUnit : Unit
 
     public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO)
     {
-        base.Initialise(enemyCharacterSO.m_StartingStats.FlatAugment(statAugments), enemyCharacterSO.m_StartingClass, enemyCharacterSO.m_CharacterSprite, enemyCharacterSO.GetUnitModelData());
+        base.Initialise(enemyCharacterSO.m_StartingStats.FlatAugment(statAugments), enemyCharacterSO.m_StartingClass, enemyCharacterSO.m_CharacterSprite, enemyCharacterSO.GetUnitModelData(), enemyCharacterSO.m_EquippedWeapon);
         InitialiseActions(enemyCharacterSO.m_Actions);
     }
 

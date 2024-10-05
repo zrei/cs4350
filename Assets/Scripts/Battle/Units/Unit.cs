@@ -27,7 +27,7 @@ public struct UnitModelData
 
 public delegate void TrackedValueEvent(float change, float current, float max);
 
-public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
+public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange, IMultStatChange, ICritModifier, ITauntTarget
 {
     #region Animation
     private static readonly int DirXAnimParam = Animator.StringToHash("DirX");
@@ -63,7 +63,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public CoordPair CurrPosition => m_CurrPosition;
 
     protected StatusManager m_StatusManager = new StatusManager();
-    public IStatusManager StatusManager => m_StatusManager;
+    // public IStatusManager StatusManager => m_StatusManager;
     #endregion
 
     #region Static Data
@@ -84,10 +84,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
     #endregion
 
+    private WeaponInstanceSO m_EquippedWeapon;
     private WeaponModel weaponModel;
 
     #region Initialisation
-    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData)
+    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO)
     {
         Sprite = sprite;
         m_Stats = stats;
@@ -95,7 +96,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         m_CurrMana = m_Stats.m_Mana;
         m_Class = classSo;
 
-        InstantiateModel(unitModelData, m_Class.m_Weapon);
+        InstantiateModel(unitModelData, weaponInstanceSO, classSo);
     }
 
     /// <summary>
@@ -103,13 +104,14 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     /// </summary>
     /// <param name="unitModelData"></param>
     /// <param name="weaponSO"></param>
-    private void InstantiateModel(UnitModelData unitModelData, WeaponSO weaponSO)
+    private void InstantiateModel(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
     {
         GameObject model = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, this.transform);
         EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
         equipArmor.Initialize(unitModelData.m_AttachItems);
         
-        WeaponModel weaponModelPrefab = weaponSO.m_WeaponModel;
+        m_EquippedWeapon = weaponSO;
+        WeaponModel weaponModelPrefab = m_EquippedWeapon.m_WeaponModel;
         if (weaponModelPrefab != null)
         {
             weaponModel = Instantiate(weaponModelPrefab);
@@ -128,7 +130,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
         }
 
-        WeaponAnimationType = weaponSO.m_WeaponAnimationType;
+        WeaponAnimationType = classSO.WeaponAnimationType;
         m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
@@ -184,6 +186,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
 
         void FinishMovement()
         {
+            ClearTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
         }
@@ -234,17 +237,19 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     #endregion
 
     #region Tokens
+    /*
     public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
     {
         return m_StatusManager.GetTokens(consumeType, tokenType);
     }
+    */
 
-    public void ClearTokens(ConsumeType consumeType)
+    public void ClearTokens(TokenConsumptionType consumeType)
     {
         m_StatusManager.ClearTokens(consumeType);
     }
 
-    public List<StatusEffect> GetInflictedStatusEffects(ConsumeType consumeType)
+    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
     {
         return m_StatusManager.GetInflictedStatusEffects(consumeType);
     }
@@ -262,7 +267,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         return new Stats(GetTotalStat(StatType.HEALTH), GetTotalStat(StatType.MANA), GetTotalStat(StatType.PHYS_ATTACK), GetTotalStat(StatType.MAG_ATTACK), GetTotalStat(StatType.PHYS_DEFENCE), GetTotalStat(StatType.MAG_DEFENCE), GetTotalStat(StatType.SPEED), (int) GetTotalStat(StatType.MOVEMENT_RANGE));
     }
 
-    // for preview purposes
+    // for preview purposes: ADD THE WEAPON STUFF
     public float GetFlatStatChange(StatType statType)
     {
         return m_StatusManager.GetFlatStatChange(statType);
@@ -274,13 +279,35 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         return m_StatusManager.GetMultStatChange(statType);
     }
 
-    public float GetTotalStat(StatType statType, float baseModifier = 1f)
+    public float GetBaseAttackModifier()
     {
-        return (m_Stats.GetStat(statType) * baseModifier + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
+        return m_EquippedWeapon.m_BaseAttackModifier;
+    }
+
+    public float GetBaseHealModifier()
+    {
+        return m_EquippedWeapon.m_BaseHealModifier;
+    }
+
+    public float GetTotalStat(StatType statType, float externalBaseModifier = 1f)
+    {
+        return (m_Stats.GetStat(statType) * externalBaseModifier + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
+    }
+    #endregion
+
+    #region Damage Modifier
+    public float GetFinalCritProportion()
+    {
+        return m_StatusManager.GetCritAmount();
     }
     #endregion
 
     #region Status
+    public bool CanPerformTurn()
+    {
+        return !m_StatusManager.IsStunned();
+    }
+
     public void InflictStatus(StatusEffect statusEffect)
     {
         m_StatusManager.AddEffect(statusEffect);
@@ -291,18 +318,23 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         foreach (StatusEffect statusEffect in statusEffects)
             InflictStatus(statusEffect);
     }
+
+    public bool IsTaunted(out Unit forceTarget)
+    {
+        return m_StatusManager.IsTaunted(out forceTarget);
+    }
     #endregion
 
     #region Token
-    public void InflictToken(Token token)
+    public void InflictToken(InflictedToken token, Unit inflicter)
     {
-        m_StatusManager.AddToken(token);
+        m_StatusManager.AddToken(token, inflicter);
     }
 
-    public void InflictTokens(List<Token> tokens)
+    public void InflictTokens(List<InflictedToken> tokens, Unit inflicter)
     {
-        foreach (Token token in tokens)
-            InflictToken(token);
+        foreach (InflictedToken token in tokens)
+            InflictToken(token, inflicter);
     }
     #endregion
 
@@ -355,14 +387,14 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         List<StatusEffect> inflictedStatusEffects = new();
         
         if (attackSO.IsPhysicalAttack)
-            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_PHYS_ATTACK));
+            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK));
         else if (attackSO.IsMagicAttack)
-            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
+            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(TokenConsumptionType.CONSUME_ON_MAG_ATTACK));
 
-        if (attackSO.ContainsSkillType(SkillType.DEALS_STATUS_OR_TOKENS))
+        if (attackSO.ContainsSkillType(SkillEffectType.DEALS_STATUS_OR_TOKENS))
             inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects.Select(x => new StatusEffect(x.m_StatusEffect, x.m_Stack)));
         
-        List<Token> inflictedTokens = attackSO.m_InflictedTokens;
+        List<InflictedToken> inflictedTokens = attackSO.m_InflictedTokens;
 
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
         GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
@@ -372,25 +404,29 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             if (attackSO.DealsDamage)
             {
                 target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-                target.ClearTokens(attackSO.IsMagic ? ConsumeType.CONSUME_ON_MAG_DEFEND : ConsumeType.CONSUME_ON_PHYS_DEFEND);
+                target.ClearTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
-            else if (attackSO.ContainsSkillType(SkillType.HEAL))
-                target.Heal(attackSO.m_HealAmount);
+            else if (attackSO.ContainsSkillType(SkillEffectType.HEAL))
+            {
+                target.Heal(DamageCalc.CalculateHealAmount(this, attackSO));
+            }
             
             if (!target.IsDead)
             {
                 target.InflictStatus(inflictedStatusEffects);
-                target.InflictTokens(inflictedTokens);
+                target.InflictTokens(inflictedTokens, this);
             }
         }
 
-        if (attackSO.IsMagic)
-            AlterMana(- ((MagicActiveSkillSO) attackSO).m_ConsumedManaAmount);
+        AlterMana(-attackSO.m_ConsumedMana);
 
         if (attackSO.IsMagicAttack)
-            ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
+            ClearTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
         else if (attackSO.IsPhysicalAttack)
-            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
+            ClearTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK);
+
+        if (attackSO.IsHeal)
+            ClearTokens(TokenConsumptionType.CONSUME_ON_HEAL);
 
         void CompleteAttackAnimationEvent()
         {

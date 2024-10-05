@@ -1,6 +1,19 @@
-using System;
 using UnityEngine;
 
+[System.Serializable]
+public class InflictedToken
+{
+    public TokenTierSO m_TokenTierData;
+    [Tooltip("Which tier should be inflicted")]
+    public int m_Tier = 1;
+    [Tooltip("Number of this token to inflict at once")]
+    public int m_Number = 1;
+
+    public int Id => m_TokenTierData.m_Id;
+    public TokenType TokenType => m_TokenTierData.TokenType;
+}
+
+/*
 [System.Serializable]
 public class Token :
     IStatChange,
@@ -9,7 +22,6 @@ public class Token :
     [SerializeField] TokenSO m_TokenData;
 
     // represents different things for different token types
-    [SerializeField] float m_Amount;
 
     public TokenType TokenType => m_TokenData.TokenType;
 
@@ -71,3 +83,4 @@ public class Token :
         return true;
     }
 }
+*/

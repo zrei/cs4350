@@ -9,17 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6af11d4b964ca407badd67c48cd81687, type: 3}
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
   m_Name: Slash
   m_EditorClassIdentifier: 
   m_SkillName: Slash
   m_Description: 
-  m_Icon: {fileID: 21300000, guid: 52a99686a23ffb64185b0638e4849a4f, type: 3}
+  m_Icon: {fileID: 0}
+  m_SkillType: 0
+  m_ConsumedMana: 0
   m_SkillTypes: 00000000
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_HealAmount: 1
+  m_HealProportion: 1
+  m_Summons: []
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
   m_TargetWillPlayHurtAnimation: 0
@@ -27,6 +30,6 @@ MonoBehaviour:
   m_OverriddenWeaponAnimationType: 0
   m_SkillAnimationType: 2
   m_TargetRules:
-  - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
   - {fileID: 11400000, guid: bafa5c363338c0849bc028b7798a2cd0, type: 2}
+  - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
   m_TargetSquares: []

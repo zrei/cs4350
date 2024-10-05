@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 
 public class StatusEffect :
-    IStatChange,
     IStatus
 {
     private StatusEffectSO m_StatusEffectSO;
@@ -52,6 +51,7 @@ public class StatusEffect :
         }
     }
 
+    /*
     public float GetFlatStatChange(StatType statType)
     {
         if (m_StatusEffectSO.StatusEffectType != StatusEffectType.STAT_CHANGE)
@@ -83,4 +83,5 @@ public class StatusEffect :
 
         return statStatusEffectSO.m_AffectAmount;
     }
+    */
 }

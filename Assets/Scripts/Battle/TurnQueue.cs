@@ -23,7 +23,7 @@ public class TurnQueue
             m_Unit = unit;
 
             m_Display = TurnDisplay.Instance.InstantiateTurnDisplayUnit(unit);
-            m_Display.UpdateTurnValue(m_TimeRemaining, DISTANCE_THRESHOLD / m_Unit.Stat.GetStat(StatType.SPEED));
+            m_Display.UpdateTurnValue(m_TimeRemaining, DISTANCE_THRESHOLD / m_Unit.GetTotalStat(StatType.SPEED));
         }
 
         public override string ToString()
@@ -34,7 +34,7 @@ public class TurnQueue
         public void TickTime(float tickAmount)
         {
             m_TimeRemaining -= tickAmount;
-            m_Display.UpdateTurnValue(m_TimeRemaining, DISTANCE_THRESHOLD / m_Unit.Stat.GetStat(StatType.SPEED));
+            m_Display.UpdateTurnValue(m_TimeRemaining, DISTANCE_THRESHOLD / m_Unit.GetTotalStat(StatType.SPEED));
         }
     }
     private List<TurnWrapper> m_Turns = new List<TurnWrapper>();
@@ -82,7 +82,7 @@ public class TurnQueue
 
     public void AddUnit(Unit unit)
     {
-        m_Turns.Add(new TurnWrapper(DISTANCE_THRESHOLD / unit.Stat.m_Speed, unit));
+        m_Turns.Add(new TurnWrapper(DISTANCE_THRESHOLD / unit.GetTotalStat(StatType.SPEED), unit));
     }
 
     public void Clear()

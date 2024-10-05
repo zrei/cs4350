@@ -9,17 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6af11d4b964ca407badd67c48cd81687, type: 3}
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
   m_Name: Sweep
   m_EditorClassIdentifier: 
   m_SkillName: Sweep
   m_Description: 1x3 Area of Effect.
-  m_Icon: {fileID: 21300000, guid: 3cd104094cfab0c439158af5000aa309, type: 3}
+  m_Icon: {fileID: 21300000, guid: 73d86eb1e0f344743a3c4b23b49492c4, type: 3}
+  m_SkillType: 1
+  m_ConsumedMana: 0
   m_SkillTypes: 00000000
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 0.8
-  m_HealAmount: 1
+  m_HealProportion: 1
+  m_Summons: []
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
   m_TargetWillPlayHurtAnimation: 0
@@ -28,7 +31,7 @@ MonoBehaviour:
   m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
-  - {fileID: 11400000, guid: bafa5c363338c0849bc028b7798a2cd0, type: 2}
+  - {fileID: 11400000, guid: 3532326be7568d1419b024ef2dccee87, type: 2}
   m_TargetSquares:
   - m_Row: 0
     m_Col: -1

@@ -41,7 +41,7 @@ namespace Game.UI
                         hpBar.SetValue(trackedUnit.CurrentHealth, trackedUnit.MaxHealth, 0);
                     }
 
-                    tokenDisplay.TrackedStatusManager = trackedUnit.StatusManager;
+                    //tokenDisplay.TrackedStatusManager = trackedUnit.StatusManager;
                     Show();
                 }
                 else

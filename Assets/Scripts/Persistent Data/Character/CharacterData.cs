@@ -37,9 +37,14 @@ public class CharacterData
     /// </summary>
     public Stats TotalBaseStats => m_CurrStats.FlatAugment(m_CurrClass.m_StatAugments);
 
+    /// <summary>
+    /// Note: This can be null. If so, it uses the base weapons
+    /// </summary>
+    public WeaponInstanceSO m_CurrEquippedWeapon;
+
     public CharacterBattleData GetBattleData()
     {
-        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass);
+        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, m_CurrEquippedWeapon ?? m_CurrClass.DefaultWeapon);
     }
 }
 
@@ -55,11 +60,14 @@ public struct CharacterBattleData
     public Stats m_CurrStats;
     public ClassSO m_ClassSO;
 
-    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO)
+    public WeaponInstanceSO m_CurrEquippedWeapon;
+
+    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO, WeaponInstanceSO currEquippedWeapon)
     {
         m_BaseData = baseData;
         m_CurrStats = currStats;
         m_ClassSO = classSO;
+        m_CurrEquippedWeapon = currEquippedWeapon;
     }
 
     public UnitModelData GetUnitModelData()

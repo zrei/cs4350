@@ -305,7 +305,7 @@ namespace Game.UI
             }
             if (skill.IsHeal)
             {
-                builder.AppendLine($"HEAL: {skill.m_HealAmount:G5}");
+                builder.AppendLine($"HEAL: {DamageCalc.CalculateHealAmount(currentUnit, skill):G5}");
             }
             if (!string.IsNullOrEmpty(skill.m_Description))
             {

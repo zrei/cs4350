@@ -9,23 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 305f67ef624e44e368f072c09ad00dbc, type: 3}
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
   m_Name: MarkTarget
   m_EditorClassIdentifier: 
   m_SkillName: Mark Target
-  m_Description: 'Apply on target:
-
-    Reduced defence on next hit taken.'
-  m_Icon: {fileID: 21300000, guid: da1ccaa3eecb39741b839f271b2fb4bb, type: 3}
+  m_Description: 'Apply on target: Reduced defence on next hit taken'
+  m_Icon: {fileID: 0}
+  m_SkillType: 0
+  m_ConsumedMana: 1
   m_SkillTypes: 01000000
-  m_InflictedTokens:
-  - m_TokenData: {fileID: 11400000, guid: 380cec2c562f98f4b9b777426fb9f012, type: 2}
-    m_Amount: 0.1
-  - m_TokenData: {fileID: 11400000, guid: 7e8bf6b59c16e7048ad81de8f5fffe9a, type: 2}
-    m_Amount: 0.1
+  m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_HealAmount: 1
+  m_HealProportion: 1
+  m_Summons: []
   m_DelayResponseAnimationTime: 0.2
   m_AnimationTime: 2
   m_TargetWillPlayHurtAnimation: 0
@@ -35,4 +32,3 @@ MonoBehaviour:
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
   m_TargetSquares: []
-  m_ConsumedManaAmount: 1

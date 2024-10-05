@@ -4,6 +4,7 @@
 public class EnemyCharacterSO : CharacterSO
 {
     public EnemyActionSetSO m_Actions;
+    public WeaponInstanceSO m_EquippedWeapon;
 
     public UnitModelData GetUnitModelData()
     {
