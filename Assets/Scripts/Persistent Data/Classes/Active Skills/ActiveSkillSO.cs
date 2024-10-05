@@ -13,6 +13,7 @@ public class ActiveSkillSO : ScriptableObject
 {
     [Header("Details")]
     public string m_SkillName;
+    [TextArea]
     public string m_Description;
     public Sprite m_Icon;
     [Tooltip("Will determine which stats to use in calculating damage")]

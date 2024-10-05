@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0b94d6327e84484bb62ecb427a46e7e, type: 3}
-  m_Name: EnemyActionSetSO
+  m_Name: BanditArcherActionSet
   m_EditorClassIdentifier: 
   m_EnemyActions:
   - m_EnemyAction: {fileID: 11400000, guid: 0973f77fdffb21445b99ab234450456a, type: 2}
+    m_Conditions: []
+    m_BasePriority: 2
+  - m_EnemyAction: {fileID: 11400000, guid: b5baf986c73c8dd4f874f04ffe175a0c, type: 2}
     m_Conditions: []
     m_BasePriority: 2
   - m_EnemyAction: {fileID: 11400000, guid: 15ac809de6e672846aff0901c7be6128, type: 2}

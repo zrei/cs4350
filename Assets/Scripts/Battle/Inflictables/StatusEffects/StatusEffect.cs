@@ -4,9 +4,6 @@ using UnityEngine;
 public class StatusEffect :
     IStatus
 {
-    private static readonly Color InflictDamageColor = new(1, 0, 0, 1);
-    // private static readonly Color StatChangeColor = new(0.5f, 0, 1, 1);
-
     private StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
 
@@ -15,12 +12,7 @@ public class StatusEffect :
     public bool IsDepleted => m_StackRemaining <= 0;
 
     public Sprite Icon => m_StatusEffectSO.m_Sprite;
-    public Color Color => m_StatusEffectSO.StatusEffectType switch
-    {
-        StatusEffectType.INFLICT_DAMAGE => InflictDamageColor,
-        //StatusEffectType.STAT_CHANGE => StatChangeColor,
-        _ => Color.white,
-    };
+    public Color Color => m_StatusEffectSO.m_Color;
     public string DisplayAmount => !string.IsNullOrEmpty(m_StatusEffectSO.m_DisplayStacksFormat)
         ? string.Format(m_StatusEffectSO.m_DisplayStacksFormat, m_StackRemaining)
         : string.Empty;

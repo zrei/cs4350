@@ -119,13 +119,7 @@ namespace Game.UI
 
         private void OnHealthChange(float change, float value, float max)
         {
-            IEnumerator ExecuteWithDelay()
-            {
-                yield return new WaitForSeconds(2.5f);
-                hpBar?.SetValue(value, max);
-            }
-            StopAllCoroutines();
-            StartCoroutine(ExecuteWithDelay());
+            hpBar?.SetValue(value, max);
         }
 
         private void OnDeath()

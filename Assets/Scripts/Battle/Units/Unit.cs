@@ -279,9 +279,19 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         return m_StatusManager.GetMultStatChange(statType);
     }
 
-    public float GetTotalStat(StatType statType, float baseModifier = 1f)
+    public float GetBaseAttackModifier()
     {
-        return (m_Stats.GetStat(statType) * baseModifier + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
+        return m_EquippedWeapon.m_BaseAttackModifier;
+    }
+
+    public float GetBaseHealModifier()
+    {
+        return m_EquippedWeapon.m_BaseHealModifier;
+    }
+
+    public float GetTotalStat(StatType statType, float externalBaseModifier = 1f)
+    {
+        return (m_Stats.GetStat(statType) * externalBaseModifier + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
     }
     #endregion
 
@@ -393,12 +403,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         {
             if (attackSO.DealsDamage)
             {
-                target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO, m_EquippedWeapon.m_BaseAttackModifier));
+                target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
                 target.ClearTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
             else if (attackSO.ContainsSkillType(SkillEffectType.HEAL))
             {
-                target.Heal(DamageCalc.CalculateHealAmount(this, attackSO, m_EquippedWeapon.m_BaseHealModifier));
+                target.Heal(DamageCalc.CalculateHealAmount(this, attackSO));
             }
             
             if (!target.IsDead)

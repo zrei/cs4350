@@ -97,9 +97,16 @@ public class BattleManager : Singleton<BattleManager>
         m_EnemyUnits.Clear();
         m_PlayerUnits.Clear();
 
-        m_MapLogic.ResetMap();
-
         InstantiateBiome(mapBiome);
+        StartCoroutine(BattleInitialise(battleSO, playerUnitData));
+    }
+
+    // fixing race condition
+    public IEnumerator BattleInitialise(BattleSO battleSO, List<CharacterBattleData> playerUnitData)
+    {
+        yield return new WaitForEndOfFrame();
+
+        m_MapLogic.ResetMap();
 
         foreach (EnemyUnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {

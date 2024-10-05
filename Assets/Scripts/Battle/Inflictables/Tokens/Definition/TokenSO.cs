@@ -13,6 +13,7 @@ public class TokenSO : ScriptableObject
     public Sprite m_Icon;
     [Tooltip("Used for different purposes depending on the token")]
     public float m_Amount;
-    public string m_DisplayAmountFormat = "{0:F0}";
+    public string m_DisplayAmountFormat = "{0:G5}";
+    public Color m_Color = Color.white;
     // public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 }

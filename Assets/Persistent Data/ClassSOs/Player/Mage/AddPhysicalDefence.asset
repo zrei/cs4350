@@ -10,12 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de9244fbea26142ed9992d77603cbb83, type: 3}
-  m_Name: Vulnerable
+  m_Name: AddPhysicalDefence
   m_EditorClassIdentifier: 
-  m_TokenName: Defense Down
+  m_TokenName: Physical Defence Up
   m_Description: 
-  m_Icon: {fileID: 21300000, guid: da1ccaa3eecb39741b839f271b2fb4bb, type: 3}
-  m_DisplayAmountFormat: '{0:F0}'
-  m_Consumption: 04000000
+  m_Icon: {fileID: 21300000, guid: d22a641b83a7eae4283aaeef645aeefc, type: 3}
+  m_DisplayAmountFormat: +{0:G5}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
+  m_Consumption: 0400000003000000
   m_AffectedStat: 4
-  m_StatChangeType: 1
+  m_StatChangeType: 0

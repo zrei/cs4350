@@ -324,7 +324,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5698728344250275026}
   - component: {fileID: 6222810406970823842}
-  - component: {fileID: 4623945692381532480}
+  - component: {fileID: 9187960043128514968}
+  - component: {fileID: 5428826389974006249}
   m_Layer: 0
   m_Name: StatusDisplay
   m_TagString: Untagged
@@ -349,7 +350,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 38}
+  m_SizeDelta: {x: 0, y: 38}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &6222810406970823842
 MonoBehaviour:
@@ -365,8 +366,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   individualStatusDisplayPrefab: {fileID: 4951893979221754607, guid: 5aeb6471af5d0694b915f089d87103d2,
     type: 3}
-  layout: {fileID: 4623945692381532480}
---- !u!114 &4623945692381532480
+  layout: {fileID: 9187960043128514968}
+--- !u!114 &9187960043128514968
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -375,7 +376,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4107025233809252333}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -383,13 +384,29 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 4
     m_Bottom: 4
-  m_ChildAlignment: 1
-  m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 30, y: 30}
-  m_Spacing: {x: 2, y: 2}
-  m_Constraint: 0
-  m_ConstraintCount: 2
+  m_ChildAlignment: 4
+  m_Spacing: 2
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &5428826389974006249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107025233809252333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
 --- !u!1 &4481421136459610720
 GameObject:
   m_ObjectHideFlags: 0
