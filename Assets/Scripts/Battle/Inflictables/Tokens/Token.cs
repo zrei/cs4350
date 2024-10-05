@@ -1,11 +1,11 @@
-using System;
 using UnityEngine;
 
 [System.Serializable]
 public class InflictedToken
 {
     public TokenTierSO m_TokenTierData;
-    public int m_Tier;
+    [Tooltip("Which tier should be inflicted")]
+    public int m_Tier = 1;
     [Tooltip("Number of this token to inflict at once")]
     public int m_Number = 1;
 }

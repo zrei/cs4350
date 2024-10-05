@@ -2,34 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum SkillEffectType
-{
-    DEALS_DAMAGE,
-    DEALS_STATUS_OR_TOKENS,
-    HEAL
-}
-
-public enum SkillType
-{
-    MAGIC,
-    PHYSICAL
-}
-
-public enum WeaponAnimationType
-{
-    STAFF = 100,
-    SWORD = 200,
-    HEAVY_SWORD = 300,
-    BOW = 400
-}
-
-public enum SkillAnimationType
-{
-    SUPPORT = 1,
-    // can have light attack, heavy attack, bla bla bla
-    ATTACK = 2,
-}
-
 [System.Serializable]
 public struct InflictedStatusEffect
 {

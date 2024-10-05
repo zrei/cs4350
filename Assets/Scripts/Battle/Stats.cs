@@ -214,12 +214,6 @@ public struct GrowthRate
     }
 }
 
-public enum StatChangeType
-{
-    FLAT,
-    MULT
-}
-
 public enum StatType
 {
     HEALTH,
@@ -234,11 +228,10 @@ public enum StatType
 
 public interface IFlatStatChange
 {
-    public int GetFlatStatChange(StatType statType);
+    public float GetFlatStatChange(StatType statType);
 }
 
-public interface IMultStatChange
-{
+public interface IMultStatChange {
     public float GetMultStatChange(StatType statType);
 }
 

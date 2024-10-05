@@ -2,13 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class StatusManager :
-    IStatChange,
-    IStatusManager
+    IFlatStatChange,
+    IMultStatChange//,
+    //IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
-    private readonly Dictionary<int, TokenStack> m_TokenStack = new();
+    private readonly Dictionary<int, TokenStack> m_TokenStacks = new();
 
     // public IEnumerable<Token> Tokens => m_Tokens.AsEnumerable();
+    public IEnumerable<TokenStack> TokenStacks => m_TokenStacks.Values;
     public IEnumerable<StatusEffect> StatusEffects => m_StatusEffects.Values;
     public event StatusEvent OnAdd;
     public event StatusEvent OnChange;
@@ -27,22 +29,33 @@ public class StatusManager :
             m_StatusEffects[statusEffect.Id] = statusEffect;
             OnAdd?.Invoke(statusEffect);
         }
-        Logger.Log(this.GetType().Name, "ADD STATUS EFFECT", LogLevel.LOG);
+        Logger.Log(this.GetType().Name, $"ADD STATUS EFFECT {statusEffect.Name}", LogLevel.LOG);
     }
 
     public void AddToken(TokenTierSO tokenData, int tier, int number = 1)
     {
-        if (m_TokenStack.ContainsKey(tokenData.m_Id))
+        if (m_TokenStacks.ContainsKey(tokenData.m_Id))
         {
-            m_TokenStack[tokenData.m_Id].AddToken(tier, number);
-            // :(
+            m_TokenStacks[tokenData.m_Id].AddToken(tier, number);
         }
         else
         {
-            m_TokenStack[tokenData.m_Id] = new TokenStack(tokenData);
-            m_TokenStack[tokenData.m_Id].AddToken(tier, number);
+            m_TokenStacks[tokenData.m_Id] = new TokenStack(tokenData, tier, number);
         }
         // OnAdd?.Invoke(token);
+    }
+
+    // special case for now
+    public void AddTauntToken(TokenTierSO tokenData, Unit forceTarget, int number = 1)
+    {
+        if (m_TokenStacks.ContainsKey(tokenData.m_Id))
+        {
+            return;
+        }
+        else
+        {
+            m_TokenStacks[tokenData.m_Id] = new TauntTokenStack(forceTarget, tokenData, number);
+        }
     }
     #endregion
 
@@ -94,28 +107,30 @@ public class StatusManager :
     #endregion
 
     #region Getters
+    /*
     public IEnumerable<Token> GetTokens(TokenType tokenType)
     {
         return m_Tokens.Where(x => x.TokenType == tokenType);
     }
 
-    public IEnumerable<Token> GetTokens(ConsumeType consumeType)
+    public IEnumerable<Token> GetTokens(TokenConsumptionType consumeType)
     {
         return m_Tokens.Where(x => x.ContainsConsumptionType(consumeType));
     }
 
-    public IEnumerable<Token> GetTokens(ConsumeType consumeType, TokenType tokenType)
+    public IEnumerable<Token> GetTokens(TokenConsumptionType consumeType, TokenType tokenType)
     {
         return m_Tokens.Where(x => x.ContainsConsumptionType(consumeType) && x.TokenType == tokenType);
     }
+    */
 
-    public List<StatusEffect> GetInflictedStatusEffects(ConsumeType consumeType)
+    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
     {
         List<StatusEffect> statusEffects = new();
 
-        foreach (Token token in m_Tokens)
+        foreach (TokenStack tokenStack in TokenStacks)
         {
-            if (token.ContainsConsumptionType(consumeType) && token.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
+            if (tokenStack.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
             {
                 statusEffects.Add(statusEffect);
             }
@@ -128,17 +143,25 @@ public class StatusManager :
     #region Clear Tokens
     public void ClearTokens()
     {
-        m_Tokens.Clear();
+        m_TokenStacks.Clear();
     }
 
-    public void ClearTokens(ConsumeType consumeType)
+    public void ClearTokens(TokenConsumptionType consumeType)
     {
-        m_Tokens = m_Tokens.Where(token =>
+        IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values;
+
+        foreach (TokenStack tokenStack in tokenStacks)
         {
-            var isConsumed = token.ContainsConsumptionType(consumeType);
-            if (isConsumed) OnRemove?.Invoke(token);
-            return !isConsumed;
-        }).ToList();
+            if (tokenStack.ContainsConsumptionType(consumeType))
+            {
+                tokenStack.ConsumeToken();
+                if (tokenStack.IsEmpty)
+                {
+                    m_TokenStacks.Remove(tokenStack.Id);
+                    // OnRemove?.Invoke(tokenStack);
+                }       
+            }
+        }
     }
     #endregion
 
@@ -147,15 +170,9 @@ public class StatusManager :
     {
         float totalFlatStatChange = 0;
 
-        foreach (Token token in m_Tokens)
+        foreach (TokenStack tokenStack in m_TokenStacks.Values)
         {
-            totalFlatStatChange += token.GetFlatStatChange(statType);
-        }
-
-        foreach (StatusEffect statusEffect in m_StatusEffects.Values)
-        {
-            if (!statusEffect.IsDepleted)
-                totalFlatStatChange += statusEffect.GetFlatStatChange(statType);
+            totalFlatStatChange += tokenStack.GetFlatStatChange(statType);
         }
 
         return totalFlatStatChange;
@@ -165,15 +182,9 @@ public class StatusManager :
     {
         float totalFlatStatChange = 1;
 
-        foreach (Token token in m_Tokens)
+        foreach (TokenStack tokenStack in m_TokenStacks.Values)
         {
-            totalFlatStatChange *= token.GetMultStatChange(statType);
-        }
-
-        foreach (StatusEffect statusEffect in m_StatusEffects.Values)
-        {
-            if (!statusEffect.IsDepleted)
-                totalFlatStatChange *= statusEffect.GetMultStatChange(statType);
+            totalFlatStatChange *= tokenStack.GetMultStatChange(statType);
         }
 
         return totalFlatStatChange;
@@ -183,14 +194,31 @@ public class StatusManager :
     #region Special Handle
     public bool IsTaunted(out Unit forceTarget)
     {
-
+        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        {
+            if (tokenStack.TokenType == TokenType.TAUNT)
+            {
+                forceTarget = ((TauntTokenStack) tokenStack).TauntedUnit;
+                if (forceTarget == null || forceTarget.IsDead)
+                    return false;
+                return true;
+            }
+        }
+        forceTarget = null;
+        return false;
     }
 
     public float GetCritAmount()
     {
-
+        float finalCritProportion = 1f;
+        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        {
+            finalCritProportion *= tokenStack.GetFinalCritProportion();
+        }
+        return finalCritProportion;
     }
 
+    /*
     public float GetLifestealAmount(float dealtDamageThisTurn)
     {
 
@@ -200,5 +228,6 @@ public class StatusManager :
     {
         
     }
+    */
     #endregion
 }

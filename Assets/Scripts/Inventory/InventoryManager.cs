@@ -5,7 +5,7 @@ public class WeaponStack
 {
     public int m_OwnedStack;
     public int m_NumEquipped;
-    public WeaponSO m_Weapon;
+    public WeaponInstanceSO m_Weapon;
 
     public WeaponStackSaveData Serialize()
     {
@@ -42,7 +42,7 @@ public class InventoryManager : Singleton<InventoryManager>
 
     }
 
-    public void ObtainWeapon(WeaponSO weaponSO)
+    public void ObtainWeapon(WeaponInstanceSO weaponSO)
     {
 
     }

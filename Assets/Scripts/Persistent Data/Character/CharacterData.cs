@@ -40,7 +40,7 @@ public class CharacterData
     /// <summary>
     /// Note: This can be null. If so, it uses the base weapons
     /// </summary>
-    public WeaponSO m_CurrEquippedWeapon;
+    public WeaponInstanceSO m_CurrEquippedWeapon;
 
     public CharacterBattleData GetBattleData()
     {
@@ -60,9 +60,9 @@ public struct CharacterBattleData
     public Stats m_CurrStats;
     public ClassSO m_ClassSO;
 
-    public WeaponSO m_CurrEquippedWeapon;
+    public WeaponInstanceSO m_CurrEquippedWeapon;
 
-    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO, WeaponSO currEquippedWeapon)
+    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO, WeaponInstanceSO currEquippedWeapon)
     {
         m_BaseData = baseData;
         m_CurrStats = currStats;

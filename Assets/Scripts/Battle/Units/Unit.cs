@@ -84,7 +84,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     public virtual UnitAllegiance UnitAllegiance => UnitAllegiance.NONE;
     #endregion
 
-    private WeaponSO m_EquippedWeapon;
+    private WeaponInstanceSO m_EquippedWeapon;
     private WeaponModel weaponModel;
 
     #region Initialisation
@@ -104,7 +104,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     /// </summary>
     /// <param name="unitModelData"></param>
     /// <param name="weaponSO"></param>
-    private void InstantiateModel(UnitModelData unitModelData, WeaponSO weaponSO)
+    private void InstantiateModel(UnitModelData unitModelData, WeaponInstanceSO weaponSO)
     {
         GameObject model = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, this.transform);
         EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
@@ -242,12 +242,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
     }
     */
 
-    public void ClearTokens(ConsumeType consumeType)
+    public void ClearTokens(TokenConsumptionType consumeType)
     {
         m_StatusManager.ClearTokens(consumeType);
     }
 
-    public List<StatusEffect> GetInflictedStatusEffects(ConsumeType consumeType)
+    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
     {
         return m_StatusManager.GetInflictedStatusEffects(consumeType);
     }
@@ -358,9 +358,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
         List<StatusEffect> inflictedStatusEffects = new();
         
         if (attackSO.IsPhysicalAttack)
-            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_PHYS_ATTACK));
+            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK));
         else if (attackSO.IsMagicAttack)
-            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(ConsumeType.CONSUME_ON_MAG_ATTACK));
+            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(TokenConsumptionType.CONSUME_ON_MAG_ATTACK));
 
         if (attackSO.ContainsSkillType(SkillEffectType.DEALS_STATUS_OR_TOKENS))
             inflictedStatusEffects.AddRange(attackSO.m_InflictedStatusEffects.Select(x => new StatusEffect(x.m_StatusEffect, x.m_Stack)));
@@ -375,7 +375,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             if (attackSO.DealsDamage)
             {
                 target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-                target.ClearTokens(attackSO.IsMagic ? ConsumeType.CONSUME_ON_MAG_DEFEND : ConsumeType.CONSUME_ON_PHYS_DEFEND);
+                target.ClearTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
             else if (attackSO.ContainsSkillType(SkillEffectType.HEAL))
                 target.Heal(attackSO.m_HealAmount);
@@ -391,9 +391,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IStatChange
             AlterMana(- ((MagicActiveSkillSO) attackSO).m_ConsumedManaAmount);
 
         if (attackSO.IsMagicAttack)
-            ClearTokens(ConsumeType.CONSUME_ON_MAG_ATTACK);
+            ClearTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
         else if (attackSO.IsPhysicalAttack)
-            ClearTokens(ConsumeType.CONSUME_ON_PHYS_ATTACK);
+            ClearTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK);
 
         void CompleteAttackAnimationEvent()
         {
