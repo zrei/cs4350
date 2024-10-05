@@ -42,7 +42,7 @@ namespace Game.UI
             Show();
         }
 
-        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        private void OnBattleEnd(UnitAllegiance _, int _2)
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
 

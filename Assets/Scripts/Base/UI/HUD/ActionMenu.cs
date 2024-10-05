@@ -91,7 +91,7 @@ namespace Game.UI
             BindButtonEvents();
         }
         
-        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        private void OnBattleEnd(UnitAllegiance _, int _2)
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;

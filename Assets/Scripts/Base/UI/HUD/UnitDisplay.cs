@@ -107,7 +107,7 @@ namespace Game.UI
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         }
 
-        private void OnBattleEnd(UnitAllegiance unitAllegiance)
+        private void OnBattleEnd(UnitAllegiance _, int _2)
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;

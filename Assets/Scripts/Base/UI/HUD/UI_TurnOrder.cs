@@ -29,7 +29,7 @@ public class UI_TurnOrder : MonoBehaviour
         m_TurnOrderText.text = stringBuilder.ToString();
     }
 
-    private void OnBattleEnd(UnitAllegiance _)
+    private void OnBattleEnd(UnitAllegiance _, int _2)
     {
         gameObject.SetActive(false);
     }

@@ -20,7 +20,7 @@ public class UI_BattleResult : MonoBehaviour
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
     }
 
-    private void OnBattleEnd(UnitAllegiance victor)
+    private void OnBattleEnd(UnitAllegiance victor, int numTurns)
     {
         m_ResultText.gameObject.SetActive(true);
         m_ResultText.text = victor switch
