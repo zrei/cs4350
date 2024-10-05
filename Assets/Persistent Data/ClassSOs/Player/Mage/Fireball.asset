@@ -13,11 +13,15 @@ MonoBehaviour:
   m_Name: Fireball
   m_EditorClassIdentifier: 
   m_SkillName: Fireball
-  m_Description: 
+  m_Description: 'Apply on target:
+
+    3x Burn (3 DMG per turn)'
   m_Icon: {fileID: 21300000, guid: 7abd5aa9917f76e42b6611ede80d2858, type: 3}
-  m_SkillTypes: 00000000
+  m_SkillTypes: 0000000001000000
   m_InflictedTokens: []
-  m_InflictedStatusEffects: []
+  m_InflictedStatusEffects:
+  - m_StatusEffect: {fileID: 11400000, guid: 3d259974e2d581d48b8bc8e5897abdf3, type: 2}
+    m_Stack: 3
   m_DamageModifier: 1
   m_HealAmount: 1
   m_DelayResponseAnimationTime: 0.2
@@ -28,6 +32,5 @@ MonoBehaviour:
   m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
-  - {fileID: 11400000, guid: 9cceed499ff45954c93f9eff929550ab, type: 2}
   m_TargetSquares: []
   m_ConsumedManaAmount: 2

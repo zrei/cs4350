@@ -15,6 +15,7 @@ public class EnemyTurnManager : TurnManager
         if (m_CurrUnit.IsDead)
         {
             GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(m_CurrUnit);
+            CompleteTurn();
             return;
         }
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();

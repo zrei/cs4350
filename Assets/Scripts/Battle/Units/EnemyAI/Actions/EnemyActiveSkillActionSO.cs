@@ -25,6 +25,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             return true;
 
         m_PossibleAttackPositions = new();
+        m_PossibleAttackPositionsIgnoreOccupied = new();
         bool hasPossibleAttackPosition = false;
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
