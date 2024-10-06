@@ -11,6 +11,9 @@ public struct CharacterSaveData
     public int m_CurrExp;
     public Stats m_CurrStats;
     public StatProgress m_CurrStatProgress;
+    /// <summary>
+    /// If null, the character has no weapon equipped and will use the default weapon
+    /// </summary>
     public int? m_CurrEquippedWeaponId;
 
     public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int? currEquippedWeaponId = null)
@@ -21,7 +24,7 @@ public struct CharacterSaveData
         m_CurrExp = currExp;
         m_CurrStats = currStats;
         m_CurrStatProgress = currStatProgress;
-        m_CurrEquippedWeaponId = null;
+        m_CurrEquippedWeaponId = currEquippedWeaponId;
     }
 }
 

@@ -21,9 +21,3 @@ public class CharacterSO : ScriptableObject
         return m_Race.GetUnitModelData(m_Gender, outfitType);
     }
 }
-
-public enum Gender
-{
-    MALE,
-    FEMALE
-}

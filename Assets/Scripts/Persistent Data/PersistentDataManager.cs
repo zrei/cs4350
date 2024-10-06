@@ -49,7 +49,8 @@ public class PersistentDataManager : Singleton<PersistentDataManager>
 
         foreach (CharacterSaveData data in characterSaveData)
         {
-            CharacterData persistentData = new() {m_BaseData = m_CharacterSOs[data.m_CharacterId], m_CurrClass = m_ClassSOs[data.m_ClassId], m_CurrExp = data.m_CurrExp, m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
+            CharacterData persistentData = new() {m_BaseData = m_CharacterSOs[data.m_CharacterId], m_CurrClass = m_ClassSOs[data.m_ClassId], m_CurrExp = data.m_CurrExp,
+                m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
             m_PersistentData.Add(persistentData.Id, persistentData);
         }
     }
