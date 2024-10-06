@@ -16,7 +16,7 @@ public static class GlobalEvents {
         public delegate void UnitEvent(Unit _);
         public delegate void TurnOrderEvent(List<Unit> _);
         public delegate void PhaseEvent(PlayerTurnState _);
-        public delegate void UnitAllegianceEvent(UnitAllegiance _);
+        public delegate void BattleOutcomeEvent(UnitAllegiance _, int numTurns);
         public delegate void AttackEvent(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target);
         public static UnitEvent UnitDefeatedEvent;
         public static TurnOrderEvent TurnOrderUpdatedEvent;
@@ -25,7 +25,7 @@ public static class GlobalEvents {
         public static VoidEvent PlayerUnitSetupEndEvent;
         public static VoidEvent PlayerTurnStartEvent;
         public static VoidEvent EnemyTurnStartEvent;
-        public static UnitAllegianceEvent BattleEndEvent;
+        public static BattleOutcomeEvent BattleEndEvent;
         public static UnitEvent PreviewUnitEvent;
         public static UnitEvent PreviewCurrentUnitEvent;
         public static AttackEvent AttackAnimationEvent; 

@@ -8,9 +8,12 @@ public class TurnQueue
     #region Configuration
     private const float DISTANCE_THRESHOLD = 50f;
     private const float TICK_AMOUNT = 0.1f;
+    private const float TIME_PER_CYCLE = 10f;
     #endregion
 
     #region Turn
+    private float m_AccumulatedTime = 0;
+    
     private class TurnWrapper
     {
         public float m_TimeRemaining;
@@ -52,6 +55,7 @@ public class TurnQueue
         {
             readyUnit = m_Turns[0].m_Unit;
             m_Turns.RemoveAt(0);
+            Debug.Log("Current Accumulated Time: " + m_AccumulatedTime + " Cycle Count: " + GetCyclesElapsed());
             return true;
         }
         else
@@ -87,6 +91,7 @@ public class TurnQueue
 
     public void Clear()
     {
+        m_AccumulatedTime = 0;
         m_Turns.Clear();
     }
     #endregion
@@ -106,6 +111,7 @@ public class TurnQueue
         {
             turnWrapper.TickTime(tick);
         }
+        m_AccumulatedTime += tick;
     }
 
     #region Helper
@@ -130,6 +136,11 @@ public class TurnQueue
         List<Unit> units = new() {};
         m_Turns.ForEach(x => units.Add(x.m_Unit));
         return units;
+    }
+    
+    public int GetCyclesElapsed()
+    {
+        return Mathf.FloorToInt(m_AccumulatedTime / TIME_PER_CYCLE);
     }
     #endregion
 }

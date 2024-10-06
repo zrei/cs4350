@@ -208,7 +208,7 @@ public class BattleManager : Singleton<BattleManager>
     {
         m_WithinBattle = false;
         Logger.Log(this.GetType().Name, $"Side that has won: {victoriousSide}", LogLevel.LOG);
-        GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide);
+        GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide, m_TurnQueue.GetCyclesElapsed());
     }
     #endregion
 

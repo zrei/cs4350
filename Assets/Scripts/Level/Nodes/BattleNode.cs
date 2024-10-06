@@ -15,7 +15,7 @@ public class BattleNode : NodeInternal
         GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
     }
 
-    private void OnBattleEnd(UnitAllegiance victor)
+    private void OnBattleEnd(UnitAllegiance victor, int numTurns)
     {
         // Save the battle result
         m_Victor = victor;
