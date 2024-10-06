@@ -38,7 +38,6 @@ public class BattleManager : Singleton<BattleManager>
     private HashSet<Unit> m_PlayerUnits = new HashSet<Unit>();
 
     private const float DELAY_TILL_NEXT_TURN = 0.3f;
-    private int m_NumTurns;
     #endregion
 
     #region State
@@ -97,7 +96,6 @@ public class BattleManager : Singleton<BattleManager>
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
         m_PlayerUnits.Clear();
-        m_NumTurns = 0;
 
         InstantiateBiome(mapBiome);
         StartCoroutine(BattleInitialise(battleSO, playerUnitData));
@@ -210,7 +208,7 @@ public class BattleManager : Singleton<BattleManager>
     {
         m_WithinBattle = false;
         Logger.Log(this.GetType().Name, $"Side that has won: {victoriousSide}", LogLevel.LOG);
-        GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide, m_NumTurns);
+        GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide, m_TurnQueue.GetCyclesElapsed());
     }
     #endregion
 
@@ -280,7 +278,6 @@ public class BattleManager : Singleton<BattleManager>
         if (m_TurnQueue.TryGetReadyUnit(out Unit readyUnit))
         {
             m_BattleTick = false;
-            m_NumTurns += 1;
             StartTurn(readyUnit);
             return;
         }
