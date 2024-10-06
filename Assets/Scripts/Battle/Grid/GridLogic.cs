@@ -383,6 +383,15 @@ public class GridLogic : MonoBehaviour
         attacker.PostSkillEvent += CompleteSkill;
         attacker.PerformSkill(activeSkill, targets);
 
+        if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))
+        {
+            foreach (EnemyUnitPlacement enemyUnitPlacement in activeSkill.m_Summons)
+            {
+                if (!IsTileOccupied(enemyUnitPlacement.m_Coordinates))
+                    BattleManager.Instance.InstantiateEnemyUnit(enemyUnitPlacement);
+            }
+        }
+
         void CompleteSkill()
         {
             attacker.PostSkillEvent -= CompleteSkill;

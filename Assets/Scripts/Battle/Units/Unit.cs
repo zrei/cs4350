@@ -167,6 +167,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public void TakeDamage(float damage)
     {
+        // if ()
         Logger.Log(this.GetType().Name, $"Unit {name} took {damage} damage", name, this.gameObject, LogLevel.LOG);
         var value = Mathf.Max(0f, m_CurrHealth - damage);
         var change = value - m_CurrHealth;
@@ -186,7 +187,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
         void FinishMovement()
         {
-            ClearTokens(TokenConsumptionType.CONSUME_ON_MOVE);
+            ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
         }
@@ -244,9 +245,14 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     }
     */
 
-    public void ClearTokens(TokenConsumptionType consumeType)
+    public void ConsumeTokens(TokenConsumptionType consumeType)
     {
-        m_StatusManager.ClearTokens(consumeType);
+        m_StatusManager.ConsumeTokens(consumeType);
+    }
+
+    public void ConsumeTokens(TokenType tokenType)
+    {
+        m_StatusManager.ConsumeTokens(tokenType);
     }
 
     public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
@@ -322,6 +328,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public bool IsTaunted(out Unit forceTarget)
     {
         return m_StatusManager.IsTaunted(out forceTarget);
+    }
+
+    public bool CanEvade()
+    {
+        return m_StatusManager.CanEvade();
     }
     #endregion
 
@@ -399,16 +410,31 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
         GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
 
+        bool isOpposingSideTarget = attackSO.IsOpposingSideTarget;
+
         foreach (Unit target in targets)
         {
+            // completely evade the effects // TODO: This does not handle animations
+            if (isOpposingSideTarget && target.CanEvade())
+            {
+                target.ConsumeTokens(TokenType.EVADE);
+                continue;
+            }
+
             if (attackSO.DealsDamage)
             {
                 target.TakeDamage(DamageCalc.CalculateDamage(this, target, attackSO));
-                target.ClearTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
+                target.ConsumeTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
-            else if (attackSO.ContainsSkillType(SkillEffectType.HEAL))
+            
+            if (attackSO.ContainsSkillType(SkillEffectType.HEAL))
             {
                 target.Heal(DamageCalc.CalculateHealAmount(this, attackSO));
+            }
+
+            if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
+            {
+                target.AlterMana(attackSO.m_ManaAlterAmount);
             }
             
             if (!target.IsDead)
@@ -421,12 +447,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         AlterMana(-attackSO.m_ConsumedMana);
 
         if (attackSO.IsMagicAttack)
-            ClearTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
+            ConsumeTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
         else if (attackSO.IsPhysicalAttack)
-            ClearTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK);
+            ConsumeTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK);
 
         if (attackSO.IsHeal)
-            ClearTokens(TokenConsumptionType.CONSUME_ON_HEAL);
+            ConsumeTokens(TokenConsumptionType.CONSUME_ON_HEAL);
 
         void CompleteAttackAnimationEvent()
         {

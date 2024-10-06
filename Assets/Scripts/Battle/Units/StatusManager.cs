@@ -161,13 +161,31 @@ public class StatusManager :
         m_TokenStacks.Clear();
     }
 
-    public void ClearTokens(TokenConsumptionType consumeType)
+    public void ConsumeTokens(TokenConsumptionType consumeType)
     {
         IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values.ToList();
 
         foreach (TokenStack tokenStack in tokenStacks)
         {
             if (tokenStack.ContainsConsumptionType(consumeType))
+            {
+                tokenStack.ConsumeToken();
+                if (tokenStack.IsEmpty)
+                {
+                    m_TokenStacks.Remove(tokenStack.Id);
+                    // OnRemove?.Invoke(tokenStack);
+                }       
+            }
+        }
+    }
+
+    public void ConsumeTokens(TokenType tokenType)
+    {
+        IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values.ToList();
+
+        foreach (TokenStack tokenStack in tokenStacks)
+        {
+            if (tokenStack.TokenType == tokenType)
             {
                 tokenStack.ConsumeToken();
                 if (tokenStack.IsEmpty)
@@ -222,6 +240,11 @@ public class StatusManager :
         }
         forceTarget = null;
         return false;
+    }
+
+    public bool CanEvade()
+    {
+        return HasTokenType(TokenType.EVADE);
     }
 
     public float GetCritAmount()

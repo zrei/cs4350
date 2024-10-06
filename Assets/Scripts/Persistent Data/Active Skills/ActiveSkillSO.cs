@@ -46,8 +46,12 @@ public class ActiveSkillSO : ScriptableObject
     public float m_HealProportion = 1f;
 
     [Space]
+    [Tooltip("Determines the amount of mana to add to the target - only used if skill alters mana")]
+    public float m_ManaAlterAmount = 0f;
+
+    [Space]
     [Tooltip("Adds to summon upon attack - only used if skill summons")]
-    public List<EnemyCharacterSO> m_Summons;
+    public List<EnemyUnitPlacement> m_Summons;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
