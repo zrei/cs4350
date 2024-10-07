@@ -3,6 +3,7 @@
 [CreateAssetMenu(fileName = "EnemyCharacterSO", menuName = "ScriptableObject/Battle/Enemy/EnemyCharacterSO")]
 public class EnemyCharacterSO : CharacterSO
 {
+    [Header("Enemy-only details")]
     public EnemyClassSO m_EnemyClass;
     [Tooltip("Stats")]
     public Stats m_Stats;

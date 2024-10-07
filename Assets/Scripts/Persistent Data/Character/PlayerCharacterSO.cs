@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName="PlayerCharacterSO", menuName="ScriptableObject/Characters/PlayerCharacterSO")]
 public class PlayerCharacterSO : CharacterSO
 {
+    [Header("Player-only details")]
     public int m_Id;
     public PlayerClassSO m_StartingClass;
     public int m_StartingLevel;
