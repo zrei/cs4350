@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyActionSetSO", menuName = "ScriptableObject/Battle/EnemyAI/EnemyActionSetSO")]
+[CreateAssetMenu(fileName = "EnemyActionSetSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/EnemyActionSetSO")]
 public class EnemyActionSetSO : ScriptableObject
 {
     // calculation has been shifted to enemy unit for runtime construction of actions sorted by priority
