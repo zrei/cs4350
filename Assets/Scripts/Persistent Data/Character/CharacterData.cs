@@ -40,11 +40,11 @@ public class CharacterData
     /// <summary>
     /// Note: This can be null. If so, it uses the base weapons
     /// </summary>
-    public WeaponInstanceSO m_CurrEquippedWeapon;
+    public int? m_CurrEquippedWeaponId;
 
     public CharacterBattleData GetBattleData()
     {
-        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, m_CurrEquippedWeapon ?? m_CurrClass.DefaultWeapon);
+        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, !m_CurrEquippedWeaponId.HasValue ? m_CurrClass.DefaultWeapon : InventoryManager.Instance.RetrieveWeapon(m_CurrEquippedWeaponId.Value));
     }
 }
 
