@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/EnemyAI/Actions/EnemyMoveActionSO")]
+[CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyMoveActionSO")]
 public class EnemyMoveActionSO : EnemyActionSO
 {
     public List<EnemyTileCondition> m_TargetConditions;

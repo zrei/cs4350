@@ -7,7 +7,6 @@ public struct EnemyUnitPlacement
     public CoordPair m_Coordinates;
     public EnemyCharacterSO m_EnemyCharacterData;
     public Stats m_StatAugments;
-    public EnemyActionSetSO m_Actions;
 
     public UnitModelData GetUnitModelData()
     {
