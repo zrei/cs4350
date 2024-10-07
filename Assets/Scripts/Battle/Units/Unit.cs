@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -427,14 +426,14 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                 target.ConsumeTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
             
-            if (attackSO.ContainsSkillType(SkillEffectType.HEAL))
+            if (attackSO.IsHeal)
             {
                 target.Heal(DamageCalc.CalculateHealAmount(this, attackSO));
             }
 
             if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
             {
-                target.AlterMana(attackSO.m_ManaAlterAmount);
+                target.AlterMana(this.GetTotalStat(StatType.MAG_ATTACK) * attackSO.m_ManaAlterProportion);
             }
             
             if (!target.IsDead)
@@ -453,6 +452,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
         if (attackSO.IsHeal)
             ConsumeTokens(TokenConsumptionType.CONSUME_ON_HEAL);
+        
+        if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
+            ConsumeTokens(TokenConsumptionType.CONSUME_ON_MANA_ALTER);
 
         void CompleteAttackAnimationEvent()
         {

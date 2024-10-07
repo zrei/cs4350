@@ -46,8 +46,8 @@ public class ActiveSkillSO : ScriptableObject
     public float m_HealProportion = 1f;
 
     [Space]
-    [Tooltip("Determines the amount of mana to add to the target - only used if skill alters mana")]
-    public float m_ManaAlterAmount = 0f;
+    [Tooltip("Determines the proportion of mana to add to the target from magic attack - only used if skill alters mana")]
+    public float m_ManaAlterProportion = 0f;
 
     [Space]
     [Tooltip("Adds to summon upon attack - only used if skill summons")]
