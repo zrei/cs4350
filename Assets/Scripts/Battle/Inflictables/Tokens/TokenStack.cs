@@ -148,6 +148,30 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
             return 1f;
         }
     }
+
+    public float GetLifestealProportion()
+    {
+        if (TokenType == TokenType.LIFESTEAL)
+        {
+            return ((LifestealTokenTierSO) m_TokenTierData).GetLifestealProportion(GetMaxTier());
+        }
+        else
+        {
+            return 0f;
+        }
+    }
+
+    public float GetReflectProportion()
+    {
+        if (TokenType == TokenType.REFLECT)
+        {
+            return ((ReflectTokenTierSO) m_TokenTierData).GetReflectProportion(GetMaxTier());
+        }
+        else
+        {
+            return 0f;
+        }
+    }
 }
 
 public class TauntTokenStack : TokenStack
