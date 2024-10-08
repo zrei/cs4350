@@ -37,6 +37,6 @@ public class UI_BattleResult : MonoBehaviour
     {
         m_ResultText.gameObject.SetActive(false);
         m_ReturnButton.gameObject.SetActive(false);
-        GlobalEvents.Battle.ReturnFromBattleEvent?.Invoke();
+        GameSceneManager.Instance.UnloadBattleScene();
     }
 }

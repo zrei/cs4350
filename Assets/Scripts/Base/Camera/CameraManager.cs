@@ -16,13 +16,28 @@ namespace Game
         [SerializeField]
         private Camera attackAnimCamera;
 
-        [SerializeField]
-        private Camera levelCamera;
-
         public Camera MainCamera => mainCamera;
         public Camera HUDCamera => hudCamera;
         public Camera UICamera => uiCamera;
         public Camera AttackAnimCamera => attackAnimCamera;
-        public Camera LevelCamera => levelCamera;
+        
+        
+        [SerializeField] private Transform m_LevelCameraTransform;
+        [SerializeField] private Transform m_BattleCameraTransform;
+        
+        public void SetUpLevelCamera()
+        {
+            var mainCameraTransform = CameraManager.Instance.MainCamera.transform;
+            CameraManager.Instance.MainCamera.orthographic = true;
+            mainCameraTransform.position = m_LevelCameraTransform.position;
+            mainCameraTransform.rotation = m_LevelCameraTransform.rotation;
+        }
+
+        public void SetUpBattleCamera()
+        {
+            var mainCameraTransform = CameraManager.Instance.MainCamera.transform;
+            CameraManager.Instance.MainCamera.orthographic = false;
+            mainCameraTransform.position = m_BattleCameraTransform.position;
+        }
     }
 }

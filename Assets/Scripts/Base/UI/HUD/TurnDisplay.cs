@@ -31,6 +31,11 @@ namespace Game.UI
             canvasGroup.alpha = 0;
             isHidden = true;
 
+            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+        }
+
+        private void OnSceneLoad()
+        {
             GlobalEvents.Battle.PlayerUnitSetupEndEvent += OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         }
@@ -45,18 +50,27 @@ namespace Game.UI
         private void OnBattleEnd(UnitAllegiance _, int _2)
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            
+            // Clear leftover mapping
+            foreach (var display in mapping.Values)
+            {
+                Destroy(display.gameObject);
+            }
+            mapping.Clear();
 
             Hide();
         }
 
         private void OnDestroy()
         {
+            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
             GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         }
 
         public TurnDisplayUnit InstantiateTurnDisplayUnit(Unit unit)
         {
+            Debug.Log("Instantiating turn display unit for " + unit.name);
             if (prefab == null)
             {
                 prefab = Addressables

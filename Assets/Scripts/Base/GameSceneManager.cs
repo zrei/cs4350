@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Game;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,67 +14,85 @@ public class GameSceneManager : Singleton<GameSceneManager>
     
     const int BATTLE_SCENE_INDEX = 1;
     
+    #region Temporary Scene Data
+    
+    // Battle
+    private BattleSO m_CurrentBattle;
+    private List<CharacterBattleData> m_UnitBattleData;
+    private GameObject m_MapBiome;
+    
+    #endregion
+    
     #region Scene Management
 
     public void LoadBattleScene(BattleSO battleSo, List<CharacterBattleData> unitBattleData, GameObject mapBiome)
     {
+        m_CurrentBattle = battleSo;
+        m_UnitBattleData = unitBattleData;
+        m_MapBiome = mapBiome;
+        
         // Set up the callback to initialize battle parameters for when the battle scene is loaded
-        GlobalEvents.Scene.BattleSceneLoadedEvent = OnBattleSceneLoaded(battleSo, unitBattleData, mapBiome);
+        GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
         
         // Load the battle scene
-        StartCoroutine(LoadSceneWithTransition(BATTLE_SCENE_INDEX));
+        StartCoroutine(LoadBattleSceneWithTransition());
     }
     
     public void UnloadBattleScene()
     {
-        // Clear the callback
-        GlobalEvents.Scene.BattleSceneLoadedEvent = null;
-        
         // Unload the battle scene
-        StartCoroutine(UnloadSceneWithTransition(BATTLE_SCENE_INDEX));
+        StartCoroutine(UnloadBattleSceneWithTransition());
     }
 
     #endregion
 
     #region Callbacks
 
-    private GlobalEvents.Scene.BattleManagerEvent OnBattleSceneLoaded(
-        BattleSO battleSo, List<CharacterBattleData> unitBattleData, GameObject mapBiome)
+    private void OnBattleSceneLoaded()
     {
-        return manager =>
-        {
-            Debug.Log("Battle scene loaded. Initialising battle.");
-            manager.InitialiseBattle(battleSo, unitBattleData, mapBiome);
-        };
+        GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
+        
+        Debug.Log("Battle scene loaded. Initialising battle.");
+        BattleManager.Instance.InitialiseBattle(m_CurrentBattle, m_UnitBattleData, m_MapBiome);
+        
+        m_CurrentBattle = null;
+        m_UnitBattleData = null;
+        m_MapBiome = null;
     }
     #endregion
 
     #region Transition
 
-    IEnumerator LoadSceneWithTransition(int levelIndex)
+    IEnumerator LoadBattleSceneWithTransition()
     {
         m_Transition.SetTrigger("Start");
         
         yield return new WaitForSeconds(m_TransitionTime);
         
-        SceneManager.LoadSceneAsync(levelIndex, LoadSceneMode.Additive);
+        SceneManager.LoadSceneAsync(BATTLE_SCENE_INDEX, LoadSceneMode.Additive);
+        
+        CameraManager.Instance.SetUpBattleCamera();
         
         m_Transition.SetTrigger("End");
         
         yield return new WaitForSeconds(m_TransitionTime);
     }
     
-    IEnumerator UnloadSceneWithTransition(int levelIndex)
+    IEnumerator UnloadBattleSceneWithTransition()
     {
         m_Transition.SetTrigger("Start");
         
         yield return new WaitForSeconds(m_TransitionTime);
         
-        SceneManager.UnloadSceneAsync(levelIndex);
+        CameraManager.Instance.SetUpLevelCamera();
+        
+        SceneManager.UnloadSceneAsync(BATTLE_SCENE_INDEX);
         
         m_Transition.SetTrigger("End");
         
         yield return new WaitForSeconds(m_TransitionTime);
+        
+        GlobalEvents.Battle.ReturnFromBattleEvent?.Invoke();
     }
 
     #endregion

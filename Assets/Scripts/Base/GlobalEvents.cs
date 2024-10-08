@@ -64,7 +64,6 @@ public static class GlobalEvents {
 
     public static class Scene
     {
-        public delegate void BattleManagerEvent(BattleManager _);
-        public static BattleManagerEvent BattleSceneLoadedEvent;
+        public static VoidEvent BattleSceneLoadedEvent;
     }
 }

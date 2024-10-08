@@ -62,6 +62,11 @@ public class EnemyActionForecastDisplay : MonoBehaviour
         canvasGroup.alpha = 0;
         isHidden = true;
 
+        GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+    }
+
+    private void OnSceneLoad()
+    {
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
     }
 
@@ -75,6 +80,7 @@ public class EnemyActionForecastDisplay : MonoBehaviour
 
     private void OnDestroy()
     {
+        GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
     }
 

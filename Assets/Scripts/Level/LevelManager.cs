@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Game;
 using Game.Input;
 using UnityEngine;
 
@@ -67,6 +68,8 @@ public class LevelManager : MonoBehaviour
         Initialise();
         
         StartPlayerPhase();
+        
+        CameraManager.Instance.SetUpLevelCamera();
     }
 
     public void OnDisable()
@@ -358,9 +361,6 @@ public class LevelManager : MonoBehaviour
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor)
     {
         Debug.Log("LevelManager: Ending Battle Node");
-        
-        GameSceneManager.Instance.UnloadBattleScene();
-        m_LevelCamera.gameObject.SetActive(true);
         
         if (victor == UnitAllegiance.PLAYER)
         {
