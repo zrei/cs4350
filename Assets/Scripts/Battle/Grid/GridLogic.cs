@@ -385,10 +385,13 @@ public class GridLogic : MonoBehaviour
 
         if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))
         {
-            foreach (EnemyUnitPlacement enemyUnitPlacement in activeSkill.m_Summons)
+            foreach (SummonWrapper summon in activeSkill.m_Summons)
             {
-                if (!IsTileOccupied(enemyUnitPlacement.m_Coordinates))
-                    BattleManager.Instance.InstantiateEnemyUnit(enemyUnitPlacement);
+                List<CoordPair> summonPositions = GetSummonPositions(summon.m_PrioritsePositions, summon.m_PrioritisedRows, summon.m_PrioritisedCols, summon.m_Adds.Count);
+                for (int i = 0; i < summonPositions.Count; ++i)
+                {
+                    BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments});
+                }
             }
         }
 
@@ -413,11 +416,11 @@ public class GridLogic : MonoBehaviour
     }
     #endregion
 
-    private List<CoordPair> GetSummonPositions(List<int> prioritisedRows, List<int> prioritisedCols, int numUnits)
+    private List<CoordPair> GetSummonPositions(bool willPrioritse, List<int> prioritisedRows, List<int> prioritisedCols, int numUnits)
     {
         HashSet<CoordPair> possibleTiles = new();
 
-        if (prioritisedCols.Count == 0 && prioritisedRows.Count == 0)
+        if (willPrioritse)
         {
             for (int r = 0; r < MapData.NUM_ROWS; ++r)
             {
@@ -452,11 +455,17 @@ public class GridLogic : MonoBehaviour
             }
         }
 
+        List<CoordPair> possibleTileList = possibleTiles.ToList();
         List<CoordPair> spawnTiles = new();
 
         for (int i = 0; i < numUnits; ++i)
         {
+            if (possibleTileList.Count == 0)
+                break;
 
+            int index = UnityEngine.Random.Range(0, possibleTileList.Count - 1);
+            spawnTiles.Add(possibleTileList[index]);
+            possibleTileList.RemoveAt(index);
         }
 
         return spawnTiles;

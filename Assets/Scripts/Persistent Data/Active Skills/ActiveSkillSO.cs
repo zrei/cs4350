@@ -153,6 +153,7 @@ public class ActiveSkillSO : ScriptableObject
 
 public struct SummonWrapper
 {
+    public bool m_PrioritsePositions;
     public List<int> m_PrioritisedRows;
     public List<int> m_PrioritisedCols;
 
