@@ -151,6 +151,7 @@ public class ActiveSkillSO : ScriptableObject
 #endif
 }
 
+[System.Serializable]
 public struct SummonWrapper
 {
     public bool m_PrioritsePositions;
@@ -160,6 +161,7 @@ public struct SummonWrapper
     public List<Adds> m_Adds;
 }
 
+[System.Serializable]
 public struct Adds
 {
     public EnemyCharacterSO m_EnemyCharacterSO;

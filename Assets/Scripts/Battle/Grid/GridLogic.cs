@@ -390,6 +390,7 @@ public class GridLogic : MonoBehaviour
                 List<CoordPair> summonPositions = GetSummonPositions(summon.m_PrioritsePositions, summon.m_PrioritisedRows, summon.m_PrioritisedCols, summon.m_Adds.Count);
                 for (int i = 0; i < summonPositions.Count; ++i)
                 {
+                    // TODO: Possible animation delay
                     BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments});
                 }
             }
@@ -416,11 +417,12 @@ public class GridLogic : MonoBehaviour
     }
     #endregion
 
+    #region Summon Helper
     private List<CoordPair> GetSummonPositions(bool willPrioritse, List<int> prioritisedRows, List<int> prioritisedCols, int numUnits)
     {
         HashSet<CoordPair> possibleTiles = new();
 
-        if (willPrioritse)
+        if (!willPrioritse)
         {
             for (int r = 0; r < MapData.NUM_ROWS; ++r)
             {
@@ -470,6 +472,7 @@ public class GridLogic : MonoBehaviour
 
         return spawnTiles;
     }
+    #endregion
 }
 
 public static class GridHelper
