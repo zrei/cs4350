@@ -412,6 +412,55 @@ public class GridLogic : MonoBehaviour
         
     }
     #endregion
+
+    private List<CoordPair> GetSummonPositions(List<int> prioritisedRows, List<int> prioritisedCols, int numUnits)
+    {
+        HashSet<CoordPair> possibleTiles = new();
+
+        if (prioritisedCols.Count == 0 && prioritisedRows.Count == 0)
+        {
+            for (int r = 0; r < MapData.NUM_ROWS; ++r)
+            {
+                for (int c = 0; c < MapData.NUM_COLS; ++c)
+                {
+                    CoordPair tile = new CoordPair(r, c);
+                    if (!IsTileOccupied(tile))
+                        possibleTiles.Add(new CoordPair(r, c));
+                }
+            }
+        }
+        else
+        {
+            foreach (int row in prioritisedRows)
+            {
+                for (int c = 0; c < MapData.NUM_COLS; ++c)
+                {
+                    CoordPair tile = new CoordPair(row, c);
+                    if (!possibleTiles.Contains(tile) && !IsTileOccupied(tile))
+                        possibleTiles.Add(tile);
+                }
+            }
+
+            foreach (int col in prioritisedCols)
+            {
+                for (int r = 0; r < MapData.NUM_ROWS; ++r)
+                {
+                    CoordPair tile = new CoordPair(r, col);
+                    if (!possibleTiles.Contains(tile) && !IsTileOccupied(tile))
+                        possibleTiles.Add(tile);
+                }
+            }
+        }
+
+        List<CoordPair> spawnTiles = new();
+
+        for (int i = 0; i < numUnits; ++i)
+        {
+
+        }
+
+        return spawnTiles;
+    }
 }
 
 public static class GridHelper
