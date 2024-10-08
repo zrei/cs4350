@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PersistentDataManager : Singleton<PersistentDataManager>
 {
-    [SerializeField] private List<CharacterSO> m_CharacterSOs;
-    [SerializeField] private List<ClassSO> m_ClassSOs;
+    [SerializeField] private List<PlayerCharacterSO> m_CharacterSOs;
+    [SerializeField] private List<PlayerClassSO> m_ClassSOs;
 
-    private Dictionary<int, CharacterSO> m_CharacterSOsMap;
-    private Dictionary<int, ClassSO> m_ClassSOsMap;
+    private Dictionary<int, PlayerCharacterSO> m_CharacterSOsMap;
+    private Dictionary<int, PlayerClassSO> m_ClassSOsMap;
 
     // mapping character IDs to their data?
     private Dictionary<int, CharacterData> m_PersistentData;

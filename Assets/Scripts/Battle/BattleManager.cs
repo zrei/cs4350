@@ -141,7 +141,7 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="unitPlacement"></param>
     /// <param name="gridType"></param>
-    private void InstantiateEnemyUnit(EnemyUnitPlacement unitPlacement)
+    public void InstantiateEnemyUnit(EnemyUnitPlacement unitPlacement)
     {
         EnemyUnit enemyUnit = Instantiate(m_EnemyUnit);
         enemyUnit.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData);

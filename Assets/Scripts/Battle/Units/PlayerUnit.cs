@@ -22,7 +22,7 @@ public class PlayerUnit : Unit
     #region Active Skills
     public List<ActiveSkillSO> GetAvailableActiveSkills()
     {
-        return m_Class.m_ActiveSkills.ToList();
+        return ((PlayerClassSO) m_Class).m_ActiveSkills.ToList();
     }
     #endregion
 }
