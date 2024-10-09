@@ -5,7 +5,7 @@ using System.Linq;
 public class CharacterDataManager : Singleton<CharacterDataManager>
 {
     // mapping character IDs to their data?
-    private readonly Dictionary<int, CharacterData> m_PersistentData = new();
+    private readonly Dictionary<int, CharacterData> m_CharacterData = new();
 
     protected override void HandleAwake()
     {
@@ -41,7 +41,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
     private void ParseSaveData(List<CharacterSaveData> characterSaveData)
     {
-        m_PersistentData.Clear();
+        m_CharacterData.Clear();
 
         foreach (CharacterSaveData data in characterSaveData)
         {
@@ -58,18 +58,18 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
             }
             CharacterData persistentData = new() {m_BaseData = chaacterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
                 m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
-            m_PersistentData.Add(persistentData.Id, persistentData);
+            m_CharacterData.Add(persistentData.Id, persistentData);
         }
     }
 
     public List<CharacterData> RetrieveAllCharacterData()
     {
-        return m_PersistentData.Values.ToList();
+        return m_CharacterData.Values.ToList();
     }
 
     public List<CharacterData> RetrieveCharacterData(List<int> IDs)
     {
-        return m_PersistentData.Values.Where(x => IDs.Contains(x.Id)).ToList();
+        return m_CharacterData.Values.Where(x => IDs.Contains(x.Id)).ToList();
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     {
         foreach (CharacterData data in updatedData)
         {
-            m_PersistentData[data.Id] = data;
+            m_CharacterData[data.Id] = data;
         }
     }
 }

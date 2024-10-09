@@ -15,7 +15,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
     
     #region Scene Management
 
-    public void LoadBattleScene(BattleSO battleSo, List<CharacterBattleData> unitBattleData, GameObject mapBiome)
+    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, GameObject mapBiome)
     {
         // Set up the callback to initialize battle parameters for when the battle scene is loaded
         GlobalEvents.Scene.BattleSceneLoadedEvent = OnBattleSceneLoaded(battleSo, unitBattleData, mapBiome);
@@ -38,7 +38,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
     #region Callbacks
 
     private GlobalEvents.Scene.BattleManagerEvent OnBattleSceneLoaded(
-        BattleSO battleSo, List<CharacterBattleData> unitBattleData, GameObject mapBiome)
+        BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, GameObject mapBiome)
     {
         return manager =>
         {

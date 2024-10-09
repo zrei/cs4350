@@ -12,7 +12,7 @@ public readonly struct LevelUpSummary
     public readonly Dictionary<StatType, int> m_TotalStatGrowths;
     public readonly Stats m_FinalStats;
 
-    public LevelUpSummary(CharacterData characterData, int initialLevel, 
+    public LevelUpSummary(PlayerCharacterData characterData, int initialLevel, 
         Dictionary<StatType, int> totalStatGrowths)
     {
         m_CharacterSO = characterData.m_BaseData;

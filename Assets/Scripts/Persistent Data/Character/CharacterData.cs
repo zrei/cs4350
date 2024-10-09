@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class CharacterData
+public class PlayerCharacterData
 {
     public PlayerCharacterSO m_BaseData;
     [HideInInspector]
@@ -38,19 +38,28 @@ public class CharacterData
     public Stats TotalBaseStats => m_CurrStats.FlatAugment(m_CurrClass.m_StatAugments);
 
     /// <summary>
-    /// Note: This can be null. If so, it uses the base weapons
+    /// Note: This can be null. If so, it uses the base weapons.
+    /// This is only a pointer since the weapon instance itself can change.
     /// </summary>
     public int? m_CurrEquippedWeaponId;
 
-    public CharacterBattleData GetBattleData()
+    public PlayerCharacterBattleData GetBattleData()
     {
-        return new CharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, !m_CurrEquippedWeaponId.HasValue ? m_CurrClass.DefaultWeapon : InventoryManager.Instance.RetrieveWeapon(m_CurrEquippedWeaponId.Value));
+        return new PlayerCharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, GetWeaponInstanceSO());
+    }
+
+    private WeaponInstanceSO GetWeaponInstanceSO()
+    {
+        if (!m_CurrEquippedWeaponId.HasValue || !InventoryManager.Instance.TryRetrieveWeapon(m_CurrEquippedWeaponId.Value, out WeaponInstanceSO weaponInstanceSO))
+            return m_CurrClass.DefaultWeapon;
+        else
+            return weaponInstanceSO;
     }
 }
 
 // TODO: This shouldn't be serializable once the data is being passed from level to battle
 [System.Serializable]
-public struct CharacterBattleData
+public struct PlayerCharacterBattleData
 {
     public PlayerCharacterSO m_BaseData;
 
@@ -62,7 +71,7 @@ public struct CharacterBattleData
 
     public WeaponInstanceSO m_CurrEquippedWeapon;
 
-    public CharacterBattleData(PlayerCharacterSO baseData, Stats currStats, PlayerClassSO classSO, WeaponInstanceSO currEquippedWeapon)
+    public PlayerCharacterBattleData(PlayerCharacterSO baseData, Stats currStats, PlayerClassSO classSO, WeaponInstanceSO currEquippedWeapon)
     {
         m_BaseData = baseData;
         m_CurrStats = currStats;

@@ -33,8 +33,9 @@ public struct CharacterSaveData
 /// </summary>
 public class SaveManager : Singleton<SaveManager>
 {
-    private const string UnitDataKey = "UnitData";
-    private const string InventoryDataKey = "InventoryData";
+    private const string UNIT_DATA_KEY = "UnitData";
+    private const string INVENTORY_DATA_KEY = "InventoryData";
+    private const string ITEM_SEPARATOR = "\t";
 
     protected override void HandleAwake()
     {
@@ -48,47 +49,44 @@ public class SaveManager : Singleton<SaveManager>
 
     public List<CharacterSaveData> LoadCharacterSaveData()
     {
-        string[] saveData = PlayerPrefs.GetString(UnitDataKey).Split("\t");
-        List<CharacterSaveData> characterData = new();
-        foreach (string data in saveData)
-        {
-            if (string.IsNullOrEmpty(data))
-                continue;
-            characterData.Add(JsonUtility.FromJson<CharacterSaveData>(data));
-        }
-        return characterData;
+        return LoadData<CharacterSaveData>(UNIT_DATA_KEY);
     }
     
     public void SaveCharacterData(IEnumerable<CharacterSaveData> data)
     {
-        StringBuilder finalString = new();
-        foreach (CharacterSaveData saveData in data)
-        {
-            finalString.Append(JsonUtility.ToJson(saveData) + "\t");
-        }
-        PlayerPrefs.SetString(UnitDataKey, finalString.ToString());
+        SaveData<CharacterSaveData>(UNIT_DATA_KEY, data);
     }
 
-    public List<WeaponInstance> LoadInventory()
+    public List<WeaponInstanceSaveData> LoadInventory()
     {
-        string[] saveData = PlayerPrefs.GetString(InventoryDataKey).Split("\t");
-        List<WeaponInstance> weaponInstances = new();
+        return LoadData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY);
+    }
+
+    public void SaveInventoryData(IEnumerable<WeaponInstanceSaveData> data)
+    {
+        SaveData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY, data);
+    }
+
+    private List<T> LoadData<T>(string saveKey)
+    {
+        string[] saveData = PlayerPrefs.GetString(saveKey).Split(ITEM_SEPARATOR);
+        List<T> characterData = new();
         foreach (string data in saveData)
         {
             if (string.IsNullOrEmpty(data))
                 continue;
-            weaponInstances.Add(JsonUtility.FromJson<WeaponInstance>(data));
+            characterData.Add(JsonUtility.FromJson<T>(data));
         }
-        return weaponInstances;
+        return characterData;
     }
 
-    public void SaveInventoryData(IEnumerable<WeaponInstance> data)
+    private void SaveData<T>(string saveKey, IEnumerable<T> data)
     {
         StringBuilder finalString = new();
-        foreach (WeaponInstance weaponInstance in data)
+        foreach (T item in data)
         {
-            finalString.Append(JsonUtility.ToJson(weaponInstance) + "\t");
+            finalString.Append(JsonUtility.ToJson(item) + ITEM_SEPARATOR);
         }
-        PlayerPrefs.SetString(InventoryDataKey, finalString.ToString());
+        PlayerPrefs.SetString(saveKey, finalString.ToString());
     }
 }
