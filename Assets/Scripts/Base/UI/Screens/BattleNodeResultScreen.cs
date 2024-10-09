@@ -34,8 +34,8 @@ namespace Game.UI
     
         private void CloseResults()
         {
-            GlobalEvents.Level.CloseRewardScreenEvent?.Invoke();
             UIScreenManager.Instance.CloseScreen();
+            GlobalEvents.Level.CloseRewardScreenEvent?.Invoke();
             m_ReturnButton.onClick.RemoveListener(CloseResults);
         }
         

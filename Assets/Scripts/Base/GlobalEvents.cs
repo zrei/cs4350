@@ -65,5 +65,6 @@ public static class GlobalEvents {
     public static class Scene
     {
         public static VoidEvent BattleSceneLoadedEvent;
+        public static VoidEvent LevelSceneLoadedEvent;
     }
 }

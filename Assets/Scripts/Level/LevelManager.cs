@@ -32,7 +32,6 @@ public class LevelManager : MonoBehaviour
     
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
-    [SerializeField] LevelTimerVisual m_LevelTimerVisual;
     
     // Unit Data
     [SerializeField] PlayerUnit m_PlayerUnit;
@@ -41,6 +40,7 @@ public class LevelManager : MonoBehaviour
     // UI
     IUIScreen m_BattleNodeResultScreen;
     IUIScreen m_RewardNodeResultScreen;
+    IUIScreen m_LevelUpResultScreen;
 
     #region Current State
     
@@ -75,6 +75,8 @@ public class LevelManager : MonoBehaviour
         StartPlayerPhase();
         
         CameraManager.Instance.SetUpLevelCamera();
+        
+        GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
     }
 
     public void OnDisable()
@@ -118,7 +120,6 @@ public class LevelManager : MonoBehaviour
         
         // Initialise the visuals of the level
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
-        m_LevelTimerVisual.Initialise(m_LevelTimerLogic);
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
 
@@ -128,6 +129,7 @@ public class LevelManager : MonoBehaviour
 
         m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
         m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
     }
     
     private void StartPlayerPhase()
@@ -456,6 +458,7 @@ public class LevelManager : MonoBehaviour
             if (levelledUpCharacters.Count > 0)
             {
                 GlobalEvents.Level.MassLevellingEvent?.Invoke(levelledUpCharacters);
+                UIScreenManager.Instance.OpenScreen(m_LevelUpResultScreen);
                 GlobalEvents.Level.CloseLevellingScreenEvent += OnCloseLevellingScreen;
                 hasEvent = true;
             }
