@@ -23,9 +23,6 @@ public enum RewardType
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
-    // Camera
-    [SerializeField] private Camera m_LevelCamera;
-    
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
     [SerializeField] LevelNodeVisualManager m_LevelNodeVisualManager;
@@ -41,6 +38,7 @@ public class LevelManager : MonoBehaviour
     IUIScreen m_BattleNodeResultScreen;
     IUIScreen m_RewardNodeResultScreen;
     IUIScreen m_LevelUpResultScreen;
+    IUIScreen m_LevelResultScreen;
 
     #region Current State
     
@@ -127,9 +125,11 @@ public class LevelManager : MonoBehaviour
         
         AddNodeEventCallbacks();
 
+        // Preload UI Screens
         m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
         m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
         m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
+        m_LevelResultScreen = UIScreenManager.Instance.LevelResultScreen;
     }
     
     private void StartPlayerPhase()
@@ -348,6 +348,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
+        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
     
     private void RemoveNodeEventCallbacks()
@@ -355,6 +356,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
+        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
 
     private void OnBattleNodeStart(BattleNode battleNode)
@@ -364,7 +366,6 @@ public class LevelManager : MonoBehaviour
         // Disable inputs
         DisableLevelGraphInput();
         
-        m_LevelCamera.gameObject.SetActive(false);
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
@@ -435,6 +436,11 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.CloseLevellingScreenEvent -= OnCloseLevellingScreen;
         
         StartPlayerPhase();
+    }
+
+    private void OnLevelEnd(LevelResultType result)
+    {
+        UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
     }
     
     #endregion

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game;
 using TMPro;
 using UnityEngine;
 
@@ -16,9 +17,6 @@ public class UI_NodePreview : MonoBehaviour
     [SerializeField] TextMeshProUGUI m_BattleDescriptionText;
     [SerializeField] TextMeshProUGUI m_BattleEnemiesText;
     
-    // Should access from camera manager in the future
-    [SerializeField] Camera m_Camera;
-    
     // Time to hover before showing the preview panel
     [SerializeField] float m_TimeToHover = 0.5f;
     private float m_HoverTimeLeft = 0f;
@@ -30,6 +28,12 @@ public class UI_NodePreview : MonoBehaviour
     {
         m_NodePreviewPanel.SetActive(false);
         m_BattlePreviewPanel.SetActive(false);
+        
+        GlobalEvents.Scene.LevelSceneLoadedEvent += OnSceneLoad;
+    }
+
+    private void OnSceneLoad()
+    {
         GlobalEvents.Level.NodeHoverStartEvent += OnHoverStart;
         GlobalEvents.Level.NodeHoverEndEvent += OnHoverEnd;
         GlobalEvents.Level.BattleNodeHoverStartEvent += OnBattleHoverStart;
@@ -96,8 +100,8 @@ public class UI_NodePreview : MonoBehaviour
         
         // Set position of preview panel to be at the node's position
         var nodePosition = node.transform.position;
-        var screenPosition = m_Camera.WorldToScreenPoint(nodePosition);
-        var viewportPosition = m_Camera.ScreenToViewportPoint(screenPosition);
+        var screenPosition = CameraManager.Instance.MainCamera.WorldToScreenPoint(nodePosition);
+        var viewportPosition = CameraManager.Instance.MainCamera.ScreenToViewportPoint(screenPosition);
         
         var rectTransform = m_NodePreviewPanel.GetComponent<RectTransform>();
         
@@ -131,8 +135,8 @@ public class UI_NodePreview : MonoBehaviour
         
         // Set position of preview panel to be at the node's position
         var nodePosition = node.transform.position;
-        var screenPosition = m_Camera.WorldToScreenPoint(nodePosition);
-        var viewportPosition = m_Camera.ScreenToViewportPoint(screenPosition);
+        var screenPosition = CameraManager.Instance.MainCamera.WorldToScreenPoint(nodePosition);
+        var viewportPosition = CameraManager.Instance.MainCamera.ScreenToViewportPoint(screenPosition);
         
         var rectTransform = m_BattlePreviewPanel.GetComponent<RectTransform>();
         
