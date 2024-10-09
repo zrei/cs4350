@@ -38,7 +38,7 @@ public static class GlobalEvents {
         public delegate void NodeEvent(NodeInternal _);
         public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
         public delegate void BattleNodeEvent(BattleNode _);
-        public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor);
+        public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor, int numTurns);
         public delegate void RewardNodeEvent(RewardNode _);
         public delegate void MassLevelUpEvent(List<LevelUpSummary> _);
         public delegate void LevelResultEvent(LevelResultType _);

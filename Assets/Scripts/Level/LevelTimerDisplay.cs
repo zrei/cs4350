@@ -84,7 +84,7 @@ public class LevelTimerDisplay : MonoBehaviour
         Hide();
     }
 
-    private void OnBattleNodeEnd(BattleNode node, UnitAllegiance _)
+    private void OnBattleNodeEnd(BattleNode node, UnitAllegiance _1, int _2)
     {
         Show();
     }

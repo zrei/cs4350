@@ -6,6 +6,7 @@ public class BattleNode : NodeInternal
     public BattleSO BattleSO => m_BattleSO;
     
     private UnitAllegiance m_Victor;
+    private int m_NumTurns;
     
     public override void StartNodeEvent()
     {
@@ -19,6 +20,7 @@ public class BattleNode : NodeInternal
     {
         // Save the battle result
         m_Victor = victor;
+        m_NumTurns = numTurns;
         
         // Remove the event listener
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
@@ -27,6 +29,6 @@ public class BattleNode : NodeInternal
     private void OnReturnFromBattle()
     {
         GlobalEvents.Battle.ReturnFromBattleEvent -= OnReturnFromBattle;
-        GlobalEvents.Level.BattleNodeEndEvent?.Invoke(this, m_Victor);
+        GlobalEvents.Level.BattleNodeEndEvent?.Invoke(this, m_Victor, m_NumTurns);
     }
 }

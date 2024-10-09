@@ -15,7 +15,8 @@ public enum PlayerLevelSelectionState
 public enum RewardType
 {
     EXP,
-    GOLD
+    GOLD,
+    TIME
 }
 
 /// <summary>
@@ -369,7 +370,7 @@ public class LevelManager : MonoBehaviour
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
-    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor)
+    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
     {
         Debug.Log("LevelManager: Ending Battle Node");
         
@@ -379,22 +380,22 @@ public class LevelManager : MonoBehaviour
         {
             m_LevelNodeManager.ClearCurrentNode();
             
-            // Add reward to pending rewards
+            // Add exp reward to pending rewards
             m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
                                               + battleNode.BattleSO.m_ExpReward;
-            
-            // Wait for reward screen to close
-            GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
         }
         else
         {
-            // No reward screen
-            
             // Set player token to facing off on the battle node
             MovePlayerTokenToBattleNode(battleNode);
-            
-            StartPlayerPhase();
         }
+            
+        // Add time cost to pending rewards
+        m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) 
+                                           - numTurns;
+        
+        // Wait for reward screen to close
+        GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
     }
     
     private void OnRewardNodeStart(RewardNode rewardNode)
@@ -454,6 +455,25 @@ public class LevelManager : MonoBehaviour
     private void ProcessReward(out bool hasEvent)
     {
         hasEvent = false;
+
+        if (m_PendingReward.ContainsKey(RewardType.TIME))
+        {
+            if (m_PendingReward[RewardType.TIME] > 0)
+            {
+                m_LevelTimerLogic.AddTime(m_PendingReward[RewardType.TIME]);
+            }
+            else
+            {
+                m_LevelTimerLogic.AdvanceTimer(-m_PendingReward[RewardType.TIME]);
+            }
+            m_PendingReward[RewardType.TIME] = 0;
+            
+            if (m_LevelTimerLogic.TimeRemaining <= 0)
+            {
+                hasEvent = true;
+                return;
+            }
+        }
         
         if (m_PendingReward.ContainsKey(RewardType.EXP))
         {
