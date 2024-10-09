@@ -4,9 +4,9 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterData
 {
-    public CharacterSO m_BaseData;
+    public PlayerCharacterSO m_BaseData;
     [HideInInspector]
-    public ClassSO m_CurrClass;
+    public PlayerClassSO m_CurrClass;
     public int m_CurrLevel;
     public int m_CurrExp;
 
@@ -52,17 +52,17 @@ public class CharacterData
 [System.Serializable]
 public struct CharacterBattleData
 {
-    public CharacterSO m_BaseData;
+    public PlayerCharacterSO m_BaseData;
 
     /// <summary>
     /// This accounts for base stats + class augments
     /// </summary>
     public Stats m_CurrStats;
-    public ClassSO m_ClassSO;
+    public PlayerClassSO m_ClassSO;
 
     public WeaponInstanceSO m_CurrEquippedWeapon;
 
-    public CharacterBattleData(CharacterSO baseData, Stats currStats, ClassSO classSO, WeaponInstanceSO currEquippedWeapon)
+    public CharacterBattleData(PlayerCharacterSO baseData, Stats currStats, PlayerClassSO classSO, WeaponInstanceSO currEquippedWeapon)
     {
         m_BaseData = baseData;
         m_CurrStats = currStats;

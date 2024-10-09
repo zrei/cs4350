@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class PersistentDataManager : Singleton<PersistentDataManager>
 {
-    [SerializeField] private List<CharacterSO> m_CharacterSOs;
-    [SerializeField] private List<ClassSO> m_ClassSOs;
+    [SerializeField] private List<PlayerCharacterSO> m_CharacterSOs;
+    [SerializeField] private List<PlayerClassSO> m_ClassSOs;
     [SerializeField] private List<WeaponInstanceSO> m_WeaponInstanceSOs;
 
-    private readonly Dictionary<int, CharacterSO> m_CharacterSOsMap = new();
-    private readonly Dictionary<int, ClassSO> m_ClassSOsMap = new();
+    private readonly Dictionary<int, PlayerCharacterSO> m_CharacterSOsMap = new();
+    private readonly Dictionary<int, PlayerClassSO> m_ClassSOsMap = new();
     private readonly Dictionary<int, WeaponInstanceSO> m_WeaponInstanceSOsMap = new();
 
     protected override void HandleAwake()
@@ -20,14 +20,14 @@ public class PersistentDataManager : Singleton<PersistentDataManager>
         m_WeaponInstanceSOs.ForEach(x => m_WeaponInstanceSOsMap.Add(x.m_WeaponId, x));
     }
 
-    public bool TryGetCharacterSO(int characterId, out CharacterSO characterSO)
+    public bool TryGetCharacterSO(int characterId, out PlayerCharacterSO characterSO)
     {
-        return TryGetSO<CharacterSO>(characterId, m_CharacterSOsMap, out characterSO);
+        return TryGetSO<PlayerCharacterSO>(characterId, m_CharacterSOsMap, out characterSO);
     }
 
-    public bool TryGetClassSO(int classId, out ClassSO classSO)
+    public bool TryGetPlayerClassSO(int classId, out PlayerClassSO playerClassSO)
     {
-        return TryGetSO<ClassSO>(classId, m_ClassSOsMap, out classSO);
+        return TryGetSO<PlayerClassSO>(classId, m_ClassSOsMap, out playerClassSO);
     }
 
     public bool TryGetWeaponInstanceSO(int weaponInstanceId, out WeaponInstanceSO weaponInstanceSO)

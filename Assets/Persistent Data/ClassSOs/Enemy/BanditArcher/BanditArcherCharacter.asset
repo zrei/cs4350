@@ -12,30 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f065d900e2ac314bac8ccfd2aa3a75f, type: 3}
   m_Name: BanditArcherCharacter
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCharacterSO
-  m_Id: 0
   m_Gender: 0
   m_Race: {fileID: 11400000, guid: b1f1db96095384d6fabce47618260e88, type: 2}
   m_CharacterName: 
   m_Description: 
   m_CharacterSprite: {fileID: 21300000, guid: eb174441329082e419b797ef43bb11a9, type: 3}
-  m_StartingClass: {fileID: 11400000, guid: 291e6ba745eeda24991d7eafa8451c5b, type: 2}
-  m_StartingLevel: 0
-  m_StartingStats:
+  m_EnemyClass: {fileID: 11400000, guid: db23103eee7a34e68b772196390b6639, type: 2}
+  m_Stats:
     m_Health: 15
     m_Mana: 0
-    m_PhysicalAttack: 5
+    m_PhysicalAttack: 6
     m_MagicAttack: 0
-    m_PhysicalDefence: 5
+    m_PhysicalDefence: 6
     m_MagicDefence: 3
     m_Speed: 5.5
     m_MovementRange: 1
-  m_GrowthRates:
-    m_HealthGrowthRate: 0
-    m_ManaGrowthRate: 0
-    m_PhysicalAttackGrowthRate: 0
-    m_MagicAttackGrowthRate: 0
-    m_PhysicalDefenceGrowthRate: 0
-    m_MagicDefenceGrowthRate: 0
-    m_SpeedGrowthRate: 0
-  m_Actions: {fileID: 11400000, guid: d232cfb2be3dac746af25217f6e8df94, type: 2}
   m_EquippedWeapon: {fileID: 11400000, guid: 7341cf388b5db445e8f24d9a864b5710, type: 2}

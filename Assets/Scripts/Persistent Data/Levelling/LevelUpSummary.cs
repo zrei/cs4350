@@ -5,8 +5,8 @@ using System.Collections.Generic;
 /// </summary>
 public readonly struct LevelUpSummary
 {
-    public readonly CharacterSO m_CharacterSO;
-    public readonly ClassSO m_ClassSO;
+    public readonly PlayerCharacterSO m_CharacterSO;
+    public readonly PlayerClassSO m_ClassSO;
     public readonly int m_LevelGrowth;
     public readonly int m_FinalLevel;
     public readonly Dictionary<StatType, int> m_TotalStatGrowths;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-[CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/EnemyAI/Actions/EnemyActiveSkillActionSO")]
+[CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
 public class EnemyActiveSkillActionSO : EnemyActionSO
 {
     public ActiveSkillSO m_ActiveSkill;
