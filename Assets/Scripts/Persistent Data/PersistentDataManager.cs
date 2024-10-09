@@ -20,7 +20,7 @@ public class PersistentDataManager : Singleton<PersistentDataManager>
         m_WeaponInstanceSOs.ForEach(x => m_WeaponInstanceSOsMap.Add(x.m_WeaponId, x));
     }
 
-    public bool TryGetCharacterSO(int characterId, out PlayerCharacterSO characterSO)
+    public bool TryGetPlayerCharacterSO(int characterId, out PlayerCharacterSO characterSO)
     {
         return TryGetSO<PlayerCharacterSO>(characterId, m_CharacterSOsMap, out characterSO);
     }

@@ -45,13 +45,13 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         foreach (CharacterSaveData data in characterSaveData)
         {
-            if (!PersistentDataManager.Instance.TryGetCharacterSO(data.m_CharacterId, out CharacterSO chaacterSO))
+            if (!PersistentDataManager.Instance.TryGetPlayerCharacterSO(data.m_CharacterId, out PlayerCharacterSO chaacterSO))
             {
                 Logger.Log(this.GetType().Name, $"Character data for {data.m_CharacterId} cannot be found", LogLevel.ERROR);
                 continue;
             }
 
-            if (!PersistentDataManager.Instance.TryGetClassSO(data.m_ClassId, out ClassSO classSO))
+            if (!PersistentDataManager.Instance.TryGetPlayerClassSO(data.m_ClassId, out PlayerClassSO classSO))
             {
                 Logger.Log(this.GetType().Name, $"Class data for {data.m_ClassId} cannot be found", LogLevel.ERROR);
                 continue;

@@ -59,7 +59,7 @@ public class SaveManager : Singleton<SaveManager>
         return characterData;
     }
     
-    public void SaveCharacterData(List<CharacterSaveData> data)
+    public void SaveCharacterData(IEnumerable<CharacterSaveData> data)
     {
         StringBuilder finalString = new();
         foreach (CharacterSaveData saveData in data)
@@ -67,5 +67,28 @@ public class SaveManager : Singleton<SaveManager>
             finalString.Append(JsonUtility.ToJson(saveData) + "\t");
         }
         PlayerPrefs.SetString(UnitDataKey, finalString.ToString());
+    }
+
+    public List<WeaponInstance> LoadInventory()
+    {
+        string[] saveData = PlayerPrefs.GetString(InventoryDataKey).Split("\t");
+        List<WeaponInstance> weaponInstances = new();
+        foreach (string data in saveData)
+        {
+            if (string.IsNullOrEmpty(data))
+                continue;
+            weaponInstances.Add(JsonUtility.FromJson<WeaponInstance>(data));
+        }
+        return weaponInstances;
+    }
+
+    public void SaveInventoryData(IEnumerable<WeaponInstance> data)
+    {
+        StringBuilder finalString = new();
+        foreach (WeaponInstance weaponInstance in data)
+        {
+            finalString.Append(JsonUtility.ToJson(weaponInstance) + "\t");
+        }
+        PlayerPrefs.SetString(InventoryDataKey, finalString.ToString());
     }
 }
