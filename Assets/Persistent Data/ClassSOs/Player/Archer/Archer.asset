@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730a4f71279f2eb4ea2d5fa3763d33bd, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: 
-  m_Id: 0
   m_ClassName: Archer
   m_Icon: {fileID: 21300000, guid: 4f253e9b886398a498e7b7543e42e1e5, type: 3}
   m_OutfitType: 1
+  m_WeaponType: {fileID: 11400000, guid: e962b9b4c7d914be0b6c3af4c0817ea6, type: 2}
+  m_PassiveSkills: []
+  m_TraversableTileTypes: 00000000
+  m_CanSwapTiles: 0
+  m_Id: 0
   m_LevelLock: 0
   m_StatAugments:
     m_Health: 0
@@ -34,12 +38,8 @@ MonoBehaviour:
     m_PhysicalDefenceGrowthRate: 0
     m_MagicDefenceGrowthRate: 0
     m_SpeedGrowthRate: 0
-  m_WeaponType: {fileID: 11400000, guid: e962b9b4c7d914be0b6c3af4c0817ea6, type: 2}
-  m_PassiveSkills: []
   m_ActiveSkills:
   - {fileID: 11400000, guid: dc73f333cf69f164d8e46421b739c84a, type: 2}
   - {fileID: 11400000, guid: 4f7ad43bf3841124e9917656545e836c, type: 2}
   - {fileID: 11400000, guid: 3d362401339d5c245ab8af1c27921de7, type: 2}
   - {fileID: 11400000, guid: 8922292bfebb874419400c56808a561d, type: 2}
-  m_TraversableTileTypes: 00000000
-  m_CanSwapTiles: 0
