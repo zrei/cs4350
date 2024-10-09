@@ -51,7 +51,7 @@ public class ActiveSkillSO : ScriptableObject
 
     [Space]
     [Tooltip("Adds to summon upon attack - only used if skill summons")]
-    public List<EnemyUnitPlacement> m_Summons;
+    public List<SummonWrapper> m_Summons;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -142,9 +142,28 @@ public class ActiveSkillSO : ScriptableObject
 
         foreach (InflictedToken inflictedToken in m_InflictedTokens)
         {
+            if (inflictedToken == null)
+                Logger.Log(this.GetType().Name, $"Empty token for {name}", LogLevel.WARNING);
             if (inflictedToken.m_Tier > inflictedToken.m_TokenTierData.NumTiers || inflictedToken.m_Tier <= 0)
-                Logger.Log(this.GetType().Name, $"Invalid tier {inflictedToken.m_Tier} for token tier {inflictedToken.m_TokenTierData.m_Id} for {name}", LogLevel.ERROR);
+                Logger.Log(this.GetType().Name, $"Invalid tier {inflictedToken.m_Tier} for token tier {inflictedToken.m_TokenTierData.m_Id} for {name}", LogLevel.WARNING);
         }
     }
 #endif
+}
+
+[System.Serializable]
+public struct SummonWrapper
+{
+    public bool m_PrioritsePositions;
+    public List<int> m_PrioritisedRows;
+    public List<int> m_PrioritisedCols;
+
+    public List<Adds> m_Adds;
+}
+
+[System.Serializable]
+public struct Adds
+{
+    public EnemyCharacterSO m_EnemyCharacterSO;
+    public Stats m_StatAugments;
 }
