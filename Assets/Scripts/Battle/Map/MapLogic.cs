@@ -70,6 +70,11 @@ public class MapLogic : MonoBehaviour
     {
         RetrieveGrid(gridType).SwapTiles(tile1, tile2);
     }
+
+    public void RemoveUnit(GridType gridType, Unit unit)
+    {
+        RetrieveGrid(gridType).RemoveUnit(unit);
+    }
     #endregion
 
     /*public void MoveUnit(GridType gridType, Unit unit, CoordPair start, CoordPair end)

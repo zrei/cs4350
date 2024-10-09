@@ -150,6 +150,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public void Heal(float healAmount)
     {
+        Logger.Log(this.GetType().Name, $"Unit {name} heals {healAmount}", name, this.gameObject, LogLevel.LOG);
         var max = MaxHealth;
         var value = Mathf.Min(max, m_CurrHealth + healAmount);
         var change = value - m_CurrHealth;
@@ -488,10 +489,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         void CompleteAttackAnimationEvent()
         {
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
-            if (IsDead)
-            {
-                Die();
-            }
             PostSkillEvent?.Invoke();
         }
     }
