@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Collections;
 
 [CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
 public class EnemyActiveSkillActionSO : EnemyActionSO
@@ -79,33 +80,50 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
     public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
     {
-        if (m_ActiveSkill.IsSelfTarget)
+        var attackDelay = 1.5f;
+        IEnumerator PlayActionWithAnimation()
         {
-            mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
-            return;
-        }
+            int animationTrigger = 0;
+            animationTrigger += (int)(m_ActiveSkill.m_OverrideWeaponAnimationType ? m_ActiveSkill.m_OverriddenWeaponAnimationType : enemyUnit.WeaponAnimationType);
+            animationTrigger += (int)m_ActiveSkill.m_SkillAnimationType;
 
-        float baseWeight = 1f / m_PossibleAttackPositions.Count;
+            enemyUnit.PlaySkillStartAnimation(animationTrigger);
 
-        List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
-
-        for (int i = 0; i < targetWeights.Count; ++i)
-        {
-            (CoordPair target, float weight) = targetWeights[i];
-            float finalNodeWeight = weight;
-
-            foreach (EnemyTileCondition targetCondition in m_TargetConditions)
+            if (m_ActiveSkill.IsSelfTarget)
             {
-                if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
-                    finalNodeWeight *= targetCondition.m_MultProportion;
+                mapLogic.ShowAttackForecast(GridType.ENEMY, new List<CoordPair>() { enemyUnit.CurrPosition });
+                yield return new WaitForSeconds(attackDelay);
+
+                mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
+                yield break;
             }
 
-            targetWeights[i] = (target, finalNodeWeight);
+            float baseWeight = 1f / m_PossibleAttackPositions.Count;
+
+            List<(CoordPair, float)> targetWeights = m_PossibleAttackPositions.Select(x => (x, baseWeight)).ToList();
+
+            for (int i = 0; i < targetWeights.Count; ++i)
+            {
+                (CoordPair target, float weight) = targetWeights[i];
+                float finalNodeWeight = weight;
+
+                foreach (EnemyTileCondition targetCondition in m_TargetConditions)
+                {
+                    if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
+                        finalNodeWeight *= targetCondition.m_MultProportion;
+                }
+
+                targetWeights[i] = (target, finalNodeWeight);
+            }
+
+            CoordPair targetTile = RandomHelper.GetRandomT(targetWeights);
+
+            mapLogic.ShowAttackForecast(GridType.PLAYER, new List<CoordPair>() { targetTile });
+            yield return new WaitForSeconds(attackDelay);
+
+            mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, targetTile, completeActionEvent);
         }
-
-        CoordPair targetTile = RandomHelper.GetRandomT(targetWeights);
-
-        mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, targetTile, completeActionEvent);
+        CoroutineManager.Instance.StartCoroutine(PlayActionWithAnimation());
     }
 
     /*

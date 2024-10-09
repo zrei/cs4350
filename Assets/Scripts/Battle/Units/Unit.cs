@@ -33,15 +33,18 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     private static readonly int DirYAnimParam = Animator.StringToHash("DirY");
     private static readonly int IsMoveAnimParam = Animator.StringToHash("IsMove");
 
-    private static readonly int AttackStartAnimParam = Animator.StringToHash("AttackStart");
-    private static readonly int AttackIDAnimParam = Animator.StringToHash("AttackID");
+    private static readonly int SkillStartAnimParam = Animator.StringToHash("SkillStart");
+    private static readonly int SkillExecuteAnimParam = Animator.StringToHash("SkillExecute");
+    private static readonly int SkillCancelAnimParam = Animator.StringToHash("SkillCancel");
+    private static readonly int SkillIDAnimParam = Animator.StringToHash("SkillID");
 
     private static readonly int PoseIDAnimParam = Animator.StringToHash("PoseID");
 
     public static readonly int HurtAnimParam = Animator.StringToHash("Hurt");
     private static readonly int DeathAnimParam = Animator.StringToHash("IsDead");
- 
+
     private Animator m_Animator;
+    private bool m_IsSkillAnimStarted;
     #endregion
 
     #region Current Status
@@ -66,7 +69,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     #region Static Data
-    public WeaponAnimationType WeaponAnimationType {get; private set;}
+    public WeaponAnimationType WeaponAnimationType { get; private set; }
 
     protected ClassSO m_Class;
     public string ClassName => m_Class.m_ClassName;
@@ -74,9 +77,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public bool CanSwapTiles => m_Class.m_CanSwapTiles;
     public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
-    public Sprite Sprite {get; private set;}
+    public Sprite Sprite { get; private set; }
 
-    public Vector3 GridYOffset {get; private set;}
+    public Vector3 GridYOffset { get; private set; }
 
     private const float CHECKPOINT_MOVE_TIME = 0.5f;
 
@@ -84,7 +87,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     private WeaponInstanceSO m_EquippedWeapon;
-    private WeaponModel weaponModel;
+    private WeaponModel m_WeaponModel;
 
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO)
@@ -108,19 +111,19 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         GameObject model = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, this.transform);
         EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
         equipArmor.Initialize(unitModelData.m_AttachItems);
-        
+
         m_EquippedWeapon = weaponSO;
         WeaponModel weaponModelPrefab = m_EquippedWeapon.m_WeaponModel;
         if (weaponModelPrefab != null)
         {
-            weaponModel = Instantiate(weaponModelPrefab);
-            var attachPoint = weaponModel.attachmentType switch
+            m_WeaponModel = Instantiate(weaponModelPrefab);
+            var attachPoint = m_WeaponModel.attachmentType switch
             {
                 WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
                 WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
                 _ => null,
             };
-            weaponModel.transform.SetParent(attachPoint, false);
+            m_WeaponModel.transform.SetParent(attachPoint, false);
         }
 
         m_Animator = model.GetComponentInChildren<Animator>();
@@ -274,7 +277,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     /// <returns></returns>
     public Stats GetTotalStats()
     {
-        return new Stats(GetTotalStat(StatType.HEALTH), GetTotalStat(StatType.MANA), GetTotalStat(StatType.PHYS_ATTACK), GetTotalStat(StatType.MAG_ATTACK), GetTotalStat(StatType.PHYS_DEFENCE), GetTotalStat(StatType.MAG_DEFENCE), GetTotalStat(StatType.SPEED), (int) GetTotalStat(StatType.MOVEMENT_RANGE));
+        return new Stats(GetTotalStat(StatType.HEALTH), GetTotalStat(StatType.MANA), GetTotalStat(StatType.PHYS_ATTACK), GetTotalStat(StatType.MAG_ATTACK), GetTotalStat(StatType.PHYS_DEFENCE), GetTotalStat(StatType.MAG_DEFENCE), GetTotalStat(StatType.SPEED), (int)GetTotalStat(StatType.MOVEMENT_RANGE));
     }
 
     // for preview purposes: ADD THE WEAPON STUFF
@@ -398,11 +401,37 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_Animator.SetTrigger(triggerID);
     }
 
-    public void PlaySkillAnimation(int attackID)
+    public void PlaySkillStartAnimation(int skillID)
     {
-        m_Animator.SetInteger(AttackIDAnimParam, attackID);
-        m_Animator.SetTrigger(AttackStartAnimParam);
-        weaponModel.PlayAttackAnimation();
+        m_Animator.SetInteger(SkillIDAnimParam, skillID);
+        m_Animator.ResetTrigger(SkillCancelAnimParam);
+        m_Animator.ResetTrigger(SkillExecuteAnimParam);
+        m_Animator.SetTrigger(SkillStartAnimParam);
+        m_IsSkillAnimStarted = true;
+
+        m_WeaponModel.PlaySkillStartAnimation(skillID);
+    }
+
+    public void PlaySkillExecuteAnimation()
+    {
+        if (!m_IsSkillAnimStarted) return;
+
+        m_Animator.SetTrigger(SkillExecuteAnimParam);
+        m_IsSkillAnimStarted = false;
+        m_Animator.SetInteger(SkillIDAnimParam, 0);
+
+        m_WeaponModel.PlaySkillExecuteAnimation();
+    }
+
+    public void CancelSkillAnimation()
+    {
+        if (!m_IsSkillAnimStarted) return;
+
+        m_Animator.SetTrigger(SkillCancelAnimParam);
+        m_IsSkillAnimStarted = false;
+        m_Animator.SetInteger(SkillIDAnimParam, 0);
+
+        m_WeaponModel.CancelSkillAnimation();
     }
     #endregion
 
