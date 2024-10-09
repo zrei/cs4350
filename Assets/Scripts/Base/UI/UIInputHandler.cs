@@ -12,14 +12,18 @@ namespace Game.UI
 
         private void OnCancel(IInput input)
         {
-            var currentScreen = UIScreenManager.Instance?.CurrentScreen;
+            if (!UIScreenManager.Instance)
+                return;
+            
+            var currentScreen = UIScreenManager.Instance.CurrentScreen;
             if (currentScreen != null)
             {
                 currentScreen.OnCancel(input);
                 return;
             }
-
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PauseScreen);
+            
+            var pauseScreen = UIScreenManager.Instance.PauseScreen;
+            UIScreenManager.Instance.OpenScreen(pauseScreen);
         }
 
         private void OnDestroy()

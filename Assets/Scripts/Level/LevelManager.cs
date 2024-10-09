@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game;
 using Game.Input;
+using Game.UI;
 using UnityEngine;
 
 public enum PlayerLevelSelectionState
@@ -36,6 +37,10 @@ public class LevelManager : MonoBehaviour
     // Unit Data
     [SerializeField] PlayerUnit m_PlayerUnit;
     [SerializeField] LevellingManager m_LevellingManager;
+    
+    // UI
+    IUIScreen m_BattleNodeResultScreen;
+    IUIScreen m_RewardNodeResultScreen;
 
     #region Current State
     
@@ -120,6 +125,9 @@ public class LevelManager : MonoBehaviour
         SetUpPlayerToken();
         
         AddNodeEventCallbacks();
+
+        m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
+        m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
     }
     
     private void StartPlayerPhase()
@@ -362,6 +370,8 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("LevelManager: Ending Battle Node");
         
+        UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
+        
         if (victor == UnitAllegiance.PLAYER)
         {
             m_LevelNodeManager.ClearCurrentNode();
@@ -398,6 +408,8 @@ public class LevelManager : MonoBehaviour
         
         // Add reward to pending rewards
         m_PendingReward[RewardType.GOLD] = m_PendingReward.GetValueOrDefault(RewardType.GOLD, 0) + rewardNode.GoldReward;
+        
+        UIScreenManager.Instance.OpenScreen(m_RewardNodeResultScreen);
         
         // Wait for reward screen to close
         GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;

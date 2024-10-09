@@ -13,7 +13,7 @@ public class UI_NodeRewards : MonoBehaviour
     private void Awake()
     {
         m_RewardPanel.SetActive(false);
-        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
+        // GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
     }
 
