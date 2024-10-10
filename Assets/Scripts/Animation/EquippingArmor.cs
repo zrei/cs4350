@@ -47,5 +47,6 @@ public class EquippingArmor : MonoBehaviour
         newMesh.bones = newBones;
         newMesh.rootBone = m_RootBone;
         newMesh.transform.SetParent(m_RootBone.parent);
+        newMesh.gameObject.layer = LayerMask.NameToLayer("Objects");
     }
 }
