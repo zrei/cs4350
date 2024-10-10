@@ -28,12 +28,13 @@ public class EnemyTurnManager : TurnManager
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
         GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
 
-        IEnumerator PerformTurn()
-        {
-            yield return new WaitForSeconds(2f);
-            enemyUnit.PerformAction(m_MapLogic, CompleteTurn);
-        }
-        StartCoroutine(PerformTurn());
+        //IEnumerator PerformTurn()
+        //{
+        //    yield return new WaitForSeconds(2f);
+        //    enemyUnit.PerformAction(m_MapLogic, CompleteTurn);
+        //}
+        //StartCoroutine(PerformTurn());
+        enemyUnit.PerformAction(m_MapLogic, CompleteTurn);
     }
 
     private void CompleteTurn()

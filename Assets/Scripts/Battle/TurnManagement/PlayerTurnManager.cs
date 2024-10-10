@@ -47,7 +47,10 @@ public class PlayerTurnManager : TurnManager
         set
         {
             selectedSkill = value;
-            // show attackable tiles
+            int animationTrigger = 0;
+            animationTrigger += (int)(selectedSkill.m_OverrideWeaponAnimationType ? selectedSkill.m_OverriddenWeaponAnimationType : m_CurrUnit.WeaponAnimationType);
+            animationTrigger += (int)selectedSkill.m_SkillAnimationType;
+            m_CurrUnit.PlaySkillStartAnimation(animationTrigger);
         }
     }
     private ActiveSkillSO selectedSkill;
@@ -280,6 +283,10 @@ public class PlayerTurnManager : TurnManager
     {
         m_MapLogic.ResetMap();
 
+        if (m_CurrState == PlayerTurnState.SELECTING_ACTION_TARGET && currAction != PlayerTurnState.SELECTING_ACTION_TARGET)
+        {
+            m_CurrUnit.CancelSkillAnimation();
+        }
         m_CurrState = currAction;
 
         GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
@@ -314,6 +321,8 @@ public class PlayerTurnManager : TurnManager
     public void EndTurn()
     {
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
+
+        m_CurrUnit.CancelSkillAnimation();
 
         m_MapLogic.onTileSelect -= OnTileSelect;
         m_MapLogic.onTileSubmit -= OnTileSubmit;

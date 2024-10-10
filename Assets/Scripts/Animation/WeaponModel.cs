@@ -10,19 +10,51 @@ public enum WeaponModelAttachmentType
 
 public class WeaponModel : MonoBehaviour
 {
-    private static int AttackStartAnimParam = Animator.StringToHash("AttackStart");
+    private static readonly int SkillStartAnimParam = Animator.StringToHash("SkillStart");
+    private static readonly int SkillExecuteAnimParam = Animator.StringToHash("SkillExecute");
+    private static readonly int SkillCancelAnimParam = Animator.StringToHash("SkillCancel");
+    private static readonly int SkillIDAnimParam = Animator.StringToHash("SkillID");
 
     public WeaponModelAttachmentType attachmentType;
 
-    private Animator animator;
+    private Animator m_Animator;
+    private bool m_IsSkillAnimStarted;
 
     private void Awake()
     {
-        animator = GetComponentInChildren<Animator>();
+        m_Animator = GetComponentInChildren<Animator>();
     }
 
-    public void PlayAttackAnimation()
+    public void PlaySkillStartAnimation(int skillID)
     {
-        animator?.SetTrigger(AttackStartAnimParam);
+        if (m_Animator == null) return;
+
+        m_Animator.SetInteger(SkillIDAnimParam, skillID);
+        m_Animator.ResetTrigger(SkillCancelAnimParam);
+        m_Animator.ResetTrigger(SkillExecuteAnimParam);
+        m_Animator.SetTrigger(SkillStartAnimParam);
+        m_IsSkillAnimStarted = true;
+    }
+
+    public void PlaySkillExecuteAnimation()
+    {
+        if (m_Animator == null) return;
+
+        if (!m_IsSkillAnimStarted) return;
+
+        m_Animator.SetTrigger(SkillExecuteAnimParam);
+        m_IsSkillAnimStarted = false;
+        m_Animator.SetInteger(SkillIDAnimParam, 0);
+    }
+
+    public void CancelSkillAnimation()
+    {
+        if (m_Animator == null) return;
+
+        if (!m_IsSkillAnimStarted) return;
+
+        m_Animator.SetTrigger(SkillCancelAnimParam);
+        m_IsSkillAnimStarted = false;
+        m_Animator.SetInteger(SkillIDAnimParam, 0);
     }
 }
