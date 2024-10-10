@@ -190,7 +190,7 @@ public class BattleManager : Singleton<BattleManager>
             return;
         
         // don't add unit back into turn queue if they're dead at the end of turn
-        if (!unit.IsDead && )
+        if (!unit.IsDead)
             m_TurnQueue.AddUnit(unit);
 
         m_TurnQueue.OrderTurnQueue();
