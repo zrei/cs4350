@@ -55,18 +55,41 @@ public class AttackAnimationManager : MonoBehaviour
 
     private IEnumerator PlayAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
+        void OnSkillHit()
+        {
+            attacker.AnimationEventHandler.onSkillHit -= OnSkillHit;
+
+            TimeManager.Instance.ModifyTime(0.1f, 0.5f);
+        }
+        attacker.AnimationEventHandler.onSkillHit += OnSkillHit;
+
+        void OnSkillComplete()
+        {
+            attacker.AnimationEventHandler.onSkillComplete -= OnSkillComplete;
+
+            GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke();
+        }
+        attacker.AnimationEventHandler.onSkillComplete += OnSkillComplete;
+
         attacker.PlaySkillExecuteAnimation();
 
         if (activeSkill.m_TargetWillPlayHurtAnimation)
         {
-            yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
-
             foreach (Unit target in targets)
                 target.PlayAnimations(Unit.HurtAnimParam);
         }
+        yield break;
 
-        // need to account for hurt animation time and take the maximum of the end times
-        yield return new WaitForSeconds(activeSkill.m_AnimationTime);
+        //if (activeSkill.m_TargetWillPlayHurtAnimation)
+        //{
+        //    yield return new WaitForSeconds(activeSkill.m_DelayResponseAnimationTime);
+
+        //    foreach (Unit target in targets)
+        //        target.PlayAnimations(Unit.HurtAnimParam);
+        //}
+
+        //// need to account for hurt animation time and take the maximum of the end times
+        //yield return new WaitForSeconds(activeSkill.m_AnimationTime);
 
         //if (!m_IsSelfTarget && !activeSkill.IsAoe)
         //{
@@ -78,6 +101,6 @@ public class AttackAnimationManager : MonoBehaviour
         //}
 
         //CameraManager.Instance.AttackAnimCamera.enabled = false;
-        GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke();
+        //GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke();
     }
 }

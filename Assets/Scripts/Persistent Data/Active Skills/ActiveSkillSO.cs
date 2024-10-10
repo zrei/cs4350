@@ -55,8 +55,6 @@ public class ActiveSkillSO : ScriptableObject
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
-    public float m_DelayResponseAnimationTime = 0.2f;
-    public float m_AnimationTime = 2f;
     public bool m_TargetWillPlayHurtAnimation = false;
     [Tooltip("Use this to override the weapon animation type instead of taking it from the character's weapon")]
     public bool m_OverrideWeaponAnimationType = false;

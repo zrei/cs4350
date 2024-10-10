@@ -45,6 +45,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     private Animator m_Animator;
     private bool m_IsSkillAnimStarted;
+    private AnimationEventHandler m_AnimationEventHandler;
+
+    public AnimationEventHandler AnimationEventHandler => m_AnimationEventHandler;
     #endregion
 
     #region Current Status
@@ -131,6 +134,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         {
             Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
         }
+        m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
 
         WeaponAnimationType = classSO.WeaponAnimationType;
         m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
