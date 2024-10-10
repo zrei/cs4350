@@ -3624,6 +3624,9 @@ GameObject:
   - component: {fileID: 975374358}
   - component: {fileID: 975374359}
   - component: {fileID: 975374360}
+  - component: {fileID: 975374363}
+  - component: {fileID: 975374362}
+  - component: {fileID: 975374361}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -3694,7 +3697,6 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
-    m_CurrEquippedWeapon: {fileID: 0}
   - m_BaseData: {fileID: 11400000, guid: fd194f8c0f7a24a79ad5372cd50b88b8, type: 2}
     m_CurrClass: {fileID: 0}
     m_CurrLevel: 0
@@ -3716,7 +3718,6 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
-    m_CurrEquippedWeapon: {fileID: 0}
   - m_BaseData: {fileID: 11400000, guid: 2541a19dc80e4469fb97bcf9977abc8c, type: 2}
     m_CurrClass: {fileID: 0}
     m_CurrLevel: 0
@@ -3738,7 +3739,6 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
-    m_CurrEquippedWeapon: {fileID: 0}
   - m_BaseData: {fileID: 11400000, guid: 75bb8482b596e473296f970cfa2cbbef, type: 2}
     m_CurrClass: {fileID: 0}
     m_CurrLevel: 0
@@ -3760,7 +3760,6 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
-    m_CurrEquippedWeapon: {fileID: 0}
 --- !u!114 &975374360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3774,6 +3773,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
+--- !u!114 &975374361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b4e64e64a1e75c47b93920162ca8e0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &975374362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53bd0d52d36e3fa4a89886241be0abe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &975374363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a581b5de163804153936d0f3ad0a92e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CharacterSOs: []
+  m_ClassSOs: []
+  m_WeaponInstanceSOs:
+  - {fileID: 11400000, guid: ecf9524f5f336194f89a45f43f6d486e, type: 2}
 --- !u!1 &1123815911
 GameObject:
   m_ObjectHideFlags: 0

@@ -42,15 +42,16 @@ public struct WeaponInstanceSaveData
     }
 }
 
-
 public class InventoryManager : Singleton<InventoryManager>
 {
-    public Dictionary<int, WeaponInstance> m_Inventory;
+    private readonly Dictionary<int, WeaponInstance> m_Inventory = new();
     private int m_CurrNextId;
 
     protected override void HandleAwake()
     {
         base.HandleAwake();
+
+        HandleDependencies();
     }
 
     private void HandleDependencies()
@@ -85,9 +86,9 @@ public class InventoryManager : Singleton<InventoryManager>
 
         foreach (WeaponInstanceSaveData data in characterSaveData)
         {
-            if (!PersistentDataManager.Instance.TryGetWeaponInstanceSO(data.m_InstanceId, out WeaponInstanceSO weaponInstanceSO))
+            if (!PersistentDataManager.Instance.TryGetWeaponInstanceSO(data.m_WeaponInstanceId, out WeaponInstanceSO weaponInstanceSO))
             {
-                Logger.Log(this.GetType().Name, $"Weapon data for {data.m_InstanceId} cannot be found", LogLevel.ERROR);
+                Logger.Log(this.GetType().Name, $"Weapon data for {data.m_WeaponInstanceId} cannot be found", LogLevel.ERROR);
                 continue;
             }
 

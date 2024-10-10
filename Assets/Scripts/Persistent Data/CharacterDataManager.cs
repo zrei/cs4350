@@ -1,11 +1,10 @@
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
 public class CharacterDataManager : Singleton<CharacterDataManager>
 {
     // mapping character IDs to their data?
-    private readonly Dictionary<int, CharacterData> m_CharacterData = new();
+    private readonly Dictionary<int, PlayerCharacterData> m_CharacterData = new();
 
     protected override void HandleAwake()
     {
@@ -56,18 +55,18 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 Logger.Log(this.GetType().Name, $"Class data for {data.m_ClassId} cannot be found", LogLevel.ERROR);
                 continue;
             }
-            CharacterData persistentData = new() {m_BaseData = chaacterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
+            PlayerCharacterData persistentData = new() {m_BaseData = chaacterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
                 m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
             m_CharacterData.Add(persistentData.Id, persistentData);
         }
     }
 
-    public List<CharacterData> RetrieveAllCharacterData()
+    public List<PlayerCharacterData> RetrieveAllCharacterData()
     {
         return m_CharacterData.Values.ToList();
     }
 
-    public List<CharacterData> RetrieveCharacterData(List<int> IDs)
+    public List<PlayerCharacterData> RetrieveCharacterData(List<int> IDs)
     {
         return m_CharacterData.Values.Where(x => IDs.Contains(x.Id)).ToList();
     }
@@ -76,9 +75,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     /// Update the persistent data with the newly updated data from a finished level
     /// </summary>
     /// <param name="updatedData"></param>
-    public void UpdateCharacterData(List<CharacterData> updatedData)
+    public void UpdateCharacterData(List<PlayerCharacterData> updatedData)
     {
-        foreach (CharacterData data in updatedData)
+        foreach (PlayerCharacterData data in updatedData)
         {
             m_CharacterData[data.Id] = data;
         }
