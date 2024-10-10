@@ -257,9 +257,34 @@ public class StatusManager :
         return finalCritProportion;
     }
 
+    public float GetLifestealProportion()
+    {
+        float finalLifestealProportion = 0f;
+        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        {
+            finalLifestealProportion += tokenStack.GetLifestealProportion();
+        }
+        return finalLifestealProportion;
+    }
+
     public bool IsStunned()
     {
         return HasTokenType(TokenType.STUN);
+    }
+
+    public bool CanReflect()
+    {
+        return HasTokenType(TokenType.REFLECT);
+    }
+
+    public float GetReflectProportion()
+    {
+        float finalReflectProportion = 0f;
+        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        {
+            finalReflectProportion += tokenStack.GetReflectProportion();
+        }
+        return finalReflectProportion;
     }
 
     /*

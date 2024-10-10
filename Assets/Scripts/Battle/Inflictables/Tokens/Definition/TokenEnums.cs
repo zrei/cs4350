@@ -8,7 +8,9 @@ public enum TokenType
     CRIT,
     TAUNT,
     STUN,
-    EVADE
+    EVADE,
+    LIFESTEAL,
+    REFLECT
 }
 
 public enum TokenConsumptionType

@@ -43,6 +43,7 @@ public class BattleManager : Singleton<BattleManager>
     #region State
     private bool m_BattleTick = false;
     private bool m_WithinBattle = false;
+    private bool m_HasBattleConcluded = false;
     #endregion
 
     #region Camera
@@ -188,7 +189,10 @@ public class BattleManager : Singleton<BattleManager>
         if (!m_WithinBattle)
             return;
         
-        m_TurnQueue.AddUnit(unit);
+        // don't add unit back into turn queue if they're dead at the end of turn
+        if (!unit.IsDead && )
+            m_TurnQueue.AddUnit(unit);
+
         m_TurnQueue.OrderTurnQueue();
         GlobalEvents.Battle.TurnOrderUpdatedEvent?.Invoke(m_TurnQueue.GetTurnOrder());
         m_BattleTick = true;
@@ -209,7 +213,12 @@ public class BattleManager : Singleton<BattleManager>
     #region BattleOutcome
     private void CompleteBattle(UnitAllegiance victoriousSide)
     {
+        // once a single battle end condition has been reached, don't re-invoke this method
+        if (m_HasBattleConcluded)
+            return;
+
         m_WithinBattle = false;
+        m_HasBattleConcluded = true;
         Logger.Log(this.GetType().Name, $"Side that has won: {victoriousSide}", LogLevel.LOG);
         GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide, m_TurnQueue.GetCyclesElapsed());
     }
@@ -236,6 +245,8 @@ public class BattleManager : Singleton<BattleManager>
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
             m_PlayerUnits.Remove(unit);
+            m_MapLogic.RemoveUnit(GridType.PLAYER, unit);
+
             if (m_PlayerUnits.Count <= 0)
             {
                 CompleteBattle(UnitAllegiance.ENEMY);
@@ -244,6 +255,8 @@ public class BattleManager : Singleton<BattleManager>
         else
         {
             m_EnemyUnits.Remove(unit);
+            m_MapLogic.RemoveUnit(GridType.ENEMY, unit);
+
             if (m_EnemyUnits.Count <= 0)
             {
                 CompleteBattle(UnitAllegiance.PLAYER);

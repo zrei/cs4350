@@ -311,6 +311,12 @@ public class GridLogic : MonoBehaviour
             m_TileData[tile2.m_Row, tile2.m_Col].m_CurrUnit.PlaceUnit(tile2, GetTilePosition(tile2));
         }
     }
+
+    public void RemoveUnit(Unit unit)
+    {
+        m_TileData[unit.CurrPosition.m_Row, unit.CurrPosition.m_Col].m_CurrUnit = null;
+        m_TileData[unit.CurrPosition.m_Row, unit.CurrPosition.m_Col].m_IsOccupied = false;
+    }
     #endregion
 
     #region Helper
@@ -405,10 +411,13 @@ public class GridLogic : MonoBehaviour
 
             foreach (Unit deadUnit in deadUnits)
             {
-                CoordPair coordinates = deadUnit.CurrPosition;
-                m_TileData[coordinates.m_Row, coordinates.m_Col].m_CurrUnit = null;
-                m_TileData[coordinates.m_Row, coordinates.m_Col].m_IsOccupied = false;
                 GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
+            }
+
+            // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
+            if (attacker.IsDead)
+            {
+                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(attacker);
             }
 
             completeSkillEvent?.Invoke();
