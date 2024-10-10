@@ -35,13 +35,13 @@ Shader "GaussianBlur"
 
         struct appdata
         {
-	        float4 positionOS : Position;
+	        float4 positionOS : POSITION;
 	        float2 uv : TEXCOORD0;
         };
 
         struct v2f
         {
-	        float4 positionCS : SV_Position;
+	        float4 positionCS : SV_POSITION;
 	        float2 uv : TEXCOORD0;
         };
 

@@ -84,6 +84,11 @@ namespace Game.UI
             canvasGroup.alpha = 0;
             isHidden = true;
 
+            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+        }
+        
+        private void OnSceneLoad()
+        {
             GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
@@ -102,6 +107,7 @@ namespace Game.UI
 
         private void OnDestroy()
         {
+            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;

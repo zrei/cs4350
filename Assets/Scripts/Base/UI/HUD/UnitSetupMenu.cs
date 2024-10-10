@@ -15,7 +15,7 @@ namespace Game.UI
 
         private bool isHidden;
 
-        private void Start()
+        private void Awake()
         {
             animator = GetComponent<Animator>();
             animator.enabled = false;
@@ -28,7 +28,12 @@ namespace Game.UI
 
             button.onSubmit.RemoveAllListeners();
             button.onSubmit.AddListener(EndSetup);
+            
+            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+        }
 
+        private void OnSceneLoad()
+        {
             var playerUnitSetup = BattleManager.Instance.PlayerUnitSetup;
             if (playerUnitSetup == null || !playerUnitSetup.IsSetupStarted)
             {
@@ -49,6 +54,7 @@ namespace Game.UI
 
         private void OnDestroy()
         {
+            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
             GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
         }
 

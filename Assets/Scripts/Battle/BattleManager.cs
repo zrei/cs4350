@@ -68,7 +68,7 @@ public class BattleManager : Singleton<BattleManager>
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
 
-        GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke(this);
+        GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke();
     }
 
     protected override void HandleAwake()
@@ -185,6 +185,9 @@ public class BattleManager : Singleton<BattleManager>
     private void EndTurn(Unit unit)
     {
         Logger.Log(this.GetType().Name, "Finish turn", LogLevel.LOG);
+        
+        if (!m_WithinBattle)
+            return;
         
         // don't add unit back into turn queue if they're dead at the end of turn
         if (!unit.IsDead)

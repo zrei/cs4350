@@ -38,6 +38,11 @@ namespace Game.UI
         public bool HasActiveScreen => activeScreens.Count > 0;
 
         public IUIScreen PauseScreen => LoadScreen("PauseScreen");
+        
+        public IUIScreen BattleNodeResultScreen => LoadScreen("BattleNodeResultScreen");
+        public IUIScreen RewardNodeResultScreen => LoadScreen("RewardNodeResultScreen");
+        public IUIScreen LevelUpResultScreen => LoadScreen("LevelUpResultScreen");
+        public IUIScreen LevelResultScreen => LoadScreen("LevelResultScreen");
 
         private IUIScreen LoadScreen(string name)
         {

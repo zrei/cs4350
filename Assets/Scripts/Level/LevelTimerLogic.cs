@@ -36,5 +36,13 @@ public class LevelTimerLogic : MonoBehaviour
         }
     }
     
+    public void AddTime(float deltaTime)
+    {
+        m_TimeRemaining += deltaTime;
+        m_TimeRemaining = Mathf.Min(m_TimeLimit, m_TimeRemaining);
+        
+        GlobalEvents.Level.TimeRemainingUpdatedEvent(m_TimeRemaining);
+    }
+    
     #endregion
 }

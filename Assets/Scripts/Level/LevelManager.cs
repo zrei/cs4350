@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using Game;
 using Game.Input;
+using Game.UI;
 using UnityEngine;
 
 public enum PlayerLevelSelectionState
@@ -13,7 +15,8 @@ public enum PlayerLevelSelectionState
 public enum RewardType
 {
     EXP,
-    GOLD
+    GOLD,
+    TIME
 }
 
 /// <summary>
@@ -21,20 +24,22 @@ public enum RewardType
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
-    // Camera
-    [SerializeField] private Camera m_LevelCamera;
-    
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
     [SerializeField] LevelNodeVisualManager m_LevelNodeVisualManager;
     
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
-    [SerializeField] LevelTimerVisual m_LevelTimerVisual;
     
     // Unit Data
     [SerializeField] PlayerUnit m_PlayerUnit;
     [SerializeField] LevellingManager m_LevellingManager;
+    
+    // UI
+    IUIScreen m_BattleNodeResultScreen;
+    IUIScreen m_RewardNodeResultScreen;
+    IUIScreen m_LevelUpResultScreen;
+    IUIScreen m_LevelResultScreen;
 
     #region Current State
     
@@ -67,6 +72,10 @@ public class LevelManager : MonoBehaviour
         Initialise();
         
         StartPlayerPhase();
+        
+        CameraManager.Instance.SetUpLevelCamera();
+        
+        GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
     }
 
     public void OnDisable()
@@ -110,13 +119,18 @@ public class LevelManager : MonoBehaviour
         
         // Initialise the visuals of the level
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
-        m_LevelTimerVisual.Initialise(m_LevelTimerLogic);
         
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
 
         SetUpPlayerToken();
         
         AddNodeEventCallbacks();
+
+        // Preload UI Screens
+        m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
+        m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
+        m_LevelResultScreen = UIScreenManager.Instance.LevelResultScreen;
     }
     
     private void StartPlayerPhase()
@@ -335,6 +349,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
+        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
     
     private void RemoveNodeEventCallbacks()
@@ -342,6 +357,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
+        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
 
     private void OnBattleNodeStart(BattleNode battleNode)
@@ -351,37 +367,35 @@ public class LevelManager : MonoBehaviour
         // Disable inputs
         DisableLevelGraphInput();
         
-        m_LevelCamera.gameObject.SetActive(false);
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
     }
     
-    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor)
+    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
     {
         Debug.Log("LevelManager: Ending Battle Node");
         
-        GameSceneManager.Instance.UnloadBattleScene();
-        m_LevelCamera.gameObject.SetActive(true);
+        UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
         
         if (victor == UnitAllegiance.PLAYER)
         {
             m_LevelNodeManager.ClearCurrentNode();
             
-            // Add reward to pending rewards
+            // Add exp reward to pending rewards
             m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
                                               + battleNode.BattleSO.m_ExpReward;
-            
-            // Wait for reward screen to close
-            GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
         }
         else
         {
-            // No reward screen
-            
             // Set player token to facing off on the battle node
             MovePlayerTokenToBattleNode(battleNode);
-            
-            StartPlayerPhase();
         }
+            
+        // Add time cost to pending rewards
+        m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) 
+                                           - numTurns;
+        
+        // Wait for reward screen to close
+        GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
     }
     
     private void OnRewardNodeStart(RewardNode rewardNode)
@@ -398,6 +412,8 @@ public class LevelManager : MonoBehaviour
         
         // Add reward to pending rewards
         m_PendingReward[RewardType.GOLD] = m_PendingReward.GetValueOrDefault(RewardType.GOLD, 0) + rewardNode.GoldReward;
+        
+        UIScreenManager.Instance.OpenScreen(m_RewardNodeResultScreen);
         
         // Wait for reward screen to close
         GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
@@ -422,6 +438,11 @@ public class LevelManager : MonoBehaviour
         
         StartPlayerPhase();
     }
+
+    private void OnLevelEnd(LevelResultType result)
+    {
+        UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
+    }
     
     #endregion
 
@@ -434,6 +455,25 @@ public class LevelManager : MonoBehaviour
     private void ProcessReward(out bool hasEvent)
     {
         hasEvent = false;
+
+        if (m_PendingReward.ContainsKey(RewardType.TIME))
+        {
+            if (m_PendingReward[RewardType.TIME] > 0)
+            {
+                m_LevelTimerLogic.AddTime(m_PendingReward[RewardType.TIME]);
+            }
+            else
+            {
+                m_LevelTimerLogic.AdvanceTimer(-m_PendingReward[RewardType.TIME]);
+            }
+            m_PendingReward[RewardType.TIME] = 0;
+            
+            if (m_LevelTimerLogic.TimeRemaining <= 0)
+            {
+                hasEvent = true;
+                return;
+            }
+        }
         
         if (m_PendingReward.ContainsKey(RewardType.EXP))
         {
@@ -444,6 +484,7 @@ public class LevelManager : MonoBehaviour
             if (levelledUpCharacters.Count > 0)
             {
                 GlobalEvents.Level.MassLevellingEvent?.Invoke(levelledUpCharacters);
+                UIScreenManager.Instance.OpenScreen(m_LevelUpResultScreen);
                 GlobalEvents.Level.CloseLevellingScreenEvent += OnCloseLevellingScreen;
                 hasEvent = true;
             }
