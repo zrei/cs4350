@@ -5,7 +5,7 @@ public class LevellingManager : MonoBehaviour
 {
     [SerializeField] LevellingSO m_LevellingSO;
 
-    public void LevelCharacter(CharacterData characterData, int expGained, out bool hasLevelledUp, out Dictionary<StatType, int> totalStatGrowths)
+    public void LevelCharacter(PlayerCharacterData characterData, int expGained, out bool hasLevelledUp, out Dictionary<StatType, int> totalStatGrowths)
     {
         hasLevelledUp = false;
         totalStatGrowths = new();

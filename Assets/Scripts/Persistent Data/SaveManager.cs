@@ -11,6 +11,9 @@ public struct CharacterSaveData
     public int m_CurrExp;
     public Stats m_CurrStats;
     public StatProgress m_CurrStatProgress;
+    /// <summary>
+    /// If null, the character has no weapon equipped and will use the default weapon
+    /// </summary>
     public int? m_CurrEquippedWeaponId;
 
     public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int? currEquippedWeaponId = null)
@@ -21,7 +24,7 @@ public struct CharacterSaveData
         m_CurrExp = currExp;
         m_CurrStats = currStats;
         m_CurrStatProgress = currStatProgress;
-        m_CurrEquippedWeaponId = null;
+        m_CurrEquippedWeaponId = currEquippedWeaponId;
     }
 }
 
@@ -30,8 +33,9 @@ public struct CharacterSaveData
 /// </summary>
 public class SaveManager : Singleton<SaveManager>
 {
-    private const string UnitDataKey = "UnitData";
-    private const string InventoryDataKey = "InventoryData";
+    private const string UNIT_DATA_KEY = "UnitData";
+    private const string INVENTORY_DATA_KEY = "InventoryData";
+    private const string ITEM_SEPARATOR = "\t";
 
     protected override void HandleAwake()
     {
@@ -45,24 +49,44 @@ public class SaveManager : Singleton<SaveManager>
 
     public List<CharacterSaveData> LoadCharacterSaveData()
     {
-        string[] saveData = PlayerPrefs.GetString(UnitDataKey).Split("\t");
-        List<CharacterSaveData> characterData = new();
+        return LoadData<CharacterSaveData>(UNIT_DATA_KEY);
+    }
+    
+    public void SaveCharacterData(IEnumerable<CharacterSaveData> data)
+    {
+        SaveData<CharacterSaveData>(UNIT_DATA_KEY, data);
+    }
+
+    public List<WeaponInstanceSaveData> LoadInventory()
+    {
+        return LoadData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY);
+    }
+
+    public void SaveInventoryData(IEnumerable<WeaponInstanceSaveData> data)
+    {
+        SaveData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY, data);
+    }
+
+    private List<T> LoadData<T>(string saveKey)
+    {
+        string[] saveData = PlayerPrefs.GetString(saveKey).Split(ITEM_SEPARATOR);
+        List<T> characterData = new();
         foreach (string data in saveData)
         {
             if (string.IsNullOrEmpty(data))
                 continue;
-            characterData.Add(JsonUtility.FromJson<CharacterSaveData>(data));
+            characterData.Add(JsonUtility.FromJson<T>(data));
         }
         return characterData;
     }
-    
-    public void SaveCharacterData(List<CharacterSaveData> data)
+
+    private void SaveData<T>(string saveKey, IEnumerable<T> data)
     {
         StringBuilder finalString = new();
-        foreach (CharacterSaveData saveData in data)
+        foreach (T item in data)
         {
-            finalString.Append(JsonUtility.ToJson(saveData) + "\t");
+            finalString.Append(JsonUtility.ToJson(item) + ITEM_SEPARATOR);
         }
-        PlayerPrefs.SetString(UnitDataKey, finalString.ToString());
+        PlayerPrefs.SetString(saveKey, finalString.ToString());
     }
 }

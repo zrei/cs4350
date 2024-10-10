@@ -92,7 +92,7 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnitData"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<CharacterBattleData> playerUnitData, GameObject mapBiome)
+    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, GameObject mapBiome)
     {
         m_TurnQueue.Clear();
         m_EnemyUnits.Clear();
@@ -103,7 +103,7 @@ public class BattleManager : Singleton<BattleManager>
     }
 
     // fixing race condition
-    public IEnumerator BattleInitialise(BattleSO battleSO, List<CharacterBattleData> playerUnitData)
+    public IEnumerator BattleInitialise(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData)
     {
         yield return new WaitForEndOfFrame();
 
@@ -157,7 +157,7 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="unitPlacement"></param>
     /// <param name="gridType"></param>
-    private void InstantiatePlayerUnit(CharacterBattleData unitBattleData, CoordPair position)
+    private void InstantiatePlayerUnit(PlayerCharacterBattleData unitBattleData, CoordPair position)
     {
         PlayerUnit playerUnit = Instantiate(m_PlayerUnit);
         playerUnit.Initialise(unitBattleData);

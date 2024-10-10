@@ -1,79 +1,51 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class PersistentDataManager : Singleton<PersistentDataManager>
 {
     [SerializeField] private List<PlayerCharacterSO> m_CharacterSOs;
     [SerializeField] private List<PlayerClassSO> m_ClassSOs;
+    [SerializeField] private List<WeaponInstanceSO> m_WeaponInstanceSOs;
 
-    private Dictionary<int, PlayerCharacterSO> m_CharacterSOsMap;
-    private Dictionary<int, PlayerClassSO> m_ClassSOsMap;
-
-    // mapping character IDs to their data?
-    private Dictionary<int, CharacterData> m_PersistentData;
+    private readonly Dictionary<int, PlayerCharacterSO> m_CharacterSOsMap = new();
+    private readonly Dictionary<int, PlayerClassSO> m_ClassSOsMap = new();
+    private readonly Dictionary<int, WeaponInstanceSO> m_WeaponInstanceSOsMap = new();
 
     protected override void HandleAwake()
     {
         base.HandleAwake();
 
-        m_CharacterSOsMap = new();
-        m_ClassSOsMap = new();
         m_CharacterSOs.ForEach(x => m_CharacterSOsMap.Add(x.m_Id, x));
         m_ClassSOs.ForEach(x => m_ClassSOsMap.Add(x.m_Id, x));
-
-        HandleDependencies();
+        m_WeaponInstanceSOs.ForEach(x => m_WeaponInstanceSOsMap.Add(x.m_WeaponId, x));
     }
 
-    private void HandleDependencies()
+    public bool TryGetPlayerCharacterSO(int characterId, out PlayerCharacterSO characterSO)
     {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-        
-        ParseSaveData(SaveManager.Instance.LoadCharacterSaveData()); 
+        return TryGetSO<PlayerCharacterSO>(characterId, m_CharacterSOsMap, out characterSO);
     }
 
-    protected override void HandleDestroy()
+    public bool TryGetPlayerClassSO(int classId, out PlayerClassSO playerClassSO)
     {
-        base.HandleDestroy();
+        return TryGetSO<PlayerClassSO>(classId, m_ClassSOsMap, out playerClassSO);
     }
 
-    private void ParseSaveData(List<CharacterSaveData> characterSaveData)
+    public bool TryGetWeaponInstanceSO(int weaponInstanceId, out WeaponInstanceSO weaponInstanceSO)
     {
-        m_PersistentData = new();
-
-        foreach (CharacterSaveData data in characterSaveData)
-        {
-            CharacterData persistentData = new() {m_BaseData = m_CharacterSOs[data.m_CharacterId], m_CurrClass = m_ClassSOs[data.m_ClassId], m_CurrExp = data.m_CurrExp, m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
-            m_PersistentData.Add(persistentData.Id, persistentData);
-        }
-    }
-
-    public List<CharacterData> RetrieveAllCharacterData()
-    {
-        return m_PersistentData.Values.ToList();
-    }
-
-    public List<CharacterData> RetrieveCharacterData(List<int> IDs)
-    {
-        return m_PersistentData.Values.Where(x => IDs.Contains(x.Id)).ToList();
-    }
-
-    /// <summary>
-    /// Update the persistent data with the newly updated data from a finished level
-    /// </summary>
-    /// <param name="updatedData"></param>
-    public void UpdateCharacterData(List<CharacterData> updatedData)
-    {
-        foreach (CharacterData data in updatedData)
-        {
-            m_PersistentData[data.Id] = data;
-        }
+        return TryGetSO<WeaponInstanceSO>(weaponInstanceId, m_WeaponInstanceSOsMap, out weaponInstanceSO);
     }
     
+    private bool TryGetSO<T>(int id, Dictionary<int, T> map, out T soInstance) where T : ScriptableObject
+    {
+        if (map.ContainsKey(id))
+        {
+            soInstance = map[id];
+            return true;
+        }
+        else
+        {
+            soInstance = null;
+            return false;
+        }
+    }
 }
