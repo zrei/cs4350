@@ -18,14 +18,14 @@ public class GameSceneManager : Singleton<GameSceneManager>
     
     // Battle
     private BattleSO m_CurrentBattle;
-    private List<CharacterBattleData> m_UnitBattleData;
+    private List<PlayerCharacterBattleData> m_UnitBattleData;
     private GameObject m_MapBiome;
     
     #endregion
     
     #region Scene Management
 
-    public void LoadBattleScene(BattleSO battleSo, List<CharacterBattleData> unitBattleData, GameObject mapBiome)
+    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, GameObject mapBiome)
     {
         m_CurrentBattle = battleSo;
         m_UnitBattleData = unitBattleData;

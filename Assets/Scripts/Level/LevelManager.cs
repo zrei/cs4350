@@ -65,7 +65,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private NodeInternal testGoalNodeInternal;
     
     // should be sent in in the future
-    [SerializeField] private List<CharacterData> m_TestCharacterData;
+    [SerializeField] private List<PlayerCharacterData> m_TestCharacterData;
     
     public void Start()
     {
