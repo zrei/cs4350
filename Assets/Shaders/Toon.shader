@@ -10,10 +10,10 @@
         [HDR] _RimColor("Rim Color", Color) = (1, 1, 1, 1)
         _RimAmount("Rim Amount", Range(0, 1)) = 0.716
         _RimThreshold("Rim Threshold", Range(0, 1)) = 0.1
-        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
-        _OutlineThreshold ("Outline Threshold", Range(0, 1)) = 0.1
-        _DepthSensitivity ("Depth Sensitivity", Range(0, 1)) = 0.1
-        _NormalSensitivity ("Normal Sensitivity", Range(0, 1)) = 0.1
+        // _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        // _OutlineThreshold ("Outline Threshold", Range(0, 1)) = 0.1
+        // _DepthSensitivity ("Depth Sensitivity", Range(0, 1)) = 0.1
+        // _NormalSensitivity ("Normal Sensitivity", Range(0, 1)) = 0.1
     }
     
     SubShader
@@ -70,10 +70,10 @@
                 half4 _RimColor;
                 float _RimAmount;
                 float _RimThreshold;
-                half4 _OutlineColor;
-                float _OutlineThreshold;
-                float _DepthSensitivity;
-                float _NormalSensitivity;
+                // half4 _OutlineColor;
+                // float _OutlineThreshold;
+                // float _DepthSensitivity;
+                // float _NormalSensitivity;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -112,28 +112,39 @@
                     // 0.3333333 * smoothstep(0.0, 0.01, NdotLShadowed)
                     // + 0.3333333 * smoothstep(0.3333333, 0.3433333, NdotLShadowed)
                     // + 0.3333333 * smoothstep(0.6666666, 0.6766666, NdotLShadowed);
-                    0.25 * smoothstep(0.0, 0.01, NdotLShadowed)
-                    + 0.25 * smoothstep(0.25, 0.26, NdotLShadowed)
-                    + 0.25 * smoothstep(0.5, 0.51, NdotLShadowed)
-                    + 0.25 * smoothstep(0.75, 0.76, NdotLShadowed);
+                    // 0.25 * smoothstep(0.0, 0.01, NdotLShadowed)
+                    // + 0.25 * smoothstep(0.25, 0.26, NdotLShadowed)
+                    // + 0.25 * smoothstep(0.5, 0.51, NdotLShadowed)
+                    // + 0.25 * smoothstep(0.75, 0.76, NdotLShadowed);
                     // 0.2 * smoothstep(0.0, 0.01, NdotLShadowed)
                     // + 0.2 * smoothstep(0.2, 0.21, NdotLShadowed)
                     // + 0.2 * smoothstep(0.4, 0.41, NdotLShadowed)
                     // + 0.2 * smoothstep(0.6, 0.61, NdotLShadowed)
                     // + 0.2 * smoothstep(0.8, 0.81, NdotLShadowed);
-                    // 0.1666666 * smoothstep(0.0, 0.01, NdotLShadowed)
-                    // + 0.1666666 * smoothstep(0.1666666, 0.1676666, NdotLShadowed)
-                    // + 0.1666666 * smoothstep(0.3333333, 0.3433333, NdotLShadowed)
-                    // + 0.1666666 * smoothstep(0.5, 0.51, NdotLShadowed)
-                    // + 0.1666666 * smoothstep(0.6666666, 0.6766666, NdotLShadowed)
-                    // + 0.1666666 * smoothstep(0.8333333, 0.8433333, NdotLShadowed);
+                    0.1666666 * smoothstep(0.0, 0.01, NdotLShadowed)
+                    + 0.1666666 * smoothstep(0.1666666, 0.1676666, NdotLShadowed)
+                    + 0.1666666 * smoothstep(0.3333333, 0.3433333, NdotLShadowed)
+                    + 0.1666666 * smoothstep(0.5, 0.51, NdotLShadowed)
+                    + 0.1666666 * smoothstep(0.6666666, 0.6766666, NdotLShadowed)
+                    + 0.1666666 * smoothstep(0.8333333, 0.8433333, NdotLShadowed);
                 half3 lightColor = mainLight.color * lightIntensity;
 
                 // Specular reflection
                 float3 halfVector = normalize(mainLight.direction + viewDirWS);
                 float NdotH = dot(normalWS, halfVector);
                 float specularIntensity = pow(NdotH * lightIntensity, _Glossiness * _Glossiness);
-                float specularIntensitySmooth = smoothstep(0.005, 0.01, specularIntensity);
+                float specularIntensitySmooth =
+                    // smoothstep(0.005, 0.01, specularIntensity);
+                    // 0.25 * smoothstep(0.0, 0.01, specularIntensity)
+                    // + 0.25 * smoothstep(0.25, 0.26, specularIntensity)
+                    // + 0.25 * smoothstep(0.5, 0.51, specularIntensity)
+                    // + 0.25 * smoothstep(0.75, 0.76, specularIntensity);
+                    0.1666666 * smoothstep(0.0, 0.01, specularIntensity)
+                    + 0.1666666 * smoothstep(0.1666666, 0.1676666, specularIntensity)
+                    + 0.1666666 * smoothstep(0.3333333, 0.3433333, specularIntensity)
+                    + 0.1666666 * smoothstep(0.5, 0.51, specularIntensity)
+                    + 0.1666666 * smoothstep(0.6666666, 0.6766666, specularIntensity)
+                    + 0.1666666 * smoothstep(0.8333333, 0.8433333, specularIntensity);
                 half3 specular = specularIntensitySmooth * _SpecularColor.rgb;
 
                 // Rim lighting
