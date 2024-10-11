@@ -3,9 +3,34 @@ using UnityEngine;
 
 public abstract class EnemyActionSO : ScriptableObject
 {
-    public abstract bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic);
+    public abstract EnemyActionWrapper GetWrapper(int priority);
+}
 
-    public abstract void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
+[System.Serializable]
+public struct EnemyTileCondition
+{
+    public EnemyTileConditionSO m_Condition;
+    public float m_MultProportion;
+    public bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair targetTile) => m_Condition.IsConditionMet(enemyUnit, mapLogic, targetTile);
+}
+
+public abstract class EnemyTargetActionSO : EnemyActionSO
+{
+    public List<EnemyTileCondition> m_TargetConditions;
+
+    public float GetFinalWeightProportionForTile(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair target)
+    {
+        float finalNodeWeight = 1f;
+
+        foreach (EnemyTileCondition targetCondition in m_TargetConditions)
+        {
+            if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
+                finalNodeWeight *= targetCondition.m_MultProportion;
+        }
+
+        return finalNodeWeight;
+    }
+
 }
 
 [System.Serializable]
@@ -17,7 +42,7 @@ public struct EnemyAction
     [Tooltip("This priority is taken into account when no condition is met at all. Higher number will mean higher priority.")]
     public int m_BasePriority;
 
-    public bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic) => m_EnemyAction.CanActionBePerformed(enemyUnit, mapLogic);
+    public EnemyActionWrapper EnemyActionWrapper => m_EnemyAction.GetWrapper(m_BasePriority);
 
     /*
     public float GetFinalWeight(EnemyUnit enemyUnit, MapLogic mapLogic)

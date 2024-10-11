@@ -1,7 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyPassActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyPassActionSO")]
-public class EnemyPassActionSO : EnemyActionSO
+public class EnemyPassActionWrapper : EnemyActionWrapper
 {
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
@@ -12,4 +11,13 @@ public class EnemyPassActionSO : EnemyActionSO
     {
         completeActionEvent?.Invoke();
     }
+}
+
+[CreateAssetMenu(fileName = "EnemyPassActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyPassActionSO")]
+public class EnemyPassActionSO : EnemyActionSO
+{
+    public override EnemyActionWrapper GetWrapper(int priority)
+    {
+        return new EnemyPassActionWrapper {m_Action = this, m_Priority = priority};
+    }   
 }

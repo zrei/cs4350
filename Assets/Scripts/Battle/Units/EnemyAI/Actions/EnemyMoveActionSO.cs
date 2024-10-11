@@ -2,13 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyMoveActionSO")]
-public class EnemyMoveActionSO : EnemyActionSO
+public class EnemyMoveActionWrapper : EnemyActionWrapper
 {
-    public List<EnemyTileCondition> m_TargetConditions;
-
     private HashSet<PathNode> m_ReachablePoints;
     private PathNode m_CachedTarget;
+
+    private EnemyMoveActionSO MoveAction => (EnemyMoveActionSO) m_Action;
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
@@ -27,14 +26,7 @@ public class EnemyMoveActionSO : EnemyActionSO
         for (int i = 0; i < nodeWeights.Count; ++i)
         {
             (PathNode node, float weight) = nodeWeights[i];
-            float finalNodeWeight = weight;
-            CoordPair position = node.m_Coordinates;
-
-            foreach (EnemyTileCondition targetCondition in m_TargetConditions)
-            {
-                if (targetCondition.IsConditionMet(enemyUnit, mapLogic, position))
-                    finalNodeWeight *= targetCondition.m_MultProportion;
-            }
+            float finalNodeWeight = weight * MoveAction.GetFinalWeightProportionForTile(enemyUnit, mapLogic, node.m_Coordinates);
 
             nodeWeights[i] = (node, finalNodeWeight);
         }
@@ -51,15 +43,7 @@ public class EnemyMoveActionSO : EnemyActionSO
         for (int i = 0; i < nodeWeights.Count; ++i)
         {
             (PathNode node, float weight) = nodeWeights[i];
-            float finalNodeWeight = weight;
-            CoordPair position = node.m_Coordinates;
-
-            foreach (EnemyTileCondition targetCondition in m_TargetConditions)
-            {
-                if (targetCondition.IsConditionMet(enemyUnit, mapLogic, position))
-                    finalNodeWeight *= targetCondition.m_MultProportion;
-            }
-
+            float finalNodeWeight = weight * MoveAction.GetFinalWeightProportionForTile(enemyUnit, mapLogic, node.m_Coordinates);
             nodeWeights[i] = (node, finalNodeWeight);
         }
 
@@ -69,10 +53,11 @@ public class EnemyMoveActionSO : EnemyActionSO
     }
 }
 
-[System.Serializable]
-public struct EnemyTileCondition
+[CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyMoveActionSO")]
+public class EnemyMoveActionSO : EnemyTargetActionSO
 {
-    public EnemyTileConditionSO m_Condition;
-    public float m_MultProportion;
-    public bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair targetTile) => m_Condition.IsConditionMet(enemyUnit, mapLogic, targetTile);
+    public override EnemyActionWrapper GetWrapper(int priority)
+    {
+        return new EnemyMoveActionWrapper {m_Action = this, m_Priority = priority};
+    }
 }

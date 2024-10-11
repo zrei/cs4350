@@ -134,17 +134,17 @@ public class EnemyActionForecastDisplay : MonoBehaviour
         Hide();
     }
 
-    private void OnDecideAction(EnemyActionSO action)
+    private void OnDecideAction(EnemyActionWrapper action)
     {
         if (action != null)
         {
             Show();
-            if (action is EnemyActiveSkillActionSO activeSkillAction)
+            if (action is EnemyActiveSkillActionWrapper activeSkillAction)
             {
                 icon.sprite = attackIcon;
                 icon.CrossFadeColor(Color.red, 0.5f, false, true);
             }
-            else if (action is EnemyMoveActionSO moveAction)
+            else if (action is EnemyMoveActionWrapper moveAction)
             {
                 icon.sprite = moveIcon;
                 icon.CrossFadeColor(Color.blue, 0.5f, false, true);

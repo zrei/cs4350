@@ -3,13 +3,8 @@ using UnityEngine;
 using System.Linq;
 using System.Collections;
 
-[CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
-public class EnemyActiveSkillActionSO : EnemyActionSO
+public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 {
-    public ActiveSkillSO m_ActiveSkill;
-    public List<EnemyTileCondition> m_TargetConditions;
-
-    public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
     public IEnumerable<CoordPair> PossibleAttackPositions => m_PossibleAttackPositionsIgnoreOccupied;
 
     private List<CoordPair> m_PossibleAttackPositions;
@@ -17,28 +12,36 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
     private CoordPair m_Target;
 
+    private EnemyActiveSkillActionSO ActiveSkillAction => (EnemyActiveSkillActionSO) m_Action;
+    private ActiveSkillSO ActiveSkill => ActiveSkillAction.m_ActiveSkill;
+    public GridType TargetGridType => ActiveSkillAction.TargetGridType;
+
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        if (m_ActiveSkill.m_ConsumedMana > enemyUnit.CurrentMana)
+        ActiveSkillSO activeSKill = ActiveSkill;
+
+        if (activeSKill.m_ConsumedMana > enemyUnit.CurrentMana)
             return false;
 
-        if (m_ActiveSkill.IsSelfTarget)
+        if (activeSKill.IsSelfTarget)
             return true;
 
         m_PossibleAttackPositions = new();
         m_PossibleAttackPositionsIgnoreOccupied = new();
         bool hasPossibleAttackPosition = false;
+
+        GridType targetGridType = TargetGridType;
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, true))
+                if (mapLogic.IsValidSkillTargetTile(activeSKill, enemyUnit, coordinates, targetGridType, true))
                 {
                     m_PossibleAttackPositions.Add(coordinates);
                     hasPossibleAttackPosition = true;
                 }
-                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, TargetGridType, false))
+                if (mapLogic.IsValidSkillTargetTile(activeSKill, enemyUnit, coordinates, targetGridType, false))
                 {
                     m_PossibleAttackPositionsIgnoreOccupied.Add(coordinates);
                 }
@@ -51,7 +54,9 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
     // preparation for caching
     public void CalculateMovementPosition(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        if (m_ActiveSkill.IsSelfTarget)
+        ActiveSkillSO activeSKill = ActiveSkill;
+
+        if (activeSKill.IsSelfTarget)
         {
             m_Target = enemyUnit.CurrPosition;
             return;
@@ -64,14 +69,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
         for (int i = 0; i < targetWeights.Count; ++i)
         {
             (CoordPair target, float weight) = targetWeights[i];
-            float finalNodeWeight = weight;
-
-            foreach (EnemyTileCondition targetCondition in m_TargetConditions)
-            {
-                if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
-                    finalNodeWeight *= targetCondition.m_MultProportion;
-            }
-
+            float finalNodeWeight = weight * ActiveSkillAction.GetFinalWeightProportionForTile(enemyUnit, mapLogic, target);
             targetWeights[i] = (target, finalNodeWeight);
         }
 
@@ -80,21 +78,22 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
 
     public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
     {
+        ActiveSkillSO activeSKill = ActiveSkill;
         var attackDelay = 1.5f;
         IEnumerator PlayActionWithAnimation()
         {
             int animationTrigger = 0;
-            animationTrigger += (int)(m_ActiveSkill.m_OverrideWeaponAnimationType ? m_ActiveSkill.m_OverriddenWeaponAnimationType : enemyUnit.WeaponAnimationType);
-            animationTrigger += (int)m_ActiveSkill.m_SkillAnimationType;
+            animationTrigger += (int)(ActiveSkill.m_OverrideWeaponAnimationType ? ActiveSkill.m_OverriddenWeaponAnimationType : enemyUnit.WeaponAnimationType);
+            animationTrigger += (int)ActiveSkill.m_SkillAnimationType;
 
             enemyUnit.PlaySkillStartAnimation(animationTrigger);
 
-            if (m_ActiveSkill.IsSelfTarget)
+            if (ActiveSkill.IsSelfTarget)
             {
                 mapLogic.ShowAttackForecast(GridType.ENEMY, new List<CoordPair>() { enemyUnit.CurrPosition });
                 yield return new WaitForSeconds(attackDelay);
 
-                mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
+                mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
                 yield break;
             }
 
@@ -105,14 +104,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             for (int i = 0; i < targetWeights.Count; ++i)
             {
                 (CoordPair target, float weight) = targetWeights[i];
-                float finalNodeWeight = weight;
-
-                foreach (EnemyTileCondition targetCondition in m_TargetConditions)
-                {
-                    if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
-                        finalNodeWeight *= targetCondition.m_MultProportion;
-                }
-
+                float finalNodeWeight = weight * ActiveSkillAction.GetFinalWeightProportionForTile(enemyUnit, mapLogic, target);
                 targetWeights[i] = (target, finalNodeWeight);
             }
 
@@ -121,9 +113,23 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             mapLogic.ShowAttackForecast(GridType.PLAYER, new List<CoordPair>() { targetTile });
             yield return new WaitForSeconds(attackDelay);
 
-            mapLogic.PerformSkill(TargetGridType, enemyUnit, m_ActiveSkill, targetTile, completeActionEvent);
+            mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, targetTile, completeActionEvent);
         }
         CoroutineManager.Instance.StartCoroutine(PlayActionWithAnimation());
+    }
+}
+
+
+[CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
+public class EnemyActiveSkillActionSO : EnemyTargetActionSO
+{
+    public ActiveSkillSO m_ActiveSkill;
+
+    public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
+    
+    public override EnemyActionWrapper GetWrapper(int priority)
+    {
+        return new EnemyActiveSkillActionWrapper {m_Action = this, m_Priority = priority};
     }
 
     /*

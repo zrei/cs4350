@@ -1,16 +1,28 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+
+/// <summary>
+/// Wraps around the EnemyActionSO as a runtime instance for each unit
+/// </summary>
+public abstract class EnemyActionWrapper
+{
+    public EnemyActionSO m_Action;
+    public int m_Priority;
+
+    public abstract bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic);
+
+    public abstract void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
+}
 
 public class EnemyUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
 
-    private List<(EnemyActionCondition, EnemyActionSO)> m_OrderedConditions;
-    private List<(int, EnemyActionSO)> m_OrderedActions;
+    private List<(EnemyActionCondition, EnemyActionWrapper)> m_OrderedConditions;
+    private List<EnemyActionWrapper> m_OrderedActions;
 
-    public event Action<EnemyActionSO> OnDecideAction;
-    public EnemyActionSO NextAction
+    public event Action<EnemyActionWrapper> OnDecideAction;
+    public EnemyActionWrapper NextAction
     {
         get => nextAction;
         private set
@@ -21,7 +33,7 @@ public class EnemyUnit : Unit
             OnDecideAction?.Invoke(nextAction);
         }
     }
-    private EnemyActionSO nextAction;
+    private EnemyActionWrapper nextAction;
 
     public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO)
     {
@@ -35,22 +47,23 @@ public class EnemyUnit : Unit
         m_OrderedActions = new();
         foreach (EnemyAction enemyAction in enemyActionSetSO.m_EnemyActions)
         {
+            EnemyActionWrapper enemyActionWrapper = enemyAction.EnemyActionWrapper;
             foreach (EnemyActionCondition condition in enemyAction.m_Conditions)
             {
-                m_OrderedConditions.Add((condition, enemyAction.m_EnemyAction));
+                m_OrderedConditions.Add((condition, enemyActionWrapper));
             }
-            m_OrderedActions.Add((enemyAction.m_BasePriority, enemyAction.m_EnemyAction));
+            m_OrderedActions.Add(enemyActionWrapper);
         }
         m_OrderedConditions.Sort((x, y) => y.Item1.m_Priority.CompareTo(x.Item1.m_Priority));
-        m_OrderedActions.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+        m_OrderedActions.Sort((x, y) => y.m_Priority.CompareTo(x.m_Priority));
     }
 
     // can cache action
-    public EnemyActionSO GetActionToBePerformed(MapLogic mapLogic)
+    public EnemyActionWrapper GetActionToBePerformed(MapLogic mapLogic)
     {
-        HashSet<EnemyActionSO> unperformableActions = new();
+        HashSet<EnemyActionWrapper> unperformableActions = new();
 
-        foreach ((EnemyActionCondition condition, EnemyActionSO action) in m_OrderedConditions)
+        foreach ((EnemyActionCondition condition, EnemyActionWrapper action) in m_OrderedConditions)
         {
             if (unperformableActions.Contains(action))
                 continue;
@@ -70,21 +83,21 @@ public class EnemyUnit : Unit
 
         // if no condition has been met, retrieve an action according to their base priority and if it can be performed
         // Pass action can always be performed
-        foreach ((int priority, EnemyActionSO enemyActionSO) in m_OrderedActions)
+        foreach (EnemyActionWrapper enemyActionWrapper in m_OrderedActions)
         {
-            if (unperformableActions.Contains(enemyActionSO))
+            if (unperformableActions.Contains(enemyActionWrapper))
                 continue;
 
-            if (!enemyActionSO.CanActionBePerformed(this, mapLogic))
+            if (!enemyActionWrapper.CanActionBePerformed(this, mapLogic))
             {
                 continue;
             }
 
-            NextAction = enemyActionSO;
-            return enemyActionSO;
+            NextAction = enemyActionWrapper;
+            return enemyActionWrapper;
         }
 
-        NextAction = new EnemyPassActionSO();
+        NextAction = new EnemyPassActionWrapper {m_Action = new EnemyPassActionSO()};
         return NextAction;
     }
 
