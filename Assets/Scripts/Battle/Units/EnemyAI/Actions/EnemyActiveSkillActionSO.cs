@@ -3,6 +3,19 @@ using UnityEngine;
 using System.Linq;
 using System.Collections;
 
+public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
+{
+    EnemyActionSO m_Action;
+
+    public IEnumerable<CoordPair> PossibleAttackPositions => m_PossibleAttackPositionsIgnoreOccupied;
+
+    private List<CoordPair> m_PossibleAttackPositions;
+    private List<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
+
+    private CoordPair m_Target;
+}
+
+
 [CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
 public class EnemyActiveSkillActionSO : EnemyActionSO
 {
@@ -10,12 +23,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
     public List<EnemyTileCondition> m_TargetConditions;
 
     public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
-    public IEnumerable<CoordPair> PossibleAttackPositions => m_PossibleAttackPositionsIgnoreOccupied;
-
-    private List<CoordPair> m_PossibleAttackPositions;
-    private List<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
-
-    private CoordPair m_Target;
+    
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {

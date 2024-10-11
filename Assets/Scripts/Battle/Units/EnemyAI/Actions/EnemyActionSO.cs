@@ -6,6 +6,8 @@ public abstract class EnemyActionSO : ScriptableObject
     public abstract bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic);
 
     public abstract void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
+
+    public abstract EnemyActionWrapper GetWrapper();
 }
 
 [System.Serializable]

@@ -2,13 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public class EnemyMoveActionWrapper : EnemyActionWrapper
+{
+    private HashSet<PathNode> m_ReachablePoints;
+    private PathNode m_CachedTarget;
+}
+
 [CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyMoveActionSO")]
 public class EnemyMoveActionSO : EnemyActionSO
 {
     public List<EnemyTileCondition> m_TargetConditions;
-
-    private HashSet<PathNode> m_ReachablePoints;
-    private PathNode m_CachedTarget;
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
