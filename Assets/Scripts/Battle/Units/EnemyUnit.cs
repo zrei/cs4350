@@ -11,11 +11,11 @@ public class EnemyUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
 
-    private List<(EnemyActionCondition, EnemyActionSO)> m_OrderedConditions;
-    private List<(int, EnemyActionSO)> m_OrderedActions;
+    private List<(EnemyActionCondition, EnemyActionWrapper)> m_OrderedConditions;
+    private List<(int, EnemyActionWrapper)> m_OrderedActions;
 
-    public event Action<EnemyActionSO> OnDecideAction;
-    public EnemyActionSO NextAction
+    public event Action<EnemyActionWrapper> OnDecideAction;
+    public EnemyActionWrapper NextAction
     {
         get => nextAction;
         private set
@@ -26,7 +26,7 @@ public class EnemyUnit : Unit
             OnDecideAction?.Invoke(nextAction);
         }
     }
-    private EnemyActionSO nextAction;
+    private EnemyActionWrapper nextAction;
 
     public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO)
     {
