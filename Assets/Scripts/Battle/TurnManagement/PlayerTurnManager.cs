@@ -105,7 +105,7 @@ public class PlayerTurnManager : TurnManager
         {
             var enemyUnit = prevUnit as EnemyUnit;
             var nextAction = enemyUnit.NextAction;
-            if (nextAction is EnemyActiveSkillActionSO enemyActiveSkillAction)
+            if (nextAction is EnemyActiveSkillActionWrapper enemyActiveSkillAction)
             {
                 m_MapLogic.ShowAttackForecast(
                     enemyActiveSkillAction.TargetGridType,
@@ -127,7 +127,7 @@ public class PlayerTurnManager : TurnManager
                 {
                     var enemyUnit = currentUnit as EnemyUnit;
                     var nextAction = enemyUnit.NextAction;
-                    if (nextAction is EnemyActiveSkillActionSO enemyActiveSkillAction)
+                    if (nextAction is EnemyActiveSkillActionWrapper enemyActiveSkillAction)
                     {
                         m_MapLogic.ShowAttackForecast(
                             enemyActiveSkillAction.TargetGridType,
