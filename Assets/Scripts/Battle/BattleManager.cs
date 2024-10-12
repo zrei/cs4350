@@ -4,6 +4,18 @@ using UnityEngine;
 using Game.Input;
 using Game;
 
+public enum WinCondition
+{
+    DEFEAT_REQUIRED,
+    SURVIVE_TURNS
+}
+
+// additional lose conditions
+public enum SecondaryLoseCondition
+{
+    TOO_MANY_TURNS
+}
+
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
 [RequireComponent(typeof(PlayerUnitSetup))]
@@ -34,8 +46,10 @@ public class BattleManager : Singleton<BattleManager>
 
     #region Turn Queue
     private TurnQueue m_TurnQueue = new TurnQueue();
-    private HashSet<Unit> m_EnemyUnits = new HashSet<Unit>();
-    private HashSet<Unit> m_PlayerUnits = new HashSet<Unit>();
+    // TODO: This isn't actually required but given the data is still in flux right now
+    // I'm leaving this here
+    private HashSet<Unit> m_AllPlayerUnits = new HashSet<Unit>();
+    private HashSet<Unit> m_AllEnemyUnits = new HashSet<Unit>();
 
     private const float DELAY_TILL_NEXT_TURN = 0.3f;
     #endregion
@@ -44,6 +58,18 @@ public class BattleManager : Singleton<BattleManager>
     private bool m_BattleTick = false;
     private bool m_WithinBattle = false;
     private bool m_HasBattleConcluded = false;
+    #endregion
+
+    #region Win Condition
+    private WinCondition m_WinCondition;
+    private float m_TurnsToSurvive;
+    private HashSet<Unit> m_TrackedEnemyUnits = new HashSet<Unit>();
+    #endregion
+
+    #region Lose Condition
+    private HashSet<Unit> m_TrackedPlayerUnits = new HashSet<Unit>();
+    private SecondaryLoseCondition[] m_SecondaryLoseCondition;
+    private float m_MaxTurns;
     #endregion
 
     #region Camera
@@ -95,8 +121,15 @@ public class BattleManager : Singleton<BattleManager>
     public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, GameObject mapBiome)
     {
         m_TurnQueue.Clear();
-        m_EnemyUnits.Clear();
-        m_PlayerUnits.Clear();
+        m_AllPlayerUnits.Clear();
+        m_AllEnemyUnits.Clear();
+        m_TrackedEnemyUnits.Clear();
+        m_TrackedPlayerUnits.Clear();
+
+        m_WinCondition = battleSO.m_WinCondition;
+        m_SecondaryLoseCondition = battleSO.m_AdditionalLoseConditions;
+        m_TurnsToSurvive = battleSO.m_TurnsToSurvive;
+        m_MaxTurns = battleSO.m_MaxTurns;
 
         InstantiateBiome(mapBiome);
         StartCoroutine(BattleInitialise(battleSO, playerUnitData));
@@ -148,7 +181,9 @@ public class BattleManager : Singleton<BattleManager>
         enemyUnit.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData);
         m_MapLogic.PlaceUnit(GridType.ENEMY, enemyUnit, unitPlacement.m_Coordinates);
         m_TurnQueue.AddUnit(enemyUnit);
-        m_EnemyUnits.Add(enemyUnit);
+        m_AllEnemyUnits.Add(enemyUnit);
+        if (unitPlacement.m_DefeatRequired)
+            m_TrackedEnemyUnits.Add(enemyUnit);
     }
 
     /// <summary>
@@ -163,7 +198,9 @@ public class BattleManager : Singleton<BattleManager>
         playerUnit.Initialise(unitBattleData);
         m_MapLogic.PlaceUnit(GridType.PLAYER, playerUnit, position);
         m_TurnQueue.AddUnit(playerUnit);
-        m_PlayerUnits.Add(playerUnit);
+        m_AllPlayerUnits.Add(playerUnit);
+        if (unitBattleData.m_CannotDieWithoutLosingBattle)
+            m_TrackedPlayerUnits.Add(playerUnit);
     }
     #endregion
 
@@ -202,7 +239,7 @@ public class BattleManager : Singleton<BattleManager>
 
     private void EvaluateEnemyDecisions()
     {
-        foreach (var u in m_EnemyUnits)
+        foreach (var u in m_AllEnemyUnits)
         {
             var enemyUnit = u as EnemyUnit;
             enemyUnit.GetActionToBePerformed(m_MapLogic);
@@ -211,6 +248,48 @@ public class BattleManager : Singleton<BattleManager>
     #endregion
 
     #region BattleOutcome
+    /// <summary>
+    /// Check the current battle state and determine if victory has been reached
+    /// </summary>
+    /// <returns></returns>
+    private bool CheckForVictory()
+    {
+        return m_WinCondition switch
+        {
+            WinCondition.DEFEAT_REQUIRED => m_TrackedEnemyUnits.Count == 0,
+            WinCondition.SURVIVE_TURNS => m_TurnQueue.GetCyclesElapsed() >= m_TurnsToSurvive,
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Check the current battle state and determine if the player has been defeated
+    /// </summary>
+    /// <param name="felledUnit"></param>
+    /// <returns></returns>
+    private bool CheckForDefeat(Unit felledUnit = null)
+    {
+        // check for tracked player unit death
+        if (felledUnit != null && m_TrackedPlayerUnits.Contains(felledUnit))
+            return true;
+
+        // check for no player units remaining
+        if (m_AllPlayerUnits.Count == 0)
+            return true;
+
+        foreach (SecondaryLoseCondition loseCondition in m_SecondaryLoseCondition)
+        {
+            switch (loseCondition)
+            {
+                case SecondaryLoseCondition.TOO_MANY_TURNS:
+                    if (m_TurnQueue.GetCyclesElapsed() >= m_MaxTurns)
+                        return true;
+                    break;
+            }
+        }
+        return false;
+    }
+
     private void CompleteBattle(UnitAllegiance victoriousSide)
     {
         // once a single battle end condition has been reached, don't re-invoke this method
@@ -244,20 +323,20 @@ public class BattleManager : Singleton<BattleManager>
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
-            m_PlayerUnits.Remove(unit);
+            m_AllPlayerUnits.Remove(unit);
             m_MapLogic.RemoveUnit(GridType.PLAYER, unit);
 
-            if (m_PlayerUnits.Count <= 0)
-            {
+            if (CheckForDefeat(unit))
                 CompleteBattle(UnitAllegiance.ENEMY);
-            }
         }
         else
         {
-            m_EnemyUnits.Remove(unit);
+            m_AllEnemyUnits.Remove(unit);
+            if (m_TrackedEnemyUnits.Contains(unit))
+                m_TrackedEnemyUnits.Remove(unit);
             m_MapLogic.RemoveUnit(GridType.ENEMY, unit);
 
-            if (m_EnemyUnits.Count <= 0)
+            if (CheckForVictory())
             {
                 CompleteBattle(UnitAllegiance.PLAYER);
             }
@@ -294,6 +373,19 @@ public class BattleManager : Singleton<BattleManager>
         if (m_TurnQueue.TryGetReadyUnit(out Unit readyUnit))
         {
             m_BattleTick = false;
+
+            if (CheckForVictory())
+            {
+                CompleteBattle(UnitAllegiance.PLAYER);
+                return;
+            }
+
+            if (CheckForDefeat())
+            {
+                CompleteBattle(UnitAllegiance.ENEMY);
+                return;
+            }
+
             StartTurn(readyUnit);
             return;
         }

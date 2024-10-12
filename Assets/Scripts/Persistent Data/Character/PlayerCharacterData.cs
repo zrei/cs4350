@@ -31,6 +31,7 @@ public class PlayerCharacterData
     public GrowthRate TotalGrowthRate => m_BaseData.m_GrowthRates.FlatAugment(m_CurrClass.m_GrowthRateAugments);
 
     public int Id => m_BaseData.m_Id;
+    public bool IsLord => m_BaseData.m_IsLord;
 
     /// <summary>
     /// Total base stats accounting for both character's current stats with equipped class' flat augments
@@ -45,7 +46,7 @@ public class PlayerCharacterData
 
     public PlayerCharacterBattleData GetBattleData()
     {
-        return new PlayerCharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, GetWeaponInstanceSO());
+        return new PlayerCharacterBattleData(m_BaseData, TotalBaseStats, m_CurrClass, GetWeaponInstanceSO(), IsLord);
     }
 
     private WeaponInstanceSO GetWeaponInstanceSO()
@@ -71,12 +72,19 @@ public struct PlayerCharacterBattleData
 
     public WeaponInstanceSO m_CurrEquippedWeapon;
 
-    public PlayerCharacterBattleData(PlayerCharacterSO baseData, Stats currStats, PlayerClassSO classSO, WeaponInstanceSO currEquippedWeapon)
+    /// <summary>
+    /// Whether this player unit should be tracked in battle. Once this unit dies, the battle is considered lost.
+    /// This could be due to a variety of reasons, e.g. the unit is a lord etc.
+    /// </summary>
+    public bool m_CannotDieWithoutLosingBattle;
+
+    public PlayerCharacterBattleData(PlayerCharacterSO baseData, Stats currStats, PlayerClassSO classSO, WeaponInstanceSO currEquippedWeapon, bool cannotDieWithoutLosingBattle)
     {
         m_BaseData = baseData;
         m_CurrStats = currStats;
         m_ClassSO = classSO;
         m_CurrEquippedWeapon = currEquippedWeapon;
+        m_CannotDieWithoutLosingBattle = cannotDieWithoutLosingBattle;
     }
 
     public UnitModelData GetUnitModelData()
