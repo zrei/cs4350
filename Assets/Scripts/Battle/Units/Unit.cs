@@ -140,6 +140,18 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
+
+        m_MeshFader = gameObject.AddComponent<MeshFader>();
+        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
+    }
+    #endregion
+
+    #region Rendering
+    private MeshFader m_MeshFader;
+
+    public void FadeMesh(float targetOpacity, float duration)
+    {
+        m_MeshFader.Fade(targetOpacity, duration);
     }
     #endregion
 
@@ -395,7 +407,15 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         OnDeath?.Invoke();
         m_Animator.SetBool(DeathAnimParam, true);
-        Destroy(gameObject, 2f);
+
+        IEnumerator DeathCoroutine()
+        {
+            yield return new WaitForSeconds(1f);
+            FadeMesh(0, 0.5f);
+            yield return new WaitForSeconds(1f);
+            Destroy(gameObject);
+        }
+        StartCoroutine(DeathCoroutine());
     }
     #endregion
 
