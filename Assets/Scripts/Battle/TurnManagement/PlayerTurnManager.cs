@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEngine;
 
 public enum PlayerTurnState
 {
     SELECTING_ACTION,
     INSPECT,
     SELECTING_MOVEMENT_SQUARE,
-    SELECTING_ACTION_TARGET
+    SELECTING_ACTION_TARGET,
+    SELECTING_TELEPORT_TARGET
 }
 
 public class PlayerTurnManager : TurnManager
@@ -54,6 +55,14 @@ public class PlayerTurnManager : TurnManager
         }
     }
     private ActiveSkillSO selectedSkill;
+
+    #region Special Teleport Handling
+    /// <summary>
+    /// Used to cache the target tile visual from active skill
+    /// targeting to be used after selecting teleport tile
+    /// </summary>
+    private CoordPair m_CachedTargetTile;
+    #endregion
 
     #region Start Turn
     /// <summary>
@@ -141,6 +150,9 @@ public class PlayerTurnManager : TurnManager
             case PlayerTurnState.SELECTING_ACTION_TARGET:
                 UpdateActiveSkillState();
                 break;
+            case PlayerTurnState.SELECTING_TELEPORT_TARGET:
+                UpdateTeleportState();
+                break;
         }
     }
 
@@ -171,6 +183,23 @@ public class PlayerTurnManager : TurnManager
             m_MapLogic.ResetTarget();
         }
     }
+
+    private void UpdateTeleportState()
+    {
+        if (selectedTileData == null || selectedTileVisual == null) return;
+
+        // TODO: UI
+        /*
+        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
+        {
+            m_MapLogic.SetTarget(selectedTileVisual.GridType, SelectedSkill, selectedTileVisual.Coordinates);
+        }
+        else
+        {
+            m_MapLogic.ResetTarget();
+        }
+        */
+    }
     #endregion
 
     #region Perform Action
@@ -187,6 +216,7 @@ public class PlayerTurnManager : TurnManager
             PlayerTurnState.SELECTING_MOVEMENT_SQUARE => TryPerformMove(),
             PlayerTurnState.INSPECT => TryInspect(),
             PlayerTurnState.SELECTING_ACTION => TrySelectAction(),
+            PlayerTurnState.SELECTING_TELEPORT_TARGET => TryPerformTeleport(),
             _ => false
         };
     }
@@ -217,6 +247,12 @@ public class PlayerTurnManager : TurnManager
 
         if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
         {
+            if (selectedSkill.ContainsSkillType(SkillEffectType.TELEPORT))
+            {
+                m_CachedTargetTile = selectedTileVisual.Coordinates;
+                TransitToAction(PlayerTurnState.SELECTING_TELEPORT_TARGET);
+                return true;
+            }
             m_MapLogic.PerformSkill(
                 selectedTileVisual.GridType,
                 m_CurrUnit,
@@ -228,6 +264,34 @@ public class PlayerTurnManager : TurnManager
 
             GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(null);
             GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+        void CompleteSkill()
+        {
+            EndTurn();
+        }
+    }
+
+    private bool TryPerformTeleport()
+    {
+        if (selectedTileData == null || selectedTileVisual == null) return false;
+
+        if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
+        {
+            m_MapLogic.PerformTeleportSkill(
+                selectedTileVisual.GridType,
+                m_CurrUnit,
+                SelectedSkill,
+                m_CachedTargetTile,
+                selectedTileVisual.Coordinates,
+                CompleteSkill);
+            m_MapLogic.ResetMap();
+            Logger.Log(this.GetType().Name, "Attack + Teleport!", LogLevel.LOG);
             return true;
         }
         else
@@ -286,7 +350,7 @@ public class PlayerTurnManager : TurnManager
     {
         m_MapLogic.ResetMap();
 
-        if (m_CurrState == PlayerTurnState.SELECTING_ACTION_TARGET && currAction != PlayerTurnState.SELECTING_ACTION_TARGET)
+        if (m_CurrState == PlayerTurnState.SELECTING_ACTION_TARGET && currAction != PlayerTurnState.SELECTING_ACTION_TARGET && currAction != PlayerTurnState.SELECTING_TELEPORT_TARGET)
         {
             m_CurrUnit.CancelSkillAnimation();
         }
@@ -298,6 +362,7 @@ public class PlayerTurnManager : TurnManager
         {
             case PlayerTurnState.SELECTING_ACTION:
             case PlayerTurnState.INSPECT:
+            case PlayerTurnState.SELECTING_TELEPORT_TARGET:
                 m_MapLogic.ShowInspectable(GridType.PLAYER);
                 m_MapLogic.ShowInspectable(GridType.ENEMY);
                 break;

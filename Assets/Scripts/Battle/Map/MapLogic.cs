@@ -185,9 +185,19 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile, completeSkillEvent);
     }
 
+    public void PerformTeleportSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, CoordPair teleportTargetTile, VoidEvent completeSkillEvent)
+    {
+        RetrieveGrid(gridType).PerformTeleportSkill(attacker, attack, targetTile, teleportTargetTile, completeSkillEvent);
+    }
+
     public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
     {
         return RetrieveGrid(gridType).IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied);
+    }
+
+    public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType)
+    {
+        return RetrieveGrid(gridType).IsValidTeleportTile(activeSkillSO, unit, targetTile);
     }
     #endregion
 

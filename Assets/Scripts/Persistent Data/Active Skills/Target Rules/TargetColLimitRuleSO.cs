@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TargetColLimitRuleSO", menuName = "ScriptableObject/ActiveSkills/TargetRules/TargetColLimitRuleSO")]
-public class TargetColLimitRuleSO : SkillTargetRuleSO
+public class TargetColLimitRuleSO : TargetLocationRuleSO
 {
     public int[] m_AllowedTargetCols;
 

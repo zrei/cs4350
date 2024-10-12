@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AttackerRowLimitRuleSO", menuName = "ScriptableObject/ActiveSkills/TargetRules/AttackerRowLimitRuleSO")]
-public class AttackerRowLimitRuleSO : SkillTargetRuleSO
+public class AttackerRowLimitRuleSO : AttackerLocationRuleSO
 {
     public int[] m_AllowedAttackerRows;
 
