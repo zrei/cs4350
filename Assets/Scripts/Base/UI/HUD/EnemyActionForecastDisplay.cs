@@ -1,5 +1,6 @@
 using Game;
 using Game.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,12 +33,14 @@ public class EnemyActionForecastDisplay : MonoBehaviour
             if (trackedUnit != null)
             {
                 trackedUnit.OnDecideAction -= OnDecideAction;
+                trackedUnit.OnDeath -= OnDeath;
             }
 
             trackedUnit = value;
             if (trackedUnit != null)
             {
                 trackedUnit.OnDecideAction += OnDecideAction;
+                trackedUnit.OnDeath += OnDeath;
                 BeginFollow();
             }
         }
@@ -51,6 +54,8 @@ public class EnemyActionForecastDisplay : MonoBehaviour
 
     private Coroutine followCoroutine;
 
+    private event Action onAnimationFinishEvent;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -63,6 +68,18 @@ public class EnemyActionForecastDisplay : MonoBehaviour
         isHidden = true;
 
         GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+        GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
+        GlobalEvents.Battle.CompleteAttackAnimationEvent += OnCompleteAttackAnimation;
+    }
+
+    private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+    {
+        Hide();
+    }
+
+    private void OnCompleteAttackAnimation()
+    {
+        Show();
     }
 
     private void OnSceneLoad()
@@ -73,6 +90,8 @@ public class EnemyActionForecastDisplay : MonoBehaviour
     private void OnBattleEnd(UnitAllegiance _, int _2)
     {
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+        GlobalEvents.Battle.CompleteAttackAnimationEvent -= OnCompleteAttackAnimation;
 
         TrackedUnit = null;
         Hide();
@@ -82,17 +101,12 @@ public class EnemyActionForecastDisplay : MonoBehaviour
     {
         GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+        GlobalEvents.Battle.CompleteAttackAnimationEvent -= OnCompleteAttackAnimation;
     }
 
     private void Start()
     {
-        // avoid null error in the level node scene
-        if (!CameraManager.IsReady)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         var parentUnit = transform.parent.GetComponent<EnemyUnit>();
         if (parentUnit == null)
         {
@@ -161,6 +175,19 @@ public class EnemyActionForecastDisplay : MonoBehaviour
         }
     }
 
+    private void OnDeath()
+    {
+        void Dispose()
+        {
+            onAnimationFinishEvent -= Dispose;
+
+            Destroy(gameObject);
+        }
+        onAnimationFinishEvent += Dispose;
+        TrackedUnit = null;
+        Hide();
+    }
+
     public void Show()
     {
         if (!isHidden) return;
@@ -184,5 +211,7 @@ public class EnemyActionForecastDisplay : MonoBehaviour
         animator.enabled = !isHidden;
         canvasGroup.interactable = !isHidden;
         canvasGroup.blocksRaycasts = !isHidden;
+
+        onAnimationFinishEvent?.Invoke();
     }
 }

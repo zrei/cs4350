@@ -92,6 +92,7 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
             {
                 mapLogic.ShowAttackForecast(GridType.ENEMY, new List<CoordPair>() { enemyUnit.CurrPosition });
                 yield return new WaitForSeconds(attackDelay);
+                mapLogic.ShowAttackForecast(GridType.ENEMY, new List<CoordPair>() { });
 
                 mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
                 yield break;
@@ -112,6 +113,7 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 
             mapLogic.ShowAttackForecast(GridType.PLAYER, new List<CoordPair>() { targetTile });
             yield return new WaitForSeconds(attackDelay);
+            mapLogic.ShowAttackForecast(GridType.PLAYER, new List<CoordPair>() { });
 
             mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, targetTile, completeActionEvent);
         }
