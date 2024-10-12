@@ -402,6 +402,11 @@ public class GridLogic : MonoBehaviour
             }
         }
 
+        if (activeSkill.ContainsSkillType(SkillEffectType.TELEPORT))
+        {
+            
+        }
+
         void CompleteSkill()
         {
             attacker.PostSkillEvent -= CompleteSkill;
