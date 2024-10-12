@@ -11,6 +11,7 @@ public class PlayerCharacterSO : CharacterSO
     public Stats m_StartingStats;
     [Tooltip("Growth rates for each stat - how growth rates work is that once the internally tracked progress of each stat reaches an arbitrary value, a single stat point is added to their base stats. Growth rates control how fast the internal progress grows.")]
     public GrowthRate m_GrowthRates;
+    public CharacterMoralityTraitSO m_CharacterMoralityTrait;
 
     public UnitModelData GetUnitModelData(OutfitType outfitType)
     {

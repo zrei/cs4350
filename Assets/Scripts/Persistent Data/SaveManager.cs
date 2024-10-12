@@ -35,6 +35,7 @@ public class SaveManager : Singleton<SaveManager>
 {
     private const string UNIT_DATA_KEY = "UnitData";
     private const string INVENTORY_DATA_KEY = "InventoryData";
+    private const string MORALITY_DATA_KEY = "MoralityData";
     private const string ITEM_SEPARATOR = "\t";
 
     protected override void HandleAwake()
@@ -47,6 +48,7 @@ public class SaveManager : Singleton<SaveManager>
         base.HandleDestroy();
     }
 
+    #region Character
     public List<CharacterSaveData> LoadCharacterSaveData()
     {
         return LoadData<CharacterSaveData>(UNIT_DATA_KEY);
@@ -56,7 +58,9 @@ public class SaveManager : Singleton<SaveManager>
     {
         SaveData<CharacterSaveData>(UNIT_DATA_KEY, data);
     }
+    #endregion
 
+    #region Inventory
     public List<WeaponInstanceSaveData> LoadInventory()
     {
         return LoadData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY);
@@ -66,6 +70,19 @@ public class SaveManager : Singleton<SaveManager>
     {
         SaveData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY, data);
     }
+    #endregion
+
+    #region Morality
+    public int LoadMorality()
+    {
+        return PlayerPrefs.GetInt(MORALITY_DATA_KEY);
+    }
+
+    public void SaveMorality(int morality)
+    {
+        PlayerPrefs.SetInt(MORALITY_DATA_KEY, morality);
+    }
+    #endregion
 
     private List<T> LoadData<T>(string saveKey)
     {
