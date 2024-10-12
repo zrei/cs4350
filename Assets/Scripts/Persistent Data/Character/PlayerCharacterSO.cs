@@ -13,6 +13,9 @@ public class PlayerCharacterSO : CharacterSO
     public GrowthRate m_GrowthRates;
     public CharacterMoralityTraitSO m_CharacterMoralityTrait;
 
+    [Tooltip("The lord cannot die in battle, or the battle is lost")]
+    public bool m_IsLord;
+
     public UnitModelData GetUnitModelData(OutfitType outfitType)
     {
         return m_Race.GetUnitModelData(m_Gender, outfitType);
