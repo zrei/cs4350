@@ -149,7 +149,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_WeaponPassiveTokens.Clear();
         foreach (InflictedToken inflictedToken in weaponInstanceSO.m_PassiveTokens)
         {
-            m_WeaponPassiveTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number));
+            m_WeaponPassiveTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier));
         }
     }
     #endregion

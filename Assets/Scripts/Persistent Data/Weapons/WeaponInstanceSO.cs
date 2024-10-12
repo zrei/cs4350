@@ -18,7 +18,7 @@ public class WeaponInstanceSO : ScriptableObject
     public WeaponType m_WeaponType;
     public WeaponModel m_WeaponModel;
 
-    [Tooltip("Always applies, will not expire")] 
+    [Tooltip("Always applies, will not expire - the number of tokens will be ignored")] 
     public List<InflictedToken> m_PassiveTokens;
 
     /// <summary>
