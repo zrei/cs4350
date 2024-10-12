@@ -50,8 +50,6 @@ public class BattleManager : Singleton<BattleManager>
     // I'm leaving this here
     private HashSet<Unit> m_AllPlayerUnits = new HashSet<Unit>();
     private HashSet<Unit> m_AllEnemyUnits = new HashSet<Unit>();
-    private HashSet<Unit> m_TrackedEnemyUnits = new HashSet<Unit>();
-    private HashSet<Unit> m_TrackedPlayerUnits = new HashSet<Unit>();
 
     private const float DELAY_TILL_NEXT_TURN = 0.3f;
     #endregion
@@ -62,10 +60,15 @@ public class BattleManager : Singleton<BattleManager>
     private bool m_HasBattleConcluded = false;
     #endregion
 
-    #region Battle Data
+    #region Win Condition
     private WinCondition m_WinCondition;
-    private SecondaryLoseCondition[] m_SecondaryLoseCondition;
     private float m_TurnsToSurvive;
+    private HashSet<Unit> m_TrackedEnemyUnits = new HashSet<Unit>();
+    #endregion
+
+    #region Lose Condition
+    private HashSet<Unit> m_TrackedPlayerUnits = new HashSet<Unit>();
+    private SecondaryLoseCondition[] m_SecondaryLoseCondition;
     private float m_MaxTurns;
     #endregion
 
@@ -245,19 +248,25 @@ public class BattleManager : Singleton<BattleManager>
     #endregion
 
     #region BattleOutcome
+    /// <summary>
+    /// Check the current battle state and determine if victory has been reached
+    /// </summary>
+    /// <returns></returns>
     private bool CheckForVictory()
     {
-        switch (m_WinCondition)
+        return m_WinCondition switch
         {
-            case WinCondition.DEFEAT_REQUIRED:
-                return m_TrackedEnemyUnits.Count == 0;
-            case WinCondition.SURVIVE_TURNS:
-                return m_TurnQueue.GetCyclesElapsed() >= m_TurnsToSurvive;
-            default:
-                return false;
-        }
+            WinCondition.DEFEAT_REQUIRED => m_TrackedEnemyUnits.Count == 0,
+            WinCondition.SURVIVE_TURNS => m_TurnQueue.GetCyclesElapsed() >= m_TurnsToSurvive,
+            _ => false
+        };
     }
 
+    /// <summary>
+    /// Check the current battle state and determine if the player has been defeated
+    /// </summary>
+    /// <param name="felledUnit"></param>
+    /// <returns></returns>
     private bool CheckForDefeat(Unit felledUnit = null)
     {
         // check for tracked player unit death
