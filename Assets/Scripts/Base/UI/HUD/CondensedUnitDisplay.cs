@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.UI
@@ -56,7 +57,7 @@ namespace Game.UI
         private CanvasGroup canvasGroup;
 
         private bool isHidden;
-        private event Action OnAnimationFinishEvent;
+        private event Action onAnimationFinishEvent;
 
         private void Awake()
         {
@@ -70,11 +71,25 @@ namespace Game.UI
             isHidden = true;
 
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
+            GlobalEvents.Battle.CompleteAttackAnimationEvent += OnCompleteAttackAnimation;
+        }
+
+        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+        {
+            Hide();
+        }
+
+        private void OnCompleteAttackAnimation()
+        {
+            Show();
         }
 
         private void OnBattleEnd(UnitAllegiance _, int _2)
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+            GlobalEvents.Battle.CompleteAttackAnimationEvent -= OnCompleteAttackAnimation;
 
             TrackedUnit = null;
             Hide();
@@ -83,12 +98,14 @@ namespace Game.UI
         private void OnDestroy()
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+            GlobalEvents.Battle.CompleteAttackAnimationEvent -= OnCompleteAttackAnimation;
         }
 
         private void Start()
         {
             // if the Unit prefab is not instantiated in the battle scene, don't show this UI
-            if (!WorldHUDManager.IsReady)
+            if (!BattleManager.IsReady)
             {
                 Destroy(gameObject);
                 return;
@@ -126,11 +143,11 @@ namespace Game.UI
         {
             void Dispose()
             {
-                OnAnimationFinishEvent -= Dispose;
+                onAnimationFinishEvent -= Dispose;
                 WorldHUDManager.Instance.RemoveHUD(transform);
                 Destroy(gameObject);
             }
-            OnAnimationFinishEvent += Dispose;
+            onAnimationFinishEvent += Dispose;
             TrackedUnit = null;
         }
 
@@ -157,7 +174,7 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
-            OnAnimationFinishEvent?.Invoke();
+            onAnimationFinishEvent?.Invoke();
         }
     }
 }

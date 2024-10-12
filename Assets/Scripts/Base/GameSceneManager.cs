@@ -69,13 +69,16 @@ public class GameSceneManager : Singleton<GameSceneManager>
         
         yield return new WaitForSeconds(m_TransitionTime);
         
-        SceneManager.LoadSceneAsync(BATTLE_SCENE_INDEX, LoadSceneMode.Additive);
-        
-        CameraManager.Instance.SetUpBattleCamera();
-        
-        m_Transition.SetTrigger("End");
-        
-        yield return new WaitForSeconds(m_TransitionTime);
+        var asyncHandle = SceneManager.LoadSceneAsync(BATTLE_SCENE_INDEX, LoadSceneMode.Additive);
+        void OnSceneLoadComplete(AsyncOperation handle)
+        {
+            asyncHandle.completed -= OnSceneLoadComplete;
+
+            CameraManager.Instance.SetUpBattleCamera();
+
+            m_Transition.SetTrigger("End");
+        }
+        asyncHandle.completed += OnSceneLoadComplete;
     }
     
     IEnumerator UnloadBattleSceneWithTransition()
@@ -84,15 +87,18 @@ public class GameSceneManager : Singleton<GameSceneManager>
         
         yield return new WaitForSeconds(m_TransitionTime);
         
-        CameraManager.Instance.SetUpLevelCamera();
-        
-        SceneManager.UnloadSceneAsync(BATTLE_SCENE_INDEX);
-        
-        m_Transition.SetTrigger("End");
-        
-        yield return new WaitForSeconds(m_TransitionTime);
-        
-        GlobalEvents.Battle.ReturnFromBattleEvent?.Invoke();
+        var asyncHandle = SceneManager.UnloadSceneAsync(BATTLE_SCENE_INDEX);
+        void OnSceneUnloadComplete(AsyncOperation handle)
+        {
+            asyncHandle.completed -= OnSceneUnloadComplete;
+
+            CameraManager.Instance.SetUpLevelCamera();
+
+            m_Transition.SetTrigger("End");
+            
+            GlobalEvents.Battle.ReturnFromBattleEvent?.Invoke();
+        }
+        asyncHandle.completed += OnSceneUnloadComplete;
     }
 
     #endregion
