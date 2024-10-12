@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cinemachine;
 using Game;
 using Game.Input;
 using Game.UI;
@@ -34,6 +35,8 @@ public class LevelManager : MonoBehaviour
     // Unit Data
     [SerializeField] PlayerUnit m_PlayerUnit;
     [SerializeField] LevellingManager m_LevellingManager;
+
+    [SerializeField] CinemachineVirtualCamera m_LevelVCam;
     
     // UI
     IUIScreen m_BattleNodeResultScreen;
@@ -154,6 +157,9 @@ public class LevelManager : MonoBehaviour
         var tokenTransform = m_PlayerUnitToken.gameObject.transform;
         tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
         tokenTransform.position = m_LevelNodeManager.CurrentNode.transform.position + Vector3.up * 0.1f;
+
+        m_LevelVCam.Follow = tokenTransform;
+        m_LevelVCam.LookAt = tokenTransform;
     }
 
     #endregion
