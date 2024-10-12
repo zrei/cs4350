@@ -12,6 +12,9 @@ public class PlayerCharacterSO : CharacterSO
     [Tooltip("Growth rates for each stat - how growth rates work is that once the internally tracked progress of each stat reaches an arbitrary value, a single stat point is added to their base stats. Growth rates control how fast the internal progress grows.")]
     public GrowthRate m_GrowthRates;
 
+    [Tooltip("The lord cannot die in battle, or the battle is lost")]
+    public bool m_IsLord;
+
     public UnitModelData GetUnitModelData(OutfitType outfitType)
     {
         return m_Race.GetUnitModelData(m_Gender, outfitType);

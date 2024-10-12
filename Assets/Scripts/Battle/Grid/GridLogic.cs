@@ -397,7 +397,7 @@ public class GridLogic : MonoBehaviour
                 for (int i = 0; i < summonPositions.Count; ++i)
                 {
                     // TODO: Possible animation delay
-                    BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments});
+                    BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments, m_DefeatRequired = false});
                 }
             }
         }
