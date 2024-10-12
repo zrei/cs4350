@@ -17,7 +17,9 @@ public class WeaponInstanceSO : ScriptableObject
     /// </summary>
     public WeaponType m_WeaponType;
     public List<WeaponModel> m_WeaponModels;
-    public List<TokenSO> m_PassiveTokens;
+
+    [Tooltip("Always applies, will not expire - the number of tokens will be ignored")] 
+    public List<InflictedToken> m_PassiveTokens;
 
     /// <summary>
     /// How much this weapon affects base attack stat

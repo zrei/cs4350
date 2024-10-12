@@ -12,9 +12,6 @@ public abstract class ClassSO : ScriptableObject
     public WeaponTypeSO m_WeaponType;
     public WeaponAnimationType WeaponAnimationType => m_WeaponType.m_WeaponAnimationType;
 
-    [Header("Passive Buffs")]
-    public PassiveSkillSO[] m_PassiveSkills;
-
     [Header("Movement")]
     public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
     public bool m_CanSwapTiles = false;

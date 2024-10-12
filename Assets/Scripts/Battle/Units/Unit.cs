@@ -91,6 +91,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     private WeaponInstanceSO m_EquippedWeapon;
     private List<WeaponModel> m_WeaponModels = new();
+    private readonly List<TokenStack> m_WeaponPassiveTokens = new();
 
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO)
@@ -102,6 +103,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_Class = classSo;
 
         InstantiateModel(unitModelData, weaponInstanceSO, classSo);
+        InitialiseWeaponPassiveTokens(weaponInstanceSO);
     }
 
     /// <summary>
@@ -155,6 +157,15 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void FadeMesh(float targetOpacity, float duration)
     {
         m_MeshFader.Fade(targetOpacity, duration);
+    }
+
+    private void InitialiseWeaponPassiveTokens(WeaponInstanceSO weaponInstanceSO)
+    {
+        m_WeaponPassiveTokens.Clear();
+        foreach (InflictedToken inflictedToken in weaponInstanceSO.m_PassiveTokens)
+        {
+            m_WeaponPassiveTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier));
+        }
     }
     #endregion
 
@@ -268,7 +279,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     */
     public bool HasToken(TokenType tokenType)
     {
-        return m_StatusManager.HasTokenType(tokenType);
+        return m_StatusManager.HasTokenType(tokenType) || m_WeaponPassiveTokens.Any(x => x.TokenType == tokenType);
     }
 
     public void ConsumeTokens(TokenConsumptionType consumeType)
@@ -283,7 +294,13 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
     {
-        return m_StatusManager.GetInflictedStatusEffects(consumeType);
+        List<StatusEffect> inflictedStatusEffects = m_StatusManager.GetInflictedStatusEffects(consumeType);
+        foreach (TokenStack token in m_WeaponPassiveTokens)
+        {
+            if (token.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
+                inflictedStatusEffects.Add(statusEffect);
+        }
+        return inflictedStatusEffects;
     }
     #endregion
 
@@ -302,13 +319,23 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     // for preview purposes: ADD THE WEAPON STUFF
     public float GetFlatStatChange(StatType statType)
     {
-        return m_StatusManager.GetFlatStatChange(statType);
+        float flatStatChange = m_StatusManager.GetFlatStatChange(statType);
+        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        {
+            flatStatChange += tokenStack.GetFlatStatChange(statType);
+        }
+        return flatStatChange;
     }
 
     // for preview purposes
     public float GetMultStatChange(StatType statType)
     {
-        return m_StatusManager.GetMultStatChange(statType);
+        float multStatChange = m_StatusManager.GetMultStatChange(statType);
+        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        {
+            multStatChange *= tokenStack.GetMultStatChange(statType);
+        }
+        return multStatChange;
     }
 
     public float GetBaseAttackModifier()
@@ -323,31 +350,51 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public float GetTotalStat(StatType statType, float externalBaseModifier = 1f)
     {
-        return (m_Stats.GetStat(statType) * externalBaseModifier + m_StatusManager.GetFlatStatChange(statType)) * m_StatusManager.GetMultStatChange(statType);
+        return (m_Stats.GetStat(statType) * externalBaseModifier + GetFlatStatChange(statType)) * GetMultStatChange(statType);
     }
     #endregion
 
     #region Damage Modifier
     public float GetFinalCritProportion()
     {
-        return m_StatusManager.GetCritAmount();
+        float critProportion = m_StatusManager.GetCritAmount();
+        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        {
+            critProportion *= tokenStack.GetFinalCritProportion();
+        }
+        return critProportion;
     }
     #endregion
 
     #region Status
     public bool CanPerformTurn()
     {
-        return !m_StatusManager.IsStunned();
+        return !HasToken(TokenType.STUN);
     }
 
     public bool HasReflect()
     {
-        return m_StatusManager.CanReflect();
+        return HasToken(TokenType.REFLECT);
     }
 
     public float GetReflectProportion()
     {
-        return m_StatusManager.GetReflectProportion();
+        float reflectProportion = m_StatusManager.GetReflectProportion();
+        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        {
+            reflectProportion += tokenStack.GetReflectProportion();
+        }
+        return reflectProportion;
+    }
+
+    public float GetLifestealProportion()
+    {
+        float lifestealProportion = m_StatusManager.GetLifestealProportion();
+        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        {
+            lifestealProportion += tokenStack.GetLifestealProportion();
+        }
+        return lifestealProportion;
     }
 
     public void InflictStatus(StatusEffect statusEffect)
@@ -368,7 +415,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public bool CanEvade()
     {
-        return m_StatusManager.CanEvade();
+        return HasToken(TokenType.EVADE);
     }
     #endregion
 
@@ -528,7 +575,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             AlterMana(-attackSO.m_ConsumedMana);
 
             if (attackSO.DealsDamage && HasToken(TokenType.LIFESTEAL))
-                Heal(m_StatusManager.GetLifestealProportion() * dealtDamage);
+                Heal(GetLifestealProportion() * dealtDamage);
 
             if (attackSO.IsMagicAttack)
                 ConsumeTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
