@@ -3,7 +3,17 @@ guid: 4384eef2d4d07714fb43b253260d899a
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Eyes
+    second: {fileID: 2100000, guid: 54ff0bae7eeec86488b97de86a2f03a3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Skin
+    second: {fileID: 2100000, guid: 883fd3db5f047614392f51b75996e426, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -21,96 +31,66 @@ ModelImporter:
     animationImportErrors: 
     animationImportWarnings: "\nClip 'EF_IdleAnim' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'Hips' has translation animation that will
-      be discarded.\n\t'Hips' is inbetween humanoid transforms and has rotation animation
-      that will be discarded.\n\t'Chest' is inbetween humanoid transforms and has
-      rotation animation that will be discarded.\n\t'Head' has scale animation that
-      will be discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
+      to improve retargeting quality.\n\t'Head' has scale animation that will be
+      discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
       has scale animation that will be discarded.\n\t'Ankle.L' has scale animation
       that will be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n\nClip
       'EF_HurtAnim' has import animation warnings that might lower retargeting quality:\nNote:
-      Activate translation DOF on avatar to improve retargeting quality.\n\t'Hips'
-      has translation animation that will be discarded.\n\t'Hips' is inbetween humanoid
-      transforms and has rotation animation that will be discarded.\n\t'Chest' is
-      inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Head'
+      Activate translation DOF on avatar to improve retargeting quality.\n\t'Head'
       has scale animation that will be discarded.\n\t'Palm.L' has scale animation
       that will be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
       has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
       that will be discarded.\n\nClip 'EF_DeathAnim' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'Hips' has translation animation that will
-      be discarded.\n\t'Hips' is inbetween humanoid transforms and has rotation animation
-      that will be discarded.\n\t'Chest' is inbetween humanoid transforms and has
-      rotation animation that will be discarded.\n\t'Head' has scale animation that
-      will be discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
+      to improve retargeting quality.\n\t'Head' has scale animation that will be
+      discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
       has scale animation that will be discarded.\n\t'Ankle.L' has scale animation
       that will be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n\nClip
       'EF_ForwardAnim' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Hips'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Chest'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Head'
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Head'
       has scale animation that will be discarded.\n\t'Palm.L' has scale animation
       that will be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
       has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
       that will be discarded.\n\nClip 'EF_BackwardAnim' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'Hips' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'Chest' is inbetween
-      humanoid transforms and has rotation animation that will be discarded.\n\t'Palm.L'
-      has scale animation that will be discarded.\n\t'Palm.R' has scale animation
-      that will be discarded.\n\t'Ankle.L' has scale animation that will be discarded.\n\t'Ankle.R'
-      has scale animation that will be discarded.\n\nClip 'EF_StrafeRightAnim' has
-      import animation warnings that might lower retargeting quality:\nNote: Activate
-      translation DOF on avatar to improve retargeting quality.\n\t'Hips' is inbetween
-      humanoid transforms and has rotation animation that will be discarded.\n\t'Ankle.L'
+      to improve retargeting quality.\n\t'Palm.L' has scale animation that will be
+      discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
       has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
-      that will be discarded.\n\nClip 'EF_StrafeLeftAnim' has import animation warnings
+      that will be discarded.\n\nClip 'EF_StrafeRightAnim' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'Hips' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'Ankle.L' has scale animation
-      that will be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n\nClip
-      'EF_MagicAttackAnim' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Hips'
-      has translation animation that will be discarded.\n\t'Hips' is inbetween humanoid
-      transforms and has rotation animation that will be discarded.\n\t'Chest' is
-      inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Head'
-      has scale animation that will be discarded.\n\t'Palm.L' has scale animation
-      that will be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
+      to improve retargeting quality.\n\t'Ankle.L' has scale animation that will
+      be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n\nClip
+      'EF_StrafeLeftAnim' has import animation warnings that might lower retargeting
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Ankle.L'
       has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
-      that will be discarded.\n\nClip 'EF_MagicSupportAnim' has import animation
-      warnings that might lower retargeting quality:\nNote: Activate translation
-      DOF on avatar to improve retargeting quality.\n\t'Hips' is inbetween humanoid
-      transforms and has rotation animation that will be discarded.\n\t'Chest' is
-      inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Palm.L'
+      that will be discarded.\n\nClip 'EF_MagicAttackAnim' has import animation warnings
+      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'Head' has scale animation that will be
+      discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
+      has scale animation that will be discarded.\n\t'Ankle.L' has scale animation
+      that will be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n\nClip
+      'EF_MagicSupportAnim' has import animation warnings that might lower retargeting
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Palm.L'
       has scale animation that will be discarded.\n\t'Palm.R' has scale animation
       that will be discarded.\n\t'Ankle.L' has scale animation that will be discarded.\n\t'Ankle.R'
       has scale animation that will be discarded.\n\nClip 'EF_SwordAttackAnim' has
       import animation warnings that might lower retargeting quality:\nNote: Activate
-      translation DOF on avatar to improve retargeting quality.\n\t'Hips' has translation
-      animation that will be discarded.\n\t'Hips' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'Chest' is inbetween
-      humanoid transforms and has rotation animation that will be discarded.\n\t'Head'
-      has scale animation that will be discarded.\n\t'Palm.L' has scale animation
-      that will be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
+      translation DOF on avatar to improve retargeting quality.\n\t'Head' has scale
+      animation that will be discarded.\n\t'Palm.L' has scale animation that will
+      be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
       has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
       that will be discarded.\n\nClip 'EF_BroadswordAttackAnim' has import animation
       warnings that might lower retargeting quality:\nNote: Activate translation
-      DOF on avatar to improve retargeting quality.\n\t'Hips' has translation animation
-      that will be discarded.\n\t'Hips' is inbetween humanoid transforms and has
-      rotation animation that will be discarded.\n\t'Chest' is inbetween humanoid
-      transforms and has rotation animation that will be discarded.\n\t'Head' has
-      scale animation that will be discarded.\n\t'Palm.L' has scale animation that
-      will be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
-      has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
-      that will be discarded.\n\nClip 'EF_BowAttackAnim' has import animation warnings
-      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'Hips' has translation animation that will
-      be discarded.\n\t'Hips' is inbetween humanoid transforms and has rotation animation
-      that will be discarded.\n\t'Chest' is inbetween humanoid transforms and has
-      rotation animation that will be discarded.\n\t'Head' has scale animation that
-      will be discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
+      DOF on avatar to improve retargeting quality.\n\t'Head' has scale animation
+      that will be discarded.\n\t'Palm.L' has scale animation that will be discarded.\n\t'Palm.R'
       has scale animation that will be discarded.\n\t'Ankle.L' has scale animation
-      that will be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n"
+      that will be discarded.\n\t'Ankle.R' has scale animation that will be discarded.\n\nClip
+      'EF_BowAttackAnim' has import animation warnings that might lower retargeting
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Head'
+      has scale animation that will be discarded.\n\t'Palm.L' has scale animation
+      that will be discarded.\n\t'Palm.R' has scale animation that will be discarded.\n\t'Ankle.L'
+      has scale animation that will be discarded.\n\t'Ankle.R' has scale animation
+      that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0

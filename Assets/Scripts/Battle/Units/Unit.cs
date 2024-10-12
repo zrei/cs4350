@@ -90,7 +90,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     private WeaponInstanceSO m_EquippedWeapon;
-    private WeaponModel m_WeaponModel;
+    private List<WeaponModel> m_WeaponModels = new();
 
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO)
@@ -116,17 +116,20 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         equipArmor.Initialize(unitModelData.m_AttachItems);
 
         m_EquippedWeapon = weaponSO;
-        WeaponModel weaponModelPrefab = m_EquippedWeapon.m_WeaponModel;
-        if (weaponModelPrefab != null)
+        foreach (var weaponModelPrefab in m_EquippedWeapon.m_WeaponModels)
         {
-            m_WeaponModel = Instantiate(weaponModelPrefab);
-            var attachPoint = m_WeaponModel.attachmentType switch
+            if (weaponModelPrefab != null)
             {
-                WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
-                WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
-                _ => null,
-            };
-            m_WeaponModel.transform.SetParent(attachPoint, false);
+                var weaponModel = Instantiate(weaponModelPrefab);
+                var attachPoint = weaponModel.attachmentType switch
+                {
+                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                    _ => null,
+                };
+                weaponModel.transform.SetParent(attachPoint, false);
+                m_WeaponModels.Add(weaponModel);
+            }
         }
 
         m_Animator = model.GetComponentInChildren<Animator>();
@@ -140,6 +143,18 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
+
+        m_MeshFader = gameObject.AddComponent<MeshFader>();
+        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
+    }
+    #endregion
+
+    #region Rendering
+    private MeshFader m_MeshFader;
+
+    public void FadeMesh(float targetOpacity, float duration)
+    {
+        m_MeshFader.Fade(targetOpacity, duration);
     }
     #endregion
 
@@ -395,7 +410,15 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         OnDeath?.Invoke();
         m_Animator.SetBool(DeathAnimParam, true);
-        Destroy(gameObject, 2f);
+
+        IEnumerator DeathCoroutine()
+        {
+            yield return new WaitForSeconds(1f);
+            FadeMesh(0, 0.5f);
+            yield return new WaitForSeconds(1f);
+            Destroy(gameObject);
+        }
+        StartCoroutine(DeathCoroutine());
     }
     #endregion
 
@@ -413,7 +436,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_Animator.SetTrigger(SkillStartAnimParam);
         m_IsSkillAnimStarted = true;
 
-        m_WeaponModel.PlaySkillStartAnimation(skillID);
+        m_WeaponModels.ForEach(x => x.PlaySkillStartAnimation(skillID));
     }
 
     public void PlaySkillExecuteAnimation()
@@ -424,7 +447,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_IsSkillAnimStarted = false;
         m_Animator.SetInteger(SkillIDAnimParam, 0);
 
-        m_WeaponModel.PlaySkillExecuteAnimation();
+        m_WeaponModels.ForEach(x => x.PlaySkillExecuteAnimation());
     }
 
     public void CancelSkillAnimation()
@@ -435,7 +458,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_IsSkillAnimStarted = false;
         m_Animator.SetInteger(SkillIDAnimParam, 0);
 
-        m_WeaponModel.CancelSkillAnimation();
+        m_WeaponModels.ForEach(x => x.CancelSkillAnimation());
     }
     #endregion
 
