@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TargetRangeRuleSO", menuName = "ScriptableObject/ActiveSkills/TargetRules/TargetRangeRuleSO")]
-public class TargetRangeRuleSO : SkillTargetRuleSO
+public class TargetRangeRuleSO : TargetLocationRuleSO
 {
     public int m_AllowedTargetRange;
 

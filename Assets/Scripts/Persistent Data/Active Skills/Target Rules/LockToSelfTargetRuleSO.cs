@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LockToSelfTargetRuleSO", menuName = "ScriptableObject/ActiveSkills/TargetRules/LockToSelfTargetRuleSO")]
-public class LockToSelfTargetRuleSO : SkillTargetRuleSO
+public class LockToSelfTargetRuleSO : TargetSideLimitRuleSO
 {
     public override bool IsValidTargetTile(CoordPair targetTile, Unit attackingUnit, GridType targetGridType)
     {
