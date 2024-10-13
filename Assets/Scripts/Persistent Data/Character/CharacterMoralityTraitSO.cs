@@ -48,7 +48,7 @@ public class CharacterMoralityTraitSO : ScriptableObject
 public struct MoralityThreshold
 {
     [Tooltip("Expressed as a percentage of the max morality")]
-    [Range(0f, 1f)]
+    [Range(-1f, 1f)]
     public float m_Threshold;
 
     public List<InflictedToken> m_Tokens;

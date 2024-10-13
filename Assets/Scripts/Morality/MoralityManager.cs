@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MoralityManager : Singleton<MoralityManager>
 {
-    [SerializeField] MoralitySettings m_MoralitySetting;
+    [SerializeField] MoralitySettingsSO m_MoralitySetting;
 
     private int m_CurrMorality;
     public float CurrMoralityPercentage => (float) m_CurrMorality / m_MoralitySetting.m_MaxMorality;
@@ -23,7 +23,7 @@ public class MoralityManager : Singleton<MoralityManager>
     private void HandleDependencies()
     {
         // TODO: Change this back later
-        m_CurrMorality = m_MoralitySetting.m_StartingMorality;
+        m_CurrMorality = Mathf.FloorToInt(m_MoralitySetting.m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality);
         /*
         if (!SaveManager.IsReady)
         {
@@ -39,6 +39,6 @@ public class MoralityManager : Singleton<MoralityManager>
 
     public void ChangeMorality(int changeAmount)
     {
-        m_CurrMorality = Mathf.Clamp(m_CurrMorality + changeAmount, 0, m_MoralitySetting.m_MaxMorality);
+        m_CurrMorality = Mathf.Clamp(m_CurrMorality + changeAmount, -m_MoralitySetting.m_MaxMorality, m_MoralitySetting.m_MaxMorality);
     }
 }
