@@ -41,6 +41,8 @@ namespace Level
         private GameObject m_TokenModel;
         private WeaponInstanceSO m_EquippedWeapon;
         private List<WeaponModel> m_WeaponModels = new();
+        
+        private MeshFader m_MeshFader;
 
         private NodeVisual m_CurrentNode;
 
@@ -70,7 +72,7 @@ namespace Level
         /// <param name="weaponSO"></param>
         private void InstantiateModel(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
         {
-            m_TokenModel = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, this.transform);
+            m_TokenModel = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, transform);
             EquippingArmor equipArmor = m_TokenModel.GetComponent<EquippingArmor>();
             equipArmor.Initialize(unitModelData.m_AttachItems);
 
@@ -102,6 +104,9 @@ namespace Level
             m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
 
             GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
+            
+            m_MeshFader = gameObject.AddComponent<MeshFader>();
+            m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
         }
         
         public void SetPositionToNode(NodeVisual nodeVisual)
@@ -189,6 +194,41 @@ namespace Level
             transform.rotation = targetRot;
             
             onCompleteRotation?.Invoke();
+        }
+        
+        /// <summary>
+        /// Defeat animation with death (fade away)
+        /// </summary>
+        /// <param name="onComplete"></param>
+        public void Die(VoidEvent onComplete)
+        {
+            m_Animator.SetBool(DeathAnimParam, true);
+
+            IEnumerator DeathCoroutine()
+            {
+                yield return new WaitForSeconds(1f);
+                m_MeshFader.Fade(0, 0.5f);
+                yield return new WaitForSeconds(1f);
+                onComplete?.Invoke();
+            }
+            StartCoroutine(DeathCoroutine());
+        }
+        
+        /// <summary>
+        /// Defeat animation without death, revives afterwards
+        /// </summary>
+        /// <param name="onComplete"></param>
+        public void Defeat(VoidEvent onComplete)
+        {
+            m_Animator.SetBool(DeathAnimParam, true);
+            IEnumerator DefeatCoroutine()
+            {
+                yield return new WaitForSeconds(2f);
+                m_Animator.SetBool(DeathAnimParam, false);
+                yield return new WaitForSeconds(1f);
+                onComplete?.Invoke();
+            }
+            StartCoroutine(DefeatCoroutine());
         }
     }
 }

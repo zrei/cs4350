@@ -14,6 +14,7 @@ public class BattleNodeVisual : NodeVisual
     [SerializeField] Transform m_PlayerTokenTransform;
     
     private const float ENTRY_ANIM_TIME = 0.3f;
+    private const float CLEAR_ANIM_TIME = 0.3f;
     
     private BattleNode m_BattleNode;
     private CharacterToken m_EnemyUnitToken;
@@ -38,44 +39,13 @@ public class BattleNodeVisual : NodeVisual
         if (m_BattleNode.IsCurrent)
         {
             SetNodeState(NodePuckType.CURRENT);
-            
-            if (m_BattleNode.IsCleared)
-            {
-                m_EnemyUnitToken.gameObject.SetActive(false);
-            }
-            else
-            {
-                m_EnemyUnitToken.gameObject.SetActive(true);
-                
-                // Set position to be facing off with player token
-                var tokenTransform = m_EnemyUnitToken.transform;
-                tokenTransform.localScale = Vector3.one * 0.4f;
-                tokenTransform.position = m_EnemyTokenTransform.position;
-                tokenTransform.rotation = m_EnemyTokenTransform.rotation;
-            }
         }
         else
         {
-            if (m_BattleNode.IsCleared)
-            {
-                SetNodeState(NodePuckType.CLEARED);
-                m_EnemyUnitToken.gameObject.SetActive(false);
-            }
-            else
-            {
-                SetNodeState(NodePuckType.BATTLE);
-            }
+            SetNodeState(m_BattleNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.BATTLE);
         }
     }
     
-    public void SetPlayerToken(GameObject playerToken)
-    {
-        // Set position to be facing off with player token
-        var tokenTransform = playerToken.transform;
-        tokenTransform.localScale = Vector3.one * 0.4f;
-        tokenTransform.position = m_PlayerTokenTransform.position;
-        tokenTransform.rotation = m_PlayerTokenTransform.rotation;
-    }
     #endregion
 
     #region Token
@@ -91,6 +61,33 @@ public class BattleNodeVisual : NodeVisual
             m_PlayerTokenTransform.rotation, null, ENTRY_ANIM_TIME);
         m_EnemyUnitToken.MoveToPosition(m_EnemyTokenTransform.position, 
             m_EnemyTokenTransform.rotation, onComplete, ENTRY_ANIM_TIME);
+    }
+    
+    public override bool HasClearAnimation()
+    {
+        return !m_BattleNode.IsCleared;
+    }
+    
+    public override void PlayClearAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    {
+        m_EnemyUnitToken.Die(OnEnemyDeathComplete);
+        return;
+        
+        void OnEnemyDeathComplete()
+        {
+            m_EnemyUnitToken.gameObject.SetActive(false);
+            playerToken.MoveToPosition(GetPlayerTargetPosition(), onComplete, CLEAR_ANIM_TIME);
+        }
+    }
+    
+    public override bool HasFailureAnimation()
+    {
+        return true;
+    }
+    
+    public override void PlayFailureAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    {
+        playerToken.Defeat(onComplete);
     }
 
     #endregion

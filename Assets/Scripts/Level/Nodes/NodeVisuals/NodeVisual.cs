@@ -90,6 +90,28 @@ public abstract class NodeVisual : MonoBehaviour, IPointerEnterHandler, IPointer
         // No animation by default
         onComplete?.Invoke();
     }
+    
+    public virtual bool HasClearAnimation()
+    {
+        return false;
+    }
+
+    public virtual void PlayClearAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    {
+        // No animation by default
+        onComplete?.Invoke();
+    }
+    
+    public virtual bool HasFailureAnimation()
+    {
+        return false;
+    }
+
+    public virtual void PlayFailureAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    {
+        // No animation by default
+        onComplete?.Invoke();
+    }
 
     #endregion
 }

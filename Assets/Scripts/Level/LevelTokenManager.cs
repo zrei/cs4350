@@ -26,11 +26,44 @@ public class LevelTokenManager : MonoBehaviour
         
         m_CurrentNodeVisual = currNodeVisual;
     }
+    
+    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
+    {
+        if (victor == UnitAllegiance.PLAYER)
+        {
+            NodeVisual battleNodeVisual = battleNode.GetComponent<NodeVisual>();
+            if (battleNodeVisual && battleNodeVisual.HasClearAnimation())
+            {
+                battleNodeVisual.PlayClearAnimation(m_PlayerUnitToken, null);
+            }
+        }
+    }
 
     #endregion
 
     #region Node Movement
 
+    /// <summary>
+    /// Get the position right before entering the destination node 
+    /// </summary>
+    /// <param name="origin">Origin node position</param>
+    /// <param name="dest">Destination node position</param>
+    /// <returns></returns>
+    private Vector3 GetNodeEdgePos(Vector3 origin, Vector3 dest)
+    {
+        var direction = (dest - origin).normalized;
+        return dest - direction * NodeVisual.NODE_RADIUS_OFFSET;
+    }
+
+    #endregion
+    
+    #region Helper
+    
+    public Transform GetPlayerTokenTransform()
+    {
+        return m_PlayerUnitToken.transform;
+    }
+    
     /// <summary>
     /// Move the player token to the destination node.
     /// If the destination node has an entry animation, move to the edge of the node and
@@ -58,26 +91,29 @@ public class LevelTokenManager : MonoBehaviour
         
         m_CurrentNodeVisual = destNodeVisual;
     }
-
-    /// <summary>
-    /// Get the position right before entering the destination node 
-    /// </summary>
-    /// <param name="origin">Origin node position</param>
-    /// <param name="dest">Destination node position</param>
-    /// <returns></returns>
-    private Vector3 GetNodeEdgePos(Vector3 origin, Vector3 dest)
+    
+    public void PlayClearAnimation(NodeVisual nodeVisual, VoidEvent onComplete)
     {
-        var direction = (dest - origin).normalized;
-        return dest - direction * NodeVisual.NODE_RADIUS_OFFSET;
+        if (nodeVisual.HasClearAnimation())
+        {
+            nodeVisual.PlayClearAnimation(m_PlayerUnitToken, onComplete);
+        }
+        else
+        {
+            onComplete?.Invoke();
+        }
     }
-
-    #endregion
     
-    #region Helper
-    
-    public Transform GetPlayerTokenTransform()
+    public void PlayFailureAnimation(NodeVisual nodeVisual, VoidEvent onComplete)
     {
-        return m_PlayerUnitToken.transform;
+        if (nodeVisual.HasFailureAnimation())
+        {
+            nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete);
+        }
+        else
+        {
+            onComplete?.Invoke();
+        }
     }
     
     #endregion
