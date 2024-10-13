@@ -72,5 +72,14 @@ public class LevelTokenManager : MonoBehaviour
     }
 
     #endregion
+    
+    #region Helper
+    
+    public Transform GetPlayerTokenTransform()
+    {
+        return m_PlayerUnitToken.transform;
+    }
+    
+    #endregion
 
 }

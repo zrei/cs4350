@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Level
@@ -39,7 +40,7 @@ namespace Level
 
         private GameObject m_TokenModel;
         private WeaponInstanceSO m_EquippedWeapon;
-        private WeaponModel m_WeaponModel;
+        private List<WeaponModel> m_WeaponModels = new();
 
         private NodeVisual m_CurrentNode;
 
@@ -74,17 +75,20 @@ namespace Level
             equipArmor.Initialize(unitModelData.m_AttachItems);
 
             m_EquippedWeapon = weaponSO;
-            WeaponModel weaponModelPrefab = m_EquippedWeapon.m_WeaponModel;
-            if (weaponModelPrefab != null)
+            foreach (var weaponModelPrefab in m_EquippedWeapon.m_WeaponModels)
             {
-                m_WeaponModel = Instantiate(weaponModelPrefab);
-                var attachPoint = m_WeaponModel.attachmentType switch
+                if (weaponModelPrefab != null)
                 {
-                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
-                    _ => null,
-                };
-                m_WeaponModel.transform.SetParent(attachPoint, false);
+                    var weaponModel = Instantiate(weaponModelPrefab);
+                    var attachPoint = weaponModel.attachmentType switch
+                    {
+                        WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                        WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                        _ => null,
+                    };
+                    weaponModel.transform.SetParent(attachPoint, false);
+                    m_WeaponModels.Add(weaponModel);
+                }
             }
 
             m_Animator = m_TokenModel.GetComponentInChildren<Animator>();
