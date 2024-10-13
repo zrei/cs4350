@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName="PlayerCharacterSO", menuName="ScriptableObject/Characters/PlayerCharacterSO")]
@@ -12,6 +13,7 @@ public class PlayerCharacterSO : CharacterSO
     [Tooltip("Growth rates for each stat - how growth rates work is that once the internally tracked progress of each stat reaches an arbitrary value, a single stat point is added to their base stats. Growth rates control how fast the internal progress grows.")]
     public GrowthRate m_GrowthRates;
     public CharacterMoralityTraitSO m_CharacterMoralityTrait;
+    public IEnumerable<InflictedToken> GetInflictedMoralityTokens(float currMoralityPercentage) => m_CharacterMoralityTrait.GetInflictedTokens(currMoralityPercentage);
 
     [Tooltip("The lord cannot die in battle, or the battle is lost")]
     public bool m_IsLord;

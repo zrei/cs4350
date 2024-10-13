@@ -91,19 +91,20 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     private WeaponInstanceSO m_EquippedWeapon;
     private List<WeaponModel> m_WeaponModels = new();
-    private readonly List<TokenStack> m_WeaponPassiveTokens = new();
+    private readonly List<TokenStack> m_PermanentTokens = new();
 
     #region Initialisation
-    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO)
+    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
+        InstantiateModel(unitModelData, weaponInstanceSO, classSo);
+        // initialise permanent tokens first just in case there's something that affects max mana or max health
+        InitialisePermanentTokens(weaponInstanceSO, permanentTokens);
+
         Sprite = sprite;
         m_Stats = stats;
-        m_CurrHealth = m_Stats.m_Health;
-        m_CurrMana = m_Stats.m_Mana;
+        m_CurrHealth = GetTotalStat(StatType.HEALTH);
+        m_CurrMana = GetTotalStat(StatType.MANA);
         m_Class = classSo;
-
-        InstantiateModel(unitModelData, weaponInstanceSO, classSo);
-        InitialiseWeaponPassiveTokens(weaponInstanceSO);
     }
 
     /// <summary>
@@ -159,12 +160,16 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_MeshFader.Fade(targetOpacity, duration);
     }
 
-    private void InitialiseWeaponPassiveTokens(WeaponInstanceSO weaponInstanceSO)
+    private void InitialisePermanentTokens(WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
-        m_WeaponPassiveTokens.Clear();
+        m_PermanentTokens.Clear();
         foreach (InflictedToken inflictedToken in weaponInstanceSO.m_PassiveTokens)
         {
-            m_WeaponPassiveTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier));
+            m_PermanentTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier));
+        }
+        foreach (InflictedToken inflictedToken in permanentTokens)
+        {
+            m_PermanentTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier));
         }
     }
     #endregion
@@ -279,7 +284,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     */
     public bool HasToken(TokenType tokenType)
     {
-        return m_StatusManager.HasTokenType(tokenType) || m_WeaponPassiveTokens.Any(x => x.TokenType == tokenType);
+        return m_StatusManager.HasTokenType(tokenType) || m_PermanentTokens.Any(x => x.TokenType == tokenType);
     }
 
     public void ConsumeTokens(TokenConsumptionType consumeType)
@@ -295,7 +300,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
     {
         List<StatusEffect> inflictedStatusEffects = m_StatusManager.GetInflictedStatusEffects(consumeType);
-        foreach (TokenStack token in m_WeaponPassiveTokens)
+        foreach (TokenStack token in m_PermanentTokens)
         {
             if (token.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
                 inflictedStatusEffects.Add(statusEffect);
@@ -320,7 +325,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public float GetFlatStatChange(StatType statType)
     {
         float flatStatChange = m_StatusManager.GetFlatStatChange(statType);
-        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        foreach (TokenStack tokenStack in m_PermanentTokens)
         {
             flatStatChange += tokenStack.GetFlatStatChange(statType);
         }
@@ -331,7 +336,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public float GetMultStatChange(StatType statType)
     {
         float multStatChange = m_StatusManager.GetMultStatChange(statType);
-        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        foreach (TokenStack tokenStack in m_PermanentTokens)
         {
             multStatChange *= tokenStack.GetMultStatChange(statType);
         }
@@ -358,7 +363,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public float GetFinalCritProportion()
     {
         float critProportion = m_StatusManager.GetCritAmount();
-        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        foreach (TokenStack tokenStack in m_PermanentTokens)
         {
             critProportion *= tokenStack.GetFinalCritProportion();
         }
@@ -380,7 +385,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public float GetReflectProportion()
     {
         float reflectProportion = m_StatusManager.GetReflectProportion();
-        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        foreach (TokenStack tokenStack in m_PermanentTokens)
         {
             reflectProportion += tokenStack.GetReflectProportion();
         }
@@ -390,7 +395,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public float GetLifestealProportion()
     {
         float lifestealProportion = m_StatusManager.GetLifestealProportion();
-        foreach (TokenStack tokenStack in m_WeaponPassiveTokens)
+        foreach (TokenStack tokenStack in m_PermanentTokens)
         {
             lifestealProportion += tokenStack.GetLifestealProportion();
         }
