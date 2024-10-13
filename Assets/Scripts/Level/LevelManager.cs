@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cinemachine;
 using Game;
 using Game.Input;
 using Game.UI;
@@ -35,6 +36,8 @@ public class LevelManager : MonoBehaviour
     
     // Unit Data
     [SerializeField] LevellingManager m_LevellingManager;
+
+    [SerializeField] CinemachineVirtualCamera m_LevelVCam;
     
     // UI
     IUIScreen m_BattleNodeResultScreen;
@@ -146,7 +149,7 @@ public class LevelManager : MonoBehaviour
             EnableLevelGraphInput();
         }
     }
-
+    
     #endregion
 
     #region Inputs

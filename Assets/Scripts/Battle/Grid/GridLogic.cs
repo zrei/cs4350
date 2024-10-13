@@ -354,6 +354,17 @@ public class GridLogic : MonoBehaviour
         return false;
     }
 
+    public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile)
+    {
+        if (!activeSkillSO.IsValidTeleportTargetTile(targetTile, unit, m_GridType))
+            return false;
+
+        if (IsTileOccupied(targetTile))
+            return false;
+
+        return true;
+    }
+
     private List<CoordPair> GetInBoundsTargetTiles(ActiveSkillSO activeSkillSO, CoordPair targetTile)
     {
         List<CoordPair> targetTiles = new();
@@ -377,34 +388,11 @@ public class GridLogic : MonoBehaviour
     /// <param name="damage"></param>
     public void PerformSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
-        List<IHealth> targets = new();
-        foreach (CoordPair coordPair in GetInBoundsTargetTiles(activeSkill, targetTile))
-        {       
-            if (IsTileOccupied(coordPair))
-            {
-                targets.Add(m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit);
-            }
-        }
+        PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill);
 
-        attacker.PostSkillEvent += CompleteSkill;
-        attacker.PerformSkill(activeSkill, targets);
-
-        if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))
+        void CompleteSkill(List<IHealth> targets)
         {
-            foreach (SummonWrapper summon in activeSkill.m_Summons)
-            {
-                List<CoordPair> summonPositions = GetSummonPositions(summon.m_PrioritsePositions, summon.m_PrioritisedRows, summon.m_PrioritisedCols, summon.m_Adds.Count);
-                for (int i = 0; i < summonPositions.Count; ++i)
-                {
-                    // TODO: Possible animation delay
-                    BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments, m_DefeatRequired = false});
-                }
-            }
-        }
-
-        void CompleteSkill()
-        {
-            attacker.PostSkillEvent -= CompleteSkill;
+            attacker.PostSkillEvent = null;
 
             // TODO: Clean this up further?
             List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
@@ -423,6 +411,60 @@ public class GridLogic : MonoBehaviour
             completeSkillEvent?.Invoke();
         }
         
+    }
+
+    public void PerformTeleportSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, CoordPair teleportTile, VoidEvent completeSkillEvent)
+    {
+        PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill);
+
+        void CompleteSkill(List<IHealth> targets)
+        {
+            attacker.PostSkillEvent = null;
+
+            foreach (IHealth target in targets)
+            {
+                if (target.IsDead)
+                    GlobalEvents.Battle.UnitDefeatedEvent?.Invoke((Unit) target);
+                else
+                    SwapTiles(targetTile, teleportTile);
+            }
+
+            // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
+            if (attacker.IsDead)
+            {
+                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(attacker);
+            }
+
+            completeSkillEvent?.Invoke();
+        }
+    }
+
+    private void PerformSkill_Shared(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, Action<List<IHealth>> postSkillEvent)
+    {
+        List<IHealth> targets = new();
+        foreach (CoordPair coordPair in GetInBoundsTargetTiles(activeSkill, targetTile))
+        {       
+            if (IsTileOccupied(coordPair))
+            {
+                targets.Add(m_TileData[coordPair.m_Row, coordPair.m_Col].m_CurrUnit);
+            }
+        }
+
+        attacker.PostSkillEvent += () => postSkillEvent(targets);
+        attacker.PerformSkill(activeSkill, targets);
+
+        if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))
+        {
+            foreach (SummonWrapper summon in activeSkill.m_Summons)
+            {
+                List<CoordPair> summonPositions = GetSummonPositions(summon.m_PrioritsePositions, summon.m_PrioritisedRows, summon.m_PrioritisedCols, summon.m_Adds.Count);
+                for (int i = 0; i < summonPositions.Count; ++i)
+                {
+                    // TODO: Possible animation delay
+                    BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments});
+                }
+            }
+        }
     }
     #endregion
 

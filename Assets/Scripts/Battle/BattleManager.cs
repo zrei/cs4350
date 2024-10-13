@@ -51,6 +51,9 @@ public class BattleManager : Singleton<BattleManager>
     private HashSet<Unit> m_AllPlayerUnits = new HashSet<Unit>();
     private HashSet<Unit> m_AllEnemyUnits = new HashSet<Unit>();
 
+    public HashSet<Unit> PlayerUnits => m_AllPlayerUnits;
+    public HashSet<Unit> EnemyUnits => m_AllEnemyUnits;
+
     private const float DELAY_TILL_NEXT_TURN = 0.3f;
     #endregion
 
@@ -73,7 +76,6 @@ public class BattleManager : Singleton<BattleManager>
     #endregion
 
     #region Camera
-    private Camera m_BattleCamera;
     private const float CAMERA_ROTATION_SPEED = 50f;
     #endregion
 
@@ -86,8 +88,6 @@ public class BattleManager : Singleton<BattleManager>
         m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
         m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
 
-        m_BattleCamera = CameraManager.Instance.MainCamera;
-        m_BattleCamera.transform.LookAt(m_CameraLookAtPoint);
         InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
 
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
@@ -360,7 +360,7 @@ public class BattleManager : Singleton<BattleManager>
     private void OnRotateCamera(IInput input)
     {
         var hAxis = input.GetValue<float>();
-        m_BattleCamera.transform.RotateAround(m_CameraLookAtPoint.position, new Vector3(0f, 1f, 0f), -hAxis * CAMERA_ROTATION_SPEED * Time.deltaTime);
+        m_CameraLookAtPoint.Rotate(Vector3.up, -hAxis * CAMERA_ROTATION_SPEED * Time.deltaTime);
     }
     #endregion
 

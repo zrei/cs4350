@@ -9,6 +9,7 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 
     private List<CoordPair> m_PossibleAttackPositions;
     private List<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
+    private List<CoordPair> m_PossibleTeleportPositions;
 
     private CoordPair m_Target;
 
@@ -26,9 +27,13 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
         if (activeSKill.IsSelfTarget)
             return true;
 
+        bool isTeleportSkill = activeSKill.ContainsSkillType(SkillEffectType.TELEPORT);
+
         m_PossibleAttackPositions = new();
         m_PossibleAttackPositionsIgnoreOccupied = new();
+        m_PossibleTeleportPositions = new();
         bool hasPossibleAttackPosition = false;
+        bool hasPossibleTeleportPositions = false;
 
         GridType targetGridType = TargetGridType;
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
@@ -45,8 +50,16 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
                 {
                     m_PossibleAttackPositionsIgnoreOccupied.Add(coordinates);
                 }
+                if (isTeleportSkill && mapLogic.IsValidTeleportTile(activeSKill, enemyUnit, coordinates, targetGridType))
+                {
+                    m_PossibleTeleportPositions.Add(coordinates);
+                    hasPossibleTeleportPositions = true;
+                }
             }
         }
+
+        if (isTeleportSkill && !hasPossibleTeleportPositions)
+            return false;
 
         return hasPossibleAttackPosition;
     }
@@ -92,8 +105,9 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
             {
                 mapLogic.ShowAttackForecast(GridType.ENEMY, new List<CoordPair>() { enemyUnit.CurrPosition });
                 yield return new WaitForSeconds(attackDelay);
+                mapLogic.ShowAttackForecast(GridType.ENEMY, new List<CoordPair>() { });
 
-                mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, enemyUnit.CurrPosition, completeActionEvent);
+                PerformSkill(mapLogic, enemyUnit, enemyUnit.CurrPosition, completeActionEvent);
                 yield break;
             }
 
@@ -112,10 +126,34 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 
             mapLogic.ShowAttackForecast(GridType.PLAYER, new List<CoordPair>() { targetTile });
             yield return new WaitForSeconds(attackDelay);
+            mapLogic.ShowAttackForecast(GridType.PLAYER, new List<CoordPair>() { });
 
-            mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, targetTile, completeActionEvent);
+            PerformSkill(mapLogic, enemyUnit, targetTile, completeActionEvent);
         }
         CoroutineManager.Instance.StartCoroutine(PlayActionWithAnimation());
+    }
+
+    private void PerformSkill(MapLogic mapLogic, EnemyUnit enemyUnit, CoordPair targetTile, VoidEvent completeActionEvent)
+    {
+        if (!ActiveSkill.ContainsSkillType(SkillEffectType.TELEPORT))
+            mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, targetTile, completeActionEvent);
+        else
+        {
+            float baseWeight = 1f / m_PossibleTeleportPositions.Count;
+
+            List<(CoordPair, float)> targetWeights = m_PossibleTeleportPositions.Select(x => (x, baseWeight)).ToList();
+
+            for (int i = 0; i < targetWeights.Count; ++i)
+            {
+                (CoordPair target, float weight) = targetWeights[i];
+                float finalNodeWeight = weight * ActiveSkillAction.GetFinalWeightProportionForTile(enemyUnit, mapLogic, target);
+                targetWeights[i] = (target, finalNodeWeight);
+            }
+
+            CoordPair teleportTile = RandomHelper.GetRandomT(targetWeights);
+
+            mapLogic.PerformTeleportSkill(TargetGridType, enemyUnit, ActiveSkill, targetTile, teleportTile, completeActionEvent);
+        }
     }
 }
 

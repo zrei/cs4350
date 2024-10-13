@@ -16,8 +16,10 @@ public class WeaponInstanceSO : ScriptableObject
     /// To assist in checking whether a weapon can be equipped for a certain class - would have to be synced up to the WeaponTypeSOs
     /// </summary>
     public WeaponType m_WeaponType;
-    public WeaponModel m_WeaponModel;
-    public List<TokenSO> m_PassiveTokens;
+    public List<WeaponModel> m_WeaponModels;
+
+    [Tooltip("Always applies, will not expire - the number of tokens will be ignored")] 
+    public List<InflictedToken> m_PassiveTokens;
 
     /// <summary>
     /// How much this weapon affects base attack stat

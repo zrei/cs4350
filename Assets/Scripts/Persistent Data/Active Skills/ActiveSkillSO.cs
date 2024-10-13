@@ -52,6 +52,10 @@ public class ActiveSkillSO : ScriptableObject
     [Space]
     [Tooltip("Adds to summon upon attack - only used if skill summons")]
     public List<SummonWrapper> m_Summons;
+
+    [Space]
+    [Tooltip("Rules governing where the target can be teleported to - should generally be location checks for target")]
+    public List<TargetLocationRuleSO> m_TeleportTargetRules;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -104,6 +108,15 @@ public class ActiveSkillSO : ScriptableObject
         if (unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
             return false;
         return m_TargetRules.All(x => x.IsValidTargetTile(targetTile, unit, targetGridType));
+    }
+
+    public bool IsValidTeleportTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
+    {
+        if (IsOpposingSideTarget && !GridHelper.IsOpposingSide(unit.UnitAllegiance, targetGridType))
+            return false;
+        else if (!IsOpposingSideTarget && !GridHelper.IsSameSide(unit.UnitAllegiance, targetGridType))
+            return false;
+        return m_TeleportTargetRules.All(x => x.IsValidTargetTile(targetTile, unit, targetGridType));
     }
 
     public List<CoordPair> ConstructAttackTargetTiles(CoordPair target)

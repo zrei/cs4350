@@ -8,10 +8,10 @@ public class StatusManager :
     //IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
-    private readonly Dictionary<int, TokenStack> m_TokenStacks = new();
+    private readonly Dictionary<int, TokenStack> m_ConsumableTokenStacks = new();
 
     // public IEnumerable<Token> Tokens => m_Tokens.AsEnumerable();
-    public IEnumerable<TokenStack> TokenStacks => m_TokenStacks.Values;
+    public IEnumerable<TokenStack> TokenStacks => m_ConsumableTokenStacks.Values;
     public IEnumerable<StatusEffect> StatusEffects => m_StatusEffects.Values;
     public event StatusEvent OnAdd;
     public event StatusEvent OnChange;
@@ -44,13 +44,13 @@ public class StatusManager :
 
         Logger.Log(this.GetType().Name, $"Add token: {inflictedToken.m_TokenTierData.name} of tier: {inflictedToken.m_Tier}", LogLevel.LOG);
 
-        if (m_TokenStacks.ContainsKey(inflictedToken.Id))
+        if (m_ConsumableTokenStacks.ContainsKey(inflictedToken.Id))
         {
-            m_TokenStacks[inflictedToken.Id].AddToken(inflictedToken.m_Tier, inflictedToken.m_Number);
+            m_ConsumableTokenStacks[inflictedToken.Id].AddToken(inflictedToken.m_Tier, inflictedToken.m_Number);
         }
         else
         {
-            m_TokenStacks[inflictedToken.Id] = new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number);
+            m_ConsumableTokenStacks[inflictedToken.Id] = new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number);
         }
         // OnAdd?.Invoke(token);
     }
@@ -58,14 +58,14 @@ public class StatusManager :
     // special case for now
     public void AddTauntToken(TokenTierSO tokenData, Unit forceTarget, int number = 1)
     {
-        if (m_TokenStacks.ContainsKey(tokenData.m_Id))
+        if (m_ConsumableTokenStacks.ContainsKey(tokenData.m_Id))
         {
             return;
         }
         else
         {
             Logger.Log(this.GetType().Name, $"Add taunt token, force target: {forceTarget.name}", LogLevel.LOG);
-            m_TokenStacks[tokenData.m_Id] = new TauntTokenStack(forceTarget, tokenData, number);
+            m_ConsumableTokenStacks[tokenData.m_Id] = new TauntTokenStack(forceTarget, tokenData, number);
         }
     }
     #endregion
@@ -120,7 +120,7 @@ public class StatusManager :
     #region Getters
     public bool HasTokenType(TokenType tokenType)
     {
-        return m_TokenStacks.Any(x => x.Value.TokenType == tokenType);
+        return m_ConsumableTokenStacks.Any(x => x.Value.TokenType == tokenType);
     }
     /*
     public IEnumerable<Token> GetTokens(TokenType tokenType)
@@ -158,12 +158,12 @@ public class StatusManager :
     #region Clear Tokens
     public void ClearTokens()
     {
-        m_TokenStacks.Clear();
+        m_ConsumableTokenStacks.Clear();
     }
 
     public void ConsumeTokens(TokenConsumptionType consumeType)
     {
-        IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values.ToList();
+        IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();
 
         foreach (TokenStack tokenStack in tokenStacks)
         {
@@ -172,7 +172,7 @@ public class StatusManager :
                 tokenStack.ConsumeToken();
                 if (tokenStack.IsEmpty)
                 {
-                    m_TokenStacks.Remove(tokenStack.Id);
+                    m_ConsumableTokenStacks.Remove(tokenStack.Id);
                     // OnRemove?.Invoke(tokenStack);
                 }       
             }
@@ -181,7 +181,7 @@ public class StatusManager :
 
     public void ConsumeTokens(TokenType tokenType)
     {
-        IEnumerable<TokenStack> tokenStacks = m_TokenStacks.Values.ToList();
+        IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();
 
         foreach (TokenStack tokenStack in tokenStacks)
         {
@@ -190,7 +190,7 @@ public class StatusManager :
                 tokenStack.ConsumeToken();
                 if (tokenStack.IsEmpty)
                 {
-                    m_TokenStacks.Remove(tokenStack.Id);
+                    m_ConsumableTokenStacks.Remove(tokenStack.Id);
                     // OnRemove?.Invoke(tokenStack);
                 }       
             }
@@ -203,7 +203,7 @@ public class StatusManager :
     {
         float totalFlatStatChange = 0;
 
-        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
             totalFlatStatChange += tokenStack.GetFlatStatChange(statType);
         }
@@ -215,7 +215,7 @@ public class StatusManager :
     {
         float totalFlatStatChange = 1;
 
-        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
             totalFlatStatChange *= tokenStack.GetMultStatChange(statType);
         }
@@ -227,7 +227,7 @@ public class StatusManager :
     #region Special Handle
     public bool IsTaunted(out Unit forceTarget)
     {
-        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
             if (tokenStack.TokenType == TokenType.TAUNT)
             {
@@ -242,15 +242,10 @@ public class StatusManager :
         return false;
     }
 
-    public bool CanEvade()
-    {
-        return HasTokenType(TokenType.EVADE);
-    }
-
     public float GetCritAmount()
     {
         float finalCritProportion = 1f;
-        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
             finalCritProportion *= tokenStack.GetFinalCritProportion();
         }
@@ -260,27 +255,17 @@ public class StatusManager :
     public float GetLifestealProportion()
     {
         float finalLifestealProportion = 0f;
-        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
             finalLifestealProportion += tokenStack.GetLifestealProportion();
         }
         return finalLifestealProportion;
     }
 
-    public bool IsStunned()
-    {
-        return HasTokenType(TokenType.STUN);
-    }
-
-    public bool CanReflect()
-    {
-        return HasTokenType(TokenType.REFLECT);
-    }
-
     public float GetReflectProportion()
     {
         float finalReflectProportion = 0f;
-        foreach (TokenStack tokenStack in m_TokenStacks.Values)
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
             finalReflectProportion += tokenStack.GetReflectProportion();
         }
