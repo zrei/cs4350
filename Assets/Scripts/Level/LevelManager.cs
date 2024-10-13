@@ -4,7 +4,9 @@ using Cinemachine;
 using Game;
 using Game.Input;
 using Game.UI;
+using Level;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
 {
@@ -25,18 +27,28 @@ public enum RewardType
 /// </summary>
 public class LevelManager : MonoBehaviour
 {
+    [Header("Manager References")]
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
     [SerializeField] LevelNodeVisualManager m_LevelNodeVisualManager;
+    [SerializeField] LevelTokenManager m_LevelTokenManager;
     
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
     
     // Unit Data
-    [SerializeField] PlayerUnit m_PlayerUnit;
     [SerializeField] LevellingManager m_LevellingManager;
 
     [SerializeField] CinemachineVirtualCamera m_LevelVCam;
+    
+    [Header("Level Settings")]
+    [SerializeField] private LevelSO m_LevelSO;
+    [SerializeField] private NodeInternal m_StartNode;
+    [SerializeField] private NodeInternal m_GoalNode;
+    
+    [Header("Test Data")]
+    // should be sent in in the future
+    [SerializeField] private List<PlayerCharacterData> m_TestCharacterData;
     
     // UI
     IUIScreen m_BattleNodeResultScreen;
@@ -48,8 +60,6 @@ public class LevelManager : MonoBehaviour
     
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
-
-    private PlayerUnit m_PlayerUnitToken;
     
     private Dictionary<RewardType, int> m_PendingReward = new ();
     
@@ -61,14 +71,6 @@ public class LevelManager : MonoBehaviour
     #endregion
 
     #region Test
-    
-    [Header("Test Settings")]
-    [SerializeField] private LevelSO m_TestLevel;
-    [SerializeField] private NodeInternal testStartNodeInternal;
-    [SerializeField] private NodeInternal testGoalNodeInternal;
-    
-    // should be sent in in the future
-    [SerializeField] private List<PlayerCharacterData> m_TestCharacterData;
     
     public void Start()
     {
@@ -111,11 +113,11 @@ public class LevelManager : MonoBehaviour
 
         var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
-        var timeLimit = m_TestLevel.m_TimeLimit;
+        var timeLimit = m_LevelSO.m_TimeLimit;
         
         // Initialise the internal graph representation of the level
         m_LevelNodeManager.Initialise(levelNodes, levelEdges, timeLimit);
-        m_LevelNodeManager.SetGoalNode(testGoalNodeInternal);
+        m_LevelNodeManager.SetGoalNode(m_GoalNode);
         
         // Initialise the timer
         m_LevelTimerLogic.Initialise(timeLimit);
@@ -123,9 +125,16 @@ public class LevelManager : MonoBehaviour
         // Initialise the visuals of the level
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         
-        m_LevelNodeManager.SetStartNode(testStartNodeInternal);
-
-        SetUpPlayerToken();
+        // Initialise the player token
+        m_LevelTokenManager.Initialise(m_TestCharacterData[0].GetBattleData(), 
+            m_LevelNodeVisualManager.GetNodeVisual(m_StartNode));
+        
+        // Set up level camera
+        var playerTokenTransform = m_LevelTokenManager.GetPlayerTokenTransform();
+        m_LevelVCam.Follow = playerTokenTransform;
+        m_LevelVCam.LookAt = playerTokenTransform;
+        
+        m_LevelNodeManager.SetStartNode(m_StartNode);
         
         AddNodeEventCallbacks();
 
@@ -148,20 +157,7 @@ public class LevelManager : MonoBehaviour
             EnableLevelGraphInput();
         }
     }
-
-    private void SetUpPlayerToken()
-    {
-        // TODO: Create specialised controller for unit tokens
-        m_PlayerUnitToken = Instantiate(m_PlayerUnit);
-        m_PlayerUnitToken.Initialise(m_TestCharacterData[0].GetBattleData());
-        var tokenTransform = m_PlayerUnitToken.gameObject.transform;
-        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
-        tokenTransform.position = m_LevelNodeManager.CurrentNode.transform.position + Vector3.up * 0.1f;
-
-        m_LevelVCam.Follow = tokenTransform;
-        m_LevelVCam.LookAt = tokenTransform;
-    }
-
+    
     #endregion
 
     #region Inputs
@@ -274,22 +270,27 @@ public class LevelManager : MonoBehaviour
         DisableLevelGraphInput();
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
+        
+        m_LevelTokenManager.MovePlayerToNode(m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
+        
+        return;
 
-        m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
+        void OnMovementComplete()
+        {
+            m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
+            
+            m_LevelTimerLogic.AdvanceTimer(timeCost);
         
-        MovePlayerTokenToNode(destNode);
-        
-        m_LevelTimerLogic.AdvanceTimer(timeCost);
-        
-        if (m_LevelTimerLogic.TimeRemaining <= 0) return;
+            if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
-        if (m_LevelNodeManager.IsCurrentNodeCleared())
-        {
-            StartPlayerPhase();
-        }
-        else
-        {
-            m_LevelNodeManager.StartCurrentNodeEvent();
+            if (m_LevelNodeManager.IsCurrentNodeCleared())
+            {
+                StartPlayerPhase();
+            }
+            else
+            {
+                m_LevelNodeManager.StartCurrentNodeEvent();
+            }
         }
     }
     
@@ -328,26 +329,6 @@ public class LevelManager : MonoBehaviour
 
     #endregion
 
-    #region Player Token
-
-    private void MovePlayerTokenToNode(NodeInternal node)
-    {
-        var tokenTransform = m_PlayerUnitToken.transform;
-        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
-        tokenTransform.position = node.transform.position + Vector3.up * 0.1f;
-        tokenTransform.rotation = Quaternion.identity;
-    }
-    
-    private void MovePlayerTokenToBattleNode(BattleNode battleNode)
-    {
-        // TODO: Remove direct reference to BattleNodeVisual
-        var battleNodeVisual = battleNode.GetComponent<BattleNodeVisual>();
-        
-        battleNodeVisual.SetPlayerToken(m_PlayerUnitToken.gameObject);
-    }
-
-    #endregion
-
     #region Callbacks
     
     private void AddNodeEventCallbacks()
@@ -373,35 +354,45 @@ public class LevelManager : MonoBehaviour
         // Disable inputs
         DisableLevelGraphInput();
         
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_TestLevel.m_BiomeObject);
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
     {
         Debug.Log("LevelManager: Ending Battle Node");
-        
-        UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
+
+        NodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
         
         if (victor == UnitAllegiance.PLAYER)
         {
-            m_LevelNodeManager.ClearCurrentNode();
-            
-            // Add exp reward to pending rewards
-            m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
-                                              + battleNode.BattleSO.m_ExpReward;
+            m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnAnimComplete);
         }
         else
         {
-            // Set player token to facing off on the battle node
-            MovePlayerTokenToBattleNode(battleNode);
+            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnAnimComplete);
         }
-            
-        // Add time cost to pending rewards
-        m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) 
-                                           - numTurns;
         
-        // Wait for reward screen to close
-        GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+        return;
+
+        void OnAnimComplete()
+        {
+            if (victor == UnitAllegiance.PLAYER)
+            {
+                m_LevelNodeManager.ClearCurrentNode();
+            
+                // Add exp reward to pending rewards
+                m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
+                                                  + battleNode.BattleSO.m_ExpReward;
+            }
+            
+            // Add time cost to pending rewards
+            m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) 
+                                               - numTurns;
+        
+            UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
+            
+            GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+        }
     }
     
     private void OnRewardNodeStart(RewardNode rewardNode)
