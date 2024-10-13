@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using Cinemachine;
 using Game;
 using Game.Input;
 using Game.UI;
 using Level;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
 {
@@ -39,7 +37,7 @@ public class LevelManager : MonoBehaviour
     // Unit Data
     [SerializeField] LevellingManager m_LevellingManager;
 
-    [SerializeField] CinemachineVirtualCamera m_LevelVCam;
+    [SerializeField] LevelCameraController m_LevelCameraController;
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;
@@ -66,8 +64,10 @@ public class LevelManager : MonoBehaviour
     #endregion
     
     #region Input and Selected Node
+    
     private NodeInternal m_CurrTargetNode;
     private bool m_HasHitNode;
+    
     #endregion
 
     #region Test
@@ -130,9 +130,7 @@ public class LevelManager : MonoBehaviour
             m_LevelNodeVisualManager.GetNodeVisual(m_StartNode));
         
         // Set up level camera
-        var playerTokenTransform = m_LevelTokenManager.GetPlayerTokenTransform();
-        m_LevelVCam.Follow = playerTokenTransform;
-        m_LevelVCam.LookAt = playerTokenTransform;
+        m_LevelCameraController.Initialise(m_LevelTokenManager.GetPlayerTokenTransform());
         
         m_LevelNodeManager.SetStartNode(m_StartNode);
         
@@ -182,12 +180,16 @@ public class LevelManager : MonoBehaviour
     {
         InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        m_LevelCameraController.EnableCameraMovement();
     }
     
     private void DisableLevelGraphInput()
     {
         InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        
+        m_LevelCameraController.DisableCameraMovement();
     }
 
     #endregion
@@ -270,6 +272,7 @@ public class LevelManager : MonoBehaviour
         DisableLevelGraphInput();
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
+        m_LevelCameraController.RecenterCamera();
         
         m_LevelTokenManager.MovePlayerToNode(m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
         
@@ -305,6 +308,7 @@ public class LevelManager : MonoBehaviour
         DisableLevelGraphInput();
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
+        m_LevelCameraController.RecenterCamera();
         
         m_LevelNodeManager.StartCurrentNodeEvent();
     }
