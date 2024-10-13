@@ -17,10 +17,6 @@ namespace Game
         public Camera HUDCamera => hudCamera;
         public Camera UICamera => uiCamera;
         
-        
-        [SerializeField] private Transform m_LevelCameraTransform;
-        [SerializeField] private Transform m_BattleCameraTransform;
-        
         public void SetUpLevelCamera()
         {
             Instance.MainCamera.orthographic = true;
