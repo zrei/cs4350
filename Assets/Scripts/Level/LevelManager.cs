@@ -3,6 +3,7 @@ using System.Linq;
 using Game;
 using Game.Input;
 using Game.UI;
+using Level;
 using UnityEngine;
 
 public enum PlayerLevelSelectionState
@@ -27,12 +28,12 @@ public class LevelManager : MonoBehaviour
     // Graph Information
     [SerializeField] LevelNodeManager m_LevelNodeManager;
     [SerializeField] LevelNodeVisualManager m_LevelNodeVisualManager;
+    [SerializeField] LevelTokenManager m_LevelTokenManager;
     
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
     
     // Unit Data
-    [SerializeField] PlayerUnit m_PlayerUnit;
     [SerializeField] LevellingManager m_LevellingManager;
     
     // UI
@@ -45,8 +46,6 @@ public class LevelManager : MonoBehaviour
     
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
-
-    private PlayerUnit m_PlayerUnitToken;
     
     private Dictionary<RewardType, int> m_PendingReward = new ();
     
@@ -120,9 +119,11 @@ public class LevelManager : MonoBehaviour
         // Initialise the visuals of the level
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         
+        // Initialise the player token
+        m_LevelTokenManager.Initialise(m_TestCharacterData[0].GetBattleData(), 
+            m_LevelNodeVisualManager.GetNodeVisual(testStartNodeInternal));
+        
         m_LevelNodeManager.SetStartNode(testStartNodeInternal);
-
-        SetUpPlayerToken();
         
         AddNodeEventCallbacks();
 
@@ -144,16 +145,6 @@ public class LevelManager : MonoBehaviour
             DisplayMovableNodes();
             EnableLevelGraphInput();
         }
-    }
-
-    private void SetUpPlayerToken()
-    {
-        // TODO: Create specialised controller for unit tokens
-        m_PlayerUnitToken = Instantiate(m_PlayerUnit);
-        m_PlayerUnitToken.Initialise(m_TestCharacterData[0].GetBattleData());
-        var tokenTransform = m_PlayerUnitToken.gameObject.transform;
-        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
-        tokenTransform.position = m_LevelNodeManager.CurrentNode.transform.position + Vector3.up * 0.1f;
     }
 
     #endregion
@@ -268,22 +259,27 @@ public class LevelManager : MonoBehaviour
         DisableLevelGraphInput();
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
+        
+        m_LevelTokenManager.MovePlayerToNode(m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
+        
+        return;
 
-        m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
+        void OnMovementComplete()
+        {
+            m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
+            
+            m_LevelTimerLogic.AdvanceTimer(timeCost);
         
-        MovePlayerTokenToNode(destNode);
-        
-        m_LevelTimerLogic.AdvanceTimer(timeCost);
-        
-        if (m_LevelTimerLogic.TimeRemaining <= 0) return;
+            if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
-        if (m_LevelNodeManager.IsCurrentNodeCleared())
-        {
-            StartPlayerPhase();
-        }
-        else
-        {
-            m_LevelNodeManager.StartCurrentNodeEvent();
+            if (m_LevelNodeManager.IsCurrentNodeCleared())
+            {
+                StartPlayerPhase();
+            }
+            else
+            {
+                m_LevelNodeManager.StartCurrentNodeEvent();
+            }
         }
     }
     
@@ -318,26 +314,6 @@ public class LevelManager : MonoBehaviour
         var selectedNode = m_CurrSelectedNode;
         m_CurrSelectedNode = null;
         GlobalEvents.Level.NodeDeselectedEvent(selectedNode);
-    }
-
-    #endregion
-
-    #region Player Token
-
-    private void MovePlayerTokenToNode(NodeInternal node)
-    {
-        var tokenTransform = m_PlayerUnitToken.transform;
-        tokenTransform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
-        tokenTransform.position = node.transform.position + Vector3.up * 0.1f;
-        tokenTransform.rotation = Quaternion.identity;
-    }
-    
-    private void MovePlayerTokenToBattleNode(BattleNode battleNode)
-    {
-        // TODO: Remove direct reference to BattleNodeVisual
-        var battleNodeVisual = battleNode.GetComponent<BattleNodeVisual>();
-        
-        battleNodeVisual.SetPlayerToken(m_PlayerUnitToken.gameObject);
     }
 
     #endregion
@@ -383,11 +359,6 @@ public class LevelManager : MonoBehaviour
             // Add exp reward to pending rewards
             m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
                                               + battleNode.BattleSO.m_ExpReward;
-        }
-        else
-        {
-            // Set player token to facing off on the battle node
-            MovePlayerTokenToBattleNode(battleNode);
         }
             
         // Add time cost to pending rewards

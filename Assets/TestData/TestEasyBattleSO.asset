@@ -27,6 +27,22 @@ MonoBehaviour:
       m_MagicDefence: 0
       m_Speed: 0
       m_MovementRange: 0
+    m_DefeatRequired: 1
+  - m_Coordinates:
+      m_Row: 0
+      m_Col: 2
+    m_EnemyCharacterData: {fileID: 11400000, guid: c3c2e1ad391594d4091b962190bff0ac,
+      type: 2}
+    m_StatAugments:
+      m_Health: 25
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 0
   m_PlayerStartingTiles:
   - m_Row: 1
     m_Col: 0
@@ -59,3 +75,7 @@ MonoBehaviour:
   - m_Row: 3
     m_Col: 4
   m_ExpReward: 100
+  m_WinCondition: 0
+  m_TurnsToSurvive: 1
+  m_AdditionalLoseConditions: 
+  m_MaxTurns: 25

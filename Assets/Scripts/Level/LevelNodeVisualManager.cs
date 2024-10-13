@@ -100,6 +100,11 @@ public class LevelNodeVisualManager : MonoBehaviour
     
     #region Helper
     
+    public NodeVisual GetNodeVisual(NodeInternal nodeInternal)
+    {
+        return m_NodeVisuals[nodeInternal];
+    }
+    
     public void DisplayMovableNodes(NodeInternal currentNode)
     {
         // If the node is not cleared, only the current node should be movable
