@@ -12,10 +12,13 @@ public class PlayerUnit : Unit
     /// Initialise stats, position, etc.
     /// Called when the unit is first spawned onto the battlefield
     /// </summary>
-    public void Initialise(PlayerCharacterBattleData characterBattleData)
+    public void Initialise(PlayerCharacterBattleData characterBattleData, List<InflictedToken> additionalPermanentTokens, float currMoralityPercentage)
     {
         CharacterName = characterBattleData.m_BaseData.m_CharacterName;
-        base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData(), characterBattleData.m_CurrEquippedWeapon);
+        List<InflictedToken> permanentTokens = new();
+        permanentTokens.AddRange(additionalPermanentTokens);
+        permanentTokens.AddRange(characterBattleData.m_BaseData.GetInflictedMoralityTokens(currMoralityPercentage));
+        base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData(), characterBattleData.m_CurrEquippedWeapon, permanentTokens);
     }
     #endregion
 

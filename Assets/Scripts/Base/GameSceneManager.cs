@@ -53,7 +53,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
         GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
         
         Debug.Log("Battle scene loaded. Initialising battle.");
-        BattleManager.Instance.InitialiseBattle(m_CurrentBattle, m_UnitBattleData, m_MapBiome);
+        BattleManager.Instance.InitialiseBattle(m_CurrentBattle, m_UnitBattleData, m_MapBiome, new());
         
         m_CurrentBattle = null;
         m_UnitBattleData = null;

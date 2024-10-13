@@ -75,6 +75,11 @@ public class BattleManager : Singleton<BattleManager>
     private float m_MaxTurns;
     #endregion
 
+    #region Current Level State
+    private float m_CurrMoralityPercentage;
+    private List<InflictedToken> m_PermanentFatigueTokens;
+    #endregion
+
     #region Camera
     private const float CAMERA_ROTATION_SPEED = 50f;
     #endregion
@@ -118,7 +123,7 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnitData"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, GameObject mapBiome)
+    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, GameObject mapBiome, List<InflictedToken> fatigueTokens)
     {
         m_TurnQueue.Clear();
         m_AllPlayerUnits.Clear();
@@ -130,6 +135,9 @@ public class BattleManager : Singleton<BattleManager>
         m_SecondaryLoseCondition = battleSO.m_AdditionalLoseConditions;
         m_TurnsToSurvive = battleSO.m_TurnsToSurvive;
         m_MaxTurns = battleSO.m_MaxTurns;
+
+        m_CurrMoralityPercentage = MoralityManager.Instance.CurrMoralityPercentage;
+        m_PermanentFatigueTokens = fatigueTokens;
 
         InstantiateBiome(mapBiome);
         StartCoroutine(BattleInitialise(battleSO, playerUnitData));
@@ -178,7 +186,8 @@ public class BattleManager : Singleton<BattleManager>
     public void InstantiateEnemyUnit(EnemyUnitPlacement unitPlacement)
     {
         EnemyUnit enemyUnit = Instantiate(m_EnemyUnit);
-        enemyUnit.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData);
+        // leaving it open to give enemy units permanent debuffs/buffs depending on the state of the level
+        enemyUnit.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData, new());
         m_MapLogic.PlaceUnit(GridType.ENEMY, enemyUnit, unitPlacement.m_Coordinates);
         m_TurnQueue.AddUnit(enemyUnit);
         m_AllEnemyUnits.Add(enemyUnit);
@@ -195,7 +204,7 @@ public class BattleManager : Singleton<BattleManager>
     private void InstantiatePlayerUnit(PlayerCharacterBattleData unitBattleData, CoordPair position)
     {
         PlayerUnit playerUnit = Instantiate(m_PlayerUnit);
-        playerUnit.Initialise(unitBattleData);
+        playerUnit.Initialise(unitBattleData, m_PermanentFatigueTokens, m_CurrMoralityPercentage);
         m_MapLogic.PlaceUnit(GridType.PLAYER, playerUnit, position);
         m_TurnQueue.AddUnit(playerUnit);
         m_AllPlayerUnits.Add(playerUnit);

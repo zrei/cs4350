@@ -35,9 +35,9 @@ public class EnemyUnit : Unit
     }
     private EnemyActionWrapper nextAction;
 
-    public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO)
+    public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO, List<InflictedToken> permanentTokens)
     {
-        base.Initialise(enemyCharacterSO.m_Stats.FlatAugment(statAugments), enemyCharacterSO.m_EnemyClass, enemyCharacterSO.m_CharacterSprite, enemyCharacterSO.GetUnitModelData(), enemyCharacterSO.m_EquippedWeapon);
+        base.Initialise(enemyCharacterSO.m_Stats.FlatAugment(statAugments), enemyCharacterSO.m_EnemyClass, enemyCharacterSO.m_CharacterSprite, enemyCharacterSO.GetUnitModelData(), enemyCharacterSO.m_EquippedWeapon, permanentTokens);
         InitialiseActions(enemyCharacterSO.EnemyActionSetSO);
     }
 

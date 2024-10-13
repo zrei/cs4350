@@ -25,6 +25,6 @@ public class TestBattleInitialiser : MonoBehaviour
         GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
         
         Debug.Log("TestBattleInitializer: Battle scene loaded. Initialising battle.");
-        BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData, m_MapBiome);
+        BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData, m_MapBiome, new());
     }
 }
