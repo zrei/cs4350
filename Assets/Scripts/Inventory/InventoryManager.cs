@@ -87,6 +87,7 @@ public class InventoryManager : Singleton<InventoryManager>
 
     private void LoadStartingInventory()
     {
+        Debug.Log("Load starting inventory");
         m_Inventory.Clear();
         m_CurrNextId = 0;
 

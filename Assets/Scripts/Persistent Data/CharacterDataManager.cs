@@ -24,7 +24,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
             return;
         }
 
-        if (PersistentDataManager.IsReady)
+        if (!PersistentDataManager.IsReady)
         {
             PersistentDataManager.OnReady += HandleDependencies;
             return;

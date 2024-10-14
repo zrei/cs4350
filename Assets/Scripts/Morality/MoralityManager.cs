@@ -12,12 +12,16 @@ public class MoralityManager : Singleton<MoralityManager>
     {
         base.HandleAwake();
 
+        GlobalEvents.Morality.MoralityChangeEvent += ChangeMorality;
+
         HandleDependencies();
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
+
+        GlobalEvents.Morality.MoralityChangeEvent -= ChangeMorality;
     }
 
     private void HandleDependencies()
@@ -40,7 +44,7 @@ public class MoralityManager : Singleton<MoralityManager>
         }
     }
 
-    public void ChangeMorality(int changeAmount)
+    private void ChangeMorality(int changeAmount)
     {
         m_CurrMorality = Mathf.Clamp(m_CurrMorality + changeAmount, -m_MoralitySetting.m_MaxMorality, m_MoralitySetting.m_MaxMorality);
     }

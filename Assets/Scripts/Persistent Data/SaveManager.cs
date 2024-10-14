@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [System.Serializable]
 public struct CharacterSaveData
@@ -36,6 +37,7 @@ public class SaveManager : Singleton<SaveManager>
     private const string UNIT_DATA_KEY = "UnitData";
     private const string INVENTORY_DATA_KEY = "InventoryData";
     private const string MORALITY_DATA_KEY = "MoralityData";
+    private const string FLAG_KEY = "FlagData";
     private const string ITEM_SEPARATOR = "\t";
 
     protected override void HandleAwake()
@@ -91,7 +93,24 @@ public class SaveManager : Singleton<SaveManager>
     #endregion
 
     #region Persistent Flags
+    public bool TryLoadPersistentFlags(out List<string> persistentFlags)
+    {
+        if (PlayerPrefs.HasKey(FLAG_KEY))
+        {
+            persistentFlags = LoadSaveDataStrings(FLAG_KEY);
+            return true;
+        }
+        else
+        {
+            persistentFlags = null;
+            return false;
+        }
+    }
 
+    public void SavePersistentFlags(IEnumerable<string> flags)
+    {
+        SaveDataStrings(FLAG_KEY, flags);
+    }
     #endregion
 
     #region Morality
@@ -107,26 +126,48 @@ public class SaveManager : Singleton<SaveManager>
     }
     #endregion
 
+    #region Array Handlers
     private List<T> LoadData<T>(string saveKey)
     {
-        string[] saveData = PlayerPrefs.GetString(saveKey).Split(ITEM_SEPARATOR);
-        List<T> characterData = new();
-        foreach (string data in saveData)
+        List<T> data = new();
+        foreach (string dataString in LoadSaveDataStrings(saveKey))
         {
-            if (string.IsNullOrEmpty(data))
-                continue;
-            characterData.Add(JsonUtility.FromJson<T>(data));
+            data.Add(JsonUtility.FromJson<T>(dataString));
         }
-        return characterData;
+        return data;
     }
 
     private void SaveData<T>(string saveKey, IEnumerable<T> data)
     {
-        StringBuilder finalString = new();
+        List<string> parsedData = new();
         foreach (T item in data)
         {
-            finalString.Append(JsonUtility.ToJson(item) + ITEM_SEPARATOR);
+            parsedData.Add(JsonUtility.ToJson(item));
+        }
+        SaveDataStrings(saveKey, parsedData);
+    }
+
+    private void SaveDataStrings(string saveKey, IEnumerable<string> data)
+    {
+        StringBuilder finalString = new();
+        foreach (string val in data)
+        {
+            finalString.Append(val + ITEM_SEPARATOR);
         }
         PlayerPrefs.SetString(saveKey, finalString.ToString());
     }
+
+    private List<string> LoadSaveDataStrings(string saveKey)
+    {
+        string[] saveData = PlayerPrefs.GetString(saveKey).Split(ITEM_SEPARATOR);
+        List<string> dataStrings = new();
+        foreach (string data in saveData)
+        {
+            if (string.IsNullOrEmpty(data))
+                continue;
+            dataStrings.Add(data);
+        }
+        return dataStrings;
+    }
+    #endregion
 }

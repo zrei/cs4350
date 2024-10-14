@@ -31,6 +31,10 @@ public class Dialogue : MonoBehaviour
         [TextArea]
         public string text;
         public Dialogue nextState;
+        [Tooltip("Whether this dialogue option will result in a change in morality")]
+        public bool changesMorality;
+        [Tooltip("How much the morality should change by")]
+        public int moralityChange;
     }
 
     public List<DialogueOption> options;

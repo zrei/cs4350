@@ -129,6 +129,8 @@ public class LevelManager : MonoBehaviour
         m_LevelTokenManager.Initialise(m_TestCharacterData[0].GetBattleData(), 
             m_LevelNodeVisualManager.GetNodeVisual(m_StartNode));
         
+        Debug.Log(m_LevelCameraController);
+        Debug.Log(m_LevelTokenManager);
         // Set up level camera
         m_LevelCameraController.Initialise(m_LevelTokenManager.GetPlayerTokenTransform());
         
