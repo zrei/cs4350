@@ -50,6 +50,19 @@ public class SaveManager : Singleton<SaveManager>
         base.HandleDestroy();
     }
 
+    #region Save
+    // not sure how slow this is... leaving it synchronous for now
+    public void Save()
+    {
+        PlayerPrefs.Save();
+    }
+
+    public void ClearSave()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+    #endregion
+
     #region Character
     public bool TryLoadCharacterSaveData(out List<CharacterSaveData> characterSaveData)
     {
