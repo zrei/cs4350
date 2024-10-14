@@ -71,6 +71,20 @@ public class StatProgress
     public int m_MagicDefenceProgress;
     public int m_SpeedProgress;
 
+    /// <summary>
+    /// Creates new stat progress with 0 progress on all stats
+    /// </summary>
+    public StatProgress()
+    {
+        m_HealthProgress = 0;
+        m_ManaProgress = 0;
+        m_PhysicalAttackProgress = 0;
+        m_MagicAttackProgress = 0;
+        m_PhysicalDefenceProgress = 0;
+        m_MagicDefenceProgress = 0;
+        m_SpeedProgress = 0;
+    }
+
     public int GetStatProgress(StatType statType)
     {
         return statType switch

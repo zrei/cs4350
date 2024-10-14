@@ -49,9 +49,18 @@ public class SaveManager : Singleton<SaveManager>
     }
 
     #region Character
-    public List<CharacterSaveData> LoadCharacterSaveData()
+    public bool TryLoadCharacterSaveData(out List<CharacterSaveData> characterSaveData)
     {
-        return LoadData<CharacterSaveData>(UNIT_DATA_KEY);
+        if (PlayerPrefs.HasKey(UNIT_DATA_KEY))
+        {
+            characterSaveData = LoadData<CharacterSaveData>(UNIT_DATA_KEY);
+            return true;
+        }
+        else
+        {
+            characterSaveData = null;
+            return false;
+        }
     }
     
     public void SaveCharacterData(IEnumerable<CharacterSaveData> data)
@@ -61,9 +70,18 @@ public class SaveManager : Singleton<SaveManager>
     #endregion
 
     #region Inventory
-    public List<WeaponInstanceSaveData> LoadInventory()
+    public bool TryLoadInventory(out List<WeaponInstanceSaveData> weaponInstanceSaveData)
     {
-        return LoadData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY);
+        if (PlayerPrefs.HasKey(INVENTORY_DATA_KEY))
+        {
+            weaponInstanceSaveData = LoadData<WeaponInstanceSaveData>(INVENTORY_DATA_KEY);
+            return true;
+        }
+        else
+        {
+            weaponInstanceSaveData = null;
+            return false;
+        }
     }
 
     public void SaveInventoryData(IEnumerable<WeaponInstanceSaveData> data)
@@ -72,10 +90,15 @@ public class SaveManager : Singleton<SaveManager>
     }
     #endregion
 
+    #region Persistent Flags
+
+    #endregion
+
     #region Morality
-    public int LoadMorality()
+    public bool TryLoadMorality(out int morality)
     {
-        return PlayerPrefs.GetInt(MORALITY_DATA_KEY);
+        morality = PlayerPrefs.GetInt(MORALITY_DATA_KEY, 0);
+        return PlayerPrefs.HasKey(MORALITY_DATA_KEY);
     }
 
     public void SaveMorality(int morality)
