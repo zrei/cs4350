@@ -133,6 +133,7 @@ public class GridLogic : MonoBehaviour
     {
         canvasGroup.interactable = true;
 
+        // color the targeted unit's tile
         if (GridHelper.GetTargetType(skill, unit.UnitAllegiance) == m_GridType)
             m_TileVisuals[initialTarget.m_Row, initialTarget.m_Col].ToggleTarget(true);
         
@@ -141,7 +142,7 @@ public class GridLogic : MonoBehaviour
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 var tileVisual = m_TileVisuals[r, c];
-                var isTeleportable = IsValidTeleportTile(skill, unit, initialTarget);
+                var isTeleportable = IsValidTeleportTile(skill, unit, new CoordPair(r, c));
                 if (isTeleportable)
                 {
                     tileVisual.selectable.interactable = true;
@@ -214,13 +215,18 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    public void ResetPath()
+    /// <summary>
+    /// Reset path
+    /// </summary>
+    /// <param name="ignored">Coordinates for tiles that should be ignored</param>
+    public void ResetPath(params CoordPair[] ignored)
     {
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                m_TileVisuals[r, c].TogglePath(false);
+                if (!ignored.Contains(new CoordPair(r, c)))
+                    m_TileVisuals[r, c].TogglePath(false);
             }
         }
     }
@@ -250,9 +256,10 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    public void ColorTeleportTarget(CoordPair targetTile)
+    public void ColorTeleportTarget(CoordPair targetTile, CoordPair initialTargetTile)
     {
-        ResetPath();
+        // do not reset the target unit's tile
+        ResetPath(initialTargetTile);
 
         if (MapData.WithinBounds(targetTile))
             m_TileVisuals[targetTile.m_Row, targetTile.m_Col].TogglePath(true);

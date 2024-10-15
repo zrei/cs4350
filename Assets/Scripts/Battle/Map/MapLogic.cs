@@ -126,9 +126,9 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).ColorTarget(attack, target);
     }
 
-    public void SetTeleportTarget(GridType gridType, CoordPair target)
+    public void SetTeleportTarget(GridType gridType, CoordPair target, CoordPair initialTargetTile)
     {
-        RetrieveGrid(gridType).ColorTeleportTarget(target);
+        RetrieveGrid(gridType).ColorTeleportTarget(target, initialTargetTile);
     }
 
     public void ShowInspectable(GridType gridType, bool ignoreEmpty=false)

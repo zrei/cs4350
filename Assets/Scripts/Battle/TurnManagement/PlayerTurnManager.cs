@@ -190,24 +190,12 @@ public class PlayerTurnManager : TurnManager
 
         if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
         {
-            m_MapLogic.SetTeleportTarget(selectedTileVisual.GridType, selectedTileVisual.Coordinates);
+            m_MapLogic.SetTeleportTarget(selectedTileVisual.GridType, selectedTileVisual.Coordinates, m_CachedTargetTile);
         }
         else
         {
             m_MapLogic.ResetPath();
         }
-
-        // TODO: UI
-        /*
-        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
-        {
-            m_MapLogic.SetTarget(selectedTileVisual.GridType, SelectedSkill, selectedTileVisual.Coordinates);
-        }
-        else
-        {
-            m_MapLogic.ResetTarget();
-        }
-        */
     }
     #endregion
 
