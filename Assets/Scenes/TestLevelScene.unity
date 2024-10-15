@@ -5796,12 +5796,9 @@ GameObject:
   m_Component:
   - component: {fileID: 975374358}
   - component: {fileID: 975374359}
-  - component: {fileID: 975374360}
-  - component: {fileID: 975374363}
-  - component: {fileID: 975374362}
-  - component: {fileID: 975374361}
   - component: {fileID: 975374364}
   - component: {fileID: 975374365}
+  - component: {fileID: 975374366}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -5846,7 +5843,7 @@ MonoBehaviour:
   m_LevelNodeVisualManager: {fileID: 1864550199}
   m_LevelTokenManager: {fileID: 975374364}
   m_LevelTimerLogic: {fileID: 2123650211}
-  m_LevellingManager: {fileID: 975374360}
+  m_LevellingManager: {fileID: 975374366}
   m_LevelCameraController: {fileID: 975374365}
   m_LevelSO: {fileID: 11400000, guid: c68e0084b280d40cfacf6bf8f65a3f72, type: 2}
   m_StartNode: {fileID: 9059603446000607190}
@@ -5936,59 +5933,6 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
---- !u!114 &975374360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
---- !u!114 &975374361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b4e64e64a1e75c47b93920162ca8e0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &975374362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53bd0d52d36e3fa4a89886241be0abe2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &975374363
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a581b5de163804153936d0f3ad0a92e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_CharacterSOs: []
-  m_ClassSOs: []
-  m_WeaponInstanceSOs:
-  - {fileID: 11400000, guid: ecf9524f5f336194f89a45f43f6d486e, type: 2}
 --- !u!114 &975374364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6021,6 +5965,19 @@ MonoBehaviour:
   m_LevelRightLimitTransform: {fileID: 1318922017}
   m_LevelTopLimitTransform: {fileID: 1694366280}
   m_LevelBottomLimitTransform: {fileID: 273258260}
+--- !u!114 &975374366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
 --- !u!1001 &1148106120
 PrefabInstance:
   m_ObjectHideFlags: 0

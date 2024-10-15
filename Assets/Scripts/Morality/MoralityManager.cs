@@ -12,19 +12,20 @@ public class MoralityManager : Singleton<MoralityManager>
     {
         base.HandleAwake();
 
+        GlobalEvents.Morality.MoralityChangeEvent += ChangeMorality;
+
         HandleDependencies();
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
+
+        GlobalEvents.Morality.MoralityChangeEvent -= ChangeMorality;
     }
 
     private void HandleDependencies()
-    {
-        // TODO: Change this back later
-        m_CurrMorality = Mathf.FloorToInt(m_MoralitySetting.m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality);
-        /*
+    {        
         if (!SaveManager.IsReady)
         {
             SaveManager.OnReady += HandleDependencies;
@@ -33,11 +34,17 @@ public class MoralityManager : Singleton<MoralityManager>
 
         SaveManager.OnReady -= HandleDependencies;
 
-        m_CurrMorality = SaveManager.Instance.LoadMorality();
-        */
+        if (SaveManager.Instance.TryLoadMorality(out int currMorality))
+        {
+            m_CurrMorality = currMorality;
+        }
+        else
+        {
+            m_CurrMorality = Mathf.FloorToInt(m_MoralitySetting.m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality);
+        }
     }
 
-    public void ChangeMorality(int changeAmount)
+    private void ChangeMorality(int changeAmount)
     {
         m_CurrMorality = Mathf.Clamp(m_CurrMorality + changeAmount, -m_MoralitySetting.m_MaxMorality, m_MoralitySetting.m_MaxMorality);
     }

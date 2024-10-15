@@ -75,4 +75,15 @@ public static class GlobalEvents {
         public static VoidEvent DialogueStartEvent;
         public static VoidEvent DialogueEndEvent;
     }
+    
+    public static class Morality
+    {
+        public static IntEvent MoralityChangeEvent;
+    }
+
+    public static class Flags
+    {
+        public delegate void FlagEvent(string flag, bool value, FlagType flagType);
+        public static FlagEvent SetFlagEvent;
+    }
 }

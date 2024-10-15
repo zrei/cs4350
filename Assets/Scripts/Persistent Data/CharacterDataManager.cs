@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class CharacterDataManager : Singleton<CharacterDataManager>
 {
+    [SerializeField] List<PlayerCharacterSO> m_StartingCharacters;
+
     // mapping character IDs to their data?
     private readonly Dictionary<int, PlayerCharacterData> m_CharacterData = new();
 
@@ -21,7 +24,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
             return;
         }
 
-        if (PersistentDataManager.IsReady)
+        if (!PersistentDataManager.IsReady)
         {
             PersistentDataManager.OnReady += HandleDependencies;
             return;
@@ -30,7 +33,15 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         SaveManager.OnReady -= HandleDependencies;
         PersistentDataManager.OnReady -= HandleDependencies;
         
-        ParseSaveData(SaveManager.Instance.LoadCharacterSaveData()); 
+        if (SaveManager.Instance.TryLoadCharacterSaveData(out List<CharacterSaveData> characterSaveData))
+        {
+            ParseSaveData(characterSaveData); 
+        }
+        else
+        {
+            LoadStartingCharacters();
+        }
+        
     }
 
     protected override void HandleDestroy()
@@ -44,7 +55,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         foreach (CharacterSaveData data in characterSaveData)
         {
-            if (!PersistentDataManager.Instance.TryGetPlayerCharacterSO(data.m_CharacterId, out PlayerCharacterSO chaacterSO))
+            if (!PersistentDataManager.Instance.TryGetPlayerCharacterSO(data.m_CharacterId, out PlayerCharacterSO characterSO))
             {
                 Logger.Log(this.GetType().Name, $"Character data for {data.m_CharacterId} cannot be found", LogLevel.ERROR);
                 continue;
@@ -55,10 +66,17 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 Logger.Log(this.GetType().Name, $"Class data for {data.m_ClassId} cannot be found", LogLevel.ERROR);
                 continue;
             }
-            PlayerCharacterData persistentData = new() {m_BaseData = chaacterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
+            PlayerCharacterData persistentData = new() {m_BaseData = characterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
                 m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
             m_CharacterData.Add(persistentData.Id, persistentData);
         }
+    }
+
+    private void LoadStartingCharacters()
+    {
+        m_CharacterData.Clear();
+
+        ReceiveCharacters(m_StartingCharacters);
     }
 
     public List<PlayerCharacterData> RetrieveAllCharacterData()
@@ -81,5 +99,21 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         {
             m_CharacterData[data.Id] = data;
         }
+    }
+    
+    /// <summary>
+    /// Add a list of characters to the roster
+    /// </summary>
+    /// <param name="playerCharacterSOs"></param>
+    public void ReceiveCharacters(List<PlayerCharacterSO> playerCharacterSOs)
+    {
+        playerCharacterSOs.ForEach(x => ReceiveCharacter(x));
+    }
+
+    private void ReceiveCharacter(PlayerCharacterSO playerCharacterSO)
+    {
+        PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClass = playerCharacterSO.m_StartingClass, m_CurrExp = 0,
+                m_CurrLevel = playerCharacterSO.m_StartingLevel, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress()};
+        m_CharacterData.Add(persistentData.Id, persistentData);
     }
 }
