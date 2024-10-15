@@ -32,7 +32,7 @@ namespace Level
         {
             if (moralityChangeAmt == 0) return;
             
-            MoralityManager.Instance.ChangeMorality(moralityChangeAmt);
+            GlobalEvents.Morality.MoralityChangeEvent(moralityChangeAmt);
         }
     }
 }
