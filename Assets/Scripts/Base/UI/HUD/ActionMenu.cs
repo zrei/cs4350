@@ -1,5 +1,4 @@
 using Game.Input;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -19,10 +18,13 @@ namespace Game.UI
         private TextMeshProUGUI skillDescription;
 
         [SerializeField]
+        private GameObject actionConfirmKeys;
+
+        [SerializeField]
         private ActionButton leftScrollButton;
 
         [SerializeField]
-        private List<ActionButton> attackButtons = new();
+        private List<ActionButton> skillButtons = new();
 
         [SerializeField]
         private ActionButton rightScrollButton;
@@ -38,35 +40,96 @@ namespace Game.UI
         #endregion
 
         private Unit currentUnit;
-        private ActiveSkillSO SelectedSkill
+
+        private List<ActiveSkillSO> AvailableSkills
         {
             set
             {
-                if (selectedSkill == value) return;
+                availableSkills = value;
+                var hasMultiPage = SkillPageCount > 1;
 
-                selectedSkill = value;
-                UpdateSkillDisplay(selectedSkill);
+                CurrentSkillPageIndex = 0;
+
+                leftScrollButton.gameObject.SetActive(hasMultiPage);
+                rightScrollButton.gameObject.SetActive(hasMultiPage);
             }
         }
-        private ActiveSkillSO selectedSkill;
-        private ActionButton SelectedActionButton
+        private List<ActiveSkillSO> availableSkills = new();
+
+        private int CurrentSkillPageIndex
+        {
+            get => currentSkillPageIndex;
+            set
+            {
+                var skillPageCount = SkillPageCount;
+                value %= skillPageCount;
+                if (value < 0) value += skillPageCount;
+
+                currentSkillPageIndex = value;
+                var startIndex = currentSkillPageIndex * skillButtons.Count;
+                for (int i = 0; i < skillButtons.Count; i++)
+                {
+                    var button = skillButtons[i];
+
+                    if (startIndex + i < availableSkills.Count)
+                    {
+                        var skill = availableSkills[startIndex + i];
+                        
+                        button.gameObject.SetActive(true);
+                        button.icon.sprite = skill.m_Icon;
+                    }
+                    else
+                    {
+                        button.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
+        private int currentSkillPageIndex = 0;
+        private int SkillPageCount => availableSkills.Count / skillButtons.Count;
+
+        private ActiveSkillSO LockedInSkill
         {
             set
             {
-                if (selectedActionButton == value) return;
+                if (lockedInSkill == value) return;
 
-                if (selectedActionButton != null)
-                {
-                    selectedActionButton.glow.CrossFadeAlpha(0, 0.2f, false);
-                }
-                selectedActionButton = value;
-                if (selectedActionButton != null)
-                {
-                    selectedActionButton.glow.CrossFadeAlpha(1f, 0.2f, false);
-                }
+                lockedInSkill = value;
+                UpdateSkillDisplay(lockedInSkill);
             }
         }
-        private ActionButton selectedActionButton;
+        private ActiveSkillSO lockedInSkill;
+
+        private ActionButton LockedInActionButton
+        {
+            set
+            {
+                if (lockedInActionButton == value) return;
+
+                if (lockedInActionButton != null)
+                {
+                    lockedInActionButton.SetGlowActive(false);
+
+                    if (lockedInActionButton == moveButton)
+                    {
+                        BattleManager.Instance.PlayerTurnManager.OnMovementRangeRemainingChange -= OnMovementRangeRemainingChange;
+                    }
+                }
+                lockedInActionButton = value;
+                if (lockedInActionButton != null)
+                {
+                    lockedInActionButton.SetGlowActive(true);
+
+                    if (lockedInActionButton == moveButton)
+                    {
+                        BattleManager.Instance.PlayerTurnManager.OnMovementRangeRemainingChange += OnMovementRangeRemainingChange;
+                    }
+                }
+
+                actionConfirmKeys.SetActive(lockedInActionButton != null && lockedInActionButton != inspectButton);
+            }
+        }
+        private ActionButton lockedInActionButton;
 
         private Animator animator;
         private CanvasGroup canvasGroup;
@@ -85,24 +148,8 @@ namespace Game.UI
             isHidden = true;
 
             GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
-        }
-        
-        private void OnSceneLoad()
-        {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
-            GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
-            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
 
             BindButtonEvents();
-        }
-        
-        private void OnBattleEnd(UnitAllegiance _, int _2)
-        {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
-            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
-            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-
-            Hide();
         }
 
         private void OnDestroy()
@@ -113,6 +160,49 @@ namespace Game.UI
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         }
 
+        #region Global Events
+        private void OnSceneLoad()
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
+            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+        }
+        
+        private void OnBattleEnd(UnitAllegiance unitAllegiance, int numTurns)
+        {
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+
+            Hide();
+        }
+
+        private void OnPreviewUnit(Unit unit)
+        {
+            UpdateSkillDisplay(lockedInSkill, unit);
+        }
+
+        private void OnPreviewCurrentUnit(Unit unit)
+        {
+            if (unit is not PlayerUnit playerUnit)
+            {
+                Hide();
+                return;
+            }
+
+            Show();
+
+            currentUnit = unit;
+            AvailableSkills = playerUnit.GetAvailableActiveSkills();
+
+            if (canvasGroup.interactable)
+            {
+                inspectButton.Select();
+            }
+        }
+        #endregion
+
+        #region Inputs
         private void BindInputEvents(bool active)
         {
             if (active)
@@ -124,6 +214,8 @@ namespace Game.UI
                 InputManager.Instance.Action5Input.OnPressEvent += OnAction5;
                 InputManager.Instance.Action6Input.OnPressEvent += OnAction6;
                 InputManager.Instance.Action7Input.OnPressEvent += OnAction7;
+                InputManager.Instance.SwitchTabInput.OnPressEvent += OnSwitchTab;
+                InputManager.Instance.CancelActionInput.OnPressEvent += OnCancelAction;
             }
             else
             {
@@ -134,150 +226,170 @@ namespace Game.UI
                 InputManager.Instance.Action5Input.OnPressEvent -= OnAction5;
                 InputManager.Instance.Action6Input.OnPressEvent -= OnAction6;
                 InputManager.Instance.Action7Input.OnPressEvent -= OnAction7;
+                InputManager.Instance.SwitchTabInput.OnPressEvent -= OnSwitchTab;
+                InputManager.Instance.CancelActionInput.OnPressEvent -= OnCancelAction;
             }
         }
 
-        private void OnAction1(IInput input) { attackButtons[0].Select(); attackButtons[0].OnSubmit(null); }
-        private void OnAction2(IInput input) { attackButtons[1].Select(); attackButtons[1].OnSubmit(null); }
-        private void OnAction3(IInput input) { attackButtons[2].Select(); attackButtons[2].OnSubmit(null); }
-        private void OnAction4(IInput input) { attackButtons[3].Select(); attackButtons[3].OnSubmit(null); }
+        private void OnAction1(IInput input) { skillButtons[0].Select(); skillButtons[0].OnSubmit(null); }
+        private void OnAction2(IInput input) { skillButtons[1].Select(); skillButtons[1].OnSubmit(null); }
+        private void OnAction3(IInput input) { skillButtons[2].Select(); skillButtons[2].OnSubmit(null); }
+        private void OnAction4(IInput input) { skillButtons[3].Select(); skillButtons[3].OnSubmit(null); }
         private void OnAction5(IInput input) { moveButton.Select(); moveButton.OnSubmit(null); }
         private void OnAction6(IInput input) { inspectButton.Select(); inspectButton.OnSubmit(null); }
         private void OnAction7(IInput input) { passButton.Select(); passButton.OnSubmit(null); }
+        private void OnSwitchTab(IInput input)
+        {
+            var delta = input.GetValue<float>();
+            OnScrollSkills((int)delta);
+        }
+        private void OnCancelAction(IInput input)
+        {
+            BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.INSPECT);
+            lockedInActionButton.OnSelect(null);
+            LockedInActionButton = null;
+        }
+        #endregion
 
         private void BindButtonEvents()
         {
-            moveButton.onSelect.RemoveAllListeners();
-            moveButton.onSelect.AddListener(() =>
-            {
-                if (selectedActionButton == null)
-                {
-                    SelectedSkill = null;
-                    skillHeader.SetValue("Move");
-                    skillDescription.gameObject.SetActive(true);
-                    skillDescription.text = $"<sprite name=\"Steps\">: {currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
-                }
-            });
-            moveButton.onSubmit.RemoveAllListeners();
-            moveButton.onSubmit.AddListener(() =>
-            {
-                SelectedSkill = null;
-                skillHeader.SetValue("Move");
-                skillDescription.gameObject.SetActive(true);
-                skillDescription.text = $"<sprite name=\"Steps\">: {currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+            moveButton.onSelect.AddListener(OnSelectMove);
+            moveButton.onSubmit.AddListener(OnSubmitMove);
 
+            inspectButton.onSelect.AddListener(OnSelectInspect);
+            inspectButton.onSubmit.AddListener(OnSubmitInspect);
+
+            passButton.onSelect.AddListener(OnSelectPass);
+            passButton.onSubmit.AddListener(OnSubmitPass);
+
+            for (int i = 0; i < skillButtons.Count; i++)
+            {
+                var button = skillButtons[i];
+                var index = i;
+                button.onSelect.AddListener(() => OnSelectSkill(index));
+                button.onSubmit.AddListener(() => OnSubmitSkill(index));
+            }
+
+            rightScrollButton.onSubmit.AddListener(() => OnScrollSkills(1));
+            leftScrollButton.onSubmit.AddListener(() => OnScrollSkills(-1));
+        }
+
+        #region Move Action
+        private void OnSelectMove()
+        {
+            if (lockedInActionButton != null) return;
+            
+            ShowMoveDescription();
+        }
+
+        private void OnSubmitMove()
+        {
+            ShowMoveDescription();
+
+            if (lockedInActionButton != moveButton)
+            {
+                LockedInActionButton = moveButton;
                 BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
-                SelectedActionButton = moveButton;
-            });
+            }
+        }
 
-            inspectButton.onSelect.RemoveAllListeners();
-            inspectButton.onSelect.AddListener(() =>
-            {
-                if (selectedActionButton == null)
-                {
-                    SelectedSkill = null;
-                    skillHeader.SetValue("Inspect");
-                    skillDescription.gameObject.SetActive(false);
-                }
-            });
-            inspectButton.onSubmit.RemoveAllListeners();
-            inspectButton.onSubmit.AddListener(() =>
-            {
-                SelectedSkill = null;
-                skillHeader.SetValue("Inspect");
-                skillDescription.gameObject.SetActive(false);
+        private void ShowMoveDescription()
+        {
+            LockedInSkill = null;
+            skillHeader.SetValue("Move");
+            skillDescription.gameObject.SetActive(true);
+            skillDescription.text = $"<sprite name=\"Steps\">: {BattleManager.Instance.PlayerTurnManager.MovementRangeRemaining}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+            // show X to cancel, F to confirm
+        }
 
+        private void OnMovementRangeRemainingChange(int stepsLeft)
+        {
+            skillDescription.text = $"<sprite name=\"Steps\">: {stepsLeft}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+        }
+        #endregion
+
+        #region Inspect Action
+        private void OnSelectInspect()
+        {
+            if (lockedInActionButton != null) return;
+
+            ShowInspectDescription();
+        }
+
+        private void OnSubmitInspect()
+        {
+            ShowInspectDescription();
+
+            if (lockedInActionButton != inspectButton)
+            {
+                LockedInActionButton = inspectButton;
                 BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.INSPECT);
-                SelectedActionButton = inspectButton;
-            });
+            }
+        }
 
-            passButton.onSelect.RemoveAllListeners();
-            passButton.onSelect.AddListener(() =>
-            {
-                if (selectedActionButton == null)
-                {
-                    SelectedSkill = null;
-                    skillHeader.SetValue("End Turn");
-                    skillDescription.gameObject.SetActive(false);
-                }
-            });
-            passButton.onSubmit.RemoveAllListeners();
-            passButton.onSubmit.AddListener(() =>
-            {
-                SelectedSkill = null;
-                skillHeader.SetValue("End Turn");
-                skillDescription.gameObject.SetActive(false);
+        private void ShowInspectDescription()
+        {
+            LockedInSkill = null;
+            skillHeader.SetValue("Inspect");
+            skillDescription.gameObject.SetActive(false);
+        }
+        #endregion
 
+        #region Pass Action
+        private void OnSelectPass()
+        {
+            if (lockedInActionButton != null) return;
+
+            ShowPassDescription();
+        }
+
+        private void OnSubmitPass()
+        {
+            ShowPassDescription();
+
+            if (lockedInActionButton != passButton)
+            {
+                LockedInActionButton = passButton;
+            }
+            else
+            {
                 BattleManager.Instance.PlayerTurnManager.EndTurn();
-            });
+            }
         }
 
-        private void OnPreviewUnit(Unit unit)
+        private void ShowPassDescription()
         {
-            UpdateSkillDisplay(selectedSkill, unit);
+            LockedInSkill = null;
+            skillHeader.SetValue("End Turn");
+            skillDescription.gameObject.SetActive(false);
+            // show X to cancel, F to confirm
+        }
+        #endregion
+
+        #region Skill Action
+        private void OnSelectSkill(int index)
+        {
+            if (lockedInActionButton != null) return;
+
+            UpdateSkillDisplay(availableSkills[index + currentSkillPageIndex * skillButtons.Count]);
         }
 
-        private void OnPreviewCurrentUnit(Unit currentUnit)
+        private void OnSubmitSkill(int index)
         {
-            if (currentUnit is not PlayerUnit playerUnit)
+            var skill = availableSkills[index + currentSkillPageIndex * skillButtons.Count];
+            BattleManager.Instance.PlayerTurnManager.SelectedSkill = skill;
+            BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_ACTION_TARGET);
+            LockedInSkill = skill;
+            LockedInActionButton = skillButtons[index];
+        }
+
+        private void OnScrollSkills(int delta)
+        {
+            CurrentSkillPageIndex += delta;
+
+            if (lockedInSkill != null)
             {
-                if (!isHidden) Hide();
-                return;
-            }
-
-            if (isHidden) Show();
-
-            this.currentUnit = currentUnit;
-            var skills = playerUnit.GetAvailableActiveSkills();
-            var hasMultiPage = false;
-            int i = 0;
-            for (; i < skills.Count; i++)
-            {
-                if (i > attackButtons.Count)
-                {
-                    hasMultiPage = true;
-                    break;
-                }
-                var button = attackButtons[i];
-                var skill = skills[i];
-                button.gameObject.SetActive(true);
-
-                button.icon.sprite = skill.m_Icon;
-
-                button.onSelect.RemoveAllListeners();
-                button.onSelect.AddListener(() =>
-                {
-                    if (selectedActionButton == null)
-                    {
-                        UpdateSkillDisplay(skill);
-                    }
-                });
-
-                button.onSubmit.RemoveAllListeners();
-                button.onSubmit.AddListener(() =>
-                {
-                    BattleManager.Instance.PlayerTurnManager.SelectedSkill = skill;
-                    BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_ACTION_TARGET);
-                    SelectedSkill = skill;
-                    SelectedActionButton = button;
-                });
-            }
-
-            if (!hasMultiPage)
-            {
-                for (; i < attackButtons.Count; i++)
-                {
-                    var button = attackButtons[i];
-                    button.gameObject.SetActive(false);
-                }
-            }
-
-            leftScrollButton.gameObject.SetActive(hasMultiPage);
-            rightScrollButton.gameObject.SetActive(hasMultiPage);
-
-            if (canvasGroup.interactable)
-            {
-                inspectButton.Select();
+                lockedInActionButton.OnSubmit(null);
             }
         }
 
@@ -329,9 +441,13 @@ namespace Game.UI
                 skillDescription.text = descriptionText;
             }
         }
+        #endregion
 
+        #region Animations
         private void Show()
         {
+            if (!isHidden) return;
+
             isHidden = false;
             animator.enabled = true;
             animator.Play(UIConstants.ShowAnimHash);
@@ -339,12 +455,14 @@ namespace Game.UI
 
         private void Hide()
         {
+            if (isHidden) return;
+
             isHidden = true;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);
 
-            SelectedActionButton = null;
-            SelectedSkill = null;
+            LockedInActionButton = null;
+            LockedInSkill = null;
         }
 
         private void OnAnimationFinish()
@@ -359,5 +477,6 @@ namespace Game.UI
             }
             BindInputEvents(!isHidden);
         }
+        #endregion
     }
 }
