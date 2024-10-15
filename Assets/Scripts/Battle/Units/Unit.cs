@@ -217,14 +217,22 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     #region Movement
+    private Coroutine moveCoroutine;
+
     public void Move(CoordPair endPosition, Stack<Vector3> positionsToMoveThrough, VoidEvent onCompleteMovement)
     {
+        if (moveCoroutine != null)
+        {
+            StopCoroutine(moveCoroutine);
+        }
+
         m_Animator.SetBool(IsMoveAnimParam, true);
-        StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, FinishMovement));
         m_CurrPosition = endPosition;
+        moveCoroutine = StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, FinishMovement));
 
         void FinishMovement()
         {
+            moveCoroutine = null;
             ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
@@ -265,6 +273,16 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             transform.position = nextPos;
         }
         onCompleteMovement?.Invoke();
+    }
+
+    public void CancelMove()
+    {
+        if (moveCoroutine != null)
+        {
+            StopCoroutine(moveCoroutine);
+            moveCoroutine = null;
+            m_Animator.SetBool(IsMoveAnimParam, false);
+        }
     }
     #endregion
 
