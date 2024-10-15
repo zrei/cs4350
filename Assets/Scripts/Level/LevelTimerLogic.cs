@@ -25,8 +25,15 @@ public class LevelTimerLogic : MonoBehaviour
     /// <param name="deltaTime"></param>
     public void AdvanceTimer(float deltaTime)
     {
-        m_TimeRemaining -= deltaTime;
-        m_TimeRemaining = Mathf.Max(0, m_TimeRemaining);
+        AddTime(-deltaTime);
+    }
+    
+    public void AddTime(float deltaTime)
+    {
+        m_TimeRemaining += deltaTime;
+        m_TimeRemaining = deltaTime < 0 
+            ? Mathf.Max(0, m_TimeRemaining) 
+            : Mathf.Min(m_TimeLimit, m_TimeRemaining);
         
         GlobalEvents.Level.TimeRemainingUpdatedEvent(m_TimeRemaining);
         
@@ -34,14 +41,6 @@ public class LevelTimerLogic : MonoBehaviour
         {
             GlobalEvents.Level.LevelEndEvent(LevelResultType.OUT_OF_TIME);
         }
-    }
-    
-    public void AddTime(float deltaTime)
-    {
-        m_TimeRemaining += deltaTime;
-        m_TimeRemaining = Mathf.Min(m_TimeLimit, m_TimeRemaining);
-        
-        GlobalEvents.Level.TimeRemainingUpdatedEvent(m_TimeRemaining);
     }
     
     #endregion

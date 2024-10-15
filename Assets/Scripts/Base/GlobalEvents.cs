@@ -72,6 +72,7 @@ public static class GlobalEvents {
 
     public static class Dialogue
     {
+        public static VoidEvent DialogueStartEvent;
         public static VoidEvent DialogueEndEvent;
     }
 }

@@ -34,12 +34,26 @@ public class UI_NodePreview : MonoBehaviour
 
     private void OnSceneLoad()
     {
+        EnableHover();
+        GlobalEvents.Dialogue.DialogueStartEvent += DisableHover;
+        GlobalEvents.Dialogue.DialogueEndEvent += EnableHover;
+    }
+
+    private void OnDestroy()
+    {
+        DisableHover();
+        GlobalEvents.Dialogue.DialogueStartEvent -= DisableHover;
+        GlobalEvents.Dialogue.DialogueEndEvent -= EnableHover;
+    }
+
+    private void EnableHover()
+    {
         GlobalEvents.Level.NodeHoverStartEvent += OnHoverStart;
         GlobalEvents.Level.NodeHoverEndEvent += OnHoverEnd;
         GlobalEvents.Level.BattleNodeHoverStartEvent += OnBattleHoverStart;
     }
 
-    private void OnDestroy()
+    private void DisableHover()
     {
         GlobalEvents.Level.NodeHoverStartEvent -= OnHoverStart;
         GlobalEvents.Level.NodeHoverEndEvent -= OnHoverEnd;
