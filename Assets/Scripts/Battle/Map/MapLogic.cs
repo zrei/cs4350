@@ -200,14 +200,14 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).PerformTeleportSkill(attacker, attack, targetTile, teleportTargetTile, completeSkillEvent);
     }
 
-    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
-    {
-        return RetrieveGrid(gridType).IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied);
-    }
-
     public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType)
     {
         return RetrieveGrid(gridType).IsValidTeleportTile(activeSkillSO, unit, targetTile);
+    }
+
+    public bool CanPerformSkill(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
+    {
+        return RetrieveGrid(gridType).CanPerformSkill(activeSkillSO, unit, targetTile, checkOccupied);
     }
     #endregion
 

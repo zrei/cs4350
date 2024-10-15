@@ -113,17 +113,29 @@ public class GridLogic : MonoBehaviour
 
     public void ShowAttackRange(Unit currentUnit, ActiveSkillSO skill)
     {
+        // check that this grid is the attacker's grid
+        bool isSameSideAsAttacker = GridHelper.IsSameSide(currentUnit.UnitAllegiance, m_GridType);
+        // if there's no attacker limitations, then there's no need to check for attacker range
+        bool hasAttackerLimitations = skill.HasAttackerLimitations;
+        bool isAttackerValid = !hasAttackerLimitations || skill.IsValidAttackerTile(currentUnit.CurrPosition);
+
         canvasGroup.interactable = true;
+
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 var tileVisual = m_TileVisuals[r, c];
                 var isAttackable = skill.IsValidTargetTile(tileVisual.Coordinates, currentUnit, m_GridType);
+                var isAttackerRange = isSameSideAsAttacker && hasAttackerLimitations && skill.IsValidAttackerTile(tileVisual.Coordinates);
                 if (isAttackable)
                 {
-                    tileVisual.selectable.interactable = true;
+                    tileVisual.selectable.interactable = isAttackerValid;
                     tileVisual.SetTileState(TileState.ATTACKABLE);
+                }
+                else if (isAttackerRange)
+                {
+                    tileVisual.ToggleAttackForecast(true);
                 }
             }
         }
@@ -142,7 +154,7 @@ public class GridLogic : MonoBehaviour
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 var tileVisual = m_TileVisuals[r, c];
-                var isTeleportable = IsValidTeleportTile(skill, unit, new CoordPair(r, c));
+                var isTeleportable = IsValidTeleportTile(skill, unit, tileVisual.Coordinates);
                 if (isTeleportable)
                 {
                     tileVisual.selectable.interactable = true;
@@ -374,7 +386,7 @@ public class GridLogic : MonoBehaviour
     /// <param name="unit"></param>
     /// <param name="targetTile"></param>
     /// <returns></returns>
-    public bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, bool checkOccupied)
+    private bool IsValidSkillTargetTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, bool checkOccupied)
     {
         if (!activeSkillSO.IsValidTargetTile(targetTile, unit, m_GridType))
             return false;
@@ -389,6 +401,11 @@ public class GridLogic : MonoBehaviour
         }
 
         return false;
+    }
+
+    public bool CanPerformSkill(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, bool checkOccupied)
+    {
+        return IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied) && activeSkillSO.IsValidAttackerTile(unit.CurrPosition);
     }
 
     public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile)
