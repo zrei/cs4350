@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game.UI
@@ -14,6 +11,11 @@ namespace Game.UI
         {
             base.Awake();
             glow.CrossFadeAlpha(0, 0, true);
+        }
+
+        public void SetGlowActive(bool active)
+        {
+            glow.CrossFadeAlpha(active ? 1 : 0, 0.2f, false);
         }
     }
 }
