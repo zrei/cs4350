@@ -3,11 +3,8 @@ using UnityEngine;
 public class RewardNode : NodeInternal
 {
     // Main currency (STC)
-    [SerializeField] private int m_goldReward;
-    public int GoldReward => m_goldReward;
-    
-    // Secondary currency (STC)
-    [SerializeField] private int m_manaStoneReward;
+    [SerializeField] private int m_RationReward;
+    public int RationReward => m_RationReward;
     
     public override void StartNodeEvent()
     {

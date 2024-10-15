@@ -24,9 +24,9 @@ namespace Game.UI
         
         private void OnRewardNodeStart(RewardNode rewardNode)
         {
-            var goldReward = rewardNode.GoldReward;
+            var rationReward = rewardNode.RationReward;
         
-            m_ResultText.text = $"Gained {goldReward} GOLD!";
+            m_ResultText.text = $"Gained {rationReward} rations!";
         
             // m_RewardPanel.SetActive(true);
             m_ReturnButton.onClick.AddListener(CloseResults);

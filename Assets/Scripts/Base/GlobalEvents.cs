@@ -40,6 +40,7 @@ public static class GlobalEvents {
         public delegate void BattleNodeEvent(BattleNode _);
         public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor, int numTurns);
         public delegate void RewardNodeEvent(RewardNode _);
+        public delegate void DialogueNodeEvent(DialogueNode _);
         public delegate void MassLevelUpEvent(List<LevelUpSummary> _);
         public delegate void LevelResultEvent(LevelResultType _);
         public static FloatEvent TimeRemainingUpdatedEvent;
@@ -53,6 +54,7 @@ public static class GlobalEvents {
         public static BattleNodeResultEvent BattleNodeEndEvent;
         public static RewardNodeEvent RewardNodeStartEvent;
         public static VoidEvent CloseRewardScreenEvent;
+        public static DialogueNodeEvent DialogueNodeEndEvent;
         public static MassLevelUpEvent MassLevellingEvent;
         public static VoidEvent CloseLevellingScreenEvent;
         public static LevelResultEvent LevelEndEvent;
@@ -68,6 +70,12 @@ public static class GlobalEvents {
         public static VoidEvent LevelSceneLoadedEvent;
     }
 
+    public static class Dialogue
+    {
+        public static VoidEvent DialogueStartEvent;
+        public static VoidEvent DialogueEndEvent;
+    }
+    
     public static class Morality
     {
         public static IntEvent MoralityChangeEvent;
