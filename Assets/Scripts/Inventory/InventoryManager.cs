@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// Representation of a weapon instance in the session data
@@ -44,6 +45,8 @@ public struct WeaponInstanceSaveData
 
 public class InventoryManager : Singleton<InventoryManager>
 {
+    [SerializeField] private List<WeaponInstanceSO> m_StartingWeapons;
+
     private readonly Dictionary<int, WeaponInstance> m_Inventory = new();
     private int m_CurrNextId;
 
@@ -76,8 +79,25 @@ public class InventoryManager : Singleton<InventoryManager>
 
     private void LoadWeapons()
     {
-        ParseSaveData(SaveManager.Instance.LoadInventory());
-        m_CurrNextId = m_Inventory.Count;
+        if (SaveManager.Instance.TryLoadInventory(out List<WeaponInstanceSaveData> weaponInstanceSaveData))
+            ParseSaveData(weaponInstanceSaveData);
+        else
+            LoadStartingInventory();
+    }
+
+    private void LoadStartingInventory()
+    {
+        Debug.Log("Load starting inventory");
+        m_Inventory.Clear();
+        m_CurrNextId = 0;
+
+        foreach (WeaponInstanceSO weapon in m_StartingWeapons)
+        {
+            // assumption is that weapons are not equipped to begin with
+            WeaponInstance weaponInstance = new() {m_InstanceId = m_CurrNextId, m_IsEquipped = false, m_WeaponInstanceSO = weapon};
+            m_Inventory.Add(weaponInstance.m_InstanceId, weaponInstance);
+            ++m_CurrNextId;
+        }
     }
 
     private void ParseSaveData(List<WeaponInstanceSaveData> characterSaveData)
@@ -95,6 +115,8 @@ public class InventoryManager : Singleton<InventoryManager>
             WeaponInstance weaponInstance = new() {m_InstanceId = data.m_InstanceId, m_IsEquipped = data.m_IsEquipped, m_WeaponInstanceSO = weaponInstanceSO};
             m_Inventory.Add(weaponInstance.m_InstanceId, weaponInstance);
         }
+
+        m_CurrNextId = m_Inventory.Count;
     }
 
     public void SaveWeapons()

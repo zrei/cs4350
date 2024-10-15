@@ -11,7 +11,7 @@ public class LevelTokenManager : MonoBehaviour
     [SerializeField] CharacterToken m_CharacterToken;
     
     // Animation time to move to a node
-    private const float MOVE_TO_NODE_TIME = 1f;
+    private const float MOVE_TO_NODE_TIME = 0.8f;
     
     private CharacterToken m_PlayerUnitToken;
     private NodeVisual m_CurrentNodeVisual;
