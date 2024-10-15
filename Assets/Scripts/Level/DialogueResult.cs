@@ -5,6 +5,7 @@ namespace Level
     /// <summary>
     /// Script to store results of a dialogue to be applied.
     /// Results includes ration and morality changes.
+    /// ApplyResults() can then be added to a dialogue's OnEnterEvent in the editor.
     /// </summary>
     public class DialogueResult : MonoBehaviour
     {
