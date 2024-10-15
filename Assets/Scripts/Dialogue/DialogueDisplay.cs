@@ -88,6 +88,7 @@ namespace Game.UI
             currentDialogue = null;
             Hide();
             InputManager.Instance.SubmitInput.OnPressEvent -= OnSubmit;
+            GlobalEvents.Dialogue.DialogueEndEvent?.Invoke();
         }
 
         private void OnSubmit(IInput input)

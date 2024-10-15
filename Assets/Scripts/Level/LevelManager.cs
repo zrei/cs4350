@@ -143,6 +143,10 @@ public class LevelManager : MonoBehaviour
         m_LevelResultScreen = UIScreenManager.Instance.LevelResultScreen;
     }
     
+    #endregion
+
+    #region Player Phase
+    
     private void StartPlayerPhase()
     {
         if (m_LevelNodeManager.IsGoalNodeCleared())
@@ -155,7 +159,15 @@ public class LevelManager : MonoBehaviour
             EnableLevelGraphInput();
         }
     }
-    
+
+    private void EndPlayerPhase()
+    {
+        DisableLevelGraphInput();
+        DeselectNode();
+        m_LevelNodeVisualManager.ClearMovableNodes();
+        m_LevelCameraController.RecenterCamera();
+    }
+
     #endregion
 
     #region Inputs
@@ -194,7 +206,7 @@ public class LevelManager : MonoBehaviour
 
     #endregion
 
-    #region Update State
+    #region Update Input State
 
     private void UpdateState()
     {
@@ -269,10 +281,7 @@ public class LevelManager : MonoBehaviour
             return;
         }
         
-        DisableLevelGraphInput();
-        DeselectNode();
-        m_LevelNodeVisualManager.ClearMovableNodes();
-        m_LevelCameraController.RecenterCamera();
+        EndPlayerPhase();
         
         m_LevelTokenManager.MovePlayerToNode(m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
         
@@ -305,10 +314,7 @@ public class LevelManager : MonoBehaviour
             return;
         }
         
-        DisableLevelGraphInput();
-        DeselectNode();
-        m_LevelNodeVisualManager.ClearMovableNodes();
-        m_LevelCameraController.RecenterCamera();
+        EndPlayerPhase();
         
         m_LevelNodeManager.StartCurrentNodeEvent();
     }
@@ -340,6 +346,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
+        GlobalEvents.Level.DialogueNodeEndEvent += OnDialogueNodeEnd;
         GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
     
@@ -348,15 +355,13 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
+        GlobalEvents.Level.DialogueNodeEndEvent -= OnDialogueNodeEnd;
         GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
 
     private void OnBattleNodeStart(BattleNode battleNode)
     {
         Debug.Log("LevelManager: Starting Battle Node");
-        
-        // Disable inputs
-        DisableLevelGraphInput();
         
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
     }
@@ -403,9 +408,6 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("LevelManager: Starting Reward Node");
         
-        // Disable inputs
-        DisableLevelGraphInput();
-        
         // Maybe insert open chest animation here
         
         // Update the level state
@@ -436,6 +438,15 @@ public class LevelManager : MonoBehaviour
     private void OnCloseLevellingScreen()
     {
         GlobalEvents.Level.CloseLevellingScreenEvent -= OnCloseLevellingScreen;
+        
+        StartPlayerPhase();
+    }
+    
+    private void OnDialogueNodeEnd(DialogueNode dialogueNode)
+    {
+        Debug.Log("LevelManager: Ending Dialogue Node");
+        
+        m_LevelNodeManager.ClearCurrentNode();
         
         StartPlayerPhase();
     }
