@@ -185,7 +185,7 @@ public class PlayerTurnManager : TurnManager
     {
         if (selectedTileData == null || selectedTileVisual == null) return;
 
-        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
+        if (m_MapLogic.CanPerformSkill(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
         {
             m_MapLogic.SetTarget(selectedTileVisual.GridType, SelectedSkill, selectedTileVisual.Coordinates);
         }
@@ -258,7 +258,7 @@ public class PlayerTurnManager : TurnManager
     {
         if (selectedTileData == null || selectedTileVisual == null) return false;
 
-        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
+        if (m_MapLogic.CanPerformSkill(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
         {
             if (selectedSkill.ContainsSkillType(SkillEffectType.TELEPORT))
             {

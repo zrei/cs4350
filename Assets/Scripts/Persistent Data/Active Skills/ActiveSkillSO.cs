@@ -83,6 +83,7 @@ public class ActiveSkillSO : ScriptableObject
     public bool IsMagicAttack => IsMagic && DealsDamage;
     public bool IsSelfTarget => m_TargetRules.Any(x => x is LockToSelfTargetRuleSO);
     public bool IsOpposingSideTarget => !IsSelfTarget && m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
+    public bool HasAttackerLimitations => m_TargetRules.Any(x => x is IAttackerRule);
     // depends on whether attacks that target the opposing side but only deal status effects will still use the attack animation
     // public bool WillPlaySupportAnimation => !DealsDamage && !m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     #endregion
@@ -102,12 +103,29 @@ public class ActiveSkillSO : ScriptableObject
         return skillTypes.Any(x => ContainsSkillType(x));
     }
 
-    // does not check for occupied tiles, that is the responsibility of the grid logic
+    /// <summary>
+    /// Checks if target tile is valid
+    /// Does not check for occupied tiles, that is the responsibility of the grid logic
+    /// </summary>
+    /// <param name="targetTile"></param>
+    /// <param name="unit"></param>
+    /// <param name="targetGridType"></param>
+    /// <returns></returns>
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
         if (unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
             return false;
-        return m_TargetRules.All(x => x.IsValidTargetTile(targetTile, unit, targetGridType));
+        return m_TargetRules.Where(x => x is ITargetRule).All(x => ((ITargetRule) x).IsValidTargetTile(targetTile, unit, targetGridType));
+    }
+
+    /// <summary>
+    /// Check if this particular attacker tile is valid
+    /// </summary>
+    /// <param name="unit">The attacker tile</param>
+    /// <returns></returns>
+    public bool IsValidAttackerTile(CoordPair attackerCoordinates)
+    {
+        return m_TargetRules.Where(x => x is IAttackerRule).All(x => ((IAttackerRule) x).IsValidAttackerTile(attackerCoordinates));
     }
 
     public bool IsValidTeleportTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)

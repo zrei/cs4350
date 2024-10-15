@@ -41,12 +41,12 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                if (mapLogic.IsValidSkillTargetTile(activeSKill, enemyUnit, coordinates, targetGridType, true))
+                if (mapLogic.CanPerformSkill(activeSKill, enemyUnit, coordinates, targetGridType, true))
                 {
                     m_PossibleAttackPositions.Add(coordinates);
                     hasPossibleAttackPosition = true;
                 }
-                if (mapLogic.IsValidSkillTargetTile(activeSKill, enemyUnit, coordinates, targetGridType, false))
+                if (mapLogic.CanPerformSkill(activeSKill, enemyUnit, coordinates, targetGridType, false))
                 {
                     m_PossibleAttackPositionsIgnoreOccupied.Add(coordinates);
                 }
