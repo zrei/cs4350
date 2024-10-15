@@ -199,17 +199,14 @@ public class PlayerTurnManager : TurnManager
     {
         if (selectedTileData == null || selectedTileVisual == null) return;
 
-        // TODO: UI
-        /*
-        if (m_MapLogic.IsValidSkillTargetTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
+        if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
         {
-            m_MapLogic.SetTarget(selectedTileVisual.GridType, SelectedSkill, selectedTileVisual.Coordinates);
+            m_MapLogic.SetTeleportTarget(selectedTileVisual.GridType, selectedTileVisual.Coordinates, m_CachedTargetTile);
         }
         else
         {
-            m_MapLogic.ResetTarget();
+            m_MapLogic.ResetPath();
         }
-        */
     }
     #endregion
 
@@ -396,9 +393,12 @@ public class PlayerTurnManager : TurnManager
         {
             case PlayerTurnState.SELECTING_ACTION:
             case PlayerTurnState.INSPECT:
-            case PlayerTurnState.SELECTING_TELEPORT_TARGET:
                 m_MapLogic.ShowInspectable(GridType.PLAYER);
                 m_MapLogic.ShowInspectable(GridType.ENEMY);
+                break;
+            case PlayerTurnState.SELECTING_TELEPORT_TARGET:
+                m_MapLogic.ShowTeleportable(GridType.PLAYER, m_CurrUnit, SelectedSkill, m_CachedTargetTile);
+                m_MapLogic.ShowTeleportable(GridType.ENEMY, m_CurrUnit, SelectedSkill, m_CachedTargetTile);
                 break;
             case PlayerTurnState.SELECTING_ACTION_TARGET:
                 if (SelectedSkill == null)
