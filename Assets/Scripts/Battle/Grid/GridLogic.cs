@@ -129,6 +129,28 @@ public class GridLogic : MonoBehaviour
         }
     }
 
+    public void ShowTeleportRange(ActiveSkillSO skill, Unit unit, CoordPair initialTarget)
+    {
+        canvasGroup.interactable = true;
+
+        if (GridHelper.GetTargetType(skill, unit.UnitAllegiance) == m_GridType)
+            m_TileVisuals[initialTarget.m_Row, initialTarget.m_Col].ToggleTarget(true);
+        
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                var tileVisual = m_TileVisuals[r, c];
+                var isTeleportable = IsValidTeleportTile(skill, unit, initialTarget);
+                if (isTeleportable)
+                {
+                    tileVisual.selectable.interactable = true;
+                    tileVisual.SetTileState(TileState.TRAVERSABLE);
+                }
+            }
+        }
+    }
+
     public void ShowInspectable(bool ignoreEmpty)
     {
         canvasGroup.interactable = true;
@@ -226,6 +248,14 @@ public class GridLogic : MonoBehaviour
                 continue;
             m_TileVisuals[target.m_Row, target.m_Col].ToggleTarget(true);
         }
+    }
+
+    public void ColorTeleportTarget(CoordPair targetTile)
+    {
+        ResetPath();
+
+        if (MapData.WithinBounds(targetTile))
+            m_TileVisuals[targetTile.m_Row, targetTile.m_Col].TogglePath(true);
     }
 
     public void ColorPath(PathNode end)

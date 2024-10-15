@@ -116,9 +116,19 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).ShowAttackRange(currentUnit, skill);
     }
 
+    public void ShowTeleportable(GridType gridType, Unit currentUnit, ActiveSkillSO skill, CoordPair initialTarget)
+    {
+        RetrieveGrid(gridType).ShowTeleportRange(skill, currentUnit, initialTarget);
+    }
+
     public void SetTarget(GridType gridType, ActiveSkillSO attack, CoordPair target)
     {
         RetrieveGrid(gridType).ColorTarget(attack, target);
+    }
+
+    public void SetTeleportTarget(GridType gridType, CoordPair target)
+    {
+        RetrieveGrid(gridType).ColorTeleportTarget(target);
     }
 
     public void ShowInspectable(GridType gridType, bool ignoreEmpty=false)
