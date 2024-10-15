@@ -414,7 +414,7 @@ public class LevelManager : MonoBehaviour
         m_LevelNodeManager.ClearCurrentNode();
         
         // Add reward to pending rewards
-        m_PendingReward[RewardType.GOLD] = m_PendingReward.GetValueOrDefault(RewardType.GOLD, 0) + rewardNode.GoldReward;
+        m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) + rewardNode.RationReward;
         
         UIScreenManager.Instance.OpenScreen(m_RewardNodeResultScreen);
         
