@@ -28,7 +28,7 @@ namespace Game.UI
             if (transitionDuration <= 0)
             {
                 fill.fillAmount = targetValue / maxValue;
-                if (text != null) text.SetValue(targetValue, maxValue);
+                text?.SetValue(targetValue, maxValue);
                 return;
             }
 
@@ -43,12 +43,12 @@ namespace Game.UI
             {
                 t += Time.unscaledDeltaTime;
                 fill.fillAmount = Mathf.Lerp(currentFill, targetValue / maxValue, t / transitionDuration);
-                if (text != null) text.SetValue(fill.fillAmount * maxValue, maxValue);
+                text?.SetValue(fill.fillAmount * maxValue, maxValue);
                 yield return null;
             }
 
             fill.fillAmount = targetValue / maxValue;
-            text.SetValue(targetValue, maxValue);
+            text?.SetValue(targetValue, maxValue);
         }
     }
 }
