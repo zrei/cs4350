@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.UI
@@ -31,23 +31,32 @@ namespace Game.UI
             canvasGroup.alpha = 0;
             isHidden = true;
 
-            GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
+            GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
+        }
+
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
         }
 
         private void OnBattleEnd(UnitAllegiance _, int _2)
         {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
 
             trackedUnit = null;
             Hide();
         }
 
-        private void OnDestroy()
+        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
         {
-            GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
-            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            trackedUnit = null;
+            Hide();
         }
 
         private void OnPreviewCurrentUnit(Unit unit)
