@@ -9,7 +9,15 @@ namespace Game.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class TurnDisplay : Singleton<TurnDisplay>
     {
-        public float radius = 60;
+        [SerializeField]
+        private FormattedTextDisplay unitName;
+
+        [SerializeField]
+        private FormattedTextDisplay timeToAct;
+
+        [SerializeField]
+        private float radius = 111;
+        public float Radius => radius;
 
         private Dictionary<Unit, TurnDisplayUnit> mapping = new();
         private TurnDisplayUnit prefab;
@@ -18,6 +26,20 @@ namespace Game.UI
         private CanvasGroup canvasGroup;
 
         private bool isHidden;
+
+        private TurnDisplayUnit HighlightedDisplay
+        {
+            get => highlightedDisplay;
+            set
+            {
+                if (highlightedDisplay != null)
+                {
+                    highlightedDisplay.OnPreviewUnit(null);
+                }
+                highlightedDisplay = value;
+            }
+        }
+        private TurnDisplayUnit highlightedDisplay;
 
         protected override void HandleAwake()
         {
@@ -31,13 +53,25 @@ namespace Game.UI
             canvasGroup.alpha = 0;
             isHidden = true;
 
+            unitName.gameObject.SetActive(false);
+            timeToAct.gameObject.SetActive(false);
+
             GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+        }
+
+        private void OnDestroy()
+        {
+            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
         }
 
         private void OnSceneLoad()
         {
             GlobalEvents.Battle.PlayerUnitSetupEndEvent += OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+            GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
         }
 
         private void OnSetupEnd()
@@ -50,7 +84,8 @@ namespace Game.UI
         private void OnBattleEnd(UnitAllegiance _, int _2)
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-            
+            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+
             // Clear leftover mapping
             foreach (var display in mapping.Values)
             {
@@ -61,11 +96,22 @@ namespace Game.UI
             Hide();
         }
 
-        private void OnDestroy()
+        private void OnPreviewUnit(Unit unit)
         {
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
-            GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
-            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            if (unit == null || !mapping.TryGetValue(unit, out var display))
+            {
+                HighlightedDisplay = null;
+                unitName.gameObject.SetActive(false);
+                timeToAct.gameObject.SetActive(false);
+                return;
+            }
+
+            display.OnPreviewUnit(unit);
+            HighlightedDisplay = display;
+            unitName.gameObject.SetActive(true);
+            timeToAct.gameObject.SetActive(true);
+            unitName.SetValue(unit.DisplayName);
+            timeToAct.SetValue(display.TimeToAct);
         }
 
         public TurnDisplayUnit InstantiateTurnDisplayUnit(Unit unit)
