@@ -77,12 +77,16 @@ public class PlayerTurnManager : TurnManager
     #endregion
 
     #region Start Turn
+    private bool m_IsTurnInProgress;
+
     /// <summary>
     /// Begin the turn involving the given player unit. Pre-calculates moveable squares.
     /// </summary>
     /// <param name="playerUnit"></param>
     public void BeginTurn(PlayerUnit playerUnit)
     {
+        m_IsTurnInProgress = true;
+
         Logger.Log(this.GetType().Name, "Start player turn with: " + playerUnit.name, LogLevel.LOG);
         GlobalEvents.Battle.PlayerTurnStartEvent?.Invoke();
 
@@ -211,6 +215,8 @@ public class PlayerTurnManager : TurnManager
     #endregion
 
     #region Perform Action
+    private bool m_IsPerformingAction;
+
     private void OnTileSubmit(TileData data, TileVisual visual)
     {
         TryPerformAction();
@@ -218,15 +224,16 @@ public class PlayerTurnManager : TurnManager
 
     public bool TryPerformAction()
     {
-        return m_CurrState switch
+        m_IsPerformingAction = m_CurrState switch
         {
             PlayerTurnState.SELECTING_ACTION_TARGET => TryPerformSkill(),
             PlayerTurnState.SELECTING_MOVEMENT_SQUARE => TryPerformMove(),
             PlayerTurnState.INSPECT => TryInspect(),
-            PlayerTurnState.SELECTING_ACTION => TrySelectAction(),
+            PlayerTurnState.SELECTING_ACTION => TryInspect(),
             PlayerTurnState.SELECTING_TELEPORT_TARGET => TryPerformTeleport(),
             _ => false
         };
+        return m_IsPerformingAction;
     }
 
     private bool TryPerformMove()
@@ -238,7 +245,7 @@ public class PlayerTurnManager : TurnManager
             if (m_MovementRangeRemaining <= 0)
             {
                 EndTurn();
-                return true;
+                return false;
             }
 
             Logger.Log(this.GetType().Name, "Begin moving from " + m_CurrUnit.CurrPosition + " to " + selectedTileVisual.Coordinates, LogLevel.LOG);
@@ -264,7 +271,7 @@ public class PlayerTurnManager : TurnManager
             {
                 m_CachedTargetTile = selectedTileVisual.Coordinates;
                 TransitToAction(PlayerTurnState.SELECTING_TELEPORT_TARGET);
-                return true;
+                return false;
             }
             m_MapLogic.PerformSkill(
                 selectedTileVisual.GridType,
@@ -287,6 +294,7 @@ public class PlayerTurnManager : TurnManager
         void CompleteSkill()
         {
             EndTurn();
+            m_IsPerformingAction = false;
         }
     }
 
@@ -315,17 +323,13 @@ public class PlayerTurnManager : TurnManager
         void CompleteSkill()
         {
             EndTurn();
+            m_IsPerformingAction = false;
         }
-    }
-
-    private bool TrySelectAction()
-    {
-        return true;
     }
 
     private bool TryInspect()
     {
-        return true;
+        return false;
     }
     #endregion
 
@@ -337,16 +341,20 @@ public class PlayerTurnManager : TurnManager
         if (m_MovementRangeRemaining > 0)
         {
             FillTraversablePoints();
+            TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
         }
         else
         {
-            var node = new PathNode(m_CurrUnit.CurrPosition, null);
-            m_ReachablePoints.Clear();
-            m_ReachablePoints.Add(node);
-            m_TileToPath.Clear();
-            m_TileToPath.Add(node.m_Coordinates, node);
+            //var node = new PathNode(m_CurrUnit.CurrPosition, null);
+            //m_ReachablePoints.Clear();
+            //m_ReachablePoints.Add(node);
+            //m_TileToPath.Clear();
+            //m_TileToPath.Add(node.m_Coordinates, node);
+            EndTurn();
         }
-        TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
+        //TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);
+
+        m_IsPerformingAction = false;
     }
 
     private void FillTraversablePoints()
@@ -362,6 +370,13 @@ public class PlayerTurnManager : TurnManager
     #endregion
 
     #region Switch Action
+    public bool TryCancelCurrentAction()
+    {
+        if (!m_IsTurnInProgress || m_IsPerformingAction) return false;
+
+        TransitToAction(PlayerTurnState.SELECTING_ACTION);
+        return true;
+    }
 
     public void TransitToAction(PlayerTurnState currAction)
     {
@@ -422,6 +437,8 @@ public class PlayerTurnManager : TurnManager
     #region End Turn
     public void EndTurn()
     {
+        m_IsTurnInProgress = false;
+
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
 
         m_CurrUnit.CancelSkillAnimation();
