@@ -6,7 +6,7 @@ TextureImporter:
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 0
+    enableMipMap: 1
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -101,6 +101,111 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
+        y: 1024
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8347b649ca8e5ca4fabb3baa8b84499d
+      internalID: 1586785015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhysicalDefence
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1024
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0f5b5704ed492149b0841dddb8b9a92
+      internalID: 1708722151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Speed
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1024
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: edc838f7dac88d946bd1b190f2d2a8a3
+      internalID: -1977730902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MagicAttack
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1024
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff723b5904c2e21449cc3cc44fd228b5
+      internalID: 1586416083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MagicDefence
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 1024
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a57b77c17ab33e4298c302f5a731978
+      internalID: -57154190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steps
+      rect:
+        serializedVersion: 2
+        x: 0
         y: 512
         width: 512
         height: 512
@@ -111,14 +216,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8474f9d76b3a4dd4b9d7d0d51c0a566f
-      internalID: 1582369141
+      spriteID: 775af31720b5794499e88b07f6c31d77
+      internalID: -792120941
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PhysicalDefence
+      name: Inspect
       rect:
         serializedVersion: 2
         x: 512
@@ -132,14 +237,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 61ccce403e942b243a3d3841f36db505
-      internalID: -1515170280
+      spriteID: d6a040c07bc093545b0633cc78748c06
+      internalID: 1464086000
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Speed
+      name: Move
       rect:
         serializedVersion: 2
         x: 1024
@@ -153,14 +258,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8cecfa5c12149f7489a5056d2184495c
-      internalID: -68289503
+      spriteID: bcd49689b96f6f24a99b621bfbfadd5b
+      internalID: -359623175
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MagicAttack
+      name: Pass
       rect:
         serializedVersion: 2
         x: 1536
@@ -174,14 +279,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a3077618518ea874a9eea03dc5f96ce7
-      internalID: -517872752
+      spriteID: 8561af220ca6fda4b8ee7d07c20bdd2b
+      internalID: -929578469
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MagicDefence
+      name: AttackIntent
       rect:
         serializedVersion: 2
         x: 2048
@@ -195,56 +300,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 38381107a3e1380409f239f493fe412e
-      internalID: 1604764167
+      spriteID: 897fdc723f1e6e347b09e6f7bd8ae7e7
+      internalID: -906106045
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Steps
-      rect:
-        serializedVersion: 2
-        x: 2560
-        y: 512
-        width: 512
-        height: 512
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6f1fa17d4ac7d2247928d4280afd10c5
-      internalID: -1960993747
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Inspect
-      rect:
-        serializedVersion: 2
-        x: 3072
-        y: 512
-        width: 512
-        height: 512
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ffa010754f546324bb6a0a4a2a8880d7
-      internalID: -727664021
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Move
+      name: MoveIntent
       rect:
         serializedVersion: 2
         x: 0
@@ -258,14 +321,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a69f3741d4b0ebc498e529c9dd3d6b9f
-      internalID: -1059269117
+      spriteID: 9438e79cb1dffa144aa8f72ffa691d4a
+      internalID: -1367087131
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pass
+      name: Burn
       rect:
         serializedVersion: 2
         x: 512
@@ -279,14 +342,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9536cd9d00c92014e85413b29c953e6e
-      internalID: 209221245
+      spriteID: 001c804b7c0c4d2409831813ad1aa6a5
+      internalID: 1199870933
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AttackIntent
+      name: Bleed
       rect:
         serializedVersion: 2
         x: 1024
@@ -300,14 +363,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b8dc3e19a9fa57342ac308d5d10fc787
-      internalID: -271732214
+      spriteID: 16cc4cbcea92d1d40bafd8af0b56b0ea
+      internalID: 263060955
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MoveIntent
+      name: Poison
       rect:
         serializedVersion: 2
         x: 1536
@@ -321,14 +384,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e6e33b860a413d943bbbd50d6a4f3901
-      internalID: 68686991
+      spriteID: 9bc2af12e2c3b0a408183bc64c420a45
+      internalID: 1975642951
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Burn
+      name: TimeToAct
       rect:
         serializedVersion: 2
         x: 2048
@@ -342,50 +405,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4a3c08eab783e4c419726391292016c4
-      internalID: -1339024296
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Bleed
-      rect:
-        serializedVersion: 2
-        x: 2560
-        y: 0
-        width: 512
-        height: 512
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 090e04b915bb1a946a6ee441fd162879
-      internalID: -944497057
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Poison
-      rect:
-        serializedVersion: 2
-        x: 3072
-        y: 0
-        width: 512
-        height: 512
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 27d1807bd206ada44b3270317145cd87
-      internalID: 629858772
+      spriteID: 3468ca88a53555546beab9accdfdeba1
+      internalID: 805484479
       vertices: []
       indices: 
       edges: []
@@ -401,20 +422,21 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      AttackIntent: -271732214
-      Bleed: -944497057
-      Burn: -1339024296
-      Inspect: -727664021
-      MagicAttack: -517872752
-      MagicDefence: 1604764167
-      Move: -1059269117
-      MoveIntent: 68686991
-      Pass: 209221245
-      PhysicalAttack: 1582369141
-      PhysicalDefence: -1515170280
-      Poison: 629858772
-      Speed: -68289503
-      Steps: -1960993747
+      AttackIntent: -906106045
+      Bleed: 263060955
+      Burn: 1199870933
+      Inspect: 1464086000
+      MagicAttack: 1586416083
+      MagicDefence: -57154190
+      Move: -359623175
+      MoveIntent: -1367087131
+      Pass: -929578469
+      PhysicalAttack: 1586785015
+      PhysicalDefence: 1708722151
+      Poison: 1975642951
+      Speed: -1977730902
+      Steps: -792120941
+      TimeToAct: 805484479
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
