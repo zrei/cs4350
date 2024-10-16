@@ -245,9 +245,13 @@ namespace Game.UI
         }
         private void OnCancelAction(IInput input)
         {
-            BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.INSPECT);
-            lockedInActionButton.OnSelect(null);
-            LockedInActionButton = null;
+            if (lockedInActionButton == null) return;
+
+            if (BattleManager.Instance.PlayerTurnManager.TryCancelCurrentAction())
+            {
+                lockedInActionButton.OnSelect(null);
+                LockedInActionButton = null;
+            }
         }
         #endregion
 
@@ -299,7 +303,6 @@ namespace Game.UI
             skillHeader.SetValue("Move");
             skillDescription.gameObject.SetActive(true);
             skillDescription.text = $"<sprite name=\"Steps\">: {BattleManager.Instance.PlayerTurnManager.MovementRangeRemaining}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
-            // show X to cancel, F to confirm
         }
 
         private void OnMovementRangeRemainingChange(int stepsLeft)
@@ -362,7 +365,6 @@ namespace Game.UI
             LockedInSkill = null;
             skillHeader.SetValue("End Turn");
             skillDescription.gameObject.SetActive(false);
-            // show X to cancel, F to confirm
         }
         #endregion
 
