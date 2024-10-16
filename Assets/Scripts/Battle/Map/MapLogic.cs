@@ -187,6 +187,16 @@ public class MapLogic : MonoBehaviour
             _ => null
         };
     }
+
+    public int GetNumberOfUnitsOnGrid(GridType gridType)
+    {
+        return RetrieveGrid(gridType).GetNumberOfUnitsOnGrid();
+    }
+
+    public Unit GetUnitAtTile(GridType gridType, CoordPair coordPair)
+    {
+        return RetrieveGrid(gridType).GetUnitAtTile(coordPair);
+    }
     #endregion
 
     #region Attacks

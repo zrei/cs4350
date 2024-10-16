@@ -367,6 +367,12 @@ public class GridLogic : MonoBehaviour
         return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
     }
 
+    // assumes that tile is filled
+    public Unit GetUnitAtTile(CoordPair tile)
+    {   
+        return m_TileData[tile.m_Row, tile.m_Col].m_CurrUnit;
+    }
+
     /// <summary>
     /// Checks that it's a valid target tile for the active skill and also checks that at least one square within the target is occupied
     /// </summary>
@@ -413,6 +419,20 @@ public class GridLogic : MonoBehaviour
             targetTiles.Add(coordPair);
         }
         return targetTiles;
+    }
+
+    public int GetNumberOfUnitsOnGrid()
+    {
+        int numUnits = 0;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied)
+                    ++numUnits;
+            }
+        }
+        return numUnits;
     }
     #endregion
 

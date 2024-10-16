@@ -157,11 +157,32 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
     }
 }
 
+[System.Serializable]
+public struct EnemySkillTileCondition 
+{
+    public EnemySkillTileConditionSO m_Condition;
+    public float m_MultProportion;
+    public bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair targetTile, ActiveSkillSO activeSkill) => m_Condition.IsConditionMet(enemyUnit, mapLogic, targetTile, activeSkill);
+}
 
 [CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
-public class EnemyActiveSkillActionSO : EnemyTargetActionSO
+public class EnemyActiveSkillActionSO : EnemyActionSO
 {
     public ActiveSkillSO m_ActiveSkill;
+    public List<EnemySkillTileCondition> m_TargetConditions;
+
+    public float GetFinalWeightProportionForTile(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair target)
+    {
+        float finalNodeWeight = 1f;
+
+        foreach (EnemySkillTileCondition targetCondition in m_TargetConditions)
+        {
+            if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target, m_ActiveSkill))
+                finalNodeWeight *= targetCondition.m_MultProportion;
+        }
+
+        return finalNodeWeight;
+    }
 
     public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
     

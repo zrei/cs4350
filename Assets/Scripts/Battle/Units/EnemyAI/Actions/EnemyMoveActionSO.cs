@@ -53,9 +53,32 @@ public class EnemyMoveActionWrapper : EnemyActionWrapper
     }
 }
 
-[CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyMoveActionSO")]
-public class EnemyMoveActionSO : EnemyTargetActionSO
+[System.Serializable]
+public struct EnemyMoveTileCondition
 {
+    public EnemyMoveTileConditionSO m_Condition;
+    public float m_MultProportion;
+    public bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair targetTile) => m_Condition.IsConditionMet(enemyUnit, mapLogic, targetTile);
+}
+
+[CreateAssetMenu(fileName = "EnemyMoveActionSO", menuName="ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyMoveActionSO")]
+public class EnemyMoveActionSO : EnemyActionSO
+{
+    public List<EnemyMoveTileCondition> m_TargetConditions;
+
+    public float GetFinalWeightProportionForTile(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair target)
+    {
+        float finalNodeWeight = 1f;
+
+        foreach (EnemyMoveTileCondition targetCondition in m_TargetConditions)
+        {
+            if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target))
+                finalNodeWeight *= targetCondition.m_MultProportion;
+        }
+
+        return finalNodeWeight;
+    }
+
     public override EnemyActionWrapper GetWrapper(int priority)
     {
         return new EnemyMoveActionWrapper {m_Action = this, m_Priority = priority};
