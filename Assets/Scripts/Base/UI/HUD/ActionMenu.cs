@@ -302,12 +302,12 @@ namespace Game.UI
             LockedInSkill = null;
             skillHeader.SetValue("Move");
             skillDescription.gameObject.SetActive(true);
-            skillDescription.text = $"<sprite name=\"Steps\">: {BattleManager.Instance.PlayerTurnManager.MovementRangeRemaining}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+            skillDescription.text = $"<sprite name=\"Steps\"> {BattleManager.Instance.PlayerTurnManager.MovementRangeRemaining}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
         }
 
         private void OnMovementRangeRemainingChange(int stepsLeft)
         {
-            skillDescription.text = $"<sprite name=\"Steps\">: {stepsLeft}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+            skillDescription.text = $"<sprite name=\"Steps\"> {stepsLeft}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
         }
         #endregion
 
