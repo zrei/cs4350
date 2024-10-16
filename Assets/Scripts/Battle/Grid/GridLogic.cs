@@ -127,15 +127,16 @@ public class GridLogic : MonoBehaviour
             {
                 var tileVisual = m_TileVisuals[r, c];
                 var isAttackable = skill.IsValidTargetTile(tileVisual.Coordinates, currentUnit, m_GridType);
-                var isAttackerRange = isSameSideAsAttacker && hasAttackerLimitations && skill.IsValidAttackerTile(tileVisual.Coordinates);
+                var isAttackerOutOfPosition = isSameSideAsAttacker && hasAttackerLimitations && !skill.IsValidAttackerTile(tileVisual.Coordinates);
                 if (isAttackable)
                 {
                     tileVisual.selectable.interactable = isAttackerValid;
                     tileVisual.SetTileState(TileState.ATTACKABLE);
                 }
-                else if (isAttackerRange)
+                
+                if (isAttackerOutOfPosition)
                 {
-                    tileVisual.ToggleAttackForecast(true);
+                    tileVisual.ToggleSkillCastBlocked(true);
                 }
             }
         }
