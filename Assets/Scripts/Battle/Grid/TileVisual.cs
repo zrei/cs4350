@@ -30,7 +30,7 @@ public class TileVisual : MonoBehaviour
     private readonly static Color InspectableColor = new(0.5f, 0.5f, 0, 1);
     //private readonly static Color InspectableColor = new(0.5f, 0.5f, 0.5f, 1);
 
-    private readonly static Color IconActiveColor = new(0, 0, 0, 0.8f);
+    private readonly static Color IconActiveColor = new(0.8f, 0.8f, 0.8f, 0.8f);
 
     #region Asset References
     [SerializeField]
