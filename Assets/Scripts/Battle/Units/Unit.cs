@@ -80,6 +80,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public bool CanSwapTiles => m_Class.m_CanSwapTiles;
     public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
+    public string CharacterName { get; protected set; }
+    public string DisplayName => !string.IsNullOrEmpty(CharacterName) ? $"{CharacterName} / {ClassName}" : ClassName;
     public Sprite Sprite { get; private set; }
 
     public Vector3 GridYOffset { get; private set; }
