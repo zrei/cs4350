@@ -139,16 +139,7 @@ namespace Game.UI
 
             if (isHidden) Show();
 
-            switch (currentUnit.UnitAllegiance)
-            {
-                case UnitAllegiance.PLAYER:
-                    var playerUnit = currentUnit as PlayerUnit;
-                    nameDisplay?.SetValue($"{playerUnit.CharacterName} / {playerUnit.ClassName}");
-                    break;
-                case UnitAllegiance.ENEMY:
-                    nameDisplay?.SetValue(currentUnit.ClassName);
-                    break;
-            }
+            nameDisplay.SetValue(currentUnit.DisplayName);
 
             characterArt.sprite = currentUnit.Sprite;
             var color = characterArt.color;

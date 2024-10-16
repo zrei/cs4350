@@ -5,8 +5,6 @@ public class PlayerUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.PLAYER;
 
-    public string CharacterName { get; private set; }
-
     #region Initialisation
     /// <summary>
     /// Initialise stats, position, etc.
