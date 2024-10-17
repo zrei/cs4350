@@ -373,6 +373,13 @@ public class GridLogic : MonoBehaviour
         return m_TileData[tile.m_Row, tile.m_Col].m_CurrUnit;
     }
 
+    // threshold object... should return false if there is no unit at all
+    // but hey that shouldn't be possible to begin with
+    public bool HasAnyUnitWithHealthThreshold(float threshold, bool greaterThan)
+    {
+
+    }
+
     /// <summary>
     /// Checks that it's a valid target tile for the active skill and also checks that at least one square within the target is occupied
     /// </summary>
