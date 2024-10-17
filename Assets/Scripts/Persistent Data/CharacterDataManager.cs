@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// hook up to events to check for class unlocks
 public class CharacterDataManager : Singleton<CharacterDataManager>
 {
     [SerializeField] List<PlayerCharacterSO> m_StartingCharacters;
@@ -61,12 +62,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 continue;
             }
 
-            if (!PersistentDataManager.Instance.TryGetPlayerClassSO(data.m_ClassId, out PlayerClassSO classSO))
-            {
-                Logger.Log(this.GetType().Name, $"Class data for {data.m_ClassId} cannot be found", LogLevel.ERROR);
-                continue;
-            }
-            PlayerCharacterData persistentData = new() {m_BaseData = characterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
+            PlayerCharacterData persistentData = new() {m_BaseData = characterSO, m_CurrClassIndex = data.m_ClassIndex, m_CurrExp = data.m_CurrExp,
                 m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
             m_CharacterData.Add(persistentData.Id, persistentData);
         }
@@ -112,8 +108,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
     private void ReceiveCharacter(PlayerCharacterSO playerCharacterSO)
     {
-        PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClass = playerCharacterSO.m_StartingClass, m_CurrExp = 0,
-                m_CurrLevel = playerCharacterSO.m_StartingLevel, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress()};
+        PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClassIndex = playerCharacterSO.StartingClassIndex, m_CurrExp = 0,
+                m_CurrLevel = playerCharacterSO.m_StartingLevel, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress(),
+                m_CurrUnlockedClasses = playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)};
         m_CharacterData.Add(persistentData.Id, persistentData);
     }
 }

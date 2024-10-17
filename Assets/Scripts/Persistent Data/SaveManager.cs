@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 public struct CharacterSaveData
 {
     public int m_CharacterId;
-    public int m_ClassId;
+    public int m_ClassIndex;
     public int m_CurrLevel;
     public int m_CurrExp;
     public Stats m_CurrStats;
@@ -16,11 +16,12 @@ public struct CharacterSaveData
     /// If null, the character has no weapon equipped and will use the default weapon
     /// </summary>
     public int? m_CurrEquippedWeaponId;
+    public string m_UnlockedClasses;
 
-    public CharacterSaveData(int characterId, int classId, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int? currEquippedWeaponId = null)
+    public CharacterSaveData(int characterId, int classIndex, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int? currEquippedWeaponId = null)
     {
         m_CharacterId = characterId;
-        m_ClassId = classId;
+        m_ClassIndex = classIndex;
         m_CurrLevel = currLevel;
         m_CurrExp = currExp;
         m_CurrStats = currStats;

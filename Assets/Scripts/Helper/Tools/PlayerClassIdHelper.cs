@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerClassIdHelper", menuName = "ScriptableObject/IdHelpers/PlayerClassIdHelper")]
@@ -15,3 +16,4 @@ public class PlayerClassIdHelper : IdHelper<PlayerClassSO>
         return playerClassSO.m_Id;
     }
 }
+*/
