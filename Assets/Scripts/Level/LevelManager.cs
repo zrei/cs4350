@@ -108,7 +108,7 @@ public class LevelManager : MonoBehaviour
         for (int i = 0; i < m_TestCharacterData.Count; i++)
         {
             m_TestCharacterData[i].m_CurrStats = m_TestCharacterData[i].m_BaseData.m_StartingStats;
-            m_TestCharacterData[i].m_CurrClass = m_TestCharacterData[i].m_BaseData.m_StartingClass;
+            m_TestCharacterData[i].m_CurrClassIndex = m_TestCharacterData[i].m_BaseData.m_PathGroup.GetDefaultClassIndex();
         }
 
         var levelNodes = FindObjectsOfType<NodeInternal>().ToList();

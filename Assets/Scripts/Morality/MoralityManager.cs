@@ -47,5 +47,6 @@ public class MoralityManager : Singleton<MoralityManager>
     private void ChangeMorality(int changeAmount)
     {
         m_CurrMorality = Mathf.Clamp(m_CurrMorality + changeAmount, -m_MoralitySetting.m_MaxMorality, m_MoralitySetting.m_MaxMorality);
+        GlobalEvents.Morality.MoralitySetEvent?.Invoke(m_CurrMorality);
     }
 }
