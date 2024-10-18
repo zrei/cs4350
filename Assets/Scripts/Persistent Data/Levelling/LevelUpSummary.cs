@@ -16,7 +16,7 @@ public readonly struct LevelUpSummary
         Dictionary<StatType, int> totalStatGrowths)
     {
         m_CharacterSO = characterData.m_BaseData;
-        m_ClassSO = characterData.m_CurrClass;
+        m_ClassSO = characterData.CurrClass;
         m_LevelGrowth = characterData.m_CurrLevel - initialLevel;
         m_FinalLevel = characterData.m_CurrLevel;
         m_TotalStatGrowths = totalStatGrowths;

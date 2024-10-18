@@ -17,7 +17,7 @@ public class PlayerUnit : Unit
         CharacterName = characterBattleData.m_BaseData.m_CharacterName;
         List<InflictedToken> permanentTokens = new();
         permanentTokens.AddRange(additionalPermanentTokens);
-        permanentTokens.AddRange(characterBattleData.m_BaseData.GetInflictedMoralityTokens(currMoralityPercentage));
+        permanentTokens.AddRange(characterBattleData.GetInflictedTokens(currMoralityPercentage));
         base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData(), characterBattleData.m_CurrEquippedWeapon, permanentTokens);
     }
     #endregion

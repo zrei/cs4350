@@ -4,11 +4,9 @@ using UnityEngine;
 public class PersistentDataManager : Singleton<PersistentDataManager>
 {
     [SerializeField] private List<PlayerCharacterSO> m_CharacterSOs;
-    [SerializeField] private List<PlayerClassSO> m_ClassSOs;
     [SerializeField] private List<WeaponInstanceSO> m_WeaponInstanceSOs;
 
     private readonly Dictionary<int, PlayerCharacterSO> m_CharacterSOsMap = new();
-    private readonly Dictionary<int, PlayerClassSO> m_ClassSOsMap = new();
     private readonly Dictionary<int, WeaponInstanceSO> m_WeaponInstanceSOsMap = new();
 
     protected override void HandleAwake()
@@ -16,18 +14,12 @@ public class PersistentDataManager : Singleton<PersistentDataManager>
         base.HandleAwake();
 
         m_CharacterSOs.ForEach(x => m_CharacterSOsMap.Add(x.m_Id, x));
-        m_ClassSOs.ForEach(x => m_ClassSOsMap.Add(x.m_Id, x));
         m_WeaponInstanceSOs.ForEach(x => m_WeaponInstanceSOsMap.Add(x.m_WeaponId, x));
     }
 
     public bool TryGetPlayerCharacterSO(int characterId, out PlayerCharacterSO characterSO)
     {
         return TryGetSO<PlayerCharacterSO>(characterId, m_CharacterSOsMap, out characterSO);
-    }
-
-    public bool TryGetPlayerClassSO(int classId, out PlayerClassSO playerClassSO)
-    {
-        return TryGetSO<PlayerClassSO>(classId, m_ClassSOsMap, out playerClassSO);
     }
 
     public bool TryGetWeaponInstanceSO(int weaponInstanceId, out WeaponInstanceSO weaponInstanceSO)

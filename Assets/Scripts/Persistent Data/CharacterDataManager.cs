@@ -61,12 +61,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 continue;
             }
 
-            if (!PersistentDataManager.Instance.TryGetPlayerClassSO(data.m_ClassId, out PlayerClassSO classSO))
-            {
-                Logger.Log(this.GetType().Name, $"Class data for {data.m_ClassId} cannot be found", LogLevel.ERROR);
-                continue;
-            }
-            PlayerCharacterData persistentData = new() {m_BaseData = characterSO, m_CurrClass = classSO, m_CurrExp = data.m_CurrExp,
+            PlayerCharacterData persistentData = new() {m_BaseData = characterSO, m_CurrClassIndex = data.m_ClassIndex, m_CurrExp = data.m_CurrExp,
                 m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
             m_CharacterData.Add(persistentData.Id, persistentData);
         }
@@ -112,8 +107,47 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
     private void ReceiveCharacter(PlayerCharacterSO playerCharacterSO)
     {
-        PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClass = playerCharacterSO.m_StartingClass, m_CurrExp = 0,
-                m_CurrLevel = playerCharacterSO.m_StartingLevel, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress()};
+        PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClassIndex = playerCharacterSO.StartingClassIndex, m_CurrExp = 0,
+                m_CurrLevel = playerCharacterSO.m_StartingLevel, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress(),
+                m_CurrUnlockedClasses = playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)};
         m_CharacterData.Add(persistentData.Id, persistentData);
     }
+
+    #region Helper
+    /// <summary>
+    /// Helper to parse the save data for unlocked classes
+    /// </summary>
+    /// <param name="unlockedClass"></param>
+    /// <param name="numClasses"></param>
+    /// <returns></returns>
+    private List<bool> ParseUnlockedClasses(int unlockedClass, int numClasses)
+    {
+        int baseNum = 2;
+        List<bool> unlockedClasses = new();
+
+        for (int i = 0; i < numClasses; ++i)
+        {
+            unlockedClasses.Add((unlockedClass & (int) Mathf.Pow(baseNum, i)) > 0);
+        }
+        return unlockedClasses;
+    }
+
+    /// <summary>
+    /// Helper to serialize the save data for unlocked classes
+    /// </summary>
+    /// <param name="unlockedClasses"></param>
+    /// <param name="numClasses"></param>
+    /// <returns></returns>
+    private int SerializeUnlockedClasses(List<bool> unlockedClasses, int numClasses)
+    {
+        int serialized = 0;
+        int baseNum = 2;
+        for (int i = 0; i < numClasses; ++i)
+        {
+            if (unlockedClasses[i])
+                serialized |= (int) Mathf.Pow(baseNum, i);
+        }
+        return serialized;
+    }
+    #endregion
 }

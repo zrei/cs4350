@@ -6,7 +6,9 @@ public class PlayerCharacterSO : CharacterSO
 {
     [Header("Player-only details")]
     public int m_Id;
-    public PlayerClassSO m_StartingClass;
+    public PathGroupSO m_PathGroup;
+    public int StartingClassIndex => m_PathGroup.GetDefaultClassIndex();
+    public int NumClasses => m_PathGroup.NumClasses;
     public int m_StartingLevel;
     [Tooltip("Starting stats when first unlocked by the player")]
     public Stats m_StartingStats;
@@ -21,5 +23,14 @@ public class PlayerCharacterSO : CharacterSO
     public UnitModelData GetUnitModelData(OutfitType outfitType)
     {
         return m_Race.GetUnitModelData(m_Gender, outfitType);
+    }
+
+    /// <summary>
+    /// Checks using the current game state only
+    /// </summary>
+    /// <returns></returns>
+    public List<bool> GetUnlockedClassIndexes(int characterLevel)
+    {
+        return m_PathGroup.GetUnlockedClassIndexes(characterLevel);
     }
 }

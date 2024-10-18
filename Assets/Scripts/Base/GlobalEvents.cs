@@ -79,6 +79,7 @@ public static class GlobalEvents {
     public static class Morality
     {
         public static IntEvent MoralityChangeEvent;
+        public static IntEvent MoralitySetEvent;
     }
 
     public static class Flags
