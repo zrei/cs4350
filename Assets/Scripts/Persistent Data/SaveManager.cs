@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [System.Serializable]
 public struct CharacterSaveData
@@ -16,9 +15,9 @@ public struct CharacterSaveData
     /// If null, the character has no weapon equipped and will use the default weapon
     /// </summary>
     public int? m_CurrEquippedWeaponId;
-    public string m_UnlockedClasses;
+    public int m_UnlockedClasses;
 
-    public CharacterSaveData(int characterId, int classIndex, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int? currEquippedWeaponId = null)
+    public CharacterSaveData(int characterId, int classIndex, int currLevel, int currExp, Stats currStats, StatProgress currStatProgress, int unlockedClasses, int? currEquippedWeaponId = null)
     {
         m_CharacterId = characterId;
         m_ClassIndex = classIndex;
@@ -27,6 +26,7 @@ public struct CharacterSaveData
         m_CurrStats = currStats;
         m_CurrStatProgress = currStatProgress;
         m_CurrEquippedWeaponId = currEquippedWeaponId;
+        m_UnlockedClasses = unlockedClasses;
     }
 }
 

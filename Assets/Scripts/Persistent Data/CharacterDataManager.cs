@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// hook up to events to check for class unlocks
 public class CharacterDataManager : Singleton<CharacterDataManager>
 {
     [SerializeField] List<PlayerCharacterSO> m_StartingCharacters;
@@ -113,4 +112,42 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 m_CurrUnlockedClasses = playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)};
         m_CharacterData.Add(persistentData.Id, persistentData);
     }
+
+    #region Helper
+    /// <summary>
+    /// Helper to parse the save data for unlocked classes
+    /// </summary>
+    /// <param name="unlockedClass"></param>
+    /// <param name="numClasses"></param>
+    /// <returns></returns>
+    private List<bool> ParseUnlockedClasses(int unlockedClass, int numClasses)
+    {
+        int baseNum = 2;
+        List<bool> unlockedClasses = new();
+
+        for (int i = 0; i < numClasses; ++i)
+        {
+            unlockedClasses.Add((unlockedClass & (int) Mathf.Pow(baseNum, i)) > 0);
+        }
+        return unlockedClasses;
+    }
+
+    /// <summary>
+    /// Helper to serialize the save data for unlocked classes
+    /// </summary>
+    /// <param name="unlockedClasses"></param>
+    /// <param name="numClasses"></param>
+    /// <returns></returns>
+    private int SerializeUnlockedClasses(List<bool> unlockedClasses, int numClasses)
+    {
+        int serialized = 0;
+        int baseNum = 2;
+        for (int i = 0; i < numClasses; ++i)
+        {
+            if (unlockedClasses[i])
+                serialized |= (int) Mathf.Pow(baseNum, i);
+        }
+        return serialized;
+    }
+    #endregion
 }

@@ -9,8 +9,11 @@ public class PlayerCharacterData
     [HideInInspector]
     public int m_CurrClassIndex;
     public PlayerClassSO CurrClass => m_BaseData.m_PathGroup.GetClass(m_CurrClassIndex);
-    public HashSet<int> m_CurrUnlockedClasses;
-    public bool IsClassUnlocked(int index) => m_CurrUnlockedClasses.Contains(index);
+    /// <summary>
+    /// At each index, indicate if that class is unlocked or not
+    /// </summary>
+    public List<bool> m_CurrUnlockedClasses;
+    public bool IsClassUnlocked(int index) => m_CurrUnlockedClasses[index];
     public int m_CurrLevel;
     public int m_CurrExp;
 
@@ -61,13 +64,26 @@ public class PlayerCharacterData
             return weaponInstanceSO;
     }
 
-    public void UnlockClass(int index)
+    /// <summary>
+    /// Use to check for new class unlocks whenever a relevant state change occurs
+    /// </summary>
+    public void CheckClassUnlocks()
     {
-        if (!m_CurrUnlockedClasses.Contains(index))
+        List<bool> unlockedClasses = m_BaseData.m_PathGroup.GetUnlockedClassIndexes(m_CurrLevel);
+        for (int i = 0; i < unlockedClasses.Count; ++i)
         {
-            m_CurrUnlockedClasses.Add(index);
-            // call an event if need to display popup or something
+            if (unlockedClasses[i])
+                UnlockClass(i);
         }
+    }
+
+    private void UnlockClass(int index)
+    {
+        if (!m_CurrUnlockedClasses[index])
+        {
+            m_CurrUnlockedClasses[index] = true;
+            // call an event if need to display popup or something
+        }  
     }
 }
 

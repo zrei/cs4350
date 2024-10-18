@@ -10,6 +10,7 @@ public class PathGroupSO : ScriptableObject
 {
     public string m_PathName;
     public List<PathClass> m_PathClasses;
+    public int NumClasses => m_PathClasses.Count;
 
     public int GetDefaultClassIndex()
     {
@@ -27,13 +28,12 @@ public class PathGroupSO : ScriptableObject
         return m_PathClasses[index].m_Class;
     }
 
-    public HashSet<int> GetUnlockedClassIndexes(int characterLevel)
+    public List<bool> GetUnlockedClassIndexes(int characterLevel)
     {
-        HashSet<int> unlockedClassIndexes = new();
+        List<bool> unlockedClassIndexes = new();
         for (int i = 0; i < m_PathClasses.Count; ++i)
         {
-            if (m_PathClasses[i].IsUnlocked(characterLevel))
-                unlockedClassIndexes.Add(i);
+            unlockedClassIndexes[i] = m_PathClasses[i].IsUnlocked(characterLevel);
         }
         return unlockedClassIndexes;
     }
