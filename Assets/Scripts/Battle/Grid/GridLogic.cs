@@ -296,6 +296,17 @@ public class GridLogic : MonoBehaviour
     {
         return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.CanSwapTiles, unit.TraversableTileTypes);
     }
+
+    public void TryReachTile(Unit unit, CoordPair destination, VoidEvent onCompleteMovement)
+    {
+        if (!Pathfinder.TryPathfind(MapData, unit.CurrPosition, destination, out PathNode pathNode, unit.TraversableTileTypes))
+        {
+            onCompleteMovement?.Invoke();
+            return;
+        }
+
+        MoveUnit(unit, pathNode, onCompleteMovement);
+    }
     #endregion
 
     #region Unit
@@ -311,15 +322,33 @@ public class GridLogic : MonoBehaviour
 
     public void MoveUnit(Unit unit, PathNode endPathNode, VoidEvent onCompleteMovement)
     {
+        int movementRange = (int) unit.GetTotalStat(StatType.MOVEMENT_RANGE);
+        PathNode finalPathNode = endPathNode;
+
+        int count = 0;
+        PathNode pointer = endPathNode;
+        while (endPathNode != null)
+        {
+            if (count == movementRange + 1)
+            {
+                finalPathNode = finalPathNode.m_Parent;
+            }
+            else
+            {
+                ++count;
+            }
+            pointer = pointer.m_Parent;
+        }
+
         CoordPair start = unit.CurrPosition;
-        CoordPair end = endPathNode.m_Coordinates;
+        CoordPair end = finalPathNode.m_Coordinates;
 
         if (m_TileData[start.m_Row, start.m_Col].m_CurrUnit != unit)
         {
             Logger.Log(this.GetType().Name, "Unit stored in the tile data is not the same as unit to be moved", LogLevel.ERROR);
         }
 
-        Stack<Vector3> movementCheckpoints = GetPathPositions(endPathNode);
+        Stack<Vector3> movementCheckpoints = GetPathPositions(finalPathNode);
         
         m_TileData[start.m_Row, start.m_Col].m_CurrUnit = m_TileData[end.m_Row, end.m_Col].m_CurrUnit;
         m_TileData[start.m_Row, start.m_Col].m_IsOccupied = m_TileData[start.m_Row, start.m_Col].m_CurrUnit != null;
@@ -377,7 +406,28 @@ public class GridLogic : MonoBehaviour
     // but hey that shouldn't be possible to begin with
     public bool HasAnyUnitWithHealthThreshold(float threshold, bool greaterThan)
     {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied && m_TileData[r, c].m_CurrUnit.CurrentHealth > threshold)
+                    return true;
+            }
+        }
+        return false;
+    }
 
+    public bool HasAnyUnitWithManaThreshold(float threshold, bool greaterThan)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied && m_TileData[r, c].m_CurrUnit.CurrentMana > threshold)
+                    return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
@@ -440,6 +490,20 @@ public class GridLogic : MonoBehaviour
             }
         }
         return numUnits;
+    }
+
+    public IEnumerable<CoordPair> GetUnoccupiedTiles()
+    {
+        List<CoordPair> tiles = new();
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied)
+                    tiles.Add(new CoordPair(r, c));
+            }
+        }
+        return tiles;
     }
     #endregion
 

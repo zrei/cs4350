@@ -197,6 +197,11 @@ public class MapLogic : MonoBehaviour
     {
         return RetrieveGrid(gridType).GetUnitAtTile(coordPair);
     }
+
+    public IEnumerable<CoordPair> GetUnoccupiedTiles(GridType gridType)
+    {
+        return RetrieveGrid(gridType).GetUnoccupiedTiles();
+    }
     #endregion
 
     #region Attacks
@@ -225,6 +230,11 @@ public class MapLogic : MonoBehaviour
     public HashSet<PathNode> CalculateReachablePoints(GridType gridType, Unit unit, int remainingMovementRange)
     {
         return RetrieveGrid(gridType).CalculateReachablePoints(unit, remainingMovementRange);
+    }
+
+    public void TryReachTile(GridType gridType, Unit unit, CoordPair destination, VoidEvent onCompleteMovement)
+    {
+        RetrieveGrid(gridType).TryReachTile(unit, destination, onCompleteMovement);
     }
     #endregion
 }

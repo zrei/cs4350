@@ -7,9 +7,9 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 {
     public IEnumerable<CoordPair> PossibleAttackPositions => m_PossibleAttackPositionsIgnoreOccupied;
 
-    private List<CoordPair> m_PossibleAttackPositions;
-    private List<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
-    private List<CoordPair> m_PossibleTeleportPositions;
+    private IEnumerable<CoordPair> m_PossibleAttackPositions;
+    private IEnumerable<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
+    private IEnumerable<CoordPair> m_PossibleTeleportPositions;
 
     private CoordPair m_Target;
 
@@ -19,51 +19,10 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        ActiveSkillSO activeSKill = ActiveSkill;
-
-        if (activeSKill.m_ConsumedMana > enemyUnit.CurrentMana)
-            return false;
-
-        if (activeSKill.IsSelfTarget)
-            return true;
-
-        bool isTeleportSkill = activeSKill.ContainsSkillType(SkillEffectType.TELEPORT);
-
-        m_PossibleAttackPositions = new();
-        m_PossibleAttackPositionsIgnoreOccupied = new();
-        m_PossibleTeleportPositions = new();
-        bool hasPossibleAttackPosition = false;
-        bool hasPossibleTeleportPositions = false;
-
-        GridType targetGridType = TargetGridType;
-        for (int r = 0; r < MapData.NUM_ROWS; ++r)
-        {
-            for (int c = 0; c < MapData.NUM_COLS; ++c)
-            {
-                CoordPair coordinates = new CoordPair(r, c);
-                if (mapLogic.IsValidSkillTargetTile(activeSKill, enemyUnit, coordinates, targetGridType, true))
-                {
-                    m_PossibleAttackPositions.Add(coordinates);
-                    hasPossibleAttackPosition = true;
-                }
-                if (mapLogic.IsValidSkillTargetTile(activeSKill, enemyUnit, coordinates, targetGridType, false))
-                {
-                    m_PossibleAttackPositionsIgnoreOccupied.Add(coordinates);
-                }
-                if (isTeleportSkill && mapLogic.IsValidTeleportTile(activeSKill, enemyUnit, coordinates, targetGridType))
-                {
-                    m_PossibleTeleportPositions.Add(coordinates);
-                    hasPossibleTeleportPositions = true;
-                }
-            }
-        }
-
-        if (isTeleportSkill && !hasPossibleTeleportPositions)
-            return false;
-
-        return hasPossibleAttackPosition;
+        return ActiveSkillAction.CanActionBePerformed(enemyUnit, mapLogic, out m_PossibleAttackPositions, out m_PossibleAttackPositionsIgnoreOccupied, out m_PossibleTeleportPositions);
     }
 
+    /*
     // preparation for caching
     public void CalculateMovementPosition(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
@@ -88,9 +47,33 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
 
         m_Target = RandomHelper.GetRandomT(targetWeights);
     }
+    */
 
     public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
     {
+        CoordPair finalTarget = ActiveSkillAction.GetChosenTargetTile(enemyUnit, mapLogic, m_PossibleAttackPositions);
+        var attackDelay = 1.5f;
+
+        IEnumerator PlayActionWithAnimation()
+        {
+            int animationTrigger = 0;
+            animationTrigger += (int)(ActiveSkill.m_OverrideWeaponAnimationType ? ActiveSkill.m_OverriddenWeaponAnimationType : enemyUnit.WeaponAnimationType);
+            animationTrigger += (int)ActiveSkill.m_SkillAnimationType;
+
+            enemyUnit.PlaySkillStartAnimation(animationTrigger);
+
+            mapLogic.ShowAttackForecast(TargetGridType, new List<CoordPair>() {finalTarget});
+            yield return new WaitForSeconds(attackDelay);
+            mapLogic.ShowAttackForecast(TargetGridType, new List<CoordPair>() { });
+
+            if (ActiveSkill.ContainsAllSkillTypes(SkillEffectType.TELEPORT))
+                mapLogic.PerformTeleportSkill(TargetGridType, enemyUnit, ActiveSkill, finalTarget, ActiveSkillAction.GetChosenTeleportTile(enemyUnit, mapLogic, m_PossibleTeleportPositions), completeActionEvent);
+            else
+                mapLogic.PerformSkill(TargetGridType, enemyUnit, ActiveSkill, finalTarget, completeActionEvent);
+        }
+
+        CoroutineManager.Instance.StartCoroutine(PlayActionWithAnimation());
+        /*
         ActiveSkillSO activeSKill = ActiveSkill;
         var attackDelay = 1.5f;
         IEnumerator PlayActionWithAnimation()
@@ -131,8 +114,10 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
             PerformSkill(mapLogic, enemyUnit, targetTile, completeActionEvent);
         }
         CoroutineManager.Instance.StartCoroutine(PlayActionWithAnimation());
+        */
     }
 
+    /*
     private void PerformSkill(MapLogic mapLogic, EnemyUnit enemyUnit, CoordPair targetTile, VoidEvent completeActionEvent)
     {
         if (!ActiveSkill.ContainsSkillType(SkillEffectType.TELEPORT))
@@ -155,33 +140,100 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
             mapLogic.PerformTeleportSkill(TargetGridType, enemyUnit, ActiveSkill, targetTile, teleportTile, completeActionEvent);
         }
     }
-}
-
-[System.Serializable]
-public struct EnemySkillTileCondition 
-{
-    public EnemySkillTileConditionSO m_Condition;
-    public float m_MultProportion;
-    public bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair targetTile, ActiveSkillSO activeSkill) => m_Condition.IsConditionMet(enemyUnit, mapLogic, targetTile, activeSkill);
+    */
 }
 
 [CreateAssetMenu(fileName = "EnemyActiveSkillActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyActiveSkillActionSO")]
 public class EnemyActiveSkillActionSO : EnemyActionSO
 {
     public ActiveSkillSO m_ActiveSkill;
-    public List<EnemySkillTileCondition> m_TargetConditions;
+    public List<EnemySkillTileConditionSO> m_TargetConditions;
+    public List<EnemyActiveSkillTileComparerSO> m_TileComparers;
 
-    public float GetFinalWeightProportionForTile(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair target)
+    [Header("Special teleport handling - ignore if skill is not teleport type")]
+    public List<EnemyMoveTileConditionSO> m_TeleportTileConditions;
+    public List<EnemyMoveTileComparerSO> m_TeleportTileComparers;
+
+    public bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic, out IEnumerable<CoordPair> targetablePositions, out IEnumerable<CoordPair> targetablePositionsIgnoreOccupied, out IEnumerable<CoordPair> possibleTeleportPositions)
     {
-        float finalNodeWeight = 1f;
+        targetablePositions = new List<CoordPair>();
+        targetablePositionsIgnoreOccupied = new List<CoordPair>();
+        possibleTeleportPositions = new List<CoordPair>();
 
-        foreach (EnemySkillTileCondition targetCondition in m_TargetConditions)
+        if (m_ActiveSkill.m_ConsumedMana > enemyUnit.CurrentMana)
+            return false;
+
+        bool isTeleportSkill = m_ActiveSkill.ContainsSkillType(SkillEffectType.TELEPORT);
+
+        bool hasPossibleAttackPosition = false;
+        bool hasPossibleTeleportPositions = false;
+
+        GridType targetGridType = TargetGridType;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
-            if (targetCondition.IsConditionMet(enemyUnit, mapLogic, target, m_ActiveSkill))
-                finalNodeWeight *= targetCondition.m_MultProportion;
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                CoordPair coordinates = new CoordPair(r, c);
+                bool meetsConditions = m_TargetConditions.All(cond => cond.IsConditionMet(enemyUnit, mapLogic, coordinates, m_ActiveSkill));
+                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, targetGridType, true) && meetsConditions)
+                {
+                    targetablePositions = targetablePositions.Append(coordinates);
+                    hasPossibleAttackPosition = true;
+                }
+                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, targetGridType, false) && meetsConditions)
+                {
+                    targetablePositionsIgnoreOccupied = targetablePositionsIgnoreOccupied.Append(coordinates);
+                }
+                if (isTeleportSkill && mapLogic.IsValidTeleportTile(m_ActiveSkill, enemyUnit, coordinates, targetGridType) && m_TeleportTileConditions.All(cond => cond.IsConditionMet(enemyUnit, mapLogic, coordinates)))
+                {
+                    possibleTeleportPositions = possibleTeleportPositions.Append(coordinates);
+                    hasPossibleTeleportPositions = true;
+                }
+            }
         }
 
-        return finalNodeWeight;
+        if (isTeleportSkill && !hasPossibleTeleportPositions)
+            return false;
+
+        return hasPossibleAttackPosition;
+    }
+
+    public CoordPair GetChosenTargetTile(EnemyUnit enemyUnit, MapLogic mapLogic, IEnumerable<CoordPair> targetablePositions)
+    {
+        IEnumerable<CoordPair> finalTiles = targetablePositions;
+        
+        if (m_TileComparers.Count > 0)
+        {
+            EnemyActiveSkillTileComparerSO firstTileComparer = m_TileComparers[0];
+            IOrderedEnumerable<CoordPair> sortedCoordPair = finalTiles.OrderBy(tile => firstTileComparer.GetTileValue(enemyUnit, mapLogic, tile, m_ActiveSkill));
+            for (int i = 1; i < m_TileComparers.Count; ++i)
+            {
+                sortedCoordPair = sortedCoordPair.ThenBy(tile => m_TileComparers[i].GetTileValue(enemyUnit, mapLogic, tile, m_ActiveSkill));
+            }
+
+            finalTiles = sortedCoordPair;
+        }
+            
+        return finalTiles.First();
+    }
+
+    public CoordPair GetChosenTeleportTile(EnemyUnit enemyUnit, MapLogic mapLogic, IEnumerable<CoordPair> teleportablePositions)
+    {
+        IEnumerable<CoordPair> finalTiles = teleportablePositions;
+        
+        if (m_TileComparers.Count > 0)
+        {
+            EnemyMoveTileComparerSO firstTileComparer = m_TeleportTileComparers[0];
+            IOrderedEnumerable<CoordPair> sortedCoordPair = finalTiles.OrderBy(tile => firstTileComparer.GetTileValue(enemyUnit, mapLogic, tile));
+            for (int i = 1; i < m_TileComparers.Count; ++i)
+            {
+                sortedCoordPair = sortedCoordPair.ThenBy(tile => m_TeleportTileComparers[i].GetTileValue(enemyUnit, mapLogic, tile));
+            }
+
+            finalTiles = sortedCoordPair;
+        }
+            
+        return finalTiles.First();
     }
 
     public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
