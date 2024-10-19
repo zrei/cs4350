@@ -152,6 +152,13 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
     public List<EnemyMoveTileConditionSO> m_TeleportTileConditions;
     public List<EnemyMoveTileComparerSO> m_TeleportTileComparers;
 
+    public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
+    
+    public override EnemyActionWrapper GetWrapper(int priority)
+    {
+        return new EnemyActiveSkillActionWrapper {m_Action = this, m_Priority = priority};
+    }
+
     public bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic, out IEnumerable<CoordPair> targetablePositions, out IEnumerable<CoordPair> targetablePositionsIgnoreOccupied, out IEnumerable<CoordPair> possibleTeleportPositions)
     {
         targetablePositions = new List<CoordPair>();
@@ -234,12 +241,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
         return finalTiles.First();
     }
 
-    public GridType TargetGridType => GridHelper.GetTargetType(m_ActiveSkill, UnitAllegiance.ENEMY);
     
-    public override EnemyActionWrapper GetWrapper(int priority)
-    {
-        return new EnemyActiveSkillActionWrapper {m_Action = this, m_Priority = priority};
-    }
 
     /*
     public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)

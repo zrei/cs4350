@@ -32,9 +32,9 @@ public class EnemyMoveActionWrapper : EnemyActionWrapper
         PathNode toMoveTo = RandomHelper.GetRandomT(nodeWeights);
         */
 
+        // calculate the final tile that the unit wants to move towards
         CoordPair finalTile = MoveAction.GetChosenTile(enemyUnit, mapLogic, m_CanOccupyTiles);
-
-        // calculate the final tile now :)
+        
         mapLogic.TryReachTile(GridType.ENEMY, enemyUnit, finalTile, completeActionEvent);
     }
 }

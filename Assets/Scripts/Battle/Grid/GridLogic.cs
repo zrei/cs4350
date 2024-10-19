@@ -337,9 +337,11 @@ public class GridLogic : MonoBehaviour
         int movementRange = (int) unit.GetTotalStat(StatType.MOVEMENT_RANGE);
         PathNode finalPathNode = endPathNode;
 
+        // calculate the final path node along the desired path that the unit
+        // can actually reach with their current movement range
         int count = 0;
         PathNode pointer = endPathNode;
-        while (endPathNode != null)
+        while (pointer != null)
         {
             if (count == movementRange + 1)
             {
@@ -555,7 +557,7 @@ public class GridLogic : MonoBehaviour
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                if (m_TileData[r, c].m_IsOccupied)
+                if (!m_TileData[r, c].m_IsOccupied)
                     tiles.Add(new CoordPair(r, c));
             }
         }
