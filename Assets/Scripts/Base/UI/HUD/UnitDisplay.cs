@@ -7,11 +7,11 @@ namespace Game.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class UnitDisplay : MonoBehaviour
     {
-        [SerializeField]
-        private bool isCurrentUnitDisplay = true;
+        private static readonly Color PlayerColor = new Color32(0, 64, 106, 102);
+        private static readonly Color EnemyColor = new Color32(106, 0, 0, 102);
 
         [SerializeField]
-        private UnitAllegiance displayType = UnitAllegiance.PLAYER;
+        private bool isCurrentUnitDisplay = true;
 
         #region Component References
         [SerializeField]
@@ -19,6 +19,9 @@ namespace Game.UI
 
         [SerializeField]
         private Image characterArt;
+
+        [SerializeField]
+        private Image background;
 
         [SerializeField]
         private FormattedTextDisplay phyAtkDisplay;
@@ -131,13 +134,21 @@ namespace Game.UI
 
         private void OnPreviewUnit(Unit currentUnit)
         {
-            if (currentUnit == null || currentUnit.UnitAllegiance != displayType)
+            if (currentUnit == null)
             {
                 if (!isHidden) Hide();
                 return;
             }
 
             if (isHidden) Show();
+
+            var backgroundColor = currentUnit.UnitAllegiance switch
+            {
+                UnitAllegiance.PLAYER => PlayerColor,
+                UnitAllegiance.ENEMY => EnemyColor,
+                _ => PlayerColor
+            };
+            background.color = backgroundColor;
 
             nameDisplay.SetValue(currentUnit.DisplayName);
 
