@@ -194,6 +194,41 @@ public static class Pathfinder
         return canTraverse;
     }
 
+    public static bool TryPathfind(MapData map, CoordPair startPosition, CoordPair destination, out PathNode pathNode, params TileType[] traversableTiles)
+    {
+        HashSet<CoordPair> checkedTiles = new HashSet<CoordPair>();
+        Queue<PathNode> q = new Queue<PathNode>();
+        q.Enqueue(new PathNode(startPosition, null));
+
+        while (q.Count > 0)
+        {
+            PathNode point = q.Dequeue();
+            CoordPair coordinates = point.m_Coordinates;
+
+            if (coordinates.Equals(destination))
+            {
+                pathNode = point;
+                return true;
+            }
+
+            if (checkedTiles.Contains(coordinates))
+                continue;
+            checkedTiles.Add(coordinates);
+            if (!MapData.WithinBounds(coordinates))
+                continue;
+            if (!IsTraversableTile(map, coordinates, traversableTiles))
+                continue;
+
+            q.Enqueue(new PathNode(coordinates.MoveLeft(), point));
+            q.Enqueue(new PathNode(coordinates.MoveRight(), point));
+            q.Enqueue(new PathNode(coordinates.MoveDown(), point));
+            q.Enqueue(new PathNode(coordinates.MoveUp(), point));
+        }
+
+        pathNode = default;
+        return false;
+    }
+
     private static bool IsTraversableTile(MapData map, CoordPair point, params TileType[] traversableTiles)
     {
         TileData tile = map.RetrieveTile(point);
