@@ -6,8 +6,8 @@ public class AttackerRowLimitRuleSO : AttackerLocationRuleSO
 {
     public int[] m_AllowedAttackerRows;
 
-    public override bool IsValidTargetTile(CoordPair targetTile, Unit attackingUnit, GridType targetGridType)
+    public override bool IsValidAttackerTile(CoordPair attackerPosition)
     {
-        return m_AllowedAttackerRows.Contains(attackingUnit.CurrPosition.m_Row);
+        return m_AllowedAttackerRows.Contains(attackerPosition.m_Row);
     }
 }

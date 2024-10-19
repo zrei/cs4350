@@ -11,8 +11,6 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
     private IEnumerable<CoordPair> m_PossibleAttackPositionsIgnoreOccupied;
     private IEnumerable<CoordPair> m_PossibleTeleportPositions;
 
-    private CoordPair m_Target;
-
     private EnemyActiveSkillActionSO ActiveSkillAction => (EnemyActiveSkillActionSO) m_Action;
     private ActiveSkillSO ActiveSkill => ActiveSkillAction.m_ActiveSkill;
     public GridType TargetGridType => ActiveSkillAction.TargetGridType;
@@ -175,12 +173,12 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             {
                 CoordPair coordinates = new CoordPair(r, c);
                 bool meetsConditions = m_TargetConditions.All(cond => cond.IsConditionMet(enemyUnit, mapLogic, coordinates, m_ActiveSkill));
-                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, targetGridType, true) && meetsConditions)
+                if (mapLogic.CanPerformSkill(m_ActiveSkill, enemyUnit, coordinates, targetGridType, true) && meetsConditions)
                 {
                     targetablePositions = targetablePositions.Append(coordinates);
                     hasPossibleAttackPosition = true;
                 }
-                if (mapLogic.IsValidSkillTargetTile(m_ActiveSkill, enemyUnit, coordinates, targetGridType, false) && meetsConditions)
+                if (mapLogic.CanPerformSkill(m_ActiveSkill, enemyUnit, coordinates, targetGridType, false) && meetsConditions)
                 {
                     targetablePositionsIgnoreOccupied = targetablePositionsIgnoreOccupied.Append(coordinates);
                 }
