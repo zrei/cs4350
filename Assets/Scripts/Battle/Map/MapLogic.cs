@@ -202,6 +202,31 @@ public class MapLogic : MonoBehaviour
     {
         return RetrieveGrid(gridType).GetUnoccupiedTiles();
     }
+
+    public bool HasAnyUnitWithHealthThreshold(GridType gridType, Threshold threshold, bool isFlat)
+    {
+        return RetrieveGrid(gridType).HasAnyUnitWithHealthThreshold(threshold, isFlat);
+    }
+
+    public bool HasAnyUnitWithManaThreshold(GridType gridType, Threshold threshold, bool isFlat)
+    {
+        return RetrieveGrid(gridType).HasAnyUnitWithManaThreshold(threshold, isFlat);
+    }
+
+    public bool HasAnyUnitWithToken(GridType gridType, TokenType tokenType)
+    {
+        return RetrieveGrid(gridType).HasAnyUnitWithToken(tokenType);
+    }
+
+    public int GetNumUnitsTargeted(GridType gridType, ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        return RetrieveGrid(gridType).GetNumberOfUnitsTargeted(activeSkillSO, targetTile);
+    }
+
+    public float GetDamageDoneBySkill(GridType gridType, Unit unit, ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        return RetrieveGrid(gridType).GetDamageDoneBySkill(unit, activeSkillSO, targetTile);
+    }
     #endregion
 
     #region Attacks

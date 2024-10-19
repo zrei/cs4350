@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "UnitWithinRowConditionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Conditions/UnitWithinRowConditionSO")]
+[CreateAssetMenu(fileName = "UnitWithinRowConditionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Conditions/ActionConditions/UnitWithinRowConditionSO")]
 public class UnitWithinRowConditionSO : EnemyActionConditionSO
 {
     public List<int> m_Rows;

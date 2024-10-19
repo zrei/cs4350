@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class TileUnitHasTokenSO : EnemySkillTileConditionSO
+[CreateAssetMenu(fileName = "SkillTargetTileUnitHasTokenConditionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Conditions/SkillTargetTileConditions/SkillTargetTileUnitHasTokenConditionSO")]
+public class SkillTargetTileUnitHasTokenConditionSO : EnemySkillTileConditionSO
 {
     public TokenType m_TokenType;
 

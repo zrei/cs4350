@@ -414,28 +414,41 @@ public class GridLogic : MonoBehaviour
         return m_TileData[tile.m_Row, tile.m_Col].m_CurrUnit;
     }
 
-    // threshold object... should return false if there is no unit at all
-    // but hey that shouldn't be possible to begin with
-    public bool HasAnyUnitWithHealthThreshold(float threshold, bool greaterThan)
+    // will return false if there is no unit
+    public bool HasAnyUnitWithHealthThreshold(Threshold threshold, bool isFlat)
     {
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                if (m_TileData[r, c].m_IsOccupied && m_TileData[r, c].m_CurrUnit.CurrentHealth > threshold)
+                if (m_TileData[r, c].m_IsOccupied && threshold.IsSatisfied(isFlat ? m_TileData[r, c].m_CurrUnit.CurrentHealth : m_TileData[r, c].m_CurrUnit.CurrentHealthProportion))
                     return true;
             }
         }
         return false;
     }
 
-    public bool HasAnyUnitWithManaThreshold(float threshold, bool greaterThan)
+    // will return false if there is no unit
+    public bool HasAnyUnitWithManaThreshold(Threshold threshold, bool isFlat)
     {
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                if (m_TileData[r, c].m_IsOccupied && m_TileData[r, c].m_CurrUnit.CurrentMana > threshold)
+                if (m_TileData[r, c].m_IsOccupied && threshold.IsSatisfied(isFlat ? m_TileData[r, c].m_CurrUnit.CurrentMana : m_TileData[r, c].m_CurrUnit.CurrentManaProportion))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public bool HasAnyUnitWithToken(TokenType tokenType)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied && m_TileData[r, c].m_CurrUnit.HasToken(tokenType))
                     return true;
             }
         }
@@ -493,6 +506,32 @@ public class GridLogic : MonoBehaviour
             targetTiles.Add(coordPair);
         }
         return targetTiles;
+    }
+
+    public int GetNumberOfUnitsTargeted(ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        int numUnits = 0;
+
+        foreach (CoordPair tile in GetInBoundsTargetTiles(activeSkillSO, targetTile))
+        {
+            if (IsTileOccupied(tile))
+                ++numUnits;
+        }
+
+        return numUnits;
+    }
+
+    public float GetDamageDoneBySkill(Unit unit, ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        float totalDamage = 0f;
+
+        foreach (CoordPair tile in GetInBoundsTargetTiles(activeSkillSO, targetTile))
+        {
+            if (IsTileOccupied(tile))
+                totalDamage += DamageCalc.CalculateDamage(unit, m_TileData[tile.m_Row, tile.m_Col].m_CurrUnit, activeSkillSO);
+        }
+
+        return totalDamage;
     }
 
     public int GetNumberOfUnitsOnGrid()

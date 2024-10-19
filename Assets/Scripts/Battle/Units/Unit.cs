@@ -185,6 +185,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #region Health and Damage
     public float CurrentHealth => m_CurrHealth;
     public float MaxHealth => GetTotalStat(StatType.HEALTH);
+    public float CurrentHealthProportion => m_CurrHealth / MaxHealth;
 
     public void Heal(float healAmount)
     {
@@ -458,6 +459,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #region Mana
     public float CurrentMana => m_CurrMana;
     public float MaxMana => GetTotalStat(StatType.MANA);
+    public float CurrentManaProportion => m_CurrMana / MaxMana;
 
     private void AlterMana(float amount)
     {
