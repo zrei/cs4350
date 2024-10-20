@@ -13,6 +13,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     {
         base.HandleAwake();
 
+        GlobalEvents.Morality.MoralitySetEvent += OnMoralitySet;
+        GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
+    
         HandleDependencies();
     }
 
@@ -47,6 +50,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
+
+        GlobalEvents.Morality.MoralitySetEvent -= OnMoralitySet;
+        GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
     }
 
     private void ParseSaveData(List<CharacterSaveData> characterSaveData)
@@ -148,6 +154,26 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 serialized |= (int) Mathf.Pow(baseNum, i);
         }
         return serialized;
+    }
+    #endregion
+
+    #region Class Unlock Events
+    private void OnMoralitySet(int _)
+    {
+        CheckAllCharacterClassUnlocks();
+    }
+
+    private void OnFlagSet(string flag, bool value, FlagType flagType)
+    {
+        CheckAllCharacterClassUnlocks();
+    }
+
+    private void CheckAllCharacterClassUnlocks()
+    {
+        foreach (PlayerCharacterData characterData in m_CharacterData.Values)
+        {
+            characterData.CheckClassUnlocks();
+        }
     }
     #endregion
 }

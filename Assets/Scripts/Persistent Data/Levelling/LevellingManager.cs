@@ -30,6 +30,7 @@ public class LevellingManager : MonoBehaviour
 
                     totalStatGrowths[statType] += growth;
                 }
+                characterData.CheckClassUnlocks();
             }
             else
             {

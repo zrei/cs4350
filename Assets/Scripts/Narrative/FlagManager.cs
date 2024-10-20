@@ -29,16 +29,12 @@ public class FlagManager : Singleton<FlagManager>
     {
         base.HandleAwake();
 
-        GlobalEvents.Flags.SetFlagEvent += SetFlagValue;
-
         HandleDependencies();
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
-
-        GlobalEvents.Flags.SetFlagEvent -= SetFlagValue;
     }
 
     private void HandleDependencies()
@@ -80,9 +76,10 @@ public class FlagManager : Singleton<FlagManager>
         SaveManager.Instance.SavePersistentFlags(flagsToSave);
     } 
 
-    private void SetFlagValue(string flag, bool value, FlagType flagType)
+    public void SetFlagValue(string flag, bool value, FlagType flagType)
     {
         m_Flags[flag] = new() {m_Value = value, m_FlagType = flagType};
+        GlobalEvents.Flags.SetFlagEvent?.Invoke(flag, value, flagType);
     }
 
     public bool GetFlagValue(string flag)
