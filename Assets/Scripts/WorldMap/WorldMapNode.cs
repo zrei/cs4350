@@ -20,6 +20,7 @@ public class WorldMapNode : MonoBehaviour
     {
         // display level UI
         // difference depending on if it's cleared or not (cannot replay level?)
+        // expand node
     }
 
     public void ExitNode()
