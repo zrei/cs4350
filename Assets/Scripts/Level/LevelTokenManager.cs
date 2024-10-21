@@ -14,11 +14,11 @@ public class LevelTokenManager : MonoBehaviour
     private const float MOVE_TO_NODE_TIME = 0.8f;
     
     private CharacterToken m_PlayerUnitToken;
-    private NodeVisual m_CurrentNodeVisual;
+    private LevelNodeVisual m_CurrentNodeVisual;
 
     #region Initialisation
 
-    public void Initialise(PlayerCharacterBattleData characterBattleData, NodeVisual currNodeVisual)
+    public void Initialise(PlayerCharacterBattleData characterBattleData, LevelNodeVisual currNodeVisual)
     {
         m_PlayerUnitToken = Instantiate(m_CharacterToken);
         m_PlayerUnitToken.Initialise(characterBattleData);
@@ -31,7 +31,7 @@ public class LevelTokenManager : MonoBehaviour
     {
         if (victor == UnitAllegiance.PLAYER)
         {
-            NodeVisual battleNodeVisual = battleNode.GetComponent<NodeVisual>();
+            LevelNodeVisual battleNodeVisual = battleNode.GetComponent<LevelNodeVisual>();
             if (battleNodeVisual && battleNodeVisual.HasClearAnimation())
             {
                 battleNodeVisual.PlayClearAnimation(m_PlayerUnitToken, null);
@@ -52,7 +52,7 @@ public class LevelTokenManager : MonoBehaviour
     private Vector3 GetNodeEdgePos(Vector3 origin, Vector3 dest)
     {
         var direction = (dest - origin).normalized;
-        return dest - direction * NodeVisual.NODE_RADIUS_OFFSET;
+        return dest - direction * LevelNodeVisual.NODE_RADIUS_OFFSET;
     }
 
     #endregion
@@ -71,7 +71,7 @@ public class LevelTokenManager : MonoBehaviour
     /// </summary>
     /// <param name="destNodeVisual"></param>
     /// <param name="onMoveComplete"></param>
-    public void MovePlayerToNode(NodeVisual destNodeVisual, VoidEvent onMoveComplete)
+    public void MovePlayerToNode(LevelNodeVisual destNodeVisual, VoidEvent onMoveComplete)
     {
         if (destNodeVisual.HasEntryAnimation())
         {
@@ -92,7 +92,7 @@ public class LevelTokenManager : MonoBehaviour
         m_CurrentNodeVisual = destNodeVisual;
     }
     
-    public void PlayClearAnimation(NodeVisual nodeVisual, VoidEvent onComplete)
+    public void PlayClearAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
     {
         if (nodeVisual.HasClearAnimation())
         {
@@ -104,7 +104,7 @@ public class LevelTokenManager : MonoBehaviour
         }
     }
     
-    public void PlayFailureAnimation(NodeVisual nodeVisual, VoidEvent onComplete)
+    public void PlayFailureAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
     {
         if (nodeVisual.HasFailureAnimation())
         {

@@ -8,11 +8,11 @@ using UnityEngine;
 public class LevelNodeVisualManager : MonoBehaviour
 {
     // Graphics
-    private Dictionary<NodeInternal, NodeVisual> m_NodeVisuals = new();
+    private Dictionary<LevelNodeInternal, LevelNodeVisual> m_NodeVisuals = new();
 
     #region Initialisation
 
-    public void Initialise(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
+    public void Initialise(List<LevelNodeInternal> levelNodes, List<EdgeInternal> levelEdges)
     {
         // Initialise the node visuals
         InitialiseNodeVisuals(levelNodes, levelEdges);
@@ -21,11 +21,11 @@ public class LevelNodeVisualManager : MonoBehaviour
         InitialiseEventListeners();
     }
     
-    public void InitialiseNodeVisuals(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
+    public void InitialiseNodeVisuals(List<LevelNodeInternal> levelNodes, List<EdgeInternal> levelEdges)
     {
         foreach (var levelNode in levelNodes)
         {
-            var nodeVisual = levelNode.GetComponent<NodeVisual>();
+            var nodeVisual = levelNode.GetComponent<LevelNodeVisual>();
             m_NodeVisuals.Add(levelNode, nodeVisual);
             
             nodeVisual.Initialise();
@@ -55,32 +55,32 @@ public class LevelNodeVisualManager : MonoBehaviour
     
     #region Callbacks
     
-    private void OnNodeEntered(NodeInternal nodeInternal)
+    private void OnNodeEntered(LevelNodeInternal nodeInternal)
     {
         m_NodeVisuals[nodeInternal].UpdateNodeVisualState();
     }
     
-    private void OnNodeCleared(NodeInternal nodeInternal)
+    private void OnNodeCleared(LevelNodeInternal nodeInternal)
     {
         m_NodeVisuals[nodeInternal].UpdateNodeVisualState();
     }
     
-    private void OnNodeExited(NodeInternal nodeInternal)
+    private void OnNodeExited(LevelNodeInternal nodeInternal)
     {
         m_NodeVisuals[nodeInternal].UpdateNodeVisualState();
     }
     
-    private void OnNodeSelected(NodeInternal nodeInternal)
+    private void OnNodeSelected(LevelNodeInternal nodeInternal)
     {
         m_NodeVisuals[nodeInternal].ToggleSelected(true);
     }
     
-    private void OnNodeDeselected(NodeInternal nodeInternal)
+    private void OnNodeDeselected(LevelNodeInternal nodeInternal)
     {
         m_NodeVisuals[nodeInternal].ToggleSelected(false);
     }
     
-    private void OnNodeMovement(NodeInternal nodeInternal1, NodeInternal nodeInternal2)
+    private void OnNodeMovement(LevelNodeInternal nodeInternal1, LevelNodeInternal nodeInternal2)
     {
         // Insert transition animations here
         Debug.Log("Animation: Transitioning between nodes: " + nodeInternal1 + " -> " + nodeInternal2);
@@ -100,12 +100,12 @@ public class LevelNodeVisualManager : MonoBehaviour
     
     #region Helper
     
-    public NodeVisual GetNodeVisual(NodeInternal nodeInternal)
+    public LevelNodeVisual GetNodeVisual(LevelNodeInternal nodeInternal)
     {
         return m_NodeVisuals[nodeInternal];
     }
     
-    public void DisplayMovableNodes(NodeInternal currentNode)
+    public void DisplayMovableNodes(LevelNodeInternal currentNode)
     {
         // If the node is not cleared, only the current node should be movable
         if (currentNode.IsCleared == false)

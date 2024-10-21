@@ -7,17 +7,17 @@ using UnityEngine;
 public class LevelNodeManager : MonoBehaviour
 {
     // Graph Information
-    private List<NodeInternal> m_LevelNodes = new();
-    public List<NodeInternal> LevelNodes => m_LevelNodes;
+    private List<LevelNodeInternal> m_LevelNodes = new();
+    public List<LevelNodeInternal> LevelNodes => m_LevelNodes;
     
-    private NodeInternal m_GoalNode;
+    private LevelNodeInternal m_GoalNode;
     
     // Current State
-    private NodeInternal m_CurrentNodeInternal;
+    private LevelNodeInternal m_CurrentNodeInternal;
 
     #region Initialisation
 
-    public void Initialise(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges, float timeLimit)
+    public void Initialise(List<LevelNodeInternal> levelNodes, List<EdgeInternal> levelEdges, float timeLimit)
     {
         // Initialise the internal graph representation of the level
         InitialiseMap(levelNodes, levelEdges);
@@ -26,7 +26,7 @@ public class LevelNodeManager : MonoBehaviour
     /// <summary>
     /// Initialise the level map with the nodes and edges in scene
     /// </summary>
-    public void InitialiseMap(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
+    public void InitialiseMap(List<LevelNodeInternal> levelNodes, List<EdgeInternal> levelEdges)
     {
         // Retrieve all nodes in the level
         foreach (var levelNode in levelNodes)
@@ -52,15 +52,15 @@ public class LevelNodeManager : MonoBehaviour
     #endregion
 
     #region Graph
-    public NodeInternal CurrentNode => m_CurrentNodeInternal;
+    public LevelNodeInternal CurrentNode => m_CurrentNodeInternal;
     
-    public void SetStartNode(NodeInternal startNode)
+    public void SetStartNode(LevelNodeInternal startNode)
     {
         m_CurrentNodeInternal = startNode;
         m_CurrentNodeInternal.EnterNode();
     }
 
-    public void MoveToNode(NodeInternal destNode, out float timeCost)
+    public void MoveToNode(LevelNodeInternal destNode, out float timeCost)
     {
         m_CurrentNodeInternal.ClearNode();
         m_CurrentNodeInternal.ExitNode();
@@ -85,13 +85,13 @@ public class LevelNodeManager : MonoBehaviour
     /// <param name="ray"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    public bool TryRetrieveNode(Ray ray, out NodeInternal node)
+    public bool TryRetrieveNode(Ray ray, out LevelNodeInternal node)
     {
         RaycastHit[] raycastHits = Physics.RaycastAll(ray, Mathf.Infinity, LayerMask.GetMask("LevelMap"));
         //Debug.DrawRay(ray.origin, ray.direction * 100, Color.white, 100f, false); 
         foreach (RaycastHit raycastHit in raycastHits)
         {
-            node = raycastHit.collider.gameObject.GetComponentInParent<NodeInternal>();
+            node = raycastHit.collider.gameObject.GetComponentInParent<LevelNodeInternal>();
 
             if (node)
                 return true;
@@ -106,7 +106,7 @@ public class LevelNodeManager : MonoBehaviour
     /// </summary>
     /// <param name="destNode"></param>
     /// <returns></returns>
-    public bool CanMoveToNode(NodeInternal destNode)
+    public bool CanMoveToNode(LevelNodeInternal destNode)
     {
         return m_CurrentNodeInternal.AdjacentNodes.ContainsKey(destNode);
     }
@@ -126,7 +126,7 @@ public class LevelNodeManager : MonoBehaviour
         m_CurrentNodeInternal.StartNodeEvent();
     }
 
-    public void SetGoalNode(NodeInternal goalNode)
+    public void SetGoalNode(LevelNodeInternal goalNode)
     {
         m_GoalNode = goalNode;
         m_GoalNode.SetGoalNode();

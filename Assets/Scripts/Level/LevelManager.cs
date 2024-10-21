@@ -41,8 +41,8 @@ public class LevelManager : MonoBehaviour
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;
-    [SerializeField] private NodeInternal m_StartNode;
-    [SerializeField] private NodeInternal m_GoalNode;
+    [SerializeField] private LevelNodeInternal m_StartNode;
+    [SerializeField] private LevelNodeInternal m_GoalNode;
     
     [Header("Test Data")]
     // should be sent in in the future
@@ -56,7 +56,7 @@ public class LevelManager : MonoBehaviour
 
     #region Current State
     
-    private NodeInternal m_CurrSelectedNode;
+    private LevelNodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
     
     private Dictionary<RewardType, int> m_PendingReward = new ();
@@ -65,7 +65,7 @@ public class LevelManager : MonoBehaviour
     
     #region Input and Selected Node
     
-    private NodeInternal m_CurrTargetNode;
+    private LevelNodeInternal m_CurrTargetNode;
     private bool m_HasHitNode;
     
     #endregion
@@ -111,7 +111,7 @@ public class LevelManager : MonoBehaviour
             m_TestCharacterData[i].m_CurrClassIndex = m_TestCharacterData[i].m_BaseData.m_PathGroup.GetDefaultClassIndex();
         }
 
-        var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
+        var levelNodes = FindObjectsOfType<LevelNodeInternal>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
         var timeLimit = m_LevelSO.m_TimeLimit;
         
@@ -321,7 +321,7 @@ public class LevelManager : MonoBehaviour
         m_LevelNodeManager.StartCurrentNodeEvent();
     }
     
-    private void SelectNode(NodeInternal node)
+    private void SelectNode(LevelNodeInternal node)
     {
         if (m_CurrSelectedNode)
         {
@@ -372,7 +372,7 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("LevelManager: Ending Battle Node");
 
-        NodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
+        LevelNodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
         
         if (victor == UnitAllegiance.PLAYER)
         {

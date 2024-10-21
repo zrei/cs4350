@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StartNode : NodeInternal
+public class StartNode : LevelNodeInternal
 {
     public override void Initialise()
     {

@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Dialogue Nodes
 /// </summary>
 [RequireComponent(typeof(DialogueNode))]
-public class DialogueNodeVisual : NodeVisual
+public class DialogueNodeVisual : LevelNodeVisual
 {
     private DialogueNode m_DialogueNode;
     

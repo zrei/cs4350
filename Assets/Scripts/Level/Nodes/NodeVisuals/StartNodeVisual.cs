@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Start Nodes
 /// </summary>
 [RequireComponent(typeof(StartNode))]
-public class StartNodeVisual : NodeVisual
+public class StartNodeVisual : LevelNodeVisual
 {
     private StartNode m_StartNode;
     

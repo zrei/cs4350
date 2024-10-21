@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RewardNode : NodeInternal
+public class RewardNode : LevelNodeInternal
 {
     // Main currency (STC)
     [SerializeField] private int m_RationReward;

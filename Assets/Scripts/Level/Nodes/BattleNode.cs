@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BattleNode : NodeInternal
+public class BattleNode : LevelNodeInternal
 {
     [SerializeField] private BattleSO m_BattleSO;
     public BattleSO BattleSO => m_BattleSO;

@@ -35,8 +35,8 @@ public static class GlobalEvents {
 
     public static class Level
     {
-        public delegate void NodeEvent(NodeInternal _);
-        public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
+        public delegate void NodeEvent(LevelNodeInternal _);
+        public delegate void NodeTransitionEvent(LevelNodeInternal _1, LevelNodeInternal _2);
         public delegate void BattleNodeEvent(BattleNode _);
         public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor, int numTurns);
         public delegate void RewardNodeEvent(RewardNode _);

@@ -44,7 +44,7 @@ namespace Level
         
         private MeshFader m_MeshFader;
 
-        private NodeVisual m_CurrentNode;
+        private LevelNodeVisual m_CurrentNode;
 
         public void Initialise(PlayerCharacterBattleData characterBattleData)
         {
@@ -109,9 +109,9 @@ namespace Level
             m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
         }
         
-        public void SetPositionToNode(NodeVisual nodeVisual)
+        public void SetPositionToNode(LevelNodeVisual nodeVisual)
         {
-            transform.position = nodeVisual.transform.position + GridYOffset + NodeVisual.TOKEN_OFFSET;
+            transform.position = nodeVisual.transform.position + GridYOffset + LevelNodeVisual.TOKEN_OFFSET;
         }
 
         public void MoveToPosition(Vector3 destPos, VoidEvent onCompleteMovement, float moveTime)

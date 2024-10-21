@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Battle Nodes
 /// </summary>
 [RequireComponent(typeof(BattleNode))]
-public class BattleNodeVisual : NodeVisual
+public class BattleNodeVisual : LevelNodeVisual
 {
     [Header("Tokens")]
     [SerializeField] CharacterToken m_CharacterToken;

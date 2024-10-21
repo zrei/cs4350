@@ -1,7 +1,7 @@
 using Game.UI;
 using UnityEngine;
 
-public class DialogueNode : NodeInternal
+public class DialogueNode : LevelNodeInternal
 {
     [SerializeField] private Dialogue m_Dialogue;
     

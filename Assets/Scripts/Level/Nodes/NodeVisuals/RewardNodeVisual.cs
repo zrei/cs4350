@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Reward Nodes
 /// </summary>
 [RequireComponent(typeof(RewardNode))]
-public class RewardNodeVisual : NodeVisual
+public class RewardNodeVisual : LevelNodeVisual
 {
     private RewardNode m_RewardNode;
     
