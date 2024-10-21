@@ -39,6 +39,8 @@ namespace Game.UI
 
         public IUIScreen PauseScreen => LoadScreen("PauseScreen");
         
+        public IUIScreen CharacterManagementScreen => LoadScreen("CharacterManagementScreen");
+        
         public IUIScreen BattleNodeResultScreen => LoadScreen("BattleNodeResultScreen");
         public IUIScreen RewardNodeResultScreen => LoadScreen("RewardNodeResultScreen");
         public IUIScreen LevelUpResultScreen => LoadScreen("LevelUpResultScreen");
@@ -97,6 +99,11 @@ namespace Game.UI
         public bool IsScreenOpen(IUIScreen screen)
         {
             return activeScreens.Contains(screen);
+        }
+        
+        public bool IsScreenActive(IUIScreen screen)
+        {
+            return activeScreens.TryPeek(out IUIScreen activeScreen) && activeScreen == screen;
         }
 
         private void Update()

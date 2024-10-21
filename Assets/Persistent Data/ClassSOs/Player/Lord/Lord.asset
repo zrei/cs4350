@@ -18,7 +18,6 @@ MonoBehaviour:
   m_WeaponType: {fileID: 11400000, guid: e437c274184526640974ade26edf643a, type: 2}
   m_TraversableTileTypes: 00000000
   m_CanSwapTiles: 0
-  m_Id: 0
   m_LevelLock: 0
   m_StatAugments:
     m_Health: 0
@@ -42,3 +41,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 492c79e89fa8f4143873b598b21df4f7, type: 2}
   - {fileID: 11400000, guid: 5f706349bc449a54bbabe0e9cf861f8b, type: 2}
   - {fileID: 11400000, guid: f97506c15cda181468eec673f4c610d7, type: 2}
+  m_PassiveEffects:
+  - m_UnlockCondition:
+      m_IsLevelLocked: 0
+      m_LevelLock: 0
+      m_IsMoralityLocked: 0
+      m_MoralityThreshold:
+        m_GreaterThan: 0
+        m_Threshold: 0
+      m_IsFlagLocked: 0
+      m_Flags: []
+    m_InflictedTokens: []

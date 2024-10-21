@@ -148,6 +148,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TogglePartyMenuAction",
+                    "type": "Button",
+                    "id": "21fdfc67-cad5-4e26-8240-3a81ab983c2c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -368,6 +377,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "CancelAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6dd41ec2-fecd-45df-a70f-2ff25105eb8d",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "TogglePartyMenuAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

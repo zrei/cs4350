@@ -49,6 +49,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private List<PlayerCharacterData> m_TestCharacterData;
     
     // UI
+    IUIScreen m_CharacterManagementScreen;
     IUIScreen m_BattleNodeResultScreen;
     IUIScreen m_RewardNodeResultScreen;
     IUIScreen m_LevelUpResultScreen;
@@ -139,6 +140,7 @@ public class LevelManager : MonoBehaviour
         AddNodeEventCallbacks();
 
         // Preload UI Screens
+        m_CharacterManagementScreen = UIScreenManager.Instance.CharacterManagementScreen;
         m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
         m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
         m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
@@ -190,10 +192,25 @@ public class LevelManager : MonoBehaviour
         UpdateState();
     }
     
+    private void OnTogglePartyMenu(IInput input)
+    {
+        if (!UIScreenManager.Instance.IsScreenOpen(m_CharacterManagementScreen))
+        {
+            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_TestCharacterData);
+            UIScreenManager.Instance.OpenScreen(m_CharacterManagementScreen);
+        }
+        else if (UIScreenManager.Instance.IsScreenActive(m_CharacterManagementScreen))
+        {
+            UIScreenManager.Instance.CloseScreen();
+        }
+    }
+    
     private void EnableLevelGraphInput()
     {
         InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
         
         m_LevelCameraController.EnableCameraMovement();
     }
