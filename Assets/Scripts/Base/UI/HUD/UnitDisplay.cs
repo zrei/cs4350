@@ -7,11 +7,11 @@ namespace Game.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class UnitDisplay : MonoBehaviour
     {
-        [SerializeField]
-        private bool isCurrentUnitDisplay = true;
+        private static readonly Color PlayerColor = new Color32(0, 64, 106, 102);
+        private static readonly Color EnemyColor = new Color32(106, 0, 0, 102);
 
         [SerializeField]
-        private UnitAllegiance displayType = UnitAllegiance.PLAYER;
+        private bool isCurrentUnitDisplay = true;
 
         #region Component References
         [SerializeField]
@@ -19,6 +19,9 @@ namespace Game.UI
 
         [SerializeField]
         private Image characterArt;
+
+        [SerializeField]
+        private Image background;
 
         [SerializeField]
         private FormattedTextDisplay phyAtkDisplay;
@@ -40,6 +43,9 @@ namespace Game.UI
 
         [SerializeField]
         private ProgressBar mpBar;
+
+        [SerializeField]
+        private StatusDisplay statusDisplay;
         #endregion
 
         private Animator animator;
@@ -82,6 +88,8 @@ namespace Game.UI
                             mpBar.SetValue(trackedUnit.CurrentMana, maxMana, 0);
                         }
                     }
+
+                    statusDisplay.TrackedStatusManager = trackedUnit.StatusManager;
                 }
             }
         }
@@ -131,7 +139,7 @@ namespace Game.UI
 
         private void OnPreviewUnit(Unit currentUnit)
         {
-            if (currentUnit == null || currentUnit.UnitAllegiance != displayType)
+            if (currentUnit == null)
             {
                 if (!isHidden) Hide();
                 return;
@@ -139,16 +147,15 @@ namespace Game.UI
 
             if (isHidden) Show();
 
-            switch (currentUnit.UnitAllegiance)
+            var backgroundColor = currentUnit.UnitAllegiance switch
             {
-                case UnitAllegiance.PLAYER:
-                    var playerUnit = currentUnit as PlayerUnit;
-                    nameDisplay?.SetValue($"{playerUnit.CharacterName} / {playerUnit.ClassName}");
-                    break;
-                case UnitAllegiance.ENEMY:
-                    nameDisplay?.SetValue(currentUnit.ClassName);
-                    break;
-            }
+                UnitAllegiance.PLAYER => PlayerColor,
+                UnitAllegiance.ENEMY => EnemyColor,
+                _ => PlayerColor
+            };
+            background.color = backgroundColor;
+
+            nameDisplay.SetValue(currentUnit.DisplayName);
 
             characterArt.sprite = currentUnit.Sprite;
             var color = characterArt.color;

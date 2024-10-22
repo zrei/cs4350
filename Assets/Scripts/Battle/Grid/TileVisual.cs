@@ -30,7 +30,7 @@ public class TileVisual : MonoBehaviour
     private readonly static Color InspectableColor = new(0.5f, 0.5f, 0, 1);
     //private readonly static Color InspectableColor = new(0.5f, 0.5f, 0.5f, 1);
 
-    private readonly static Color IconActiveColor = new(0, 0, 0, 0.8f);
+    private readonly static Color IconActiveColor = new(0.8f, 0.8f, 0.8f, 0.8f);
 
     #region Asset References
     [SerializeField]
@@ -49,6 +49,8 @@ public class TileVisual : MonoBehaviour
 
     [SerializeField]
     private ParticleSystem attackForecastParticleEffect;
+    [SerializeField]
+    private ParticleSystem skillCastBlockedParticleEffect;
 
     private TileState m_CurrState = TileState.NONE;
 
@@ -99,6 +101,7 @@ public class TileVisual : MonoBehaviour
                 icon.sprite = null;
                 icon.color = Color.clear;
                 ToggleAttackForecast(false);
+                ToggleSkillCastBlocked(false);
                 break;
         }
     }
@@ -132,13 +135,25 @@ public class TileVisual : MonoBehaviour
 
     public void ToggleAttackForecast(bool isTarget)
     {
-        if (isTarget)
+        if (isTarget && !attackForecastParticleEffect.isPlaying)
         {
             attackForecastParticleEffect.Play();
         }
         else
         {
             attackForecastParticleEffect.Stop();
+        }
+    }
+
+    public void ToggleSkillCastBlocked(bool isBlocked)
+    {
+        if (isBlocked && !skillCastBlockedParticleEffect.isPlaying)
+        {
+            skillCastBlockedParticleEffect.Play();
+        }
+        else
+        {
+            skillCastBlockedParticleEffect.Stop();
         }
     }
     #endregion
