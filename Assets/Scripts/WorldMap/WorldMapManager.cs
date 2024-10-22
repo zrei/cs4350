@@ -33,6 +33,7 @@ public class WorldMapManager : MonoBehaviour
         */
     }
 
+    // get the edges
     private IEnumerator MoveToLevel(int currLevelNumber, int newLevelNumber)
     {
         // move between the positions... quickly... exit node
