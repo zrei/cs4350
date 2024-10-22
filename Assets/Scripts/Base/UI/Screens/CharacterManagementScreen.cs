@@ -14,6 +14,8 @@ namespace Game.UI
         [SerializeField]
         private NamedObjectButton m_PartyMemberButtonPrefab;
         
+        private List<NamedObjectButton> m_PartyMemberButtons = new();
+        
         public NamedObjectButton SelectedPartyMemberButton
         {
             set
@@ -48,10 +50,11 @@ namespace Game.UI
         private void OnOpenPartyOverview(List<PlayerCharacterData> partyMembers)
         {
             // Clear existing party members
-            foreach (Transform child in m_PartyMemberButtonContainer)
+            foreach (var button in m_PartyMemberButtons)
             {
-                Destroy(child.gameObject);
+                Destroy(button.gameObject);
             }
+            m_PartyMemberButtons.Clear();
             
             if (partyMembers.Count == 0)
             {
@@ -64,6 +67,7 @@ namespace Game.UI
                 var partyMemberButton = Instantiate(m_PartyMemberButtonPrefab, m_PartyMemberButtonContainer);
                 partyMemberButton.SetObjectName(playerUnit.m_BaseData.m_CharacterName);
                 partyMemberButton.onSubmit.AddListener(DisplayPartyMember);
+                m_PartyMemberButtons.Add(partyMemberButton);
                 continue;
 
                 void DisplayPartyMember()
@@ -73,7 +77,7 @@ namespace Game.UI
                 }
             }
             
-            SelectedPartyMemberButton = m_PartyMemberButtonContainer.GetChild(0).GetComponent<NamedObjectButton>();
+            SelectedPartyMemberButton = m_PartyMemberButtons[0];
             m_CharacterOverviewDisplay.ViewUnit(partyMembers[0]);
             m_CharacterOverviewDisplay.gameObject.SetActive(true);
         }
