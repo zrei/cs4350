@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeChangeAmt: -15
-  moralityChangeAmt: 0
+  moralityChangeAmt: -30
 --- !u!1 &5324863533857733401
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,6 +139,10 @@ MonoBehaviour:
   options:
   - text: Let's go
     nextState: {fileID: 0}
+    changesMorality: 0
+    moralityChange: 0
   - text: I'm hungryyyyy
     nextState: {fileID: 3636274808806051152}
+    changesMorality: 0
+    moralityChange: 0
   defaultNextState: {fileID: 0}

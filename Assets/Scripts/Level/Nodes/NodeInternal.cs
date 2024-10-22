@@ -16,20 +16,38 @@ public struct NodeInfo
 /// </summary>
 public abstract class NodeInternal : MonoBehaviour
 {
+    #region Static Information
+    
     // Static Node Information
     [SerializeField] private NodeInfo m_NodeInfo;
-    
-    // Whether is goal node
-    private bool m_IsGoalNode = false;
-    
-    // Whether the node has been cleared
-    private bool m_IsCleared = false;
+    public NodeInfo NodeInfo => m_NodeInfo;
 
-    // Whether the node is the current node
-    private bool m_IsCurrent = false;
+    [SerializeField] private bool m_IsMoralityLocked;
+    public bool IsMoralityLocked => m_IsMoralityLocked;
+    
+    [SerializeField] private Threshold m_MoralityThreshold;
+    public Threshold MoralityThreshold => m_MoralityThreshold;
     
     // Adjacent nodes and their costs
     private Dictionary<NodeInternal, float> m_AdjacentNodes = new();
+    
+    #endregion
+
+    #region Node State Information
+
+    // Whether is goal node
+    private bool m_IsGoalNode = false;
+    public bool IsGoalNode => m_IsGoalNode;
+    
+    // Whether the node has been cleared
+    private bool m_IsCleared = false;
+    public bool IsCleared => m_IsCleared;
+
+    // Whether the node is the current node
+    private bool m_IsCurrent = false;
+    public bool IsCurrent => m_IsCurrent;
+
+    #endregion
     
     #region Initialisation
 
@@ -37,16 +55,7 @@ public abstract class NodeInternal : MonoBehaviour
     
     #endregion
 
-    #region StaticInformation
-    
-    public NodeInfo NodeInfo => m_NodeInfo;
-
-    #endregion
-
     #region NodeState
-    public bool IsGoalNode => m_IsGoalNode;
-    public bool IsCleared => m_IsCleared;
-    public bool IsCurrent => m_IsCurrent;
     
     public void SetGoalNode()
     {

@@ -394,7 +394,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5777226466383560898, guid: 80b9a0fb318b24bd7af603b1959bc0a7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 80b9a0fb318b24bd7af603b1959bc0a7, type: 3}
 --- !u!4 &273258260 stripped
 Transform:
@@ -491,7 +495,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3869324773163303819, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1, type: 3}
 --- !u!114 &276866167 stripped
 MonoBehaviour:
@@ -6817,7 +6825,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5777226466383560898, guid: 80b9a0fb318b24bd7af603b1959bc0a7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 80b9a0fb318b24bd7af603b1959bc0a7, type: 3}
 --- !u!4 &1318922017 stripped
 Transform:
@@ -7188,6 +7200,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
         type: 3}
+      propertyPath: m_IsMoralityLocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
       propertyPath: m_NodeInfo.m_NodeName
       value: Ration Node
       objectReference: {fileID: 0}
@@ -7196,10 +7213,24 @@ PrefabInstance:
       propertyPath: m_NodeInfo.m_NodeDescription
       value: Get some rations here
       objectReference: {fileID: 0}
+    - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      propertyPath: m_MoralityThreshold.m_GreaterThan
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147535854840381578, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3268789184524180170, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8f496d2cc5f1045099d9ae330b30073b, type: 3}
 --- !u!4 &1694366280 stripped
 Transform:
@@ -7726,7 +7757,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5777226466383560898, guid: 80b9a0fb318b24bd7af603b1959bc0a7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 80b9a0fb318b24bd7af603b1959bc0a7, type: 3}
 --- !u!4 &182571941443399828 stripped
 Transform:
@@ -7988,7 +8023,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3869324773163303819, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1, type: 3}
 --- !u!114 &5800835706781479174 stripped
 MonoBehaviour:
@@ -8078,13 +8117,32 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
         type: 3}
+      propertyPath: m_IsMoralityLocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
       propertyPath: m_NodeInfo.m_NodeDescription
       value: Get some rewards here. There might be a strong weapon...
+      objectReference: {fileID: 0}
+    - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      propertyPath: m_MoralityThreshold.m_Threshold
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147535854840381578, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3268789184524180170, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8f496d2cc5f1045099d9ae330b30073b, type: 3}
 --- !u!114 &5812809984715093177 stripped
 MonoBehaviour:
@@ -8175,7 +8233,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3962683356527489608, guid: 3db58a0df0a53417a97c65988d180193,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 3db58a0df0a53417a97c65988d180193, type: 3}
 --- !u!4 &9059603446000607189 stripped
 Transform:

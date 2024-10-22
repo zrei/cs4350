@@ -1,9 +1,7 @@
-using System;
 using Level;
-using TMPro;
+using Level.Nodes.NodeVisuals;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// Base class that handles the visuals of a node, e.g. highlighting the node
@@ -25,6 +23,8 @@ public abstract class NodeVisual : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private GameObject m_movableCursorToken;
     // Cursor token model for selected nodes
     [SerializeField] private GameObject m_selectedCursorToken;
+    
+    [SerializeField] private MoralityThresholdDisplay m_MoralityThresholdDisplay;
 
     #region Initialisation
     public abstract void Initialise();
@@ -66,6 +66,12 @@ public abstract class NodeVisual : MonoBehaviour, IPointerEnterHandler, IPointer
         var position = m_starToken.transform.position;
         m_movableCursorToken.transform.position = position + new Vector3(0, 0.3f, 0.3f);
         m_selectedCursorToken.transform.position = position + new Vector3(0, 0.3f, 0.3f);
+    }
+    
+    public void SetMoralityThresholdText(Threshold moralityThreshold)
+    {
+        m_MoralityThresholdDisplay.SetMoralityThresholdText(moralityThreshold);
+        m_MoralityThresholdDisplay.Show();
     }
     #endregion
 

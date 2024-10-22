@@ -26,6 +26,9 @@ public class BattleNodeVisual : NodeVisual
         if (m_BattleNode.IsGoalNode)
             ToggleStarOn();
         
+        if (m_BattleNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_BattleNode.MoralityThreshold);
+        
         var enemyUnitData = m_BattleNode.BattleSO.m_EnemyUnitsToSpawn[0].m_EnemyCharacterData;
         
         m_EnemyUnitToken = Instantiate(m_CharacterToken, transform, true);

@@ -105,16 +105,9 @@ public class LevelNodeVisualManager : MonoBehaviour
         return m_NodeVisuals[nodeInternal];
     }
     
-    public void DisplayMovableNodes(NodeInternal currentNode)
+    public void DisplayMovableNodes(List<NodeInternal> movableNodes)
     {
-        // If the node is not cleared, only the current node should be movable
-        if (currentNode.IsCleared == false)
-        {
-            m_NodeVisuals[currentNode].ToggleMovable(true);
-            return;
-        }
-        
-        foreach (var node in currentNode.AdjacentNodes.Keys)
+        foreach (var node in movableNodes)
         {
             m_NodeVisuals[node].ToggleMovable(true);
         }

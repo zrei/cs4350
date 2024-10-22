@@ -234,6 +234,10 @@ MonoBehaviour:
   m_NodeInfo:
     m_NodeName: Story Node
     m_NodeDescription: Progress the story here
+  m_IsMoralityLocked: 0
+  m_MoralityThreshold:
+    m_GreaterThan: 0
+    m_Threshold: 0
   m_Dialogue: {fileID: 0}
 --- !u!114 &662664019987882140
 MonoBehaviour:
@@ -252,6 +256,7 @@ MonoBehaviour:
   m_starToken: {fileID: 5659876102791545761}
   m_movableCursorToken: {fileID: 2015534312466817915}
   m_selectedCursorToken: {fileID: 4107680075368379875}
+  m_MoralityThresholdDisplay: {fileID: 5780161510327612113}
   m_dialogueToken: {fileID: 4991098055703731398}
 --- !u!1 &4107680075368379875 stripped
 GameObject:
@@ -265,3 +270,15 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 8718808732384136115}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5780161510327612113 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2938647263433652578, guid: c9071d1592e7143be9c500ec030495ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 8718808732384136115}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10defc8cc91a441394a48fee34170ea4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

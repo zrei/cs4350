@@ -22,6 +22,9 @@ public class RewardNodeVisual : NodeVisual
         
         m_rationToken.SetActive(false);
         m_chestToken.SetActive(false);
+        
+        if (m_RewardNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_RewardNode.MoralityThreshold);
     }
     
     
