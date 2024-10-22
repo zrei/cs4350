@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,11 +48,23 @@ namespace Game.UI
         private FormattedTextDisplay classDisplay;
         
         [SerializeField]
+        private NamedObjectButton skillsTabButton;
+        
+        [SerializeField]
+        private NamedObjectButton weaponsTabButton;
+        
+        [SerializeField]
         private SkillsOverviewDisplay skillsOverviewDisplay;
         
         [SerializeField]
         private WeaponsOverviewDisplay weaponsOverviewDisplay;
         #endregion
+
+        private void Awake()
+        {
+            skillsTabButton.onSubmit.AddListener(OnSkillsTabSubmit);
+            weaponsTabButton.onSubmit.AddListener(OnWeaponsTabSubmit);
+        }
 
         public void ViewUnit(PlayerCharacterData playerUnit)
         {
@@ -78,9 +91,24 @@ namespace Game.UI
             
             skillsOverviewDisplay.DisplayUnitSkills(playerUnit);
             weaponsOverviewDisplay.DisplayUnitWeapons(playerUnit);
-            
+
+            OnSkillsTabSubmit();
+        }
+
+        private void OnSkillsTabSubmit()
+        {
             skillsOverviewDisplay.Show();
             weaponsOverviewDisplay.Hide();
+            skillsTabButton.SetGlowActive(true);
+            weaponsTabButton.SetGlowActive(false);
+        }
+        
+        private void OnWeaponsTabSubmit()
+        {
+            skillsOverviewDisplay.Hide();
+            weaponsOverviewDisplay.Show();
+            skillsTabButton.SetGlowActive(false);
+            weaponsTabButton.SetGlowActive(true);
         }
     }
 }
