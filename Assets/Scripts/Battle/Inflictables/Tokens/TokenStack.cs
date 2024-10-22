@@ -118,7 +118,7 @@ public class TokenStack :
         if (TokenType == TokenType.MULT_STAT_CHANGE)
         {
             MultStatChangeTokenTierSO mult = (MultStatChangeTokenTierSO) m_TokenTierData;
-            if (mult.m_AffectedStat != statType)
+            if (!mult.m_AffectedStats.Contains(statType))
             {
                 return 1f;
             }
@@ -138,7 +138,7 @@ public class TokenStack :
         if (TokenType == TokenType.FLAT_STAT_CHANGE)
         {
             FlatStatChangeTokenTierSO flat = (FlatStatChangeTokenTierSO) m_TokenTierData;
-            if (flat.m_AffectedStat != statType)
+            if (!flat.m_AffectedStats.Contains(statType))
             {
                 return 0f;
             }
