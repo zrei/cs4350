@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,66 +9,59 @@ namespace Game.UI
     {
 
         #region Component References
-        [SerializeField]
-        private FormattedTextDisplay pathDisplay;
-        
-        [SerializeField]
-        private FormattedTextDisplay nameDisplay;
-        
-        [SerializeField]
-        private FormattedTextDisplay levelDisplay;
 
-        [SerializeField]
-        private Image characterArt;
-        
-        [SerializeField]
-        private FormattedTextDisplay hpDisplay;
+        [SerializeField] private FormattedTextDisplay pathDisplay;
 
-        [SerializeField]
-        private FormattedTextDisplay mpDisplay;
+        [SerializeField] private FormattedTextDisplay nameDisplay;
 
-        [SerializeField]
-        private FormattedTextDisplay phyAtkDisplay;
+        [SerializeField] private FormattedTextDisplay levelDisplay;
 
-        [SerializeField]
-        private FormattedTextDisplay mgcAtkDisplay;
+        [SerializeField] private Image characterArt;
 
-        [SerializeField]
-        private FormattedTextDisplay phyDefDisplay;
+        [SerializeField] private FormattedTextDisplay equippedWeaponDisplay;
 
-        [SerializeField]
-        private FormattedTextDisplay mgcDefDisplay;
+        [SerializeField] private FormattedTextDisplay hpDisplay;
 
-        [SerializeField]
-        private FormattedTextDisplay spdDisplay;
-        
-        [SerializeField]
-        private FormattedTextDisplay moveDisplay;
-        
-        [SerializeField]
-        private FormattedTextDisplay classDisplay;
-        
-        [SerializeField]
-        private NamedObjectButton skillsTabButton;
-        
-        [SerializeField]
-        private NamedObjectButton weaponsTabButton;
-        
-        [SerializeField]
-        private SkillsOverviewDisplay skillsOverviewDisplay;
-        
-        [SerializeField]
-        private WeaponsOverviewDisplay weaponsOverviewDisplay;
+        [SerializeField] private FormattedTextDisplay mpDisplay;
+
+        [SerializeField] private FormattedTextDisplay phyAtkDisplay;
+
+        [SerializeField] private FormattedTextDisplay mgcAtkDisplay;
+
+        [SerializeField] private FormattedTextDisplay phyDefDisplay;
+
+        [SerializeField] private FormattedTextDisplay mgcDefDisplay;
+
+        [SerializeField] private FormattedTextDisplay spdDisplay;
+
+        [SerializeField] private FormattedTextDisplay moveDisplay;
+
+        [SerializeField] private FormattedTextDisplay classDisplay;
+
+        [SerializeField] private NamedObjectButton skillsTabButton;
+
+        [SerializeField] private NamedObjectButton weaponsTabButton;
+
+        [SerializeField] private SkillsOverviewDisplay skillsOverviewDisplay;
+
+        [SerializeField] private WeaponsOverviewDisplay weaponsOverviewDisplay;
+
         #endregion
+        
+        private PlayerCharacterData m_PlayerUnit;
 
         private void Awake()
         {
             skillsTabButton.onSubmit.AddListener(OnSkillsTabSubmit);
             weaponsTabButton.onSubmit.AddListener(OnWeaponsTabSubmit);
+
+            weaponsOverviewDisplay.OnWeaponChanged.AddListener(OnWeaponChanged);
         }
 
         public void ViewUnit(PlayerCharacterData playerUnit)
         {
+            m_PlayerUnit = playerUnit;
+            
             pathDisplay?.SetValue($"{playerUnit.m_BaseData.m_PathGroup.m_PathName}");
             nameDisplay?.SetValue($"{playerUnit.m_BaseData.m_CharacterName}");
             levelDisplay?.SetValue($"{playerUnit.m_CurrLevel}");
@@ -76,6 +70,8 @@ namespace Game.UI
             var color = characterArt.color;
             color.a = playerUnit.m_BaseData.m_CharacterSprite != null ? 1 : 0;
             characterArt.color = color;
+
+            equippedWeaponDisplay?.SetValue($"{playerUnit.GetWeaponInstanceSO().m_WeaponName}");
 
             var currStats = playerUnit.m_CurrStats;
             hpDisplay?.SetValue(currStats.m_Health);
@@ -86,9 +82,9 @@ namespace Game.UI
             mgcDefDisplay?.SetValue(currStats.m_MagicDefence);
             spdDisplay?.SetValue(currStats.m_Speed);
             moveDisplay?.SetValue(currStats.m_MovementRange);
-            
+
             classDisplay?.SetValue($"{playerUnit.CurrClass.m_ClassName}");
-            
+
             skillsOverviewDisplay.DisplayUnitSkills(playerUnit);
             weaponsOverviewDisplay.DisplayUnitWeapons(playerUnit);
 
@@ -102,13 +98,25 @@ namespace Game.UI
             skillsTabButton.SetGlowActive(true);
             weaponsTabButton.SetGlowActive(false);
         }
-        
+
         private void OnWeaponsTabSubmit()
         {
             skillsOverviewDisplay.Hide();
             weaponsOverviewDisplay.Show();
             skillsTabButton.SetGlowActive(false);
             weaponsTabButton.SetGlowActive(true);
+        }
+
+        private void OnWeaponChanged()
+        {
+            equippedWeaponDisplay?.SetValue($"{m_PlayerUnit.GetWeaponInstanceSO().m_WeaponName}");
+        }
+    
+
+        // Temporary method to pass party members information to weapons overview display
+        public void SetPartyMembers(List<PlayerCharacterData> partyMembers)
+        {
+            weaponsOverviewDisplay.SetPartyMembers(partyMembers);
         }
     }
 }

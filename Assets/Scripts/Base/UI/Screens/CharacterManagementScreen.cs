@@ -80,6 +80,9 @@ namespace Game.UI
             SelectedPartyMemberButton = m_PartyMemberButtons[0];
             m_CharacterOverviewDisplay.ViewUnit(partyMembers[0]);
             m_CharacterOverviewDisplay.gameObject.SetActive(true);
+            
+            // Temporary way to pass party members
+            m_CharacterOverviewDisplay.SetPartyMembers(partyMembers);
         }
         
         public override void ScreenUpdate()
