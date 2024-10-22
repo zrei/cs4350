@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StatusEffect :
@@ -11,12 +12,16 @@ public class StatusEffect :
     public int StackRemaining => m_StackRemaining;
     public bool IsDepleted => m_StackRemaining <= 0;
 
+    #region IStatus
     public Sprite Icon => m_StatusEffectSO.m_Sprite;
     public Color Color => m_StatusEffectSO.m_Color;
     public string DisplayTier => m_StatusEffectSO is DamageStatusEffectSO damageStatusEffect ? $"{damageStatusEffect.m_DamagePerTurn:G3}" : string.Empty;
-    public string DisplayStacks => $"{m_StackRemaining} <sprite name=\"Turn\">";
+    public string DisplayStacks => $"<size=50%>x</size>{m_StackRemaining} <sprite name=\"Turn\">";
     public string Name => m_StatusEffectSO.name;
     public string Description => m_StatusEffectSO.m_Description;
+    public List<int> NumStacksPerTier => null;
+    public int CurrentHighestTier => 0;
+    #endregion
 
     public StatusEffect(StatusEffectSO statusEffect, int initialStack)
     {

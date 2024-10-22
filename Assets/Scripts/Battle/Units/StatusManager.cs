@@ -47,12 +47,13 @@ public class StatusManager :
         if (m_ConsumableTokenStacks.ContainsKey(inflictedToken.Id))
         {
             m_ConsumableTokenStacks[inflictedToken.Id].AddToken(inflictedToken.m_Tier, inflictedToken.m_Number);
+            OnChange?.Invoke(m_ConsumableTokenStacks[inflictedToken.Id]);
         }
         else
         {
             m_ConsumableTokenStacks[inflictedToken.Id] = new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number);
+            OnAdd?.Invoke(m_ConsumableTokenStacks[inflictedToken.Id]);
         }
-        OnAdd?.Invoke(m_ConsumableTokenStacks[inflictedToken.Id]);
     }
 
     // special case for now
@@ -80,17 +81,17 @@ public class StatusManager :
         OnChange?.Invoke(statusEffect);
         if (statusEffect.IsDepleted)
         {
-            OnRemove?.Invoke(statusEffect);
             m_StatusEffects.Remove(statusEffectId);
+            OnRemove?.Invoke(statusEffect);
         }
     }
 
     public void ClearStatusEffect(int statusEffectId)
     {
-        if (m_StatusEffects.ContainsKey(statusEffectId))
+        if (m_StatusEffects.TryGetValue(statusEffectId, out var statusEffect))
         {
-            OnRemove?.Invoke(m_StatusEffects[statusEffectId]);
             m_StatusEffects.Remove(statusEffectId);
+            OnRemove?.Invoke(statusEffect);
         }
     }
     #endregion
@@ -111,8 +112,8 @@ public class StatusManager :
 
         foreach (StatusEffect statusEffect in toRemove)
         {
-            OnRemove?.Invoke(statusEffect);
             m_StatusEffects.Remove(statusEffect.Id);
+            OnRemove?.Invoke(statusEffect);
         }
     }
     #endregion
@@ -158,7 +159,9 @@ public class StatusManager :
     #region Clear Tokens
     public void ClearTokens()
     {
+        var tokens = new List<TokenStack>(m_ConsumableTokenStacks.Values);
         m_ConsumableTokenStacks.Clear();
+        tokens.ForEach(x => OnRemove?.Invoke(x));
     }
 
     public void ConsumeTokens(TokenConsumptionType consumeType)
@@ -170,6 +173,7 @@ public class StatusManager :
             if (tokenStack.ContainsConsumptionType(consumeType))
             {
                 tokenStack.ConsumeToken();
+                OnChange?.Invoke(tokenStack);
                 if (tokenStack.IsEmpty)
                 {
                     m_ConsumableTokenStacks.Remove(tokenStack.Id);
@@ -188,6 +192,7 @@ public class StatusManager :
             if (tokenStack.TokenType == tokenType)
             {
                 tokenStack.ConsumeToken();
+                OnChange?.Invoke(tokenStack);
                 if (tokenStack.IsEmpty)
                 {
                     m_ConsumableTokenStacks.Remove(tokenStack.Id);
