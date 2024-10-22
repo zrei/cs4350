@@ -373,11 +373,31 @@ namespace Game.UI
         {
             if (lockedInActionButton != null) return;
 
-            UpdateSkillDisplay(availableSkills[index + currentSkillPageIndex * skillButtons.Count]);
+            var skillIndex = index + currentSkillPageIndex * skillButtons.Count;
+            if (skillIndex >= availableSkills.Count)
+            {
+                var diff = availableSkills.Count - 1 - skillIndex;
+                skillIndex = availableSkills.Count - 1;
+                index += diff;
+                skillButtons[index].OnSelect(null);
+                return;
+            }
+
+            UpdateSkillDisplay(availableSkills[skillIndex]);
         }
 
         private void OnSubmitSkill(int index)
         {
+            var skillIndex = index + currentSkillPageIndex * skillButtons.Count;
+            if (skillIndex >= availableSkills.Count)
+            {
+                var diff = availableSkills.Count - 1 - skillIndex;
+                skillIndex = availableSkills.Count - 1;
+                index += diff;
+                skillButtons[index].OnSubmit(null);
+                return;
+            }
+
             var skill = availableSkills[index + currentSkillPageIndex * skillButtons.Count];
             BattleManager.Instance.PlayerTurnManager.SelectedSkill = skill;
             BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.SELECTING_ACTION_TARGET);
@@ -389,7 +409,7 @@ namespace Game.UI
         {
             CurrentSkillPageIndex += delta;
 
-            if (lockedInSkill != null)
+            if (lockedInActionButton != null)
             {
                 lockedInActionButton.OnSubmit(null);
             }
