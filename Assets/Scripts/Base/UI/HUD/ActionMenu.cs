@@ -86,7 +86,7 @@ namespace Game.UI
             }
         }
         private int currentSkillPageIndex = 0;
-        private int SkillPageCount => availableSkills.Count / skillButtons.Count;
+        private int SkillPageCount => Mathf.CeilToInt((float)availableSkills.Count / skillButtons.Count);
 
         private ActiveSkillSO LockedInSkill
         {
