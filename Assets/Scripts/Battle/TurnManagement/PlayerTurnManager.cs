@@ -350,6 +350,7 @@ public class PlayerTurnManager : TurnManager
             //m_ReachablePoints.Add(node);
             //m_TileToPath.Clear();
             //m_TileToPath.Add(node.m_Coordinates, node);
+            m_CurrUnit.ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             EndTurn();
         }
         //TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);

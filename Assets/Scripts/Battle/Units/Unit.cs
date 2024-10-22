@@ -68,7 +68,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public CoordPair CurrPosition => m_CurrPosition;
 
     protected StatusManager m_StatusManager = new StatusManager();
-    // public IStatusManager StatusManager => m_StatusManager;
+    public IStatusManager StatusManager => m_StatusManager;
     #endregion
 
     #region Static Data
@@ -236,7 +236,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         void FinishMovement()
         {
             moveCoroutine = null;
-            ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
         }
