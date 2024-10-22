@@ -48,6 +48,9 @@ namespace Game.UI
         
         [SerializeField]
         private SkillsOverviewDisplay skillsOverviewDisplay;
+        
+        [SerializeField]
+        private WeaponsOverviewDisplay weaponsOverviewDisplay;
         #endregion
 
         public void ViewUnit(PlayerCharacterData playerUnit)
@@ -74,6 +77,10 @@ namespace Game.UI
             classDisplay?.SetValue($"{playerUnit.CurrClass.m_ClassName}");
             
             skillsOverviewDisplay.DisplayUnitSkills(playerUnit);
+            weaponsOverviewDisplay.DisplayUnitWeapons(playerUnit);
+            
+            skillsOverviewDisplay.Show();
+            weaponsOverviewDisplay.Hide();
         }
     }
 }

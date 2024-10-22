@@ -12,7 +12,27 @@ namespace Game.UI
         private Transform m_PartyMemberButtonContainer;
         
         [SerializeField]
-        private PartyMemberButton m_PartyMemberButtonPrefab;
+        private NamedObjectButton m_PartyMemberButtonPrefab;
+        
+        public NamedObjectButton SelectedPartyMemberButton
+        {
+            set
+            {
+                if (m_SelectedPartyMemberButton == value) return;
+                
+                if (m_SelectedPartyMemberButton != null)
+                {
+                    m_SelectedPartyMemberButton.SetGlowActive(false);
+                }
+                
+                m_SelectedPartyMemberButton = value;
+                if (m_SelectedPartyMemberButton != null)
+                {
+                    m_SelectedPartyMemberButton.SetGlowActive(true);
+                }
+            }
+        }
+        private NamedObjectButton m_SelectedPartyMemberButton;
 
         public override void Initialize()
         {
@@ -42,16 +62,18 @@ namespace Game.UI
             foreach (var playerUnit in partyMembers)
             {
                 var partyMemberButton = Instantiate(m_PartyMemberButtonPrefab, m_PartyMemberButtonContainer);
-                partyMemberButton.SetPartyMemberName(playerUnit.m_BaseData.m_CharacterName);
+                partyMemberButton.SetObjectName(playerUnit.m_BaseData.m_CharacterName);
                 partyMemberButton.onSubmit.AddListener(DisplayPartyMember);
                 continue;
 
                 void DisplayPartyMember()
                 {
+                    SelectedPartyMemberButton = partyMemberButton;
                     m_CharacterOverviewDisplay.ViewUnit(playerUnit);
                 }
             }
             
+            SelectedPartyMemberButton = m_PartyMemberButtonContainer.GetChild(0).GetComponent<NamedObjectButton>();
             m_CharacterOverviewDisplay.ViewUnit(partyMembers[0]);
             m_CharacterOverviewDisplay.gameObject.SetActive(true);
         }

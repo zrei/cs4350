@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Game.UI
 {
-    public class PartyMemberButton : SelectableBase
+    public class NamedObjectButton : SelectableBase
     {
         public Image icon;
         public TextMeshProUGUI nameText;
@@ -20,9 +20,9 @@ namespace Game.UI
             glow.CrossFadeAlpha(active ? 1 : 0, 0.2f, false);
         }
         
-        public void SetPartyMemberName(string unitName)
+        public void SetObjectName(string objectName)
         {
-            nameText.text = unitName;
+            nameText.text = objectName;
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Game.UI
     {
 
         #region Component References
+        private CanvasGroup canvasGroup;
         
         [SerializeField]
         private List<ActionButton> activeSkillButtons = new();
@@ -20,9 +21,6 @@ namespace Game.UI
 
         [SerializeField] 
         private FormattedTextDisplay skillDescriptionText;
-        
-        [SerializeField]
-        private GameObject skillRangesPanel;
         
         #endregion
 
@@ -43,6 +41,9 @@ namespace Game.UI
 
         private void Awake()
         {
+            canvasGroup = GetComponent<CanvasGroup>();
+            Hide();
+            
             for (int i = 0; i < activeSkillButtons.Count; i++)
             {
                 var button = activeSkillButtons[i];
@@ -93,7 +94,6 @@ namespace Game.UI
             {
                 skillHeaderText.SetValue(string.Empty);
                 skillDescriptionText.SetValue(string.Empty);
-                skillRangesPanel.SetActive(false);
                 return;
             }
             
@@ -101,6 +101,18 @@ namespace Game.UI
             skillDescriptionText.SetValue(skill.m_Description);
         }
 
+        public void Hide()
+        {
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.alpha = 0;
+        }
         
+        public void Show()
+        {
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.alpha = 1;
+        }
     }
 }
