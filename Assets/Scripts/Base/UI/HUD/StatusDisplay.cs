@@ -41,9 +41,12 @@ namespace Game.UI
                     trackedStatusManager.OnRemove -= OnRemove;
                     trackedStatusManager.OnChange -= OnChange;
 
-                    var displays = new List<IndividualStatusDisplay>(activeDisplays.Values);
-                    activeDisplays.Clear();
-                    displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
+                    if (activeDisplays.Count > 0)
+                    {
+                        var displays = new List<IndividualStatusDisplay>(activeDisplays.Values);
+                        activeDisplays.Clear();
+                        displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
+                    }
                 }
                 trackedStatusManager = value;
                 if (trackedStatusManager != null)
@@ -69,7 +72,7 @@ namespace Game.UI
         {
             displayPool = new(
                 createFunc: () => Instantiate(individualStatusDisplayPrefab, layout.transform),
-                actionOnGet: display => display.gameObject.SetActive(true),
+                actionOnGet: display => { display.gameObject.SetActive(true); display.transform.SetAsFirstSibling(); },
                 actionOnRelease: display => display.gameObject.SetActive(false),
                 actionOnDestroy: display => Destroy(display.gameObject),
                 collectionCheck: true,
