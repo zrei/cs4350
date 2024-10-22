@@ -1,21 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class StatusManager :
     IFlatStatChange,
-    IMultStatChange//,
-    //IStatusManager
+    IMultStatChange,
+    IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
     private readonly Dictionary<int, TokenStack> m_ConsumableTokenStacks = new();
 
-    // public IEnumerable<Token> Tokens => m_Tokens.AsEnumerable();
+    #region IStatusManager
     public IEnumerable<TokenStack> TokenStacks => m_ConsumableTokenStacks.Values;
     public IEnumerable<StatusEffect> StatusEffects => m_StatusEffects.Values;
     public event StatusEvent OnAdd;
     public event StatusEvent OnChange;
     public event StatusEvent OnRemove;
+    #endregion
 
     #region Add Inflictable
     public void AddEffect(StatusEffect statusEffect)
@@ -52,7 +52,7 @@ public class StatusManager :
         {
             m_ConsumableTokenStacks[inflictedToken.Id] = new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number);
         }
-        // OnAdd?.Invoke(token);
+        OnAdd?.Invoke(m_ConsumableTokenStacks[inflictedToken.Id]);
     }
 
     // special case for now
@@ -98,7 +98,7 @@ public class StatusManager :
     #region Tick
     public void Tick(Unit unit)
     {
-        HashSet<StatusEffect> toRemove = new() {};
+        HashSet<StatusEffect> toRemove = new() { };
         foreach (StatusEffect statusEffect in m_StatusEffects.Values)
         {
             Logger.Log(this.GetType().Name, $"Afflicting status effect {statusEffect.Name}", LogLevel.LOG);
@@ -150,7 +150,7 @@ public class StatusManager :
                 statusEffects.Add(statusEffect);
             }
         }
-        
+
         return statusEffects;
     }
     #endregion
@@ -173,8 +173,8 @@ public class StatusManager :
                 if (tokenStack.IsEmpty)
                 {
                     m_ConsumableTokenStacks.Remove(tokenStack.Id);
-                    // OnRemove?.Invoke(tokenStack);
-                }       
+                    OnRemove?.Invoke(tokenStack);
+                }
             }
         }
     }
@@ -191,8 +191,8 @@ public class StatusManager :
                 if (tokenStack.IsEmpty)
                 {
                     m_ConsumableTokenStacks.Remove(tokenStack.Id);
-                    // OnRemove?.Invoke(tokenStack);
-                }       
+                    OnRemove?.Invoke(tokenStack);
+                }
             }
         }
     }
@@ -231,7 +231,7 @@ public class StatusManager :
         {
             if (tokenStack.TokenType == TokenType.TAUNT)
             {
-                forceTarget = ((TauntTokenStack) tokenStack).TauntedUnit;
+                forceTarget = ((TauntTokenStack)tokenStack).TauntedUnit;
                 if (forceTarget == null || forceTarget.IsDead)
                     return false;
                 Logger.Log(this.GetType().Name, $"Is being taunted by {forceTarget.name}", LogLevel.LOG);

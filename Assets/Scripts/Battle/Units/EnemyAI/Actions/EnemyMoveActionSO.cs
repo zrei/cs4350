@@ -36,6 +36,7 @@ public class EnemyMoveActionWrapper : EnemyActionWrapper
         CoordPair finalTile = MoveAction.GetChosenTile(enemyUnit, mapLogic, m_CanOccupyTiles);
         
         mapLogic.TryReachTile(GridType.ENEMY, enemyUnit, finalTile, completeActionEvent);
+        enemyUnit.ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
     }
 }
 

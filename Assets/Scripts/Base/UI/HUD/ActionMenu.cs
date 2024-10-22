@@ -86,7 +86,7 @@ namespace Game.UI
             }
         }
         private int currentSkillPageIndex = 0;
-        private int SkillPageCount => availableSkills.Count / skillButtons.Count;
+        private int SkillPageCount => Mathf.CeilToInt((float)availableSkills.Count / skillButtons.Count);
 
         private ActiveSkillSO LockedInSkill
         {
@@ -245,9 +245,13 @@ namespace Game.UI
         }
         private void OnCancelAction(IInput input)
         {
-            BattleManager.Instance.PlayerTurnManager.TransitToAction(PlayerTurnState.INSPECT);
-            lockedInActionButton.OnSelect(null);
-            LockedInActionButton = null;
+            if (lockedInActionButton == null) return;
+
+            if (BattleManager.Instance.PlayerTurnManager.TryCancelCurrentAction())
+            {
+                lockedInActionButton.OnSelect(null);
+                LockedInActionButton = null;
+            }
         }
         #endregion
 
@@ -298,13 +302,12 @@ namespace Game.UI
             LockedInSkill = null;
             skillHeader.SetValue("Move");
             skillDescription.gameObject.SetActive(true);
-            skillDescription.text = $"<sprite name=\"Steps\">: {BattleManager.Instance.PlayerTurnManager.MovementRangeRemaining}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
-            // show X to cancel, F to confirm
+            skillDescription.text = $"<sprite name=\"Steps\"> {BattleManager.Instance.PlayerTurnManager.MovementRangeRemaining}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
         }
 
         private void OnMovementRangeRemainingChange(int stepsLeft)
         {
-            skillDescription.text = $"<sprite name=\"Steps\">: {stepsLeft}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
+            skillDescription.text = $"<sprite name=\"Steps\"> {stepsLeft}/{currentUnit.GetTotalStat(StatType.MOVEMENT_RANGE)}";
         }
         #endregion
 
@@ -362,7 +365,6 @@ namespace Game.UI
             LockedInSkill = null;
             skillHeader.SetValue("End Turn");
             skillDescription.gameObject.SetActive(false);
-            // show X to cancel, F to confirm
         }
         #endregion
 

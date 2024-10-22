@@ -68,7 +68,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public CoordPair CurrPosition => m_CurrPosition;
 
     protected StatusManager m_StatusManager = new StatusManager();
-    // public IStatusManager StatusManager => m_StatusManager;
+    public IStatusManager StatusManager => m_StatusManager;
     #endregion
 
     #region Static Data
@@ -80,6 +80,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public bool CanSwapTiles => m_Class.m_CanSwapTiles;
     public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
+    public string CharacterName { get; protected set; }
+    public string DisplayName => !string.IsNullOrEmpty(CharacterName) ? $"{CharacterName} / {ClassName}" : ClassName;
     public Sprite Sprite { get; private set; }
 
     public Vector3 GridYOffset { get; private set; }
@@ -234,7 +236,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         void FinishMovement()
         {
             moveCoroutine = null;
-            ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
         }

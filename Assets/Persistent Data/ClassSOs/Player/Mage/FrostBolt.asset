@@ -15,13 +15,18 @@ MonoBehaviour:
   m_SkillName: Frost Bolt
   m_Description: 'Apply on target:
 
-    Reduced speed until next skill action or
-    hit taken.'
-  m_Icon: {fileID: 21300000, guid: 93ef1fad307cfb34eb4ba85b74399247, type: 3}
+    Speed Down'
+  m_Icon: {fileID: 3711662245719310502, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 4
   m_SkillTypes: 0000000001000000
-  m_InflictedTokens: []
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
+    m_Tier: 2
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
+    m_Tier: 1
+    m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1

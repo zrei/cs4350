@@ -16,6 +16,13 @@ public abstract class TokenTierSO : ScriptableObject
     public bool m_AllowStack;
     public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 
+    [Header("Details")]
+    public string m_TokenName;
+    [TextArea]
+    public string m_Description;
+    public Sprite m_Icon;
+    public Color m_Color = Color.white;
+
     [Header("Tiers")]
     [Tooltip("Tokens in order of their tiers: Start from tier 1 and go up")]
     public List<TokenSO> m_TieredTokens;

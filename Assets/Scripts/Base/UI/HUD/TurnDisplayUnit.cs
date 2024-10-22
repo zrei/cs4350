@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,18 +13,18 @@ namespace Game.UI
 
         private Coroutine animateCoroutine;
 
+        public float TimeToAct { get; private set; }
+
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
             image = GetComponent<Image>();
             GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDefeated;
-            GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
         }
 
         private void OnDestroy()
         {
             GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDefeated;
-            GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
         }
 
         private void OnUnitDefeated(Unit defeatedUnit)
@@ -34,13 +33,12 @@ namespace Game.UI
             {
                 if (animateCoroutine != null) StopCoroutine(animateCoroutine);
                 GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDefeated;
-                GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
                 TurnDisplay.Instance.RemoveTurnDisplayUnit(unit);
                 Destroy(gameObject);
             }
         }
 
-        private void OnPreviewUnit(Unit unit)
+        public void OnPreviewUnit(Unit unit)
         {
             if (unit == this.unit)
             {
@@ -96,9 +94,10 @@ namespace Game.UI
 
         public void UpdateTurnValue(float timeToNext, float max)
         {
+            TimeToAct = timeToNext;
             var ratio = timeToNext / max;
             var angle = ratio * 2 * Mathf.PI;
-            rectTransform.anchoredPosition = TurnDisplay.Instance.radius * new Vector2(-Mathf.Sin(angle), Mathf.Cos(angle));
+            rectTransform.anchoredPosition = TurnDisplay.Instance.Radius * new Vector2(-Mathf.Sin(angle), Mathf.Cos(angle));
             var rot = rectTransform.localEulerAngles;
             rot.z = ratio * 360;
             rectTransform.localEulerAngles = rot;

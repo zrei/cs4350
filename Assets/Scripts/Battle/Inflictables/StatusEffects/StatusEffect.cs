@@ -13,9 +13,8 @@ public class StatusEffect :
 
     public Sprite Icon => m_StatusEffectSO.m_Sprite;
     public Color Color => m_StatusEffectSO.m_Color;
-    public string DisplayAmount => !string.IsNullOrEmpty(m_StatusEffectSO.m_DisplayStacksFormat)
-        ? string.Format(m_StatusEffectSO.m_DisplayStacksFormat, m_StackRemaining)
-        : string.Empty;
+    public string DisplayTier => m_StatusEffectSO is DamageStatusEffectSO damageStatusEffect ? $"{damageStatusEffect.m_DamagePerTurn:G3}" : string.Empty;
+    public string DisplayStacks => $"{m_StackRemaining} <sprite name=\"Turn\">";
     public string Name => m_StatusEffectSO.name;
     public string Description => m_StatusEffectSO.m_Description;
 

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f584b98fbf82e44fc81ac0ec2cd4a4c8, type: 3}
+  m_Name: MovementBoost
+  m_EditorClassIdentifier: 
+  m_Id: 4
+  m_AllowStack: 1
+  m_TokenName: Movement Boost
+  m_Description: Increased movement range until next turn. (+100% per tier)
+  m_Icon: {fileID: 644687021031443899, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_Color: {r: 1, g: 0.8039216, b: 0, a: 1}
+  m_TieredTokens:
+  - {fileID: 11400000, guid: 8d8d8a76e83b62f4cba4f1d4169eee11, type: 2}
+  - {fileID: 11400000, guid: 7df66fb1a738e10488b5011ae9fd30ba, type: 2}
+  m_Consumption: 08000000
+  m_AffectedStats: 07000000
