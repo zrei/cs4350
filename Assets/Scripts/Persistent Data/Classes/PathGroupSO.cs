@@ -33,7 +33,7 @@ public class PathGroupSO : ScriptableObject
         List<bool> unlockedClassIndexes = new();
         for (int i = 0; i < m_PathClasses.Count; ++i)
         {
-            unlockedClassIndexes[i] = m_PathClasses[i].IsUnlocked(characterLevel);
+            unlockedClassIndexes.Add(m_PathClasses[i].IsUnlocked(characterLevel));
         }
         return unlockedClassIndexes;
     }
