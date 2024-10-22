@@ -187,6 +187,46 @@ public class MapLogic : MonoBehaviour
             _ => null
         };
     }
+
+    public int GetNumberOfUnitsOnGrid(GridType gridType)
+    {
+        return RetrieveGrid(gridType).GetNumberOfUnitsOnGrid();
+    }
+
+    public Unit GetUnitAtTile(GridType gridType, CoordPair coordPair)
+    {
+        return RetrieveGrid(gridType).GetUnitAtTile(coordPair);
+    }
+
+    public IEnumerable<CoordPair> GetUnoccupiedTiles(GridType gridType)
+    {
+        return RetrieveGrid(gridType).GetUnoccupiedTiles();
+    }
+
+    public bool HasAnyUnitWithHealthThreshold(GridType gridType, Threshold threshold, bool isFlat)
+    {
+        return RetrieveGrid(gridType).HasAnyUnitWithHealthThreshold(threshold, isFlat);
+    }
+
+    public bool HasAnyUnitWithManaThreshold(GridType gridType, Threshold threshold, bool isFlat)
+    {
+        return RetrieveGrid(gridType).HasAnyUnitWithManaThreshold(threshold, isFlat);
+    }
+
+    public bool HasAnyUnitWithToken(GridType gridType, TokenType tokenType)
+    {
+        return RetrieveGrid(gridType).HasAnyUnitWithToken(tokenType);
+    }
+
+    public int GetNumUnitsTargeted(GridType gridType, ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        return RetrieveGrid(gridType).GetNumberOfUnitsTargeted(activeSkillSO, targetTile);
+    }
+
+    public float GetDamageDoneBySkill(GridType gridType, Unit unit, ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        return RetrieveGrid(gridType).GetDamageDoneBySkill(unit, activeSkillSO, targetTile);
+    }
     #endregion
 
     #region Attacks
@@ -215,6 +255,11 @@ public class MapLogic : MonoBehaviour
     public HashSet<PathNode> CalculateReachablePoints(GridType gridType, Unit unit, int remainingMovementRange)
     {
         return RetrieveGrid(gridType).CalculateReachablePoints(unit, remainingMovementRange);
+    }
+
+    public void TryReachTile(GridType gridType, Unit unit, CoordPair destination, VoidEvent onCompleteMovement)
+    {
+        RetrieveGrid(gridType).TryReachTile(unit, destination, onCompleteMovement);
     }
     #endregion
 }
