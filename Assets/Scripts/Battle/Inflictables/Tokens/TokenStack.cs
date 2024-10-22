@@ -32,25 +32,24 @@ public class TokenStack :
     #region IStatus
     public Sprite Icon => m_TokenTierData.m_Icon;
     public Color Color => m_TokenTierData.m_Color;
-    public string DisplayTier => m_TokenTierData.NumTiers == 1 ? string.Empty : GetMaxTier() switch
+    public string DisplayTier => m_NumTiers == 1 ? string.Empty : TokenUtil.NumToRomanNumeral(GetMaxTier());
+    public string DisplayStacks
     {
-        -1 => string.Empty,
-        0 => string.Empty,
-        1 => "I",
-        2 => "II",
-        3 => "III",
-        4 => "IV",
-        5 => "V",
-        6 => "VI",
-        7 => "VII",
-        8 => "VIII",
-        9 => "IX",
-        10 => "X",
-        _ => string.Empty,
-    };
-    public string DisplayStacks => $"{m_NumTokensOfEachTier.Aggregate((x, y) => x + y)} <sprite name=\"Stack\">";
+        get
+        {
+            var tierIndex = GetMaxTier() - 1;
+            if (tierIndex < 0 || tierIndex >= m_NumTiers)
+            {
+                return string.Empty;
+            }
+
+            return $"<size=50%>x</size>{m_NumTokensOfEachTier[tierIndex]}<sprite name=\"Stack\">";
+        }
+    }
     public string Name => m_TokenTierData.m_TokenName;
     public string Description => m_TokenTierData.m_Description;
+    public List<int> NumStacksPerTier => m_NumTokensOfEachTier;
+    public int CurrentHighestTier => GetMaxTier();
     #endregion
 
     public TokenStack(TokenTierSO tokenTier, int initialTier, int initialNumber = 1)
