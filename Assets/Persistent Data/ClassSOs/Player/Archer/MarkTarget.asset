@@ -13,12 +13,17 @@ MonoBehaviour:
   m_Name: MarkTarget
   m_EditorClassIdentifier: 
   m_SkillName: Mark Target
-  m_Description: 'Apply on target: Reduced defence on next hit taken'
+  m_Description: 'Apply on target:
+
+    Defence Down.'
   m_Icon: {fileID: 2613184551013223596, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 1
   m_SkillTypes: 01000000
-  m_InflictedTokens: []
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: 3bd20286dd9b2c44c9977a2f23463996, type: 2}
+    m_Tier: 2
+    m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1

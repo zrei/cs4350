@@ -10,24 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: FrostBolt
+  m_Name: PoisonShot
   m_EditorClassIdentifier: 
-  m_SkillName: Frost Bolt
-  m_Description: 'Apply on target:
-
-    Speed Down'
-  m_Icon: {fileID: 3711662245719310502, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
-  m_SkillType: 0
-  m_ConsumedMana: 4
-  m_SkillTypes: 0000000001000000
-  m_InflictedTokens:
-  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
-    m_Tier: 2
-    m_Number: 1
-  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
-    m_Tier: 1
-    m_Number: 1
-  m_InflictedStatusEffects: []
+  m_SkillName: PoisonShot
+  m_Description: 
+  m_Icon: {fileID: -5573393650252216343, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillType: 1
+  m_ConsumedMana: 0
+  m_SkillTypes: 00000000
+  m_InflictedTokens: []
+  m_InflictedStatusEffects:
+  - m_StatusEffect: {fileID: 11400000, guid: 1c78879aa98354c4d948d640dfd7cd4a, type: 2}
+    m_Stack: 3
   m_DamageModifier: 1
   m_HealProportion: 1
   m_ManaAlterProportion: 0

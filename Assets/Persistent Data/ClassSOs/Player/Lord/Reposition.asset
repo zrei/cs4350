@@ -15,15 +15,18 @@ MonoBehaviour:
   m_SkillName: Reposition
   m_Description: 'Buff target:
 
-    Increased speed and movement.
-
-    Expires on
-    next skill action.'
+    Speed Up, Movement Up.'
   m_Icon: {fileID: -6913803671930707150, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 0
   m_SkillTypes: 01000000
-  m_InflictedTokens: []
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: e978f3b5d68364245bad675bf3841823, type: 2}
+    m_Tier: 1
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: 86099e809049cd94f8cd2a1d3fdf018d, type: 2}
+    m_Tier: 1
+    m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1

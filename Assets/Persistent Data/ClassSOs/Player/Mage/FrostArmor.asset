@@ -13,14 +13,20 @@ MonoBehaviour:
   m_Name: FrostArmor
   m_EditorClassIdentifier: 
   m_SkillName: Frost Armor
-  m_Description: 'Buff target:
+  m_Description: 'Apply on target:
 
-    Increased physical defence on next hit taken.'
+    Defence Up'
   m_Icon: {fileID: 2232522528189805345, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 2
   m_SkillTypes: 01000000
-  m_InflictedTokens: []
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: eb96b45dd1eecc540af4de5cfef3f762, type: 2}
+    m_Tier: 2
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: eb96b45dd1eecc540af4de5cfef3f762, type: 2}
+    m_Tier: 1
+    m_Number: 2
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1

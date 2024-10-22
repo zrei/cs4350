@@ -10,21 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: FrostBolt
+  m_Name: Taunt
   m_EditorClassIdentifier: 
-  m_SkillName: Frost Bolt
-  m_Description: 'Apply on target:
-
-    Speed Down'
-  m_Icon: {fileID: 3711662245719310502, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillName: Taunt
+  m_Description: Force enemies to target self.
+  m_Icon: {fileID: -97088158288067470, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
-  m_ConsumedMana: 4
+  m_ConsumedMana: 1
   m_SkillTypes: 0000000001000000
   m_InflictedTokens:
-  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
-    m_Tier: 2
-    m_Number: 1
-  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
+  - m_TokenTierData: {fileID: 11400000, guid: d8acbcf0174f34748aa064f80bda700d, type: 2}
     m_Tier: 1
     m_Number: 1
   m_InflictedStatusEffects: []
@@ -33,10 +28,27 @@ MonoBehaviour:
   m_ManaAlterProportion: 0
   m_Summons: []
   m_TeleportTargetRules: []
-  m_TargetWillPlayHurtAnimation: 1
+  m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0
-  m_SkillAnimationType: 2
+  m_SkillAnimationType: 1
   m_TargetRules:
+  - {fileID: 11400000, guid: 3532326be7568d1419b024ef2dccee87, type: 2}
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
-  m_TargetSquares: []
+  m_TargetSquares:
+  - m_Row: -1
+    m_Col: -1
+  - m_Row: -1
+    m_Col: 0
+  - m_Row: -1
+    m_Col: 1
+  - m_Row: 0
+    m_Col: -1
+  - m_Row: 0
+    m_Col: 1
+  - m_Row: 1
+    m_Col: -1
+  - m_Row: 1
+    m_Col: 0
+  - m_Row: 1
+    m_Col: 1
