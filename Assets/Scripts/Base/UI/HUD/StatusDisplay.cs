@@ -41,10 +41,9 @@ namespace Game.UI
                     trackedStatusManager.OnRemove -= OnRemove;
                     trackedStatusManager.OnChange -= OnChange;
 
-                    foreach (var status in activeDisplays.Keys)
-                    {
-                        OnRemove(status);
-                    }
+                    var displays = new List<IndividualStatusDisplay>(activeDisplays.Values);
+                    activeDisplays.Clear();
+                    displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
                 }
                 trackedStatusManager = value;
                 if (trackedStatusManager != null)
@@ -55,7 +54,7 @@ namespace Game.UI
 
                     foreach (var status in trackedStatusManager.TokenStacks)
                     {
-                        //OnAdd(status);
+                        OnAdd(status);
                     }
                     foreach (var status in trackedStatusManager.StatusEffects)
                     {
@@ -87,12 +86,11 @@ namespace Game.UI
         public void OnAdd(IStatus status)
         {
             if (displayPool.CountActive >= MaxDisplays) return;
+            if (activeDisplays.ContainsKey(status)) return;
 
-            IndividualStatusDisplay display;
-            if (activeDisplays.TryAdd(status, display = displayPool.Get()))
-            {
-                display.TrackedStatus = status;
-            }
+            var display = displayPool.Get();
+            display.TrackedStatus = status;
+            activeDisplays.Add(status, display);
         }
 
         public void OnRemove(IStatus status)

@@ -43,6 +43,9 @@ namespace Game.UI
 
         [SerializeField]
         private ProgressBar mpBar;
+
+        [SerializeField]
+        private StatusDisplay statusDisplay;
         #endregion
 
         private Animator animator;
@@ -85,6 +88,8 @@ namespace Game.UI
                             mpBar.SetValue(trackedUnit.CurrentMana, maxMana, 0);
                         }
                     }
+
+                    statusDisplay.TrackedStatusManager = trackedUnit.StatusManager;
                 }
             }
         }

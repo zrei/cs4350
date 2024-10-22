@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,7 +9,8 @@ public interface IStatus
 {
     Sprite Icon { get; }
     Color Color { get; }
-    string DisplayAmount { get; }
+    string DisplayTier { get; }
+    string DisplayStacks { get; }
     string Name { get; }
     string Description { get; }
 }
@@ -23,19 +22,16 @@ namespace Game.UI
         IPointerExitHandler
     {
         [SerializeField]
+        private GraphicGroup graphicGroup;
+
+        [SerializeField]
         private Image icon;
 
         [SerializeField]
-        private TextMeshProUGUI amount;
+        private TextMeshProUGUI tier;
 
         [SerializeField]
-        private GameObject displayNameRoot;
-
-        [SerializeField]
-        private TextMeshProUGUI displayName;
-
-        [SerializeField]
-        private List<Graphic> tintable;
+        private TextMeshProUGUI stacks;
 
         public IStatus TrackedStatus
         {
@@ -46,9 +42,9 @@ namespace Game.UI
                 if (trackedStatus != null)
                 {
                     icon.sprite = trackedStatus.Icon;
-                    amount.text = trackedStatus.DisplayAmount;
-                    displayName.text = trackedStatus.Name;
-                    tintable.ForEach(t => t.color = trackedStatus.Color);
+                    graphicGroup.color = trackedStatus.Color;
+                    tier.text = trackedStatus.DisplayTier;
+                    stacks.text = trackedStatus.DisplayStacks;
                 }
             }
         }
@@ -56,22 +52,19 @@ namespace Game.UI
 
         private void Awake()
         {
-            displayNameRoot.gameObject.SetActive(false);
         }
 
         public void OnChange()
         {
-            amount.text = trackedStatus.DisplayAmount;
+            stacks.text = trackedStatus.DisplayStacks;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            displayNameRoot.gameObject.SetActive(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            displayNameRoot.gameObject.SetActive(false);
         }
     }
 }
