@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using Game;
-using Level;
 using UnityEngine;
 
 public class WorldMapManager : MonoBehaviour
 {
-    [SerializeField] private CharacterToken m_PlayerToken;
+    [SerializeField] private Level.CharacterToken m_PlayerToken;
     [SerializeField] private List<WorldMapNode> m_LevelNodes;
 
     // can handle camera here for now
