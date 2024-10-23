@@ -1,9 +1,11 @@
 using Game.Input;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
+using static GlobalEvents;
 
 namespace Game.UI
 {
@@ -16,17 +18,58 @@ namespace Game.UI
         [SerializeField]
         private DialogueButton dialogueButtonPrefab;
 
+        #region Component References
+        #region Character Sprite
+        [SerializeField]
+        private GameObject characterSpriteContainer;
+
+        [SerializeField]
+        private Image characterSprite;
+        #endregion
+
+        #region Character Name
+        [SerializeField]
+        private GameObject characterNameContainer;
+
+        [SerializeField]
+        private TextMeshProUGUI characterName;
+        #endregion
+
+        [SerializeField]
+        private GraphicGroup graphicGroup;
+
         [SerializeField]
         private AnimatableTextDisplay text;
 
         [SerializeField]
         private LayoutGroup buttonsLayout;
+        #endregion
 
         private Animator animator;
         private CanvasGroup canvasGroup;
 
         private bool isHidden;
 
+        private Dialogue CurrentDialogue
+        {
+            set
+            {
+                currentDialogue = value;
+
+                if (currentDialogue != null)
+                {
+                    text.SetText(currentDialogue.text);
+
+                    graphicGroup.CrossFadeColor(currentDialogue.characterColor, 0.25f, false, false);
+
+                    characterSprite.sprite = currentDialogue.characterSprite;
+                    characterSpriteContainer.SetActive(currentDialogue.characterSprite != null);
+
+                    characterName.text = currentDialogue.characterName;
+                    characterNameContainer.SetActive(!string.IsNullOrEmpty(currentDialogue.characterName));
+                }
+            }
+        }
         private Dialogue currentDialogue;
 
         private HashSet<DialogueButton> activeDisplays = new();
@@ -63,8 +106,7 @@ namespace Game.UI
 
             Show();
 
-            currentDialogue = dialogue;
-            text.SetText(dialogue.text);
+            CurrentDialogue = dialogue;
             dialogue.onEnterState?.Invoke();
 
             InputManager.Instance.SubmitInput.OnPressEvent += OnSubmit;
@@ -80,14 +122,13 @@ namespace Game.UI
                 return;
             }
 
-            currentDialogue = dialogue;
-            text.SetText(dialogue.text);
+            CurrentDialogue = dialogue;
             dialogue.onEnterState?.Invoke();
         }
 
         private void ExitDialogue()
         {
-            currentDialogue = null;
+            CurrentDialogue = null;
             Hide();
             InputManager.Instance.SubmitInput.OnPressEvent -= OnSubmit;
             GlobalEvents.Dialogue.DialogueEndEvent?.Invoke();
@@ -111,10 +152,18 @@ namespace Game.UI
 
             if (currentDialogue.options.Count > 0)
             {
+                bool isFirst = true;
                 foreach (var option in currentDialogue.options)
                 {
+                    var isUnlocked = option.IsUnlocked;
+                    if (!isUnlocked && option.hideIfConditionsUnmet) continue;
+
                     var button = displayPool.Get();
-                    button.text.text = option.text;
+                    button.text.text = isUnlocked ? option.text : $"{option.lockedText} {option.text}";
+                    button.interactable = isUnlocked;
+
+                    if (!isUnlocked) continue;
+                    
                     var nextState = option.nextState;
                     button.onSubmit.RemoveAllListeners();
                     button.onSubmit.AddListener(() =>
@@ -130,10 +179,13 @@ namespace Game.UI
                             displayPool.Release(active);
                         }
                     });
+
+                    if (isFirst)
+                    {
+                        isFirst = false;
+                        button.Select();
+                    }
                 }
-            }
-            else
-            {
             }
         }
 

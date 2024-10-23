@@ -97,7 +97,7 @@ public class LevelTimerDisplay : MonoBehaviour
     
     private void SetTimeRemainingText(float timeRemaining)
     {
-        m_TimeRemainingText.text = timeRemaining.ToString("F0");
+        m_TimeRemainingText.text = $"{timeRemaining:F0}<sprite name=\"Rations\" tint>";
     }
 
     private void Hide()

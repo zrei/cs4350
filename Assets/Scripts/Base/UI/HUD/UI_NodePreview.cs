@@ -10,6 +10,8 @@ public class UI_NodePreview : MonoBehaviour
     [SerializeField] GameObject m_NodePreviewPanel;
     [SerializeField] TextMeshProUGUI m_NodeNameText;
     [SerializeField] TextMeshProUGUI m_DescriptionText;
+    [SerializeField] TextMeshProUGUI m_UnlockConditionHeader;
+    [SerializeField] TextMeshProUGUI m_UnlockConditionText;
     
     [Header("Battle Preview")]
     [SerializeField] GameObject m_BattlePreviewPanel;
@@ -111,20 +113,26 @@ public class UI_NodePreview : MonoBehaviour
     {
         m_NodeNameText.text = node.NodeInfo.m_NodeName;
         m_DescriptionText.text = node.NodeInfo.m_NodeDescription;
-        
-        // Set position of preview panel to be at the node's position
-        var nodePosition = node.transform.position;
-        var screenPosition = CameraManager.Instance.MainCamera.WorldToScreenPoint(nodePosition);
-        var viewportPosition = CameraManager.Instance.MainCamera.ScreenToViewportPoint(screenPosition);
-        
-        var rectTransform = m_NodePreviewPanel.GetComponent<RectTransform>();
-        
-        if (viewportPosition.x < 0.8f)
-            rectTransform.anchoredPosition = screenPosition + Vector3.right * 240f;
+
+        if (node.IsMoralityLocked)
+        {
+            int thresholdValue = MoralityManager.Instance.GetMoralityValue(node.MoralityThreshold.m_Threshold);
+            bool isSatisfied = node.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage);
+            
+            m_UnlockConditionHeader.text = "Unlock Condition";
+            m_UnlockConditionText.text = $"Morality<sprite name=\"Morality\" tint>: ";
+            m_UnlockConditionText.text += node.MoralityThreshold.m_GreaterThan ? $">{thresholdValue}" : $"<{thresholdValue}";
+            m_UnlockConditionText.text += isSatisfied ? " (Satisfied)" : " (Not Satisfied)";
+            m_UnlockConditionText.color = isSatisfied ? Color.green : Color.red;
+        }
         else
-            rectTransform.anchoredPosition = screenPosition + Vector3.left * 240f;
+        {
+            m_UnlockConditionHeader.text = "";
+            m_UnlockConditionText.text = "";
+        }
         
         m_CurrentPreviewPanel = m_NodePreviewPanel;
+        SetUpPreviewPanelLocation(node.transform.position);
     }
     
     private void SetUpBattlePreviewPanel(BattleNode node)
@@ -147,18 +155,21 @@ public class UI_NodePreview : MonoBehaviour
             m_BattleEnemiesText.text += $"{enemyClass.Key}\tx{enemyClass.Value}\n";
         }
         
+        m_CurrentPreviewPanel = m_BattlePreviewPanel;
+        SetUpPreviewPanelLocation(node.transform.position);
+    }
+
+    private void SetUpPreviewPanelLocation(Vector3 nodePosition)
+    {
         // Set position of preview panel to be at the node's position
-        var nodePosition = node.transform.position;
         var screenPosition = CameraManager.Instance.MainCamera.WorldToScreenPoint(nodePosition);
         var viewportPosition = CameraManager.Instance.MainCamera.ScreenToViewportPoint(screenPosition);
         
-        var rectTransform = m_BattlePreviewPanel.GetComponent<RectTransform>();
+        var rectTransform = m_CurrentPreviewPanel.GetComponent<RectTransform>();
         
         if (viewportPosition.x < 0.8f)
             rectTransform.anchoredPosition = screenPosition + Vector3.right * 240f;
         else
             rectTransform.anchoredPosition = screenPosition + Vector3.left * 240f;
-        
-        m_CurrentPreviewPanel = m_BattlePreviewPanel;
     }
 }
