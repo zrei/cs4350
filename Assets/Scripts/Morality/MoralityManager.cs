@@ -49,4 +49,6 @@ public class MoralityManager : Singleton<MoralityManager>
         m_CurrMorality = Mathf.Clamp(m_CurrMorality + changeAmount, -m_MoralitySetting.m_MaxMorality, m_MoralitySetting.m_MaxMorality);
         GlobalEvents.Morality.MoralitySetEvent?.Invoke(m_CurrMorality);
     }
+    
+    public int GetMoralityValue(float percentage) => Mathf.FloorToInt(percentage * m_MoralitySetting.m_MaxMorality);
 }

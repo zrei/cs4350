@@ -97,8 +97,10 @@ public class LevelManager : MonoBehaviour
     
     public void DisplayMovableNodes()
     {
+        var movableNodes = m_LevelNodeManager.GetCurrentMovableNodes();
+        
         m_LevelNodeVisualManager.ClearMovableNodes();
-        m_LevelNodeVisualManager.DisplayMovableNodes(m_LevelNodeManager.CurrentNode);
+        m_LevelNodeVisualManager.DisplayMovableNodes(movableNodes);
     }
 
     #endregion

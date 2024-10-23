@@ -17,6 +17,9 @@ public class DialogueNodeVisual : NodeVisual
         
         if (m_DialogueNode.IsGoalNode)
             ToggleStarOn();
+        
+        if (m_DialogueNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_DialogueNode.MoralityThreshold);
     }
 
     #region Graphics

@@ -108,7 +108,34 @@ public class LevelNodeManager : MonoBehaviour
     /// <returns></returns>
     public bool CanMoveToNode(NodeInternal destNode)
     {
+        if (destNode.IsMoralityLocked && !destNode.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMorality))
+        {
+            return false;
+        }
+        
         return m_CurrentNodeInternal.AdjacentNodes.ContainsKey(destNode);
+    }
+    
+    public List<NodeInternal> GetCurrentMovableNodes()
+    {
+        List<NodeInternal> movableNodes = new();
+        
+        // If the node is not cleared, only the current node should be movable
+        if (m_CurrentNodeInternal.IsCleared == false)
+        {
+            movableNodes.Add(m_CurrentNodeInternal);
+            return movableNodes;
+        }
+        
+        foreach (var node in m_CurrentNodeInternal.AdjacentNodes.Keys)
+        {
+            if (CanMoveToNode(node))
+            {
+                movableNodes.Add(node);
+            }
+        }
+
+        return movableNodes;
     }
     
     public bool IsCurrentNodeCleared()
