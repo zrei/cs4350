@@ -482,6 +482,38 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4130335212123749678, guid: 7ed678e52334249bba065cf7db0a8d9a,
         type: 3}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_DefaultDialogue
+      value: 
+      objectReference: {fileID: 4130335212123749678, guid: 7ed678e52334249bba065cf7db0a8d9a,
+        type: 3}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_ConditionalDialogues.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_ConditionalDialogues.Array.data[0].m_Dialogue
+      value: 
+      objectReference: {fileID: 4130335212123749678, guid: bd9b88c808a794c3594ac2e994b9b971,
+        type: 3}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_ConditionalDialogues.Array.data[0].m_FlagConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_ConditionalDialogues.Array.data[0].m_FlagConditions.Array.data[0].flagName
+      value: VillagePillaged
+      objectReference: {fileID: 0}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_ConditionalDialogues.Array.data[0].m_FlagConditions.Array.data[0].flagValue
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3084327578963601100, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
         type: 3}
       propertyPath: text
@@ -2844,6 +2876,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2578122031409413761, guid: 6c3574ef8ba56487c88c68ba42a97fed,
         type: 3}
+    - target: {fileID: 2715569543952376440, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
+        type: 3}
+      propertyPath: m_DefaultDialogue
+      value: 
+      objectReference: {fileID: 2578122031409413761, guid: 6c3574ef8ba56487c88c68ba42a97fed,
+        type: 3}
     - target: {fileID: 3084327578963601100, guid: 027d7906a6ac149ff8c7fa6fe9d6d1a1,
         type: 3}
       propertyPath: text
@@ -2989,7 +3027,7 @@ PrefabInstance:
     - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
         type: 3}
       propertyPath: m_MoralityThreshold.m_GreaterThan
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7147535854840381578, guid: 8f496d2cc5f1045099d9ae330b30073b,
         type: 3}
