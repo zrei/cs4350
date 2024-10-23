@@ -18,6 +18,12 @@ public class WorldMapNode : MonoBehaviour
     private bool m_IsCurrent;
     private int m_LevelNumber;
 
+    public void Initialise(LevelState initialState, bool isCurrentLevel)
+    {
+        m_LevelState = initialState;
+        m_IsCurrent = isCurrentLevel;
+    }
+
     public void EnterNode()
     {
         // display level UI
