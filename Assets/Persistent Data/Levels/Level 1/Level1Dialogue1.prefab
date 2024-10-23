@@ -84,6 +84,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeChangeAmt: -15
   moralityChangeAmt: 0
+  flagResults: []
 --- !u!1 &4238048150012490194
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,7 +95,7 @@ GameObject:
   m_Component:
   - component: {fileID: 294267782474217562}
   - component: {fileID: 994132547348094530}
-  - component: {fileID: 5727270512279736050}
+  - component: {fileID: 2445815926888123963}
   m_Layer: 7
   m_Name: Pillage
   m_TagString: Untagged
@@ -132,7 +133,7 @@ MonoBehaviour:
   onEnterState:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5727270512279736050}
+      - m_Target: {fileID: 2445815926888123963}
         m_TargetAssemblyTypeName: Level.DialogueResult, Assembly-CSharp
         m_MethodName: ApplyResults
         m_Mode: 1
@@ -155,7 +156,7 @@ MonoBehaviour:
   debugTrigger: 0
   options: []
   defaultNextState: {fileID: 0}
---- !u!114 &5727270512279736050
+--- !u!114 &2445815926888123963
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -167,8 +168,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeChangeAmt: 15
-  moralityChangeAmt: -15
+  timeChangeAmt: 0
+  moralityChangeAmt: 0
+  flagResults:
+  - flagName: VillagePillaged
+    flagType: 0
+    flagValue: 1
 --- !u!1 &5324863533857733401
 GameObject:
   m_ObjectHideFlags: 0
