@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game;
@@ -5,6 +6,7 @@ using Game.Input;
 using Game.UI;
 using Level;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum PlayerLevelSelectionState
 {
@@ -51,6 +53,9 @@ public class LevelManager : MonoBehaviour
     IUIScreen m_LevelUpResultScreen;
     IUIScreen m_LevelResultScreen;
 
+    public delegate void LevelManagerEvent(LevelManager levelManager);
+    public static LevelManagerEvent OnReady;
+
     #region Current State
     
     private List<PlayerCharacterData> m_CurrParty;
@@ -71,6 +76,11 @@ public class LevelManager : MonoBehaviour
     #endregion
     
     #region Initialisation
+
+    private void Start()
+    {
+        OnReady?.Invoke(this);
+    }
 
     public void Initialise(List<PlayerCharacterData> partyMembers)
     {
@@ -125,7 +135,9 @@ public class LevelManager : MonoBehaviour
     {
         if (m_LevelNodeManager.IsGoalNodeCleared())
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(LevelResultType.SUCCESS);
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.SUCCESS);
+            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
+            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
         }
         else
         {
@@ -385,25 +397,22 @@ public class LevelManager : MonoBehaviour
         
         if (victor == UnitAllegiance.PLAYER)
         {
-            m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnAnimComplete);
+            m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnSuccessAnimComplete);
         }
         else
         {
-            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnAnimComplete);
+            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete);
         }
         
         return;
 
-        void OnAnimComplete()
+        void OnSuccessAnimComplete()
         {
-            if (victor == UnitAllegiance.PLAYER)
-            {
-                m_LevelNodeManager.ClearCurrentNode();
-            
-                // Add exp reward to pending rewards
-                m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
-                                                  + battleNode.BattleSO.m_ExpReward;
-            }
+            m_LevelNodeManager.ClearCurrentNode();
+        
+            // Add exp reward to pending rewards
+            m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
+                                              + battleNode.BattleSO.m_ExpReward;
             
             // Add time cost to pending rewards
             m_PendingRewards[RewardType.TIME] = m_PendingRewards.GetValueOrDefault(RewardType.TIME, 0) 
@@ -412,6 +421,11 @@ public class LevelManager : MonoBehaviour
             UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
             
             GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+        }
+
+        void OnFailureAnimComplete()
+        {
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.DEFEAT);
         }
     }
     
@@ -465,7 +479,7 @@ public class LevelManager : MonoBehaviour
         StartPlayerPhase();
     }
 
-    private void OnLevelEnd(LevelResultType result)
+    private void OnLevelEnd(int levelId, LevelResultType result)
     {
         UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
     }

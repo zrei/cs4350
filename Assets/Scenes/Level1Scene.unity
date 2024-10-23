@@ -155,7 +155,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 10
+  m_Priority: 9
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 849061321}
   m_Follow: {fileID: 849061321}
@@ -1611,7 +1611,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BattleSO
       value: 
-      objectReference: {fileID: 11400000, guid: b85c2256de7ac0743b88173de9de5ebc,
+      objectReference: {fileID: 11400000, guid: 5836857df75954e4bb0e7287532dce5f,
         type: 2}
     - target: {fileID: 4181535030482913831, guid: 80b9a0fb318b24bd7af603b1959bc0a7,
         type: 3}
@@ -2985,6 +2985,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_MoralityThreshold.m_Threshold
       value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5848132962229706104, guid: 8f496d2cc5f1045099d9ae330b30073b,
+        type: 3}
+      propertyPath: m_MoralityThreshold.m_GreaterThan
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7147535854840381578, guid: 8f496d2cc5f1045099d9ae330b30073b,
         type: 3}

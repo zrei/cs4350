@@ -61,6 +61,7 @@ public class LevelTimerDisplay : MonoBehaviour
         
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
+        GlobalEvents.Level.ReturnFromLevelEvent += Hide;
         
         Show();
     }
@@ -71,6 +72,7 @@ public class LevelTimerDisplay : MonoBehaviour
         GlobalEvents.Level.TimeRemainingUpdatedEvent -= OnTimeRemainingUpdate;
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
     }
 
     private void OnTimeRemainingUpdate(float timeRemaining)
