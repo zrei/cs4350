@@ -6,7 +6,8 @@ using System.Collections.Generic;
 /// </summary>
 public static class Flags
 {
-
+    public static string WIN_LEVEL_FLAG = "WIN_LEVEL";
+    public static string LOSE_LEVEL_FLAG = "LOSE_LEVEL";
 }
 
 public enum FlagType
