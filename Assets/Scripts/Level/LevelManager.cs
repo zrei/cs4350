@@ -16,8 +16,8 @@ public enum PlayerLevelSelectionState
 public enum RewardType
 {
     EXP,
-    GOLD,
-    TIME
+    TIME,
+    WEAPON
 }
 
 /// <summary>
@@ -49,6 +49,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private List<PlayerCharacterData> m_TestCharacterData;
     
     // UI
+    IUIScreen m_CharacterManagementScreen;
     IUIScreen m_BattleNodeResultScreen;
     IUIScreen m_RewardNodeResultScreen;
     IUIScreen m_LevelUpResultScreen;
@@ -59,7 +60,8 @@ public class LevelManager : MonoBehaviour
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
     
-    private Dictionary<RewardType, int> m_PendingReward = new ();
+    private Dictionary<RewardType, int> m_PendingRewards = new ();
+    private List<WeaponInstanceSO> m_PendingWeaponRewards = new ();
     
     #endregion
     
@@ -139,6 +141,7 @@ public class LevelManager : MonoBehaviour
         AddNodeEventCallbacks();
 
         // Preload UI Screens
+        m_CharacterManagementScreen = UIScreenManager.Instance.CharacterManagementScreen;
         m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
         m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
         m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
@@ -190,10 +193,27 @@ public class LevelManager : MonoBehaviour
         UpdateState();
     }
     
+    private void OnTogglePartyMenu(IInput input)
+    {
+        if (!UIScreenManager.Instance.IsScreenOpen(m_CharacterManagementScreen))
+        {
+            Debug.Log("Opening Party Management Screen");
+            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_TestCharacterData);
+            UIScreenManager.Instance.OpenScreen(m_CharacterManagementScreen);
+        }
+        else if (UIScreenManager.Instance.IsScreenActive(m_CharacterManagementScreen))
+        {
+            Debug.Log("Closing Party Management Screen");
+            UIScreenManager.Instance.CloseScreen();
+        }
+    }
+    
     private void EnableLevelGraphInput()
     {
         InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
         
         m_LevelCameraController.EnableCameraMovement();
     }
@@ -202,6 +222,8 @@ public class LevelManager : MonoBehaviour
     {
         InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= OnTogglePartyMenu;
         
         m_LevelCameraController.DisableCameraMovement();
     }
@@ -392,12 +414,12 @@ public class LevelManager : MonoBehaviour
                 m_LevelNodeManager.ClearCurrentNode();
             
                 // Add exp reward to pending rewards
-                m_PendingReward[RewardType.EXP] = m_PendingReward.GetValueOrDefault(RewardType.EXP, 0) 
+                m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
                                                   + battleNode.BattleSO.m_ExpReward;
             }
             
             // Add time cost to pending rewards
-            m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) 
+            m_PendingRewards[RewardType.TIME] = m_PendingRewards.GetValueOrDefault(RewardType.TIME, 0) 
                                                - numTurns;
         
             UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
@@ -416,7 +438,10 @@ public class LevelManager : MonoBehaviour
         m_LevelNodeManager.ClearCurrentNode();
         
         // Add reward to pending rewards
-        m_PendingReward[RewardType.TIME] = m_PendingReward.GetValueOrDefault(RewardType.TIME, 0) + rewardNode.RationReward;
+        if (rewardNode.RewardType == RewardType.TIME)
+            m_PendingRewards[RewardType.TIME] = m_PendingRewards.GetValueOrDefault(RewardType.TIME, 0) + rewardNode.RationReward;
+        else if (rewardNode.RewardType == RewardType.WEAPON)
+            m_PendingWeaponRewards.Add(rewardNode.WeaponReward);
         
         UIScreenManager.Instance.OpenScreen(m_RewardNodeResultScreen);
         
@@ -470,17 +495,17 @@ public class LevelManager : MonoBehaviour
     {
         hasEvent = false;
 
-        if (m_PendingReward.ContainsKey(RewardType.TIME))
+        if (m_PendingRewards.ContainsKey(RewardType.TIME))
         {
-            if (m_PendingReward[RewardType.TIME] > 0)
+            if (m_PendingRewards[RewardType.TIME] > 0)
             {
-                m_LevelTimerLogic.AddTime(m_PendingReward[RewardType.TIME]);
+                m_LevelTimerLogic.AddTime(m_PendingRewards[RewardType.TIME]);
             }
             else
             {
-                m_LevelTimerLogic.AdvanceTimer(-m_PendingReward[RewardType.TIME]);
+                m_LevelTimerLogic.AdvanceTimer(-m_PendingRewards[RewardType.TIME]);
             }
-            m_PendingReward[RewardType.TIME] = 0;
+            m_PendingRewards[RewardType.TIME] = 0;
             
             if (m_LevelTimerLogic.TimeRemaining <= 0)
             {
@@ -489,11 +514,11 @@ public class LevelManager : MonoBehaviour
             }
         }
         
-        if (m_PendingReward.ContainsKey(RewardType.EXP))
+        if (m_PendingRewards.ContainsKey(RewardType.EXP))
         {
-            AddCharacterExp(m_PendingReward[RewardType.EXP], out var levelledUpCharacters);
+            AddCharacterExp(m_PendingRewards[RewardType.EXP], out var levelledUpCharacters);
             
-            m_PendingReward[RewardType.EXP] = 0;
+            m_PendingRewards[RewardType.EXP] = 0;
             
             if (levelledUpCharacters.Count > 0)
             {
@@ -504,9 +529,14 @@ public class LevelManager : MonoBehaviour
             }
         }
 
-        if (m_PendingReward.ContainsKey(RewardType.GOLD))
+        if (m_PendingWeaponRewards.Count > 0)
         {
-            // Add gold to player
+            foreach (var weapon in m_PendingWeaponRewards)
+            {
+                InventoryManager.Instance.ObtainWeapon(weapon);
+            }
+            
+            m_PendingWeaponRewards.Clear();
         }
     }
     

@@ -365,6 +365,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public float GetBaseAttackModifier()
     {
+        Debug.Log($"Current Weapon: {m_EquippedWeapon.m_WeaponName}");
         return m_EquippedWeapon.m_BaseAttackModifier;
     }
 

@@ -56,7 +56,7 @@ public class PlayerCharacterData
         return new PlayerCharacterBattleData(m_BaseData, TotalBaseStats, CurrClass, GetWeaponInstanceSO(), IsLord, CurrClass.GetInflictedTokens(this.m_CurrLevel));
     }
 
-    private WeaponInstanceSO GetWeaponInstanceSO()
+    public WeaponInstanceSO GetWeaponInstanceSO()
     {
         if (!m_CurrEquippedWeaponId.HasValue || !InventoryManager.Instance.TryRetrieveWeapon(m_CurrEquippedWeaponId.Value, out WeaponInstanceSO weaponInstanceSO))
             return CurrClass.DefaultWeapon;

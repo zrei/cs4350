@@ -9,7 +9,8 @@ public delegate void Vector3Event(Vector3 _);
 public static class GlobalEvents {
 
     public static class UI {
-
+        public delegate void PartyEvent(List<PlayerCharacterData> _);
+        public static PartyEvent OpenPartyOverviewEvent;
     }
 
     public static class Battle {

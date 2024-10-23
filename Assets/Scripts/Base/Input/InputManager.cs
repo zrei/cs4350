@@ -138,6 +138,7 @@ namespace Game.Input
         public IInput SwitchTabInput => GetInput("SwitchTab");
         public IInput ConfirmActionInput => GetInput("ConfirmAction");
         public IInput CancelActionInput => GetInput("CancelAction");
+        public IInput TogglePartyMenuInput => GetInput("TogglePartyMenuAction");
         #endregion
 
         // Input actions used by Unity's event system input module
