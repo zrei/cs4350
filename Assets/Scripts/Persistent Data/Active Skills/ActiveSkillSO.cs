@@ -25,6 +25,7 @@ public class ActiveSkillSO : ScriptableObject
     [Header("Effects")]
     [Tooltip("Determines what the skill does upon being activated")]
     public SkillEffectType[] m_SkillTypes;
+    public string SkillEffects => string.Empty;
 
     [Space]
     // status
@@ -73,6 +74,7 @@ public class ActiveSkillSO : ScriptableObject
     [Header("Target")]
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetSquares;
+    public string EffectArea => string.Empty;
 
     #region Helpers
     public bool IsAoe => m_TargetSquares.Count > 0;
