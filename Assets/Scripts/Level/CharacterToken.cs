@@ -215,7 +215,7 @@ namespace Level
         }
         
         /// <summary>
-        /// Defeat animation without death, revives afterwards
+        /// Defeat animation without fade away
         /// </summary>
         /// <param name="onComplete"></param>
         public void Defeat(VoidEvent onComplete)
@@ -224,8 +224,6 @@ namespace Level
             IEnumerator DefeatCoroutine()
             {
                 yield return new WaitForSeconds(2f);
-                m_Animator.SetBool(DeathAnimParam, false);
-                yield return new WaitForSeconds(1f);
                 onComplete?.Invoke();
             }
             StartCoroutine(DefeatCoroutine());

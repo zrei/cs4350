@@ -400,7 +400,7 @@ public class BattleManager : Singleton<BattleManager>
         }
 
         m_TurnQueue.Tick();
-        Logger.Log(this.GetType().Name, m_TurnQueue.ToString(), LogLevel.LOG);
+        // Logger.Log(this.GetType().Name, m_TurnQueue.ToString(), LogLevel.LOG);
     }
     #endregion
 }

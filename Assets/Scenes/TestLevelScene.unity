@@ -6535,6 +6535,7 @@ GameObject:
   - component: {fileID: 975374364}
   - component: {fileID: 975374365}
   - component: {fileID: 975374366}
+  - component: {fileID: 975374367}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -6584,6 +6585,63 @@ MonoBehaviour:
   m_LevelSO: {fileID: 11400000, guid: c68e0084b280d40cfacf6bf8f65a3f72, type: 2}
   m_StartNode: {fileID: 9059603446000607190}
   m_GoalNode: {fileID: 1318922018}
+--- !u!114 &975374364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4307351c54a44a4ac3c7f4942ce7064, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CharacterToken: {fileID: 5286906893726745741, guid: db6c6533ba6a249e49bd9617058474a7,
+    type: 3}
+--- !u!114 &975374365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d2e0334f40a465a8a1816e3d8f9eca1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LevelVCam: {fileID: 11458887}
+  m_LevelCameraLookAtTransform: {fileID: 849061321}
+  m_LevelLeftLimitTransform: {fileID: 9059603446000607189}
+  m_LevelRightLimitTransform: {fileID: 1318922017}
+  m_LevelTopLimitTransform: {fileID: 1694366280}
+  m_LevelBottomLimitTransform: {fileID: 273258260}
+--- !u!114 &975374366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
+--- !u!114 &975374367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86bd728000844293977289fa7b50a76b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_TestCharacterData:
   - m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
     m_CurrClassIndex: 0
@@ -6673,51 +6731,7 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
---- !u!114 &975374364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4307351c54a44a4ac3c7f4942ce7064, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_CharacterToken: {fileID: 5286906893726745741, guid: db6c6533ba6a249e49bd9617058474a7,
-    type: 3}
---- !u!114 &975374365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d2e0334f40a465a8a1816e3d8f9eca1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_LevelVCam: {fileID: 11458887}
-  m_LevelCameraLookAtTransform: {fileID: 849061321}
-  m_LevelLeftLimitTransform: {fileID: 9059603446000607189}
-  m_LevelRightLimitTransform: {fileID: 1318922017}
-  m_LevelTopLimitTransform: {fileID: 1694366280}
-  m_LevelBottomLimitTransform: {fileID: 273258260}
---- !u!114 &975374366
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}
+  m_LevelManager: {fileID: 975374359}
 --- !u!1001 &1148106120
 PrefabInstance:
   m_ObjectHideFlags: 0
