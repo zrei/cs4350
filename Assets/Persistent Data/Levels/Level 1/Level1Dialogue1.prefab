@@ -63,7 +63,10 @@ MonoBehaviour:
   onExitState:
     m_PersistentCalls:
       m_Calls: []
-  text: We just left the town... What a glutton.
+  characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
+  characterName: 
+  characterColor: {r: 1, g: 0, b: 0, a: 1}
+  text: We just left the town... What a glutton. (-15<sprite name="Rations" tint>)
   debugTrigger: 0
   options: []
   defaultNextState: {fileID: 0}
@@ -80,7 +83,92 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeChangeAmt: -15
-  moralityChangeAmt: -30
+  moralityChangeAmt: 0
+--- !u!1 &4238048150012490194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 294267782474217562}
+  - component: {fileID: 994132547348094530}
+  - component: {fileID: 5727270512279736050}
+  m_Layer: 7
+  m_Name: Pillage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &294267782474217562
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4238048150012490194}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4286239811993333608}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &994132547348094530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4238048150012490194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ae88b964d30854f855f5f0ea4a82a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onEnterState:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5727270512279736050}
+        m_TargetAssemblyTypeName: Level.DialogueResult, Assembly-CSharp
+        m_MethodName: ApplyResults
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onExitState:
+    m_PersistentCalls:
+      m_Calls: []
+  characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
+  characterName: 
+  characterColor: {r: 1, g: 0, b: 0, a: 1}
+  text: You rob the village of their supplies... (+15<sprite name="Rations" tint>)
+    (-15<sprite name="Morality" tint>)
+  debugTrigger: 0
+  options: []
+  defaultNextState: {fileID: 0}
+--- !u!114 &5727270512279736050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4238048150012490194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeChangeAmt: 15
+  moralityChangeAmt: -15
 --- !u!1 &5324863533857733401
 GameObject:
   m_ObjectHideFlags: 0
@@ -112,6 +200,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4132462743296238948}
+  - {fileID: 294267782474217562}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2578122031409413761
@@ -132,6 +221,9 @@ MonoBehaviour:
   onExitState:
     m_PersistentCalls:
       m_Calls: []
+  characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
+  characterName: 
+  characterColor: {r: 1, g: 1, b: 1, a: 1}
   text: "Looks like the road ahead splits into two. \n\nIf we take the northern route,
     there should be a village where we can stock up on rations.\n\nHowever, the southern
     route can get us to the boss faster."
@@ -139,10 +231,24 @@ MonoBehaviour:
   options:
   - text: Let's go
     nextState: {fileID: 0}
+    conditions: []
+    hideIfConditionsUnmet: 0
+    lockedText: 
     changesMorality: 0
     moralityChange: 0
   - text: I'm hungryyyyy
     nextState: {fileID: 3636274808806051152}
+    conditions: []
+    hideIfConditionsUnmet: 0
+    lockedText: 
     changesMorality: 0
     moralityChange: 0
+  - text: Pillage the village.
+    nextState: {fileID: 994132547348094530}
+    conditions:
+    - {fileID: 11400000, guid: e230ba054f2e382498f9119b217bec23, type: 2}
+    hideIfConditionsUnmet: 0
+    lockedText: '[Requires -<sprite name="Morality">]'
+    changesMorality: 1
+    moralityChange: -15
   defaultNextState: {fileID: 0}
