@@ -15,7 +15,7 @@ namespace Game.UI
             public Color colorMult;
         }
 
-        public List<Tintable> graphics;
+        public List<Tintable> graphics = new();
 
         public override void CrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha, bool useRGB)
         {
@@ -34,7 +34,7 @@ namespace Game.UI
 
         private void UpdateColors()
         {
-            graphics.ForEach(x => x.graphic.color = color * x.colorMult);
+            graphics.ForEach(x => { if (x.graphic != null) x.graphic.color = color * x.colorMult; });
         }
 
         public override void SetVerticesDirty()
