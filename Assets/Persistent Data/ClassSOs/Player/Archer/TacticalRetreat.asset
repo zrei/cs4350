@@ -13,25 +13,29 @@ MonoBehaviour:
   m_Name: TacticalRetreat
   m_EditorClassIdentifier: 
   m_SkillName: Tactical Retreat
-  m_Description: 'Buff self: Increased speed, movement and damage.
+  m_Description: 'Buff self:
 
-    Expires on
-    next skill action or hit taken.'
-  m_Icon: {fileID: 21300000, guid: cbfaf7128a0e9be45a3f9f76b8fbc6e3, type: 3}
+    Speed Up, Movement Up, Critical.'
+  m_Icon: {fileID: -1929982818213864919, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 1
   m_SkillTypes: 01000000
   m_InflictedTokens:
-  - m_TokenTierData: {fileID: 11400000, guid: b4b22915e90839549bb65c8a50eb056c, type: 2}
+  - m_TokenTierData: {fileID: 11400000, guid: 83a815389a0744034b7b6743cdd08642, type: 2}
     m_Tier: 1
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: e978f3b5d68364245bad675bf3841823, type: 2}
+    m_Tier: 2
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: 86099e809049cd94f8cd2a1d3fdf018d, type: 2}
+    m_Tier: 2
     m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
-  m_DelayResponseAnimationTime: 0.2
-  m_AnimationTime: 2
+  m_TeleportTargetRules: []
   m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f584b98fbf82e44fc81ac0ec2cd4a4c8, type: 3}
+  m_Name: SpeedDown
+  m_EditorClassIdentifier: 
+  m_Id: 7
+  m_AllowStack: 1
+  m_TokenName: Speed Down
+  m_Description: Decreased speed until next turn. (10% per tier)
+  m_Icon: {fileID: 6823316075010515700, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_Color: {r: 0, g: 0.5647059, b: 1, a: 1}
+  m_TieredTokens:
+  - {fileID: 11400000, guid: 604f41b9e9302c746bc12178dbc82d2d, type: 2}
+  - {fileID: 11400000, guid: 0c40e3087bde98d4db0ec68429db5c7c, type: 2}
+  - {fileID: 11400000, guid: 47157557fd38a7d4a9e2042eb3598e36, type: 2}
+  m_Consumption: 09000000
+  m_AffectedStats: 06000000

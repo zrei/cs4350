@@ -68,7 +68,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public CoordPair CurrPosition => m_CurrPosition;
 
     protected StatusManager m_StatusManager = new StatusManager();
-    // public IStatusManager StatusManager => m_StatusManager;
+    public IStatusManager StatusManager => m_StatusManager;
     #endregion
 
     #region Static Data
@@ -80,6 +80,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public bool CanSwapTiles => m_Class.m_CanSwapTiles;
     public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
+    public string CharacterName { get; protected set; }
+    public string DisplayName => !string.IsNullOrEmpty(CharacterName) ? $"{CharacterName} / {ClassName}" : ClassName;
     public Sprite Sprite { get; private set; }
 
     public Vector3 GridYOffset { get; private set; }
@@ -185,6 +187,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #region Health and Damage
     public float CurrentHealth => m_CurrHealth;
     public float MaxHealth => GetTotalStat(StatType.HEALTH);
+    public float CurrentHealthProportion => m_CurrHealth / MaxHealth;
 
     public void Heal(float healAmount)
     {
@@ -233,7 +236,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         void FinishMovement()
         {
             moveCoroutine = null;
-            ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
             m_Animator.SetBool(IsMoveAnimParam, false);
             onCompleteMovement?.Invoke();
         }
@@ -363,6 +365,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public float GetBaseAttackModifier()
     {
+        Debug.Log($"Current Weapon: {m_EquippedWeapon.m_WeaponName}");
         return m_EquippedWeapon.m_BaseAttackModifier;
     }
 
@@ -458,6 +461,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #region Mana
     public float CurrentMana => m_CurrMana;
     public float MaxMana => GetTotalStat(StatType.MANA);
+    public float CurrentManaProportion => m_CurrMana / MaxMana;
 
     private void AlterMana(float amount)
     {

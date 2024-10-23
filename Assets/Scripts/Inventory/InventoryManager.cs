@@ -148,4 +148,9 @@ public class InventoryManager : Singleton<InventoryManager>
             return true;
         }
     }
+    
+    public List<WeaponInstance> RetrieveWeaponsOfType(WeaponType weaponType)
+    {
+        return m_Inventory.Values.Where(x => x.m_WeaponInstanceSO.m_WeaponType == weaponType).ToList();
+    }
 }

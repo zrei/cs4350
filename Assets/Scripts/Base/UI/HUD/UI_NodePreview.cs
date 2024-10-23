@@ -73,7 +73,7 @@ public class UI_NodePreview : MonoBehaviour
         }
     }
 
-    private void OnHoverStart(LevelNodeInternal node)
+    private void OnHoverStart(NodeInternal node)
     {
         SetUpGeneralPreviewPanel(node);
         
@@ -107,7 +107,7 @@ public class UI_NodePreview : MonoBehaviour
         m_CurrentPreviewPanel.SetActive(false);
     }
     
-    private void SetUpGeneralPreviewPanel(LevelNodeInternal node)
+    private void SetUpGeneralPreviewPanel(NodeInternal node)
     {
         m_NodeNameText.text = node.NodeInfo.m_NodeName;
         m_DescriptionText.text = node.NodeInfo.m_NodeDescription;

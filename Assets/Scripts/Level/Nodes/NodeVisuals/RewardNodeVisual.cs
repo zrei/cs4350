@@ -5,11 +5,12 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Reward Nodes
 /// </summary>
 [RequireComponent(typeof(RewardNode))]
-public class RewardNodeVisual : LevelNodeVisual
+public class RewardNodeVisual : NodeVisual
 {
     private RewardNode m_RewardNode;
     
-    // Chest token model
+    // Reward token models
+    [SerializeField] private GameObject m_rationToken;
     [SerializeField] private GameObject m_chestToken;
     
     public override void Initialise()
@@ -18,6 +19,12 @@ public class RewardNodeVisual : LevelNodeVisual
         
         if (m_RewardNode.IsGoalNode)
             ToggleStarOn();
+        
+        m_rationToken.SetActive(false);
+        m_chestToken.SetActive(false);
+        
+        if (m_RewardNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_RewardNode.MoralityThreshold);
     }
     
     
@@ -33,7 +40,10 @@ public class RewardNodeVisual : LevelNodeVisual
         else
         {
             SetNodeState(m_RewardNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
-            m_chestToken.SetActive(!m_RewardNode.IsCleared);
+            if (m_RewardNode.RewardType == RewardType.TIME)
+                m_rationToken.SetActive(!m_RewardNode.IsCleared);
+            else if (m_RewardNode.RewardType == RewardType.WEAPON)
+                m_chestToken.SetActive(!m_RewardNode.IsCleared);
         }
     }
 

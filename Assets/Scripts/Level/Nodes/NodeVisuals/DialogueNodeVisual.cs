@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Dialogue Nodes
 /// </summary>
 [RequireComponent(typeof(DialogueNode))]
-public class DialogueNodeVisual : LevelNodeVisual
+public class DialogueNodeVisual : NodeVisual
 {
     private DialogueNode m_DialogueNode;
     
@@ -17,6 +17,9 @@ public class DialogueNodeVisual : LevelNodeVisual
         
         if (m_DialogueNode.IsGoalNode)
             ToggleStarOn();
+        
+        if (m_DialogueNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_DialogueNode.MoralityThreshold);
     }
 
     #region Graphics

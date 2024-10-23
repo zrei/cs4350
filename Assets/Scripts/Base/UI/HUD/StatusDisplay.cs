@@ -41,9 +41,11 @@ namespace Game.UI
                     trackedStatusManager.OnRemove -= OnRemove;
                     trackedStatusManager.OnChange -= OnChange;
 
-                    foreach (var status in activeDisplays.Keys)
+                    if (activeDisplays.Count > 0)
                     {
-                        OnRemove(status);
+                        var displays = new List<IndividualStatusDisplay>(activeDisplays.Values);
+                        activeDisplays.Clear();
+                        displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
                     }
                 }
                 trackedStatusManager = value;
@@ -55,7 +57,7 @@ namespace Game.UI
 
                     foreach (var status in trackedStatusManager.TokenStacks)
                     {
-                        //OnAdd(status);
+                        OnAdd(status);
                     }
                     foreach (var status in trackedStatusManager.StatusEffects)
                     {
@@ -70,7 +72,7 @@ namespace Game.UI
         {
             displayPool = new(
                 createFunc: () => Instantiate(individualStatusDisplayPrefab, layout.transform),
-                actionOnGet: display => display.gameObject.SetActive(true),
+                actionOnGet: display => { display.gameObject.SetActive(true); display.transform.SetAsFirstSibling(); },
                 actionOnRelease: display => display.gameObject.SetActive(false),
                 actionOnDestroy: display => Destroy(display.gameObject),
                 collectionCheck: true,
@@ -87,12 +89,11 @@ namespace Game.UI
         public void OnAdd(IStatus status)
         {
             if (displayPool.CountActive >= MaxDisplays) return;
+            if (activeDisplays.ContainsKey(status)) return;
 
-            IndividualStatusDisplay display;
-            if (activeDisplays.TryAdd(status, display = displayPool.Get()))
-            {
-                display.TrackedStatus = status;
-            }
+            var display = displayPool.Get();
+            display.TrackedStatus = status;
+            activeDisplays.Add(status, display);
         }
 
         public void OnRemove(IStatus status)

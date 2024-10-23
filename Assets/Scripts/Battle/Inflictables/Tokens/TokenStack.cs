@@ -1,10 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// An instance, in-battle, of a stack of tokens coming from the same group
 /// </summary>
-public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICritModifier
+public class TokenStack :
+    IFlatStatChange,
+    IMultStatChange,
+    IInflictStatus,
+    ICritModifier,
+    IStatus
 {
     #region Details
     private TokenTierSO m_TokenTierData;
@@ -21,6 +27,29 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
     
     #region State
     public virtual bool IsEmpty => m_NumTokensOfEachTier.All(x => x <= 0);
+    #endregion
+
+    #region IStatus
+    public Sprite Icon => m_TokenTierData.m_Icon;
+    public Color Color => m_TokenTierData.m_Color;
+    public string DisplayTier => m_NumTiers == 1 ? string.Empty : TokenUtil.NumToRomanNumeral(GetMaxTier());
+    public string DisplayStacks
+    {
+        get
+        {
+            var tierIndex = GetMaxTier() - 1;
+            if (tierIndex < 0 || tierIndex >= m_NumTiers)
+            {
+                return string.Empty;
+            }
+
+            return $"<size=50%>x</size>{m_NumTokensOfEachTier[tierIndex]}<sprite name=\"Stack\">";
+        }
+    }
+    public string Name => m_TokenTierData.m_TokenName;
+    public string Description => m_TokenTierData.m_Description;
+    public List<int> NumStacksPerTier => m_NumTokensOfEachTier;
+    public int CurrentHighestTier => GetMaxTier();
     #endregion
 
     public TokenStack(TokenTierSO tokenTier, int initialTier, int initialNumber = 1)
@@ -88,7 +117,7 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
         if (TokenType == TokenType.MULT_STAT_CHANGE)
         {
             MultStatChangeTokenTierSO mult = (MultStatChangeTokenTierSO) m_TokenTierData;
-            if (mult.m_AffectedStat != statType)
+            if (!mult.m_AffectedStats.Contains(statType))
             {
                 return 1f;
             }
@@ -108,7 +137,7 @@ public class TokenStack : IFlatStatChange, IMultStatChange, IInflictStatus, ICri
         if (TokenType == TokenType.FLAT_STAT_CHANGE)
         {
             FlatStatChangeTokenTierSO flat = (FlatStatChangeTokenTierSO) m_TokenTierData;
-            if (flat.m_AffectedStat != statType)
+            if (!flat.m_AffectedStats.Contains(statType))
             {
                 return 0f;
             }

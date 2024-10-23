@@ -6,11 +6,11 @@ using UnityEngine;
 /// </summary>
 public class EdgeInternal : MonoBehaviour
 {
-    [SerializeField] private LevelNodeInternal nodeInternalA;
-    public LevelNodeInternal NodeInternalA => nodeInternalA;
+    [SerializeField] private NodeInternal nodeInternalA;
+    public NodeInternal NodeInternalA => nodeInternalA;
     
-    [SerializeField] private LevelNodeInternal nodeInternalB;
-    public LevelNodeInternal NodeInternalB => nodeInternalB;
+    [SerializeField] private NodeInternal nodeInternalB;
+    public NodeInternal NodeInternalB => nodeInternalB;
     
     [SerializeField] private float m_Cost;
     public float Cost => m_Cost;

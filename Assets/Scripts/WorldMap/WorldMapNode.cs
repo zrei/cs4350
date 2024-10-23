@@ -10,6 +10,7 @@ public enum LevelState
 public class WorldMapNode : MonoBehaviour
 {
     [SerializeField] LevelInfo m_LevelInfo;
+    [SerializeField] Transform m_CharacterPosition;
 
     // set during initialisation
     private LevelState m_LevelState;
@@ -34,4 +35,9 @@ public class WorldMapNode : MonoBehaviour
         // do stuff depending on state
     }
     // move through selection or just next and previous?
+
+    public void PlacePlayerToken(CharacterToken characterToken)
+    {
+        characterToken.transform.position = m_CharacterPosition.transform.position;
+    }
 }

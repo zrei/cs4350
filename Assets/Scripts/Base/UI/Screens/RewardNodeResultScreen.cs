@@ -24,11 +24,17 @@ namespace Game.UI
         
         private void OnRewardNodeStart(RewardNode rewardNode)
         {
-            var rationReward = rewardNode.RationReward;
+            if (rewardNode.RewardType == RewardType.TIME)
+            {
+                var rationReward = rewardNode.RationReward;
+                m_ResultText.text = $"Gained {rationReward} rations!";
+            }
+            else if (rewardNode.RewardType == RewardType.WEAPON)
+            {
+                var weaponReward = rewardNode.WeaponReward;
+                m_ResultText.text = $"Gained {weaponReward.m_WeaponName}!";
+            }
         
-            m_ResultText.text = $"Gained {rationReward} rations!";
-        
-            // m_RewardPanel.SetActive(true);
             m_ReturnButton.onClick.AddListener(CloseResults);
         }
     

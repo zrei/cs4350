@@ -127,15 +127,16 @@ public class GridLogic : MonoBehaviour
             {
                 var tileVisual = m_TileVisuals[r, c];
                 var isAttackable = skill.IsValidTargetTile(tileVisual.Coordinates, currentUnit, m_GridType);
-                var isAttackerRange = isSameSideAsAttacker && hasAttackerLimitations && skill.IsValidAttackerTile(tileVisual.Coordinates);
+                var isAttackerOutOfPosition = isSameSideAsAttacker && hasAttackerLimitations && !skill.IsValidAttackerTile(tileVisual.Coordinates);
                 if (isAttackable)
                 {
                     tileVisual.selectable.interactable = isAttackerValid;
                     tileVisual.SetTileState(TileState.ATTACKABLE);
                 }
-                else if (isAttackerRange)
+                
+                if (isAttackerOutOfPosition)
                 {
-                    tileVisual.ToggleAttackForecast(true);
+                    tileVisual.ToggleSkillCastBlocked(true);
                 }
             }
         }
@@ -308,6 +309,17 @@ public class GridLogic : MonoBehaviour
     {
         return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.CanSwapTiles, unit.TraversableTileTypes);
     }
+
+    public void TryReachTile(Unit unit, CoordPair destination, VoidEvent onCompleteMovement)
+    {
+        if (!Pathfinder.TryPathfind(MapData, unit.CurrPosition, destination, out PathNode pathNode, unit.TraversableTileTypes))
+        {
+            onCompleteMovement?.Invoke();
+            return;
+        }
+
+        MoveUnit(unit, pathNode, onCompleteMovement);
+    }
     #endregion
 
     #region Unit
@@ -323,15 +335,35 @@ public class GridLogic : MonoBehaviour
 
     public void MoveUnit(Unit unit, PathNode endPathNode, VoidEvent onCompleteMovement)
     {
+        int movementRange = (int) unit.GetTotalStat(StatType.MOVEMENT_RANGE);
+        PathNode finalPathNode = endPathNode;
+
+        // calculate the final path node along the desired path that the unit
+        // can actually reach with their current movement range
+        int count = 0;
+        PathNode pointer = endPathNode;
+        while (pointer != null)
+        {
+            if (count == movementRange + 1)
+            {
+                finalPathNode = finalPathNode.m_Parent;
+            }
+            else
+            {
+                ++count;
+            }
+            pointer = pointer.m_Parent;
+        }
+
         CoordPair start = unit.CurrPosition;
-        CoordPair end = endPathNode.m_Coordinates;
+        CoordPair end = finalPathNode.m_Coordinates;
 
         if (m_TileData[start.m_Row, start.m_Col].m_CurrUnit != unit)
         {
             Logger.Log(this.GetType().Name, "Unit stored in the tile data is not the same as unit to be moved", LogLevel.ERROR);
         }
 
-        Stack<Vector3> movementCheckpoints = GetPathPositions(endPathNode);
+        Stack<Vector3> movementCheckpoints = GetPathPositions(finalPathNode);
         
         m_TileData[start.m_Row, start.m_Col].m_CurrUnit = m_TileData[end.m_Row, end.m_Col].m_CurrUnit;
         m_TileData[start.m_Row, start.m_Col].m_IsOccupied = m_TileData[start.m_Row, start.m_Col].m_CurrUnit != null;
@@ -377,6 +409,53 @@ public class GridLogic : MonoBehaviour
     private bool IsTileOccupied(CoordPair tile)
     {
         return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
+    }
+
+    // assumes that tile is filled
+    public Unit GetUnitAtTile(CoordPair tile)
+    {   
+        return m_TileData[tile.m_Row, tile.m_Col].m_CurrUnit;
+    }
+
+    // will return false if there is no unit
+    public bool HasAnyUnitWithHealthThreshold(Threshold threshold, bool isFlat)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied && threshold.IsSatisfied(isFlat ? m_TileData[r, c].m_CurrUnit.CurrentHealth : m_TileData[r, c].m_CurrUnit.CurrentHealthProportion))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // will return false if there is no unit
+    public bool HasAnyUnitWithManaThreshold(Threshold threshold, bool isFlat)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied && threshold.IsSatisfied(isFlat ? m_TileData[r, c].m_CurrUnit.CurrentMana : m_TileData[r, c].m_CurrUnit.CurrentManaProportion))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public bool HasAnyUnitWithToken(TokenType tokenType)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied && m_TileData[r, c].m_CurrUnit.HasToken(tokenType))
+                    return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
@@ -430,6 +509,60 @@ public class GridLogic : MonoBehaviour
             targetTiles.Add(coordPair);
         }
         return targetTiles;
+    }
+
+    public int GetNumberOfUnitsTargeted(ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        int numUnits = 0;
+
+        foreach (CoordPair tile in GetInBoundsTargetTiles(activeSkillSO, targetTile))
+        {
+            if (IsTileOccupied(tile))
+                ++numUnits;
+        }
+
+        return numUnits;
+    }
+
+    public float GetDamageDoneBySkill(Unit unit, ActiveSkillSO activeSkillSO, CoordPair targetTile)
+    {
+        float totalDamage = 0f;
+
+        foreach (CoordPair tile in GetInBoundsTargetTiles(activeSkillSO, targetTile))
+        {
+            if (IsTileOccupied(tile))
+                totalDamage += DamageCalc.CalculateDamage(unit, m_TileData[tile.m_Row, tile.m_Col].m_CurrUnit, activeSkillSO);
+        }
+
+        return totalDamage;
+    }
+
+    public int GetNumberOfUnitsOnGrid()
+    {
+        int numUnits = 0;
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (m_TileData[r, c].m_IsOccupied)
+                    ++numUnits;
+            }
+        }
+        return numUnits;
+    }
+
+    public IEnumerable<CoordPair> GetUnoccupiedTiles()
+    {
+        List<CoordPair> tiles = new();
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                if (!m_TileData[r, c].m_IsOccupied)
+                    tiles.Add(new CoordPair(r, c));
+            }
+        }
+        return tiles;
     }
     #endregion
 

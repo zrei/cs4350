@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Battle Nodes
 /// </summary>
 [RequireComponent(typeof(BattleNode))]
-public class BattleNodeVisual : LevelNodeVisual
+public class BattleNodeVisual : NodeVisual
 {
     [Header("Tokens")]
     [SerializeField] CharacterToken m_CharacterToken;
@@ -25,6 +25,9 @@ public class BattleNodeVisual : LevelNodeVisual
         
         if (m_BattleNode.IsGoalNode)
             ToggleStarOn();
+        
+        if (m_BattleNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_BattleNode.MoralityThreshold);
         
         var enemyUnitData = m_BattleNode.BattleSO.m_EnemyUnitsToSpawn[0].m_EnemyCharacterData;
         
