@@ -16,8 +16,9 @@ public class GameSceneManager : Singleton<GameSceneManager>
     private static readonly int End = Animator.StringToHash("End");
     
     const int BATTLE_SCENE_INDEX = 1;
+    
+    // Respective level scenes indexes will accessed by adding the level id to the level 1 value
     const int LEVEL_1_SCENE_INDEX = 2;
-    const int LEVEL_2_SCENE_INDEX = 2;
     
     private VoidEvent m_OnSceneChange;
     private VoidEvent m_AfterSceneChange;
@@ -36,7 +37,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
     public void LoadLevelScene(int levelId, List<PlayerCharacterData> partyMembers)
     {
         LevelManager.OnReady += OnLevelManagerReady;
-        var sceneIndex = levelId == 0 ? LEVEL_1_SCENE_INDEX : LEVEL_2_SCENE_INDEX;
+        var sceneIndex = LEVEL_1_SCENE_INDEX + levelId;
         StartCoroutine(LoadAdditiveSceneWithTransition(sceneIndex));
         return;
         
@@ -54,7 +55,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
         m_AfterSceneChange = () => GlobalEvents.Level.ReturnFromLevelEvent?.Invoke();
         
         // Unload the level scene
-        var sceneIndex = levelId == 0 ? LEVEL_1_SCENE_INDEX : LEVEL_2_SCENE_INDEX;
+        var sceneIndex = LEVEL_1_SCENE_INDEX + levelId;
         StartCoroutine(UnloadAdditiveSceneWithTransition(sceneIndex));
     }
 
