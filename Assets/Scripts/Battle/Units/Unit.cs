@@ -1,3 +1,4 @@
+using Game.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -197,6 +198,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         var change = value - m_CurrHealth;
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, m_CurrHealth, max);
+
+        DamageDisplayManager.Instance?.ShowDamage($"<color=#22fe22>{change:F1}", transform);
     }
 
     void IHealth.SetHealth(float health)
@@ -214,6 +217,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         var change = value - m_CurrHealth;
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, value, MaxHealth);
+
+        DamageDisplayManager.Instance?.ShowDamage($"<color=#fe2222>{change:F1}", transform);
     }
 
     public event TrackedValueEvent OnHealthChange;
@@ -426,6 +431,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void InflictStatus(StatusEffect statusEffect)
     {
         m_StatusManager.AddEffect(statusEffect);
+        DamageDisplayManager.Instance?.ShowDamage($"<color=#{ColorUtility.ToHtmlStringRGB(statusEffect.Color)}><sprite name=\"{statusEffect.Icon.name}\" tint>", transform);
     }
 
     public void InflictStatus(List<StatusEffect> statusEffects)
@@ -449,6 +455,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void InflictToken(InflictedToken token, Unit inflicter)
     {
         m_StatusManager.AddToken(token, inflicter);
+        DamageDisplayManager.Instance?.ShowDamage($"<color=#{ColorUtility.ToHtmlStringRGB(token.m_TokenTierData.m_Color)}><sprite name=\"{token.m_TokenTierData.m_Icon.name}\" tint>", transform);
     }
 
     public void InflictTokens(List<InflictedToken> tokens, Unit inflicter)
@@ -556,64 +563,71 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
         GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
 
-        bool isOpposingSideTarget = attackSO.IsOpposingSideTarget;
+        AnimationEventHandler.onSkillHit += OnSkillHit;
 
-        foreach (Unit target in targets)
+        void OnSkillHit()
         {
-            // completely evade the effects // TODO: This does not handle animations
-            if (isOpposingSideTarget && target.CanEvade())
-            {
-                target.ConsumeTokens(TokenType.EVADE);
-                continue;
-            }
+            AnimationEventHandler.onSkillHit -= OnSkillHit;
 
-            if (attackSO.DealsDamage)
-            {
-                float damage = DamageCalc.CalculateDamage(this, target, attackSO);
-                dealtDamage += damage;
-                target.TakeDamage(damage);
+            bool isOpposingSideTarget = attackSO.IsOpposingSideTarget;
 
-                if (target.HasReflect())
+            foreach (Unit target in targets)
+            {
+                // completely evade the effects // TODO: This does not handle animations
+                if (isOpposingSideTarget && target.CanEvade())
                 {
-                    TakeDamage(damage * target.GetReflectProportion());
+                    target.ConsumeTokens(TokenType.EVADE);
+                    continue;
                 }
-                target.ConsumeTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
+
+                if (attackSO.DealsDamage)
+                {
+                    float damage = DamageCalc.CalculateDamage(this, target, attackSO);
+                    dealtDamage += damage;
+                    target.TakeDamage(damage);
+
+                    if (target.HasReflect())
+                    {
+                        TakeDamage(damage * target.GetReflectProportion());
+                    }
+                    target.ConsumeTokens(attackSO.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
+                }
+
+                if (attackSO.IsHeal)
+                {
+                    target.Heal(DamageCalc.CalculateHealAmount(this, attackSO));
+                }
+
+                if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
+                {
+                    target.AlterMana(this.GetTotalStat(StatType.MAG_ATTACK) * attackSO.m_ManaAlterProportion);
+                }
+
+                if (!target.IsDead)
+                {
+                    target.InflictStatus(inflictedStatusEffects);
+                    target.InflictTokens(inflictedTokens, this);
+                }
             }
-            
-            if (attackSO.IsHeal)
+
+            if (!IsDead)
             {
-                target.Heal(DamageCalc.CalculateHealAmount(this, attackSO));
+                AlterMana(-attackSO.m_ConsumedMana);
+
+                if (attackSO.DealsDamage && HasToken(TokenType.LIFESTEAL))
+                    Heal(GetLifestealProportion() * dealtDamage);
+
+                if (attackSO.IsMagicAttack)
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
+                else if (attackSO.IsPhysicalAttack)
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK);
+
+                if (attackSO.IsHeal)
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_HEAL);
+
+                if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_MANA_ALTER);
             }
-
-            if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
-            {
-                target.AlterMana(this.GetTotalStat(StatType.MAG_ATTACK) * attackSO.m_ManaAlterProportion);
-            }
-            
-            if (!target.IsDead)
-            {
-                target.InflictStatus(inflictedStatusEffects);
-                target.InflictTokens(inflictedTokens, this);
-            }
-        }
-
-        if (!IsDead)
-        {
-            AlterMana(-attackSO.m_ConsumedMana);
-
-            if (attackSO.DealsDamage && HasToken(TokenType.LIFESTEAL))
-                Heal(GetLifestealProportion() * dealtDamage);
-
-            if (attackSO.IsMagicAttack)
-                ConsumeTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
-            else if (attackSO.IsPhysicalAttack)
-                ConsumeTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK);
-
-            if (attackSO.IsHeal)
-                ConsumeTokens(TokenConsumptionType.CONSUME_ON_HEAL);
-            
-            if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
-                ConsumeTokens(TokenConsumptionType.CONSUME_ON_MANA_ALTER);
         }
 
         void CompleteAttackAnimationEvent()

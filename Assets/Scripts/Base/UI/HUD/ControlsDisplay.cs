@@ -14,6 +14,9 @@ namespace Game.UI
             GlobalEvents.Scene.LevelSceneLoadedEvent += ShowLevelControls;
             GlobalEvents.Scene.BattleSceneLoadedEvent += ShowBattleControls;
             GlobalEvents.Battle.ReturnFromBattleEvent += ShowLevelControls;
+            GlobalEvents.Level.ReturnFromLevelEvent += Hide;
+            
+            Hide();
         }
         
         private void OnDestroy()
@@ -21,6 +24,7 @@ namespace Game.UI
             GlobalEvents.Scene.LevelSceneLoadedEvent -= ShowLevelControls;
             GlobalEvents.Scene.BattleSceneLoadedEvent -= ShowBattleControls;
             GlobalEvents.Battle.ReturnFromBattleEvent -= ShowLevelControls;
+            GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
         }
 
         private void ShowLevelControls()

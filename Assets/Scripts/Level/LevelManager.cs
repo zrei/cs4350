@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game;
@@ -5,6 +6,7 @@ using Game.Input;
 using Game.UI;
 using Level;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum PlayerLevelSelectionState
 {
@@ -44,10 +46,6 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private NodeInternal m_StartNode;
     [SerializeField] private NodeInternal m_GoalNode;
     
-    [Header("Test Data")]
-    // should be sent in in the future
-    [SerializeField] private List<PlayerCharacterData> m_TestCharacterData;
-    
     // UI
     IUIScreen m_CharacterManagementScreen;
     IUIScreen m_BattleNodeResultScreen;
@@ -55,7 +53,12 @@ public class LevelManager : MonoBehaviour
     IUIScreen m_LevelUpResultScreen;
     IUIScreen m_LevelResultScreen;
 
+    public delegate void LevelManagerEvent(LevelManager levelManager);
+    public static LevelManagerEvent OnReady;
+
     #region Current State
+    
+    private List<PlayerCharacterData> m_CurrParty;
     
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
@@ -71,49 +74,17 @@ public class LevelManager : MonoBehaviour
     private bool m_HasHitNode;
     
     #endregion
-
-    #region Test
-    
-    public void Start()
-    {
-        Initialise();
-        
-        StartPlayerPhase();
-        
-        CameraManager.Instance.SetUpLevelCamera();
-        
-        GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
-    }
-
-    public void OnDisable()
-    {
-        if (InputManager.Instance)
-        {
-            DisableLevelGraphInput();
-        }
-        
-        RemoveNodeEventCallbacks();
-    }
-    
-    public void DisplayMovableNodes()
-    {
-        var movableNodes = m_LevelNodeManager.GetCurrentMovableNodes();
-        
-        m_LevelNodeVisualManager.ClearMovableNodes();
-        m_LevelNodeVisualManager.DisplayMovableNodes(movableNodes);
-    }
-
-    #endregion
     
     #region Initialisation
 
-    public void Initialise()
+    private void Start()
     {
-        for (int i = 0; i < m_TestCharacterData.Count; i++)
-        {
-            m_TestCharacterData[i].m_CurrStats = m_TestCharacterData[i].m_BaseData.m_StartingStats;
-            m_TestCharacterData[i].m_CurrClassIndex = m_TestCharacterData[i].m_BaseData.m_PathGroup.GetDefaultClassIndex();
-        }
+        OnReady?.Invoke(this);
+    }
+
+    public void Initialise(List<PlayerCharacterData> partyMembers)
+    {
+        m_CurrParty = partyMembers;
 
         var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
@@ -130,7 +101,7 @@ public class LevelManager : MonoBehaviour
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         
         // Initialise the player token
-        m_LevelTokenManager.Initialise(m_TestCharacterData[0].GetBattleData(), 
+        m_LevelTokenManager.Initialise(m_CurrParty[0].GetBattleData(), 
             m_LevelNodeVisualManager.GetNodeVisual(m_StartNode));
         
         Debug.Log(m_LevelCameraController);
@@ -148,6 +119,12 @@ public class LevelManager : MonoBehaviour
         m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
         m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
         m_LevelResultScreen = UIScreenManager.Instance.LevelResultScreen;
+        
+        CameraManager.Instance.SetUpLevelCamera();
+        
+        GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
+        
+        StartPlayerPhase();
     }
     
     #endregion
@@ -158,7 +135,9 @@ public class LevelManager : MonoBehaviour
     {
         if (m_LevelNodeManager.IsGoalNodeCleared())
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(LevelResultType.SUCCESS);
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.SUCCESS);
+            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
+            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
         }
         else
         {
@@ -173,6 +152,14 @@ public class LevelManager : MonoBehaviour
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
         m_LevelCameraController.RecenterCamera();
+    }
+    
+    public void DisplayMovableNodes()
+    {
+        var movableNodes = m_LevelNodeManager.GetCurrentMovableNodes();
+        
+        m_LevelNodeVisualManager.ClearMovableNodes();
+        m_LevelNodeVisualManager.DisplayMovableNodes(movableNodes);
     }
 
     #endregion
@@ -200,7 +187,7 @@ public class LevelManager : MonoBehaviour
         if (!UIScreenManager.Instance.IsScreenOpen(m_CharacterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_TestCharacterData);
+            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_CurrParty);
             UIScreenManager.Instance.OpenScreen(m_CharacterManagementScreen);
         }
         else if (UIScreenManager.Instance.IsScreenActive(m_CharacterManagementScreen))
@@ -367,6 +354,16 @@ public class LevelManager : MonoBehaviour
 
     #region Callbacks
     
+    public void OnDisable()
+    {
+        if (InputManager.Instance)
+        {
+            DisableLevelGraphInput();
+        }
+        
+        RemoveNodeEventCallbacks();
+    }
+    
     private void AddNodeEventCallbacks()
     {
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
@@ -389,7 +386,7 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("LevelManager: Starting Battle Node");
         
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_TestCharacterData.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
@@ -400,25 +397,22 @@ public class LevelManager : MonoBehaviour
         
         if (victor == UnitAllegiance.PLAYER)
         {
-            m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnAnimComplete);
+            m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnSuccessAnimComplete);
         }
         else
         {
-            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnAnimComplete);
+            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete);
         }
         
         return;
 
-        void OnAnimComplete()
+        void OnSuccessAnimComplete()
         {
-            if (victor == UnitAllegiance.PLAYER)
-            {
-                m_LevelNodeManager.ClearCurrentNode();
-            
-                // Add exp reward to pending rewards
-                m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
-                                                  + battleNode.BattleSO.m_ExpReward;
-            }
+            m_LevelNodeManager.ClearCurrentNode();
+        
+            // Add exp reward to pending rewards
+            m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
+                                              + battleNode.BattleSO.m_ExpReward;
             
             // Add time cost to pending rewards
             m_PendingRewards[RewardType.TIME] = m_PendingRewards.GetValueOrDefault(RewardType.TIME, 0) 
@@ -427,6 +421,11 @@ public class LevelManager : MonoBehaviour
             UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
             
             GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+        }
+
+        void OnFailureAnimComplete()
+        {
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.DEFEAT);
         }
     }
     
@@ -480,7 +479,7 @@ public class LevelManager : MonoBehaviour
         StartPlayerPhase();
     }
 
-    private void OnLevelEnd(LevelResultType result)
+    private void OnLevelEnd(int levelId, LevelResultType result)
     {
         UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
     }
@@ -547,7 +546,7 @@ public class LevelManager : MonoBehaviour
         levelledUpCharacters = new List<LevelUpSummary>();
             
         // Add exp points to each character
-        foreach (var characterData in m_TestCharacterData)
+        foreach (var characterData in m_CurrParty)
         {
             var initialLevel = characterData.m_CurrLevel;
                 

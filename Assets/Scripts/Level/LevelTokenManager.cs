@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Level;
 using UnityEngine;
@@ -115,7 +116,12 @@ public class LevelTokenManager : MonoBehaviour
             onComplete?.Invoke();
         }
     }
-    
+
+    private void OnDestroy()
+    {
+        Destroy(m_PlayerUnitToken);
+    }
+
     #endregion
 
 }

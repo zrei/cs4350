@@ -16,6 +16,8 @@ namespace Game.UI
     {
         [SerializeField] TextMeshProUGUI m_ResultText;
         [SerializeField] Button m_ReturnButton;
+        
+        private int currentLevelId;
 
         public override void Initialize()
         {
@@ -28,7 +30,7 @@ namespace Game.UI
             GlobalEvents.Level.LevelEndEvent -= OnLevelEnd;
         }
         
-        private void OnLevelEnd(LevelResultType result)
+        private void OnLevelEnd(int levelId, LevelResultType result)
         {
             m_ResultText.text = result switch
             {
@@ -38,14 +40,15 @@ namespace Game.UI
                 _ => "???"
             };
 
+            currentLevelId = levelId;
             m_ReturnButton.onClick.AddListener(ReturnFromLevel);
         }
         
         public void ReturnFromLevel()
         {
             UIScreenManager.Instance.CloseScreen();
-            GlobalEvents.Level.ReturnFromLevelEvent?.Invoke();
             m_ReturnButton.onClick.RemoveListener(ReturnFromLevel);
+            GameSceneManager.Instance.UnloadLevelScene(currentLevelId);
         }
         
         public override void ScreenUpdate()

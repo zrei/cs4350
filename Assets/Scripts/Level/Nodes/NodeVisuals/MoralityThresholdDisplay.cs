@@ -25,13 +25,13 @@ namespace Level.Nodes.NodeVisuals
             
             if (threshold.m_GreaterThan)
             {
-                m_MoralityThresholdText.text = $">{thresholdValue}";
-                m_MoralityThresholdText.color = Color.blue;
+                m_MoralityThresholdText.text = $">{thresholdValue}<sprite name=\"Morality\" tint>";
+                m_MoralityThresholdText.color = GOOD_COLOR;
             }
             else
             {
-                m_MoralityThresholdText.text = $"<{thresholdValue}";
-                m_MoralityThresholdText.color = Color.red;
+                m_MoralityThresholdText.text = $"<{thresholdValue}<sprite name=\"Morality\" tint>";
+                m_MoralityThresholdText.color = BAD_COLOR;
             }
         }
 
