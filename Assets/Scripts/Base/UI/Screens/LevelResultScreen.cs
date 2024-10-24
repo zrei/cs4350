@@ -1,3 +1,4 @@
+using System.Text;
 using Game.Input;
 using TMPro;
 using UnityEngine;
@@ -14,8 +15,13 @@ namespace Game.UI
 {
     public class LevelResultScreen : BaseUIScreen
     {
+        [SerializeField] GameObject m_ResultPanel;
         [SerializeField] TextMeshProUGUI m_ResultText;
         [SerializeField] Button m_ReturnButton;
+        
+        [SerializeField] GameObject m_RewardsPanel;
+        [SerializeField] TextMeshProUGUI m_RewardsText;
+        [SerializeField] Button m_RewardsReturnButton;
         
         private int currentLevelId;
 
@@ -30,7 +36,7 @@ namespace Game.UI
             GlobalEvents.Level.LevelEndEvent -= OnLevelEnd;
         }
         
-        private void OnLevelEnd(int levelId, LevelResultType result)
+        private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
         {
             m_ResultText.text = result switch
             {
@@ -40,14 +46,48 @@ namespace Game.UI
                 _ => "???"
             };
 
-            currentLevelId = levelId;
-            m_ReturnButton.onClick.AddListener(ReturnFromLevel);
+            currentLevelId = levelSo.m_LevelId;
+            
+            bool hasRewards = levelSo.m_RewardCharacters.Count > 0 || levelSo.m_RewardWeapons.Count > 0;
+            if (result == LevelResultType.SUCCESS && hasRewards)
+                m_ReturnButton.onClick.AddListener(ShowRewards);
+            else
+                m_ReturnButton.onClick.AddListener(ReturnFromLevel);
+            
+            m_ResultPanel.SetActive(true);
+            m_RewardsPanel.SetActive(false);
+
+            return;
+            
+            void ShowRewards()
+            {
+                m_ResultPanel.SetActive(false);
+
+                var builder = new StringBuilder();
+                foreach (var rewardChar in levelSo.m_RewardCharacters)
+                {
+                    builder.AppendLine($"{rewardChar.m_CharacterName} has joined your party!");
+                }
+                
+                builder.AppendLine();
+                
+                foreach (var rewardWeapon in levelSo.m_RewardWeapons)
+                {
+                    builder.AppendLine($"Gained {rewardWeapon.m_WeaponName}!");
+                }
+
+                m_RewardsText.text = builder.ToString();
+                m_RewardsReturnButton.onClick.AddListener(ReturnFromLevel);
+                m_RewardsPanel.SetActive(true);
+            }
         }
         
-        public void ReturnFromLevel()
+        private void ReturnFromLevel()
         {
-            UIScreenManager.Instance.CloseScreen();
             m_ReturnButton.onClick.RemoveListener(ReturnFromLevel);
+            m_RewardsReturnButton.onClick.RemoveListener(ReturnFromLevel);
+            
+            UIScreenManager.Instance.CloseScreen();
             GameSceneManager.Instance.UnloadLevelScene(currentLevelId);
         }
         
