@@ -1688,6 +1688,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4231029485781734450}
   - component: {fileID: 5133202122932937425}
+  - component: {fileID: 6606803327731080595}
   - component: {fileID: 4063756034201118342}
   - component: {fileID: 1713038174281128022}
   m_Layer: 5
@@ -1729,6 +1730,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   root: {fileID: 4231029485781734450}
+--- !u!114 &6606803327731080595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6431375138487571276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 083c947b8b84d35419b5fecaa6aac376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageDisplayPrefab: {fileID: 619602753397399138, guid: 95b9c8b55cb97234a8ab47efb95e4aaa,
+    type: 3}
 --- !u!223 &4063756034201118342
 Canvas:
   m_ObjectHideFlags: 0
@@ -2846,17 +2861,17 @@ PrefabInstance:
     - target: {fileID: 575862453054668510, guid: e620ff2a92f3742c794d41e4f2f08be3,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 575862453054668510, guid: e620ff2a92f3742c794d41e4f2f08be3,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.8
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 575862453054668510, guid: e620ff2a92f3742c794d41e4f2f08be3,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.8
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 575862453054668510, guid: e620ff2a92f3742c794d41e4f2f08be3,
         type: 3}
@@ -2871,7 +2886,7 @@ PrefabInstance:
     - target: {fileID: 575862453054668510, guid: e620ff2a92f3742c794d41e4f2f08be3,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.008548737
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 575862453054668510, guid: e620ff2a92f3742c794d41e4f2f08be3,
         type: 3}
