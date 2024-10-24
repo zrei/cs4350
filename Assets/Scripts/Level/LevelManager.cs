@@ -135,9 +135,7 @@ public class LevelManager : MonoBehaviour
     {
         if (m_LevelNodeManager.IsGoalNodeCleared())
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.SUCCESS);
-            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
-            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO, LevelResultType.SUCCESS);
         }
         else
         {
@@ -379,7 +377,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
         GlobalEvents.Level.DialogueNodeEndEvent -= OnDialogueNodeEnd;
-        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
+        GlobalEvents.Level.LevelEndEvent -= OnLevelEnd;
     }
 
     private void OnBattleNodeStart(BattleNode battleNode)
@@ -425,7 +423,7 @@ public class LevelManager : MonoBehaviour
 
         void OnFailureAnimComplete()
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.DEFEAT);
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO, LevelResultType.DEFEAT);
         }
     }
     
@@ -479,9 +477,24 @@ public class LevelManager : MonoBehaviour
         StartPlayerPhase();
     }
 
-    private void OnLevelEnd(int levelId, LevelResultType result)
+    private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
     {
         UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
+
+        if (result == LevelResultType.SUCCESS)
+        {
+            Debug.Log("Receiving Reward Characters");
+            CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
+            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
+            
+            foreach (var weaponReward in levelSo.m_RewardWeapons)
+            {
+                InventoryManager.Instance.ObtainWeapon(weaponReward);
+            }
+            InventoryManager.Instance.SaveWeapons();
+            
+            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
+        }
     }
     
     #endregion
