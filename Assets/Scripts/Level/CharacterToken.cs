@@ -76,6 +76,8 @@ namespace Level
             EquippingArmor equipArmor = m_TokenModel.GetComponent<EquippingArmor>();
             equipArmor.Initialize(unitModelData.m_AttachItems);
 
+            ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
+
             m_EquippedWeapon = weaponSO;
             foreach (var weaponModelPrefab in m_EquippedWeapon.m_WeaponModels)
             {
@@ -227,6 +229,23 @@ namespace Level
                 onComplete?.Invoke();
             }
             StartCoroutine(DefeatCoroutine());
+        }
+
+        public void ChangeArmorMaterial(Color armorPlate, Color armorTrim, Color underArmor) {
+            SkinnedMeshRenderer[] armorPieces = m_TokenModel.GetComponentsInChildren<SkinnedMeshRenderer>();
+            for (int i = 0; i < armorPieces.Length; i++) {
+                Material[] newArmorMats = armorPieces[i].materials;
+                for (int j = 0; j < newArmorMats.Length; j++) {
+                    if (newArmorMats[j].name == "ArmorPlate (Instance)") {
+                        newArmorMats[j].color = armorPlate;
+                    } else if (newArmorMats[j].name == "ArmorTrim (Instance)") {
+                        newArmorMats[j].color = armorTrim;
+                    } else if (newArmorMats[j].name == "UnderArmor (Instance)") {
+                        newArmorMats[j].color = underArmor;
+                    }
+                }
+                armorPieces[i].materials = newArmorMats;
+            }
         }
     }
 }
