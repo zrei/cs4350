@@ -140,6 +140,13 @@ public class SaveManager : Singleton<SaveManager>
     }
     #endregion
 
+    #region Level Progress
+    public int LoadCurrentLevel()
+    {
+        return PlayerPrefs.GetInt("LEVEL_PROGRESS", 1);
+    }
+    #endregion
+
     #region Array Handlers
     private List<T> LoadData<T>(string saveKey)
     {

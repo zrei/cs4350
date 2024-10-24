@@ -6,6 +6,8 @@ using UnityEngine;
 public class WorldMapManager : MonoBehaviour
 {
     [SerializeField] private Level.CharacterToken m_PlayerToken;
+
+    // in order
     [SerializeField] private List<WorldMapNode> m_LevelNodes;
 
     // can handle camera here for now
@@ -14,6 +16,24 @@ public class WorldMapManager : MonoBehaviour
 
     private int m_CurrLevel;
 
+    private void Start()
+    {
+        Initialise();
+    }
+
+    private void Initialise()
+    {
+        m_CurrLevel = SaveManager.Instance.LoadCurrentLevel();
+        for (int i = 0; i < m_CurrLevel; ++i)
+        {
+            m_LevelNodes[i].gameObject.SetActive(true);
+        }
+        for (int i = m_CurrLevel; i < m_LevelNodes.Count; ++i)
+        {
+            m_LevelNodes[i].gameObject.SetActive(false);
+        }
+    }
+
     public WorldMapNode GetLevel(int levelNumber)
     {
         return m_LevelNodes[levelNumber - 1];
@@ -21,7 +41,7 @@ public class WorldMapManager : MonoBehaviour
 
     private void Awake()
     {
-        if (FlagManager.Instance.GetFlagValue(Flags.WIN_LEVEL_FLAG))
+        if (FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
         {
             // proceed to the next level
         }
@@ -37,12 +57,15 @@ public class WorldMapManager : MonoBehaviour
         */
     }
 
-    private void MoveToLevel(int newLevelNumber)
+    private void UnlockLevel()
     {
-        if (newLevelNumber == m_CurrLevel)
+        WorldMapNode nextNode = m_LevelNodes[m_CurrLevel + 1];
+        /*
+        if (nextNode == m_CurrLevel)
             return;
 
-        MoveToLevel(m_CurrLevel, newLevelNumber);
+        MoveToLevel(m_CurrLevel, nextNode);
+        */
     }
 
     // literally just teleport them to the level
