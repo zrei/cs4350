@@ -425,27 +425,27 @@ namespace Game.UI
             {
                 if (target != null)
                 {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):G5} <sprite name=\"PhysicalAttack\">");
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):F1} <sprite name=\"PhysicalAttack\">");
                 }
                 else
                 {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):G5} <sprite name=\"PhysicalAttack\">");
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):F1} <sprite name=\"PhysicalAttack\">");
                 }
             }
             if (skill.IsMagicAttack)
             {
                 if (target != null)
                 {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):G5} <sprite name=\"MagicAttack\">");
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):F1} <sprite name=\"MagicAttack\">");
                 }
                 else
                 {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):G5} <sprite name=\"MagicAttack\">");
+                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):F1} <sprite name=\"MagicAttack\">");
                 }
             }
             if (skill.IsHeal)
             {
-                builder.AppendLine($"HEAL: {DamageCalc.CalculateHealAmount(currentUnit, skill):G5}");
+                builder.AppendLine($"HEAL: {DamageCalc.CalculateHealAmount(currentUnit, skill):F1}");
             }
             if (!string.IsNullOrEmpty(skill.m_Description))
             {
