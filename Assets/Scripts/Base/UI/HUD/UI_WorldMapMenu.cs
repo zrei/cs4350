@@ -26,8 +26,16 @@ public class UI_WorldMapMenu : MonoBehaviour
     {
         foreach (LevelButtonData levelButtonData in m_LevelButtons)
         {
-            levelButtonData.button.onSubmit.AddListener(() => LoadLevel(levelButtonData.levelId));
+            levelButtonData.button.onSubmit.AddListener(OnSubmit);
             levelButtonData.button.interactable = levelButtonData.IsConditionsSatisfied();
+            continue;
+
+            void OnSubmit()
+            {
+                // Load level then disable button
+                LoadLevel(levelButtonData.levelId);
+                levelButtonData.button.interactable = false;
+            }
         }
         
         m_CanvasGroup = GetComponent<CanvasGroup>();
