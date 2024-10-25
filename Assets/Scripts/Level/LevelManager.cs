@@ -43,7 +43,7 @@ public class LevelManager : MonoBehaviour
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;
-    [SerializeField] private NodeInternal m_StartNode;
+    [SerializeField] private StartNode m_StartNode;
     [SerializeField] private NodeInternal m_GoalNode;
     
     // UI
@@ -124,7 +124,7 @@ public class LevelManager : MonoBehaviour
         
         GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
         
-        StartPlayerPhase();
+        m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
     
     #endregion
