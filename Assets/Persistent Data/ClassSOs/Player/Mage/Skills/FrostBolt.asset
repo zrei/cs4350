@@ -13,25 +13,17 @@ MonoBehaviour:
   m_Name: FrostBolt
   m_EditorClassIdentifier: 
   m_SkillName: Frost Bolt
-  m_Description: 'Apply on target:
-
-    Speed Down'
+  m_Description: Attack an enemy and give them 2 Speed Down I tokens.
   m_Icon: {fileID: 3711662245719310502, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 4
   m_SkillTypes: 0000000001000000
   m_InflictedTokens:
   - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
-    m_Tier: 3
-    m_Number: 5
-  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
-    m_Tier: 2
-    m_Number: 5
-  - m_TokenTierData: {fileID: 11400000, guid: b3046027460f27449ab38f67727dd29b, type: 2}
     m_Tier: 1
-    m_Number: 5
+    m_Number: 2
   m_InflictedStatusEffects: []
-  m_DamageModifier: 1
+  m_DamageModifier: 0.75
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
