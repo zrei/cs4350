@@ -10,21 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: Rally
+  m_Name: Inspire
   m_EditorClassIdentifier: 
-  m_SkillName: Rally
-  m_Description: 'Buff self and allies:
-
-    Attack Up, Speed Up'
+  m_SkillName: Inspire
+  m_Description: Gives an ally an Attack Boost I token
   m_Icon: {fileID: 1644151247965553156, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 2
   m_SkillTypes: 01000000
   m_InflictedTokens:
   - m_TokenTierData: {fileID: 11400000, guid: e01beb6af2322af45b22e94261b5b6de, type: 2}
-    m_Tier: 2
-    m_Number: 1
-  - m_TokenTierData: {fileID: 11400000, guid: e978f3b5d68364245bad675bf3841823, type: 2}
     m_Tier: 1
     m_Number: 1
   m_InflictedStatusEffects: []
@@ -38,5 +33,5 @@ MonoBehaviour:
   m_OverriddenWeaponAnimationType: 0
   m_SkillAnimationType: 1
   m_TargetRules:
-  - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
-  m_TargetSO: {fileID: 11400000, guid: 07ceb5a02e5a44824bae1668e0b579bf, type: 2}
+  - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
