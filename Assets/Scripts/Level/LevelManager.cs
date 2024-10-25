@@ -303,8 +303,6 @@ public class LevelManager : MonoBehaviour
             m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
             
             m_LevelTimerLogic.AdvanceTimer(timeCost);
-        
-            if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
             if (m_LevelNodeManager.IsCurrentNodeCleared())
             {
@@ -520,12 +518,6 @@ public class LevelManager : MonoBehaviour
                 m_LevelTimerLogic.AdvanceTimer(-m_PendingRewards[RewardType.TIME]);
             }
             m_PendingRewards[RewardType.TIME] = 0;
-            
-            if (m_LevelTimerLogic.TimeRemaining <= 0)
-            {
-                hasEvent = true;
-                return;
-            }
         }
         
         if (m_PendingRewards.ContainsKey(RewardType.EXP))

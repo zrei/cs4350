@@ -119,7 +119,8 @@ public class LevelTokenManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        Destroy(m_PlayerUnitToken.gameObject);
+        if (m_PlayerUnitToken)
+            Destroy(m_PlayerUnitToken.gameObject);
     }
 
     #endregion
