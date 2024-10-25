@@ -209,8 +209,8 @@
                 finalColor = lerp(finalColor, _OutlineColor, edge * _OutlineThreshold);
                 */
 
-                int xRemap = (int)(screenUV.x * 10000) % 16;
-                int yRemap = (int)(screenUV.y * 10000) % 16;
+                int xRemap = (uint)(screenUV.x * 10000) % 16;
+                int yRemap = (uint)(screenUV.y * 10000) % 16;
                 float threshold = threshold_map[xRemap][yRemap];
                 clip(_Opacity - threshold);
 

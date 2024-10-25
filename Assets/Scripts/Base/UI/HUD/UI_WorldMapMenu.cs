@@ -11,7 +11,11 @@ public struct LevelButtonData
     
     public bool IsConditionsSatisfied()
     {
-        return conditions.All(flagCondition => FlagManager.Instance.GetFlagValue(flagCondition.flagName) == flagCondition.flagValue);
+        if (conditions == null) return true;
+        return conditions.All(flagCondition => {
+            if (!FlagManager.IsReady) return true;
+            return FlagManager.Instance.GetFlagValue(flagCondition.flagName) == flagCondition.flagValue;
+        });
     }
 }
 

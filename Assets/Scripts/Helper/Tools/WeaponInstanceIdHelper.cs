@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CreateAssetMenu(fileName = "WeaponInstanceIdHelper", menuName = "ScriptableObject/IdHelpers/WeaponInstanceIdHelper")]
 public class WeaponInstanceIdHelper : IdHelper<WeaponInstanceSO>
 {
@@ -15,3 +16,4 @@ public class WeaponInstanceIdHelper : IdHelper<WeaponInstanceSO>
         return weaponInstanceSO.m_WeaponId;
     }
 }
+#endif
