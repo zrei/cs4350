@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GameSceneManager : Singleton<GameSceneManager>
 {
+    [SerializeField] Light m_WorldLight;
+    [SerializeField] Light m_LevelLight;
+    
     [SerializeField] Animator m_Transition;
     [SerializeField] float m_TransitionTime = 1f;
     
@@ -37,6 +40,9 @@ public class GameSceneManager : Singleton<GameSceneManager>
     public void LoadLevelScene(int levelId, List<PlayerCharacterData> partyMembers)
     {
         LevelManager.OnReady += OnLevelManagerReady;
+        m_WorldLight = FindAnyObjectByType<Light>(FindObjectsInactive.Exclude);
+        m_OnSceneChange += () => m_WorldLight.gameObject.SetActive(false);
+        
         var sceneIndex = LEVEL_1_SCENE_INDEX + levelId;
         StartCoroutine(LoadAdditiveSceneWithTransition(sceneIndex));
         return;
@@ -52,6 +58,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
     
     public void UnloadLevelScene(int levelId)
     {
+        m_OnSceneChange = () => m_WorldLight.gameObject.SetActive(true);
         m_AfterSceneChange = () => GlobalEvents.Level.ReturnFromLevelEvent?.Invoke();
         
         // Unload the level scene
@@ -69,6 +76,8 @@ public class GameSceneManager : Singleton<GameSceneManager>
         GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
         
         m_OnSceneChange = CameraManager.Instance.SetUpBattleCamera;
+        m_LevelLight = FindAnyObjectByType<Light>(FindObjectsInactive.Exclude);
+        m_OnSceneChange += () => m_LevelLight.gameObject.SetActive(false);
 
         // Load the battle scene
         StartCoroutine(LoadAdditiveSceneWithTransition(BATTLE_SCENE_INDEX));
@@ -77,6 +86,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
     public void UnloadBattleScene()
     {
         m_OnSceneChange = CameraManager.Instance.SetUpLevelCamera;
+        m_OnSceneChange += () => m_LevelLight.gameObject.SetActive(true);
         
         m_AfterSceneChange = () => GlobalEvents.Battle.ReturnFromBattleEvent?.Invoke();
         
