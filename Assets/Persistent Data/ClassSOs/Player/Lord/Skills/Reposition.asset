@@ -13,12 +13,15 @@ MonoBehaviour:
   m_Name: Reposition
   m_EditorClassIdentifier: 
   m_SkillName: Reposition
-  m_Description: Moves an ally to one space away from you
+  m_Description: Moves an ally to one space away from you. GIve them a Crit I token.
   m_Icon: {fileID: -6913803671930707150, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 0
-  m_SkillTypes: 05000000
-  m_InflictedTokens: []
+  m_SkillTypes: 0500000001000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: 83a815389a0744034b7b6743cdd08642, type: 2}
+    m_Tier: 1
+    m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1
