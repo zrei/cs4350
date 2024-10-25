@@ -10,28 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: Reposition
+  m_Name: LayOnHands
   m_EditorClassIdentifier: 
-  m_SkillName: Reposition
-  m_Description: 'Moves an ally to one space away from you.
-
-    GIve them a Crit
-    I token.'
-  m_Icon: {fileID: -6913803671930707150, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillName: Lay on Hands
+  m_Description: Heal an ally.
+  m_Icon: {fileID: -6789252460078593350, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
-  m_ConsumedMana: 3
-  m_SkillTypes: 0500000001000000
-  m_InflictedTokens:
-  - m_TokenTierData: {fileID: 11400000, guid: 83a815389a0744034b7b6743cdd08642, type: 2}
-    m_Tier: 1
-    m_Number: 1
+  m_ConsumedMana: 8
+  m_SkillTypes: 02000000
+  m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_HealProportion: 1
+  m_HealProportion: 1.5
   m_ManaAlterProportion: 0
   m_Summons: []
-  m_TeleportTargetRules:
-  - {fileID: 11400000, guid: cc45ea8061ec83a46b6960ad032d87f1, type: 2}
+  m_TeleportTargetRules: []
   m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0

@@ -10,22 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: BowShot
+  m_Name: Judgement
   m_EditorClassIdentifier: 
-  m_SkillName: Bow Shot
-  m_Description: 
-  m_Icon: {fileID: -5573393650252216343, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
-  m_SkillType: 1
-  m_ConsumedMana: 0
-  m_SkillTypes: 00000000
-  m_InflictedTokens: []
+  m_SkillName: Judgement
+  m_Description: Give an enemy 2 Defense Down II Tokens.
+  m_Icon: {fileID: 21300000, guid: 7d7354c4207c50747add531d3f1db315, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 12
+  m_SkillTypes: 01000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: 3bd20286dd9b2c44c9977a2f23463996, type: 2}
+    m_Tier: 2
+    m_Number: 2
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
   m_TeleportTargetRules: []
-  m_TargetWillPlayHurtAnimation: 1
+  m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0
   m_SkillAnimationType: 2
