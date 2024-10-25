@@ -96,6 +96,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     private List<WeaponModel> m_WeaponModels = new();
     private readonly List<TokenStack> m_PermanentTokens = new();
 
+    public List<WeaponModel> WeaponModels => m_WeaponModels;
+
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
@@ -602,7 +604,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
                 if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
                 {
-                    target.AlterMana(this.GetTotalStat(StatType.MAG_ATTACK) * attackSO.m_ManaAlterProportion);
+                    target.AlterMana(DamageCalc.CalculateManaAlterAmount(this, attackSO));
                 }
 
                 if (!target.IsDead)

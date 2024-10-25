@@ -152,7 +152,7 @@ namespace Game.UI
 
             if (currentDialogue.options.Count > 0)
             {
-                bool isFirst = true;
+                //bool isFirst = true;
                 foreach (var option in currentDialogue.options)
                 {
                     var isUnlocked = option.IsUnlocked;
@@ -180,11 +180,11 @@ namespace Game.UI
                         }
                     });
 
-                    if (isFirst)
-                    {
-                        isFirst = false;
-                        button.Select();
-                    }
+                    //if (isFirst)
+                    //{
+                    //    isFirst = false;
+                    //    button.Select();
+                    //}
                 }
             }
         }

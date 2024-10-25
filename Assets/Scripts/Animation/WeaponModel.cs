@@ -17,6 +17,10 @@ public class WeaponModel : MonoBehaviour
 
     public WeaponModelAttachmentType attachmentType;
 
+    public List<Transform> fxAttachPoints = new();
+
+    private Transform parent;
+
     private Animator m_Animator;
     private bool m_IsSkillAnimStarted;
 
@@ -56,5 +60,16 @@ public class WeaponModel : MonoBehaviour
         m_Animator.SetTrigger(SkillCancelAnimParam);
         m_IsSkillAnimStarted = false;
         m_Animator.SetInteger(SkillIDAnimParam, 0);
+    }
+
+    private void Unparent()
+    {
+        parent = transform.parent;
+        transform.SetParent(null);
+    }
+
+    private void Reparent()
+    {
+        transform.SetParent(parent);
     }
 }

@@ -41,12 +41,14 @@ public class SkillAnimationManager : MonoBehaviour
         {
             attacker.AnimationEventHandler.onSkillHit -= OnSkillHit;
 
-            IEnumerator SlowTime()
+            IEnumerator ExecuteWithDelay()
             {
                 yield return new WaitForSeconds(0.1f);
                 TimeManager.Instance.ModifyTime(0.1f, 0.5f);
             }
-            StartCoroutine(SlowTime());
+            StartCoroutine(ExecuteWithDelay());
+
+            activeSkill.m_SkillFXs.ForEach(x => x.Play(attacker, targets.Count > 0 ? targets[0] : null));
         }
         attacker.AnimationEventHandler.onSkillHit += OnSkillHit;
 
@@ -78,38 +80,36 @@ public class SkillAnimationManager : MonoBehaviour
         }
         else if (attacker.UnitAllegiance == target.UnitAllegiance)
         {
+            // todo: handle buff skill animation
             player = attacker;
             enemy = target;
         }
 
         var battleManager = BattleManager.Instance;
 
-        if (!activeSkill.IsAoe && attacker.UnitAllegiance != target.UnitAllegiance)
-        {
-            m_SkillAnimVCam.enabled = true;
-            
-            foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(0, 0.25f);
-            foreach (var unit in battleManager.EnemyUnits) unit.FadeMesh(0, 0.25f);
-            yield return new WaitForSeconds(0.5f);
+        m_SkillAnimVCam.enabled = true;
 
-            if (player != null)
-            {
-                m_CachedAttackerPosition = player.transform.position;
-                m_CachedAttackerRotation = player.transform.rotation;
-                player.transform.position = m_AttackerPosition.position;
-                player.transform.rotation = m_AttackerPosition.rotation;
-                player.FadeMesh(1, 0.25f);
-            }
-            if (enemy != null)
-            {
-                m_CachedTargetPosition = enemy.transform.position;
-                m_CachedTargetRotation = enemy.transform.rotation;
-                enemy.transform.position = m_TargetPosition.position;
-                enemy.transform.rotation = m_TargetPosition.rotation;
-                enemy.FadeMesh(1, 0.25f);
-            }
-            yield return new WaitForSeconds(0.5f);
+        foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(0, 0.25f);
+        foreach (var unit in battleManager.EnemyUnits) unit.FadeMesh(0, 0.25f);
+        yield return new WaitForSeconds(0.5f);
+
+        if (player != null)
+        {
+            m_CachedAttackerPosition = player.transform.position;
+            m_CachedAttackerRotation = player.transform.rotation;
+            player.transform.position = m_AttackerPosition.position;
+            player.transform.rotation = m_AttackerPosition.rotation;
+            player.FadeMesh(1, 0.25f);
         }
+        if (enemy != null)
+        {
+            m_CachedTargetPosition = enemy.transform.position;
+            m_CachedTargetRotation = enemy.transform.rotation;
+            enemy.transform.position = m_TargetPosition.position;
+            enemy.transform.rotation = m_TargetPosition.rotation;
+            enemy.FadeMesh(1, 0.25f);
+        }
+        yield return new WaitForSeconds(0.5f);
 
         attacker.PlaySkillExecuteAnimation();
 
@@ -121,29 +121,26 @@ public class SkillAnimationManager : MonoBehaviour
 
         while (!isSkillComplete) yield return null;
 
-        if (!activeSkill.IsAoe && attacker.UnitAllegiance != target.UnitAllegiance)
+        m_SkillAnimVCam.enabled = false;
+
+        player?.FadeMesh(0, 0.25f);
+        enemy?.FadeMesh(0, 0.25f);
+        yield return new WaitForSeconds(0.5f);
+
+        if (player != null)
         {
-            m_SkillAnimVCam.enabled = false;
-
-            player?.FadeMesh(0, 0.25f);
-            enemy?.FadeMesh(0, 0.25f);
-            yield return new WaitForSeconds(0.5f);
-
-            if (player != null)
-            {
-                player.transform.position = m_CachedAttackerPosition;
-                player.transform.rotation = m_CachedAttackerRotation;
-            }
-            if (enemy != null)
-            {
-                enemy.transform.position = m_CachedTargetPosition;
-                enemy.transform.rotation = m_CachedTargetRotation;
-            }
-
-            foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(1, 0.25f);
-            foreach (var unit in battleManager.EnemyUnits) unit.FadeMesh(1, 0.25f);
-            yield return new WaitForSeconds(0.5f);
+            player.transform.position = m_CachedAttackerPosition;
+            player.transform.rotation = m_CachedAttackerRotation;
         }
+        if (enemy != null)
+        {
+            enemy.transform.position = m_CachedTargetPosition;
+            enemy.transform.rotation = m_CachedTargetRotation;
+        }
+
+        foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(1, 0.25f);
+        foreach (var unit in battleManager.EnemyUnits) unit.FadeMesh(1, 0.25f);
+        yield return new WaitForSeconds(0.5f);
 
         GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke();
     }

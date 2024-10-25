@@ -46,6 +46,11 @@ public abstract class TokenTierSO : ScriptableObject
     public TokenConsumptionType[] m_Consumption;
     public bool ContainsConsumptionType(TokenConsumptionType consumeType) => m_Consumption.Contains(consumeType);
 
+    public override string ToString()
+    {
+        return m_Icon != null ? $"<sprite name=\"{m_Icon.name}\" tint>" : m_TokenName;
+    }
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
