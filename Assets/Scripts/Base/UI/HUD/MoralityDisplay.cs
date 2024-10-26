@@ -87,6 +87,7 @@ public class MoralityDisplay : MonoBehaviour
 
         GlobalEvents.Morality.MoralityChangeEvent += OnMoralityChange;
         GlobalEvents.Scene.LevelSceneLoadedEvent += Show;
+        GlobalEvents.Battle.ReturnFromBattleEvent += Show;
         GlobalEvents.Scene.BattleSceneLoadedEvent += Hide;
         GlobalEvents.Level.ReturnFromLevelEvent += Hide;
 
@@ -96,6 +97,7 @@ public class MoralityDisplay : MonoBehaviour
     private void OnDestroy()
     {
         GlobalEvents.Scene.LevelSceneLoadedEvent -= Show;
+        GlobalEvents.Battle.ReturnFromBattleEvent -= Show;
         GlobalEvents.Scene.BattleSceneLoadedEvent -= Hide;
         GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
     }
