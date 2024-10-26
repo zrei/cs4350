@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeChangeAmt: 0
+  timeChangeAmt: 15
   moralityChangeAmt: 0
   flagResults:
   - flagName: VillagePillaged
@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 4286239811993333608}
   - component: {fileID: 2578122031409413761}
   m_Layer: 7
-  m_Name: Level1Starting Dialogue
+  m_Name: Level1Dialogue2Loot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -226,22 +226,10 @@ MonoBehaviour:
   onExitState:
     m_PersistentCalls:
       m_Calls: []
-  characterSprite: {fileID: 21300000, guid: c829463b7c1b4554f8ecad9f6615b3b1, type: 3}
-  characterName: Oeyn
+  characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
+  characterName: 
   characterColor: {r: 1, g: 1, b: 1, a: 1}
-  text: My lord, we are currently attack from Bandits, who seemed to have been embued
-    with some special power. We need to get to the Elven Kingdoms as soon as possible
-    to warn them about the incoming invasion. Along the way, we might come across
-    villagers. We can consider visiting these villagers, but do note of the strength
-    of the enemies in the way.
+  text: You descarate the place and find nothing.
   debugTrigger: 0
-  options:
-  - text: Understood
-    nextState: {fileID: 4130335212123749678, guid: 5e4ac8c381cb7b94d86d0c677d8e1980,
-      type: 3}
-    conditions: []
-    hideIfConditionsUnmet: 0
-    lockedText: 
-    changesMorality: 0
-    moralityChange: 0
+  options: []
   defaultNextState: {fileID: 0}
