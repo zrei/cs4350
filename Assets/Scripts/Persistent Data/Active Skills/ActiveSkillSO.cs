@@ -33,7 +33,7 @@ public class SkillFX
     // todo: refactor this to feedback system
     public ParticleSystem m_FeedbackSystemPrefab;
 
-    public void Play(Unit caster, Unit target)
+    public void Play(Unit caster, List<Unit> targets)
     {
         if (m_FeedbackSystemPrefab == null) return;
 
@@ -52,11 +52,32 @@ public class SkillFX
                 attachPoint = attachPoints[attachPointIndex];
                 break;
             case AttachmentType.Caster:
-                attachPoint = caster?.transform;
-                break;
+                // target is caster for self-target i.e. no need separate handling
             case AttachmentType.Target:
-                attachPoint = target?.transform;
                 break;
+        }
+
+        if (m_AttachmentType == AttachmentType.Target || m_AttachmentType == AttachmentType.Caster)
+        {
+            if (targets == null) return;
+
+            var fxs = new List<ParticleSystem>();
+            foreach (var target in targets)
+            {
+                if (target == null) continue;
+                fxs.Add(Object.Instantiate(m_FeedbackSystemPrefab, target.transform));
+            }
+            IEnumerator PlayMultipleAndDispose()
+            {
+                fxs.ForEach(x => x.Play());
+                while (fxs.Any(x => x.isPlaying))
+                {
+                    yield return null;
+                }
+                fxs.ForEach(x => Object.Destroy(x.gameObject));
+            }
+            CoroutineManager.Instance.StartCoroutine(PlayMultipleAndDispose());
+            return;
         }
 
         if (attachPoint == null) return;
@@ -183,23 +204,29 @@ public class ActiveSkillSO : ScriptableObject
         }
         if (skillTypesSet.Contains(SkillEffectType.SUMMON))
         {
-            builder.AppendLine($"Summon unit");
+            // handle manually for now
+            //builder.AppendLine($"Summon unit");
         }
         if (skillTypesSet.Contains(SkillEffectType.TELEPORT))
         {
-            builder.AppendLine($"Teleport target");
+            // handle manually for now
+            //builder.AppendLine($"Teleport target");
         }
         if (skillTypesSet.Contains(SkillEffectType.DEALS_STATUS_OR_TOKENS))
         {
-            builder.AppendLine("Applies:");
+            builder.Append("Applies: ");
             foreach (var token in m_InflictedTokens)
             {
-                builder.AppendLine(token.ToString());
+                builder.Append(token.ToString());
+                builder.Append(", ");
             }
             foreach (var status in m_InflictedStatusEffects)
             {
-                builder.AppendLine(status.ToString());
+                builder.Append(status.ToString());
+                builder.Append(", ");
             }
+            builder[builder.Length - 1] = '\n';
+            builder[builder.Length - 2] = ' ';
         }
 
         if (!string.IsNullOrEmpty(m_Description))
