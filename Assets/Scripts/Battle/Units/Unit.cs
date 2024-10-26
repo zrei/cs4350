@@ -203,7 +203,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, m_CurrHealth, max);
 
-        DamageDisplayManager.Instance?.ShowDamage($"<color=#22fe22>{change:F1}", transform);
+        DamageDisplayManager.Instance?.ShowDamage($"<color=#33ff33>{change:F1}", transform);
     }
 
     void IHealth.SetHealth(float health)
@@ -222,7 +222,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, value, MaxHealth);
 
-        DamageDisplayManager.Instance?.ShowDamage($"<color=#fe2222>{change:F1}", transform);
+        DamageDisplayManager.Instance?.ShowDamage($"<color=#ff3333>{change:F1}", transform);
     }
 
     public event TrackedValueEvent OnHealthChange;

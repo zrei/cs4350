@@ -71,5 +71,7 @@ public class WeaponModel : MonoBehaviour
     private void Reparent()
     {
         transform.SetParent(parent);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
     }
 }

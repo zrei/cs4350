@@ -48,6 +48,11 @@ public class SkillAnimationManager : MonoBehaviour
             }
             StartCoroutine(ExecuteWithDelay());
 
+            if (activeSkill.m_TargetWillPlayHurtAnimation)
+            {
+                foreach (Unit t in targets)
+                    t.PlayAnimations(Unit.HurtAnimParam);
+            }
             activeSkill.m_SkillFXs.ForEach(x => x.Play(attacker, targets.Count > 0 ? targets[0] : null));
         }
         attacker.AnimationEventHandler.onSkillHit += OnSkillHit;
@@ -112,12 +117,6 @@ public class SkillAnimationManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         attacker.PlaySkillExecuteAnimation();
-
-        if (activeSkill.m_TargetWillPlayHurtAnimation)
-        {
-            foreach (Unit t in targets)
-                t.PlayAnimations(Unit.HurtAnimParam);
-        }
 
         while (!isSkillComplete) yield return null;
 
