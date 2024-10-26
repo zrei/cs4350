@@ -33,6 +33,8 @@ public class MapLogic : MonoBehaviour
         m_PlayerGrid.onTileSubmit += OnTileSubmit;
         m_EnemyGrid.onTileSelect += OnTileSelect;
         m_EnemyGrid.onTileSubmit += OnTileSubmit;
+        m_PlayerGrid.OnTeleportUnit += OnUnitTeleport;
+        m_EnemyGrid.OnTeleportUnit += OnUnitTeleport;
     }
 
     private void OnTileSelect(TileData data, TileVisual visual)
@@ -240,9 +242,9 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(gridType).PerformTeleportSkill(attacker, attack, targetTile, teleportTargetTile, completeSkillEvent);
     }
 
-    public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType)
+    public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair initialTarget, CoordPair targetTile, GridType gridType)
     {
-        return RetrieveGrid(gridType).IsValidTeleportTile(activeSkillSO, unit, targetTile);
+        return RetrieveGrid(gridType).IsValidTeleportTile(activeSkillSO, unit, initialTarget, targetTile);
     }
 
     public bool CanPerformSkill(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile, GridType gridType, bool checkOccupied = false)
@@ -260,6 +262,13 @@ public class MapLogic : MonoBehaviour
     public void TryReachTile(GridType gridType, Unit unit, CoordPair destination, VoidEvent onCompleteMovement)
     {
         RetrieveGrid(gridType).TryReachTile(unit, destination, onCompleteMovement);
+    }
+    #endregion
+
+    #region Teleport
+    private void OnUnitTeleport(GridType teleportTargetGrid, CoordPair teleportStartPoint, CoordPair teleportDestination)
+    {
+        RetrieveGrid(teleportTargetGrid).SwapTiles(teleportStartPoint, teleportDestination);
     }
     #endregion
 }
