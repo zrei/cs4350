@@ -71,8 +71,8 @@ public class SkillAnimationManager : MonoBehaviour
         Unit player = null;
         Unit enemy = null;
         var target = targets[0];
-        var isOneOnOne = targets.Count == 1 && attacker.UnitAllegiance != target.UnitAllegiance;
-        if (isOneOnOne || m_IsSelfTarget)
+        var isOneOnOne = targets.Count == 1 && (attacker.UnitAllegiance != target.UnitAllegiance || m_IsSelfTarget);
+        if (isOneOnOne)
         {
             if (attacker.UnitAllegiance == UnitAllegiance.PLAYER && target.UnitAllegiance == UnitAllegiance.ENEMY)
             {
@@ -126,7 +126,7 @@ public class SkillAnimationManager : MonoBehaviour
 
         m_SkillAnimVCam.enabled = false;
 
-        if (isOneOnOne || m_IsSelfTarget)
+        if (isOneOnOne)
         {
             player?.FadeMesh(0, 0.25f);
             enemy?.FadeMesh(0, 0.25f);
