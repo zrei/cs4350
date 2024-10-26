@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: Demoralise
+  m_EditorClassIdentifier: 
+  m_SkillName: Demoralise
+  m_Description: Gives enemies in a 2x2 area 1 Attack Down I token.
+  m_Icon: {fileID: 21300000, guid: 18330f4264590f845913d30527e7694f, type: 3}
+  m_SkillType: 1
+  m_ConsumedMana: 6
+  m_SkillTypes: 01000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: a47200a506aba8d4db9fd78b2841133a, type: 2}
+    m_Tier: 1
+    m_Number: 1
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 0.8
+  m_HealProportion: 1
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportTargetRules: []
+  m_TargetWillPlayHurtAnimation: 0
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 1
+  m_TargetRules:
+  - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 962f4f0466b17ef4d8e9f161fbc97bc1, type: 2}

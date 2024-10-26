@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: Holy Protection
+  m_EditorClassIdentifier: 
+  m_SkillName: Holy Protection
+  m_Description: Give an ally a Defence Boost II token.
+  m_Icon: {fileID: 21300000, guid: 0fb71fd2bc88ca94aad91c59d69256a6, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 10
+  m_SkillTypes: 01000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: eb96b45dd1eecc540af4de5cfef3f762, type: 2}
+    m_Tier: 2
+    m_Number: 1
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 1
+  m_HealProportion: 1
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportTargetRules: []
+  m_TargetWillPlayHurtAnimation: 0
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 1
+  m_TargetRules:
+  - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}

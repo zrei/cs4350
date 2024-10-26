@@ -103,7 +103,7 @@ public class ActiveSkillSO : ScriptableObject
     [Space]
     // damage
     [Tooltip("Determines the base attack modifier for damage - only used if skill deals damage")]
-    [Range(0f, 1f)]
+    [Range(0f, 5f)]
     public float m_DamageModifier = 1f;
 
     [Space]
