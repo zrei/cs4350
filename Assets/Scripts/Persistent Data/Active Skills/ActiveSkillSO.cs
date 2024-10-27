@@ -141,8 +141,10 @@ public class ActiveSkillSO : ScriptableObject
     public List<SummonWrapper> m_Summons;
 
     [Space]
+    [Tooltip("Whether this skill will teleport the caster regardless of the initial target")]
+    public bool m_TeleportSelf;
     [Tooltip("Rules governing where the target can be teleported to - should generally be location checks for target")]
-    public List<TargetLocationRuleSO> m_TeleportTargetRules;
+    public List<TeleportRuleSO> m_TeleportTargetRules;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -174,6 +176,7 @@ public class ActiveSkillSO : ScriptableObject
     public bool IsSelfTarget => m_TargetRules.Any(x => x is LockToSelfTargetRuleSO);
     public bool IsOpposingSideTarget => !IsSelfTarget && m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     public bool HasAttackerLimitations => m_TargetRules.Any(x => x is IAttackerRule);
+    public GridType TargetGridType(UnitAllegiance unitAllegiance) => IsOpposingSideTarget ? GridHelper.GetOpposingSide(unitAllegiance) : GridHelper.GetSameSide(unitAllegiance);
     // depends on whether attacks that target the opposing side but only deal status effects will still use the attack animation
     // public bool WillPlaySupportAnimation => !DealsDamage && !m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     #endregion
@@ -267,6 +270,23 @@ public class ActiveSkillSO : ScriptableObject
     }
 
     /// <summary>
+    /// Return the target for teleportation
+    /// </summary>
+    /// <param name="unit">The unit casting this skill</param>
+    /// <param name="initialTargetTile">The target of this tile</param>
+    /// <returns></returns>
+    public CoordPair TeleportStartTile(Unit unit, CoordPair initialTargetTile) => m_TeleportSelf ? unit.CurrPosition : initialTargetTile;
+    public GridType TeleportTargetGrid(Unit unit)
+    {
+        if (m_TeleportSelf)
+            return GridHelper.GetSameSide(unit.UnitAllegiance);
+        else if (IsOpposingSideTarget)
+            return GridHelper.GetOpposingSide(unit.UnitAllegiance);
+        else
+            return GridHelper.GetSameSide(unit.UnitAllegiance);
+    }
+
+    /// <summary>
     /// Check if this particular attacker tile is valid
     /// </summary>
     /// <param name="unit">The attacker tile</param>
@@ -276,13 +296,11 @@ public class ActiveSkillSO : ScriptableObject
         return m_TargetRules.Where(x => x is IAttackerRule).All(x => ((IAttackerRule) x).IsValidAttackerTile(attackerCoordinates));
     }
 
-    public bool IsValidTeleportTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
+    public bool IsValidTeleportTargetTile(CoordPair initialTarget, CoordPair targetTile, Unit unit, GridType targetGridType)
     {
-        if (IsOpposingSideTarget && !GridHelper.IsOpposingSide(unit.UnitAllegiance, targetGridType))
+        if (TeleportTargetGrid(unit) != targetGridType)
             return false;
-        else if (!IsOpposingSideTarget && !GridHelper.IsSameSide(unit.UnitAllegiance, targetGridType))
-            return false;
-        return m_TeleportTargetRules.All(x => x.IsValidTargetTile(targetTile, unit, targetGridType));
+        return m_TeleportTargetRules.All(x => x.IsValidTeleportTile(TeleportStartTile(unit, initialTarget), targetTile, unit));
     }
 
     public List<CoordPair> ConstructAttackTargetTiles(CoordPair target) => m_TargetSO.ConstructAttackTargetTiles(target);
