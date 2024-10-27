@@ -80,35 +80,31 @@ public class MoralityDisplay : MonoBehaviour
         animator.enabled = false;
 
         canvasGroup = GetComponent<CanvasGroup>();
-        isHidden = false;
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+        isHidden = true;
 
         GlobalEvents.Morality.MoralityChangeEvent += OnMoralityChange;
-        GlobalEvents.Level.BattleNodeStartEvent += OnBattleStart;
-        GlobalEvents.Level.BattleNodeEndEvent += OnBattleEnd;
+        GlobalEvents.Scene.LevelSceneLoadedEvent += Show;
+        GlobalEvents.Battle.ReturnFromBattleEvent += Show;
+        GlobalEvents.Scene.BattleSceneLoadedEvent += Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent += Hide;
 
         Morality = MoralityManager.Instance.CurrMoralityPercentage;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.Morality.MoralityChangeEvent -= OnMoralityChange;
-        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleStart;
-        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleEnd;
+        GlobalEvents.Scene.LevelSceneLoadedEvent -= Show;
+        GlobalEvents.Battle.ReturnFromBattleEvent -= Show;
+        GlobalEvents.Scene.BattleSceneLoadedEvent -= Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
     }
 
     private void OnMoralityChange(int value)
     {
         Morality = MoralityManager.Instance.CurrMoralityPercentage;
-    }
-
-    private void OnBattleStart(BattleNode node)
-    {
-        Hide();
-    }
-
-    private void OnBattleEnd(BattleNode node, UnitAllegiance victor, int numTurns)
-    {
-        Show();
     }
 
     private void Show()

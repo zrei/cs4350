@@ -313,6 +313,9 @@ public class PlayerTurnManager : TurnManager
                 CompleteSkill);
             m_MapLogic.ResetMap();
             Logger.Log(this.GetType().Name, "Attack + Teleport!", LogLevel.LOG);
+
+            GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(null);
+            GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
             return true;
         }
         else

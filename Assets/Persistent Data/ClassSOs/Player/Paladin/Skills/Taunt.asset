@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: Taunt
+  m_EditorClassIdentifier: 
+  m_SkillName: Taunt
+  m_Description: 'Give yourself a Taunt token, forcing enemies to attack you.
+
+    Gain
+    1 Defence Boost I token.'
+  m_Icon: {fileID: 21300000, guid: d2bd7cccb490d4c4b8c0ae88e340a366, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 5
+  m_SkillTypes: 01000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: d8acbcf0174f34748aa064f80bda700d, type: 2}
+    m_Tier: 1
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: eb96b45dd1eecc540af4de5cfef3f762, type: 2}
+    m_Tier: 1
+    m_Number: 1
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 1
+  m_HealProportion: 1
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportTargetRules: []
+  m_TargetWillPlayHurtAnimation: 0
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 1
+  m_TargetRules:
+  - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
+  m_SkillFXs:
+  - m_AttachmentType: 2
+    m_WeaponModelIndex: 0
+    m_AttachPointIndex: 0
+    m_FeedbackSystemPrefab: {fileID: 2286231067387788820, guid: 650d249f6b8465e4e8573eee19f75d66,
+      type: 3}

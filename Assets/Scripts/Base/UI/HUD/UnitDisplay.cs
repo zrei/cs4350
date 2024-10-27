@@ -159,7 +159,7 @@ namespace Game.UI
 
             characterArt.sprite = currentUnit.Sprite;
             var color = characterArt.color;
-            color.a = currentUnit.Sprite != null ? 1 : 0;
+            color.a = currentUnit.Sprite != null ? 0.6f : 0;
             characterArt.color = color;
 
             var totalStats = currentUnit.GetTotalStats();

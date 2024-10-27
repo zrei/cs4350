@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Pool;
 using UnityEngine.UI;
-using static GlobalEvents;
 
 namespace Game.UI
 {
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(CanvasGroup))]
-    public class DialogueDisplay : Singleton<DialogueDisplay>
+    public class DialogueDisplay : Singleton<DialogueDisplay>,
+        IPointerClickHandler
     {
         private const int MaxOptions = 5;
 
@@ -140,7 +141,7 @@ namespace Game.UI
             {
                 text.SkipToEnd();
             }
-            else if (currentDialogue.options.Count == 0)
+            else if (currentDialogue?.options?.Count == 0)
             {
                 TryNextDialogue(currentDialogue.defaultNextState);
             }
@@ -152,7 +153,7 @@ namespace Game.UI
 
             if (currentDialogue.options.Count > 0)
             {
-                bool isFirst = true;
+                //bool isFirst = true;
                 foreach (var option in currentDialogue.options)
                 {
                     var isUnlocked = option.IsUnlocked;
@@ -180,11 +181,11 @@ namespace Game.UI
                         }
                     });
 
-                    if (isFirst)
-                    {
-                        isFirst = false;
-                        button.Select();
-                    }
+                    //if (isFirst)
+                    //{
+                    //    isFirst = false;
+                    //    button.Select();
+                    //}
                 }
             }
         }
@@ -214,6 +215,11 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            OnSubmit(null);
         }
     }
 }

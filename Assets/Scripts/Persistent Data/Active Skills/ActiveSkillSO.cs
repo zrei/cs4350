@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 [System.Serializable]
@@ -7,6 +9,91 @@ public struct InflictedStatusEffect
 {
     public StatusEffectSO m_StatusEffect;
     public int m_Stack;
+
+    public override string ToString()
+    {
+        return $"{m_Stack}x <color=#{ColorUtility.ToHtmlStringRGB(m_StatusEffect.m_Color)}>{m_StatusEffect}</color>";
+    }
+}
+
+[System.Serializable]
+public class SkillFX
+{
+    public enum AttachmentType
+    {
+        WeaponModel,
+        Caster,
+        Target,
+    }
+
+    public AttachmentType m_AttachmentType;
+
+    public int m_WeaponModelIndex;
+    public int m_AttachPointIndex;
+    // todo: refactor this to feedback system
+    public ParticleSystem m_FeedbackSystemPrefab;
+
+    public void Play(Unit caster, List<Unit> targets)
+    {
+        if (m_FeedbackSystemPrefab == null) return;
+
+        Transform attachPoint = null;
+        switch (m_AttachmentType)
+        {
+            case AttachmentType.WeaponModel:
+                var weaponModels = caster.WeaponModels;
+                var weaponModelIndex = Mathf.Clamp(m_WeaponModelIndex, 0, weaponModels.Count);
+                if (weaponModelIndex < 0 || weaponModelIndex >= weaponModels.Count) return;
+                var weaponModel = weaponModels[weaponModelIndex];
+
+                var attachPoints = weaponModel.fxAttachPoints;
+                var attachPointIndex = Mathf.Clamp(m_AttachPointIndex, 0, attachPoints.Count);
+                if (attachPointIndex < 0 || attachPointIndex >= attachPoints.Count) return;
+                attachPoint = attachPoints[attachPointIndex];
+                break;
+            case AttachmentType.Caster:
+                // target is caster for self-target i.e. no need separate handling
+            case AttachmentType.Target:
+                break;
+        }
+
+        if (m_AttachmentType == AttachmentType.Target || m_AttachmentType == AttachmentType.Caster)
+        {
+            if (targets == null) return;
+
+            var fxs = new List<ParticleSystem>();
+            foreach (var target in targets)
+            {
+                if (target == null) continue;
+                fxs.Add(Object.Instantiate(m_FeedbackSystemPrefab, target.transform));
+            }
+            IEnumerator PlayMultipleAndDispose()
+            {
+                fxs.ForEach(x => x.Play());
+                while (fxs.Any(x => x.isPlaying))
+                {
+                    yield return null;
+                }
+                fxs.ForEach(x => Object.Destroy(x.gameObject));
+            }
+            CoroutineManager.Instance.StartCoroutine(PlayMultipleAndDispose());
+            return;
+        }
+
+        if (attachPoint == null) return;
+
+        var fx = Object.Instantiate(m_FeedbackSystemPrefab, attachPoint);
+        IEnumerator PlayAndDispose()
+        {
+            fx.Play();
+            while (fx.isPlaying)
+            {
+                yield return null;
+            }
+            Object.Destroy(fx.gameObject);
+        }
+        CoroutineManager.Instance.StartCoroutine(PlayAndDispose());
+    }
 }
 
 [CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkills/ActiveSkillSO")]
@@ -37,7 +124,7 @@ public class ActiveSkillSO : ScriptableObject
     [Space]
     // damage
     [Tooltip("Determines the base attack modifier for damage - only used if skill deals damage")]
-    [Range(0f, 1f)]
+    [Range(0f, 5f)]
     public float m_DamageModifier = 1f;
 
     [Space]
@@ -74,6 +161,9 @@ public class ActiveSkillSO : ScriptableObject
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public TargetSO m_TargetSO;
 
+    [Header("FX")]
+    public List<SkillFX> m_SkillFXs;
+
     #region Helpers
     public bool IsAoe => m_TargetSO.IsAoe;
     public bool DealsDamage => ContainsSkillType(SkillEffectType.DEALS_DAMAGE);
@@ -87,6 +177,64 @@ public class ActiveSkillSO : ScriptableObject
     // depends on whether attacks that target the opposing side but only deal status effects will still use the attack animation
     // public bool WillPlaySupportAnimation => !DealsDamage && !m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     #endregion
+
+    public string GetDescription(ICanAttack caster, IHealth target)
+    {
+        var builder = new StringBuilder();
+
+        var skillTypesSet = new HashSet<SkillEffectType>(m_SkillTypes);
+        if (skillTypesSet.Contains(SkillEffectType.DEALS_DAMAGE))
+        {
+            var dmgSpriteTag = m_SkillType switch
+            {
+                SkillType.PHYSICAL => "<sprite name=\"PhysicalAttack\" tint>",
+                SkillType.MAGIC => "<sprite name=\"MagicAttack\" tint>",
+                _ => string.Empty,
+            };
+            var dmgText = $"{(target != null ? DamageCalc.CalculateDamage(caster, target, this) : DamageCalc.CalculateDamage(caster, this)):F1}";
+            builder.AppendLine($"DMG: {dmgText} {dmgSpriteTag}");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.HEAL))
+        {
+            builder.AppendLine($"HEAL: {DamageCalc.CalculateHealAmount(caster, this):F1}");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.ALTER_MANA))
+        {
+            builder.AppendLine($"ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this):F1}");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.SUMMON))
+        {
+            // handle manually for now
+            //builder.AppendLine($"Summon unit");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.TELEPORT))
+        {
+            // handle manually for now
+            //builder.AppendLine($"Teleport target");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.DEALS_STATUS_OR_TOKENS))
+        {
+            builder.Append("Applies: ");
+            foreach (var token in m_InflictedTokens)
+            {
+                builder.Append(token.ToString());
+                builder.Append(", ");
+            }
+            foreach (var status in m_InflictedStatusEffects)
+            {
+                builder.Append(status.ToString());
+                builder.Append(", ");
+            }
+            builder[builder.Length - 1] = '\n';
+            builder[builder.Length - 2] = ' ';
+        }
+
+        if (!string.IsNullOrEmpty(m_Description))
+        {
+            builder.AppendLine(m_Description);
+        }
+        return builder.ToString();
+    }
 
     public bool ContainsSkillType(SkillEffectType skillType)
     {

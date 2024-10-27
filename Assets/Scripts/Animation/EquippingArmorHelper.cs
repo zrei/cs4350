@@ -1,8 +1,7 @@
-
-#if UNITY_EDITOR
 using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
 
 [CustomEditor(typeof(EquippingArmorHelper))]
 public class EquippingArmorHelperEditor : Editor
@@ -18,6 +17,7 @@ public class EquippingArmorHelperEditor : Editor
         }
     }
 }
+#endif
 
 [RequireComponent(typeof(EquippingArmor))]
 public class EquippingArmorHelper : MonoBehaviour
@@ -25,6 +25,7 @@ public class EquippingArmorHelper : MonoBehaviour
     [Header("Helper - for attaching bones")]
     [SerializeField] Transform m_BonesParent;
 
+    #if UNITY_EDITOR
     private EquippingArmor component;
 
     public void PopulateBones()
@@ -52,5 +53,6 @@ public class EquippingArmorHelper : MonoBehaviour
             LookIntoChildren(transformArray, child);
         }
     }
+    #endif
 }
-#endif
+

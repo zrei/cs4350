@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: FrostArmor
+  m_EditorClassIdentifier: 
+  m_SkillName: Frost Armor
+  m_Description: Give an ally 2 Defence Boost I tokens.
+  m_Icon: {fileID: 2232522528189805345, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 3
+  m_SkillTypes: 01000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: eb96b45dd1eecc540af4de5cfef3f762, type: 2}
+    m_Tier: 1
+    m_Number: 2
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 1
+  m_HealProportion: 1
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportTargetRules: []
+  m_TargetWillPlayHurtAnimation: 0
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 1
+  m_TargetRules:
+  - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
+  m_SkillFXs:
+  - m_AttachmentType: 0
+    m_WeaponModelIndex: 0
+    m_AttachPointIndex: 0
+    m_FeedbackSystemPrefab: {fileID: 965934133866386570, guid: c37b26d54ad5d6c4e9476ac8e506e5ba,
+      type: 3}
+  - m_AttachmentType: 2
+    m_WeaponModelIndex: 0
+    m_AttachPointIndex: 0
+    m_FeedbackSystemPrefab: {fileID: 7809357934258581437, guid: 8188a00edf990ab45bc32c9e58c43a34,
+      type: 3}

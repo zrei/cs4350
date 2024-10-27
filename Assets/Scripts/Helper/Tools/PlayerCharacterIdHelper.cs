@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CreateAssetMenu(fileName = "PlayerCharacterIdHelper", menuName = "ScriptableObject/IdHelpers/PlayerCharacterIdHelper")]
 public class PlayerCharacterIdHelper : IdHelper<PlayerCharacterSO>
 {
@@ -15,3 +16,4 @@ public class PlayerCharacterIdHelper : IdHelper<PlayerCharacterSO>
         return playerCharacterSO.m_Id;
     }
 }
+#endif

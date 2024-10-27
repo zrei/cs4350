@@ -420,39 +420,8 @@ namespace Game.UI
             if (skill == null) return;
 
             skillHeader.SetValue(skill.m_SkillName);
-            var builder = new StringBuilder();
-            if (skill.IsPhysicalAttack)
-            {
-                if (target != null)
-                {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):F1} <sprite name=\"PhysicalAttack\">");
-                }
-                else
-                {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):F1} <sprite name=\"PhysicalAttack\">");
-                }
-            }
-            if (skill.IsMagicAttack)
-            {
-                if (target != null)
-                {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, target, skill):F1} <sprite name=\"MagicAttack\">");
-                }
-                else
-                {
-                    builder.AppendLine($"DMG: {DamageCalc.CalculateDamage(currentUnit, skill):F1} <sprite name=\"MagicAttack\">");
-                }
-            }
-            if (skill.IsHeal)
-            {
-                builder.AppendLine($"HEAL: {DamageCalc.CalculateHealAmount(currentUnit, skill):F1}");
-            }
-            if (!string.IsNullOrEmpty(skill.m_Description))
-            {
-                builder.AppendLine(skill.m_Description);
-            }
+            var descriptionText = skill.GetDescription(currentUnit, target);
 
-            var descriptionText = builder.ToString();
             if (string.IsNullOrEmpty(descriptionText))
             {
                 skillDescription.gameObject.SetActive(false);
