@@ -1,6 +1,4 @@
-using Level;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public enum LevelState 
 {
@@ -11,47 +9,52 @@ public enum LevelState
 
 public class WorldMapNode : MonoBehaviour
 {
-    [SerializeField] LevelInfo m_LevelInfo;
+    [SerializeField] LevelSO m_LevelInfo;
     [SerializeField] Transform m_CharacterPosition;
-    [SerializeField] Spline m_Spline;
+    [SerializeField] WorldMapEdge m_WorldMapEdge;
+    [SerializeField] WorldMapVisual m_WorldMapVisual;
 
     // set during initialisation
     private LevelState m_LevelState;
-    private bool m_IsCurrent;
-    private int m_LevelNumber;
+    private bool m_IsCurrent = false;
+    public bool IsCurrent => m_IsCurrent;
 
     public void Initialise(LevelState initialState, bool isCurrentLevel)
     {
         m_LevelState = initialState;
         m_IsCurrent = isCurrentLevel;
+        if (initialState != LevelState.LOCKED)
+            m_WorldMapVisual.Initialise();
+        if (initialState == LevelState.CLEARED && !isCurrentLevel)
+            m_WorldMapEdge.InstantiatePath(m_WorldMapVisual.NodeRadiusOffset);
+        
+        if (isCurrentLevel)
+            m_WorldMapVisual.ToggleCurrLevel(true);
+
+        m_WorldMapVisual.OnSelected += OnSelected;
+        m_WorldMapVisual.OnDeselected += OnDeselected;
     }
 
-    public void EnterNode()
+    private void OnSelected()
     {
-        // display level UI
-        // difference depending on if it's cleared or not (cannot replay level?)
-        // expand node
+        if (!m_IsCurrent)
+            m_WorldMapVisual.ToggleSelected(true);
     }
 
-    public void ExitNode()
+    private void OnDeselected()
     {
-        // exit level UI
+        m_WorldMapVisual.ToggleSelected(false);
     }
 
     // on... click
-    public void OnLevelSelected()
+    public void OnGoToLevel()
     {
         // do stuff depending on state
     }
     // move through selection or just next and previous?
 
-    public void PlacePlayerToken(CharacterToken characterToken)
+    public void PlacePlayerToken(WorldMapPlayerToken characterToken)
     {
         characterToken.transform.position = m_CharacterPosition.transform.position;
-    }
-
-    public Vector3 GetPathPosition(float timeProportion)
-    {
-        return m_Spline.EvaluatePosition(timeProportion);
     }
 }

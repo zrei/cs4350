@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Game;
 using UnityEngine;
 
-public class WorldMapManager : MonoBehaviour
+public class WorldMapManager : Singleton<WorldMapManager>
 {
-    [SerializeField] private Level.CharacterToken m_PlayerToken;
+    [SerializeField] private WorldMapPlayerToken m_PlayerToken;
 
-    // in order
+    [Tooltip("World map nodes in order of level")]
     [SerializeField] private List<WorldMapNode> m_LevelNodes;
 
     // can handle camera here for now
@@ -16,20 +16,43 @@ public class WorldMapManager : MonoBehaviour
 
     private int m_CurrLevel;
 
-    private void Start()
+    protected override void HandleAwake()
     {
+        base.HandleAwake();
+
+        HandleDependencies();
+    }
+
+    protected override void HandleDestroy()
+    {
+        base.HandleDestroy();
+    }
+
+    private void HandleDependencies()
+    {
+        if (!SaveManager.IsReady)
+        {
+            SaveManager.OnReady += HandleDependencies;
+            return;
+        }
+
+        SaveManager.OnReady -= HandleDependencies;
+
         Initialise();
     }
 
     private void Initialise()
     {
+        Debug.Log("Run initialise");
         m_CurrLevel = SaveManager.Instance.LoadCurrentLevel();
         for (int i = 0; i < m_CurrLevel; ++i)
         {
+            m_LevelNodes[i].Initialise(LevelState.CLEARED, i == m_CurrLevel - 1);
             m_LevelNodes[i].gameObject.SetActive(true);
         }
         for (int i = m_CurrLevel; i < m_LevelNodes.Count; ++i)
         {
+            m_LevelNodes[i].Initialise(LevelState.LOCKED, false);
             m_LevelNodes[i].gameObject.SetActive(false);
         }
     }
@@ -39,6 +62,7 @@ public class WorldMapManager : MonoBehaviour
         return m_LevelNodes[levelNumber - 1];
     }
 
+    /*
     private void Awake()
     {
         if (FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
@@ -54,8 +78,9 @@ public class WorldMapManager : MonoBehaviour
         // reset flags
         FlagManager.Instance.SetFlagValue(Flags.WIN_LEVEL_FLAG, FlagType.SESSION, false);
         FlagManager.Instance.SetFlagValue(Flags.LOSE_LEVEL_FLAG, FlagType.SESSION, false);
-        */
+        
     }
+    */
 
     private void UnlockLevel()
     {
@@ -86,7 +111,7 @@ public class WorldMapManager : MonoBehaviour
         }
         worldMapCamera.transform.position = m_LevelNodes[newLevelNumber].transform.position;
         // fade character token back and change position
-        m_LevelNodes[newLevelNumber].PlacePlayerToken(m_PlayerToken);
+        //m_LevelNodes[newLevelNumber].PlacePlayerToken(m_PlayerToken);
         m_CurrLevel = newLevelNumber;
     }
 }

@@ -1,17 +1,63 @@
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 
-/// <summary>
-/// Will be used for set-up only
-/// </summary>
 public class WorldMapEdge : MonoBehaviour
 {
-    [SerializeField] private WorldMapNode m_StartingNode;
-    [SerializeField] private WorldMapNode m_EndNode;
+    [SerializeField] private Transform m_StartingPoint;
+    [SerializeField] private Transform m_EndPoint;
     [SerializeField] private SplineContainer m_SplineContainer;
+    [SerializeField] private WorldMapPathNode m_NodeObj;
 
     public SplineContainer Spline => m_SplineContainer;
+
+    private const float NODE_INTERVALS = 2f;
+    private const float DELAY = 0.5f;
+
+    public void InstantiatePath(float offset, bool instant = true)
+    {
+        float totalDistance = m_SplineContainer.CalculateLength();
+        float endingDistance = totalDistance - offset;
+        if (instant)
+            InstantiateAll(offset, endingDistance, totalDistance);
+        else
+            StartCoroutine(SpawnPathCoroutine(offset, endingDistance, totalDistance));
+    }
+
+    private void InstantiateAll(float startingDistance, float endingDistance, float totalDistance)
+    {
+        while (startingDistance < endingDistance)
+        {
+            InstantiatePathNode(GetPathNodePosition(startingDistance / totalDistance));
+            startingDistance += NODE_INTERVALS;
+        }
+    }
+
+    private Vector3 GetPathNodePosition(float proportionOfDistance)
+    {
+        return m_SplineContainer.EvaluatePosition(proportionOfDistance);
+    }
+
+    private void InstantiatePathNode(Vector3 position, bool instant = true, float appearTime = 0.1f)
+    {
+        WorldMapPathNode node = Instantiate(m_NodeObj, position, Quaternion.identity, this.transform);
+        
+        if (instant)
+            node.SetToMaxSize();
+        else
+            node.Expand(appearTime);
+    }
+
+    private IEnumerator SpawnPathCoroutine(float pathStartLength, float pathEndLength, float totalPathLength)
+    {
+        while (pathStartLength < pathEndLength)
+        {
+            yield return new WaitForSeconds(DELAY);
+            InstantiatePathNode(GetPathNodePosition(pathStartLength / totalPathLength), false, DELAY);
+            pathStartLength += NODE_INTERVALS;
+        }
+    }
 
 #if UNITY_EDITOR
     public void UpdateSpline()
@@ -31,12 +77,12 @@ public class WorldMapEdge : MonoBehaviour
 
         m_SplineContainer.Spline[0] = new BezierKnot() {Position = Vector3.zero};
         
-        if (m_StartingNode != null)
-            this.transform.position = m_StartingNode.transform.position;
+        if (m_StartingPoint != null)
+            this.transform.position = m_StartingPoint.position;
         
-        if (m_EndNode != null)
+        if (m_EndPoint != null)
         {
-            m_SplineContainer.Spline[m_SplineContainer.Spline.Count - 1] = new BezierKnot() {Position = m_SplineContainer.transform.InverseTransformPoint(m_EndNode.transform.position)};
+            m_SplineContainer.Spline[m_SplineContainer.Spline.Count - 1] = new BezierKnot() {Position = m_SplineContainer.transform.InverseTransformPoint(m_EndPoint.position)};
         }
     }
 #endif

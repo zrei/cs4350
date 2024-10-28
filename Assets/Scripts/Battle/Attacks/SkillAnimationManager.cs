@@ -51,7 +51,7 @@ public class SkillAnimationManager : MonoBehaviour
             if (activeSkill.m_TargetWillPlayHurtAnimation)
             {
                 foreach (Unit t in targets)
-                    t.PlayAnimations(Unit.HurtAnimParam);
+                    t.PlayAnimations(ArmorVisual.HurtAnimParam);
             }
             activeSkill.m_SkillFXs.ForEach(x => x.Play(attacker, targets));
         }
