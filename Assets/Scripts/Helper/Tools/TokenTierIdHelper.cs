@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CreateAssetMenu(fileName = "TokenTierIdHelper", menuName = "ScriptableObject/IdHelpers/TokenTierIdHelper")]
 public class TokenTierIdHelper : IdHelper<TokenTierSO>
 {
@@ -15,3 +16,4 @@ public class TokenTierIdHelper : IdHelper<TokenTierSO>
         return tokenTierSO.m_Id;
     }
 }
+#endif

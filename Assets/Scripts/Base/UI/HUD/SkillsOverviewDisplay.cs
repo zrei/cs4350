@@ -39,6 +39,8 @@ namespace Game.UI
         }
         private ActiveSkillSO lockedInSkill;
 
+        private PlayerCharacterData m_PlayerUnit;
+
         private void Awake()
         {
             canvasGroup = GetComponent<CanvasGroup>();
@@ -58,6 +60,7 @@ namespace Game.UI
             LockedInSkill = null;
             UpdateSkillDisplay(null);
             
+            m_PlayerUnit = playerUnit;
             activeSkills = playerUnit.CurrClass.m_ActiveSkills.ToList();
             
             for (int i = 0; i < activeSkillButtons.Count; i++)
@@ -98,7 +101,7 @@ namespace Game.UI
             }
             
             skillHeaderText.SetValue(skill.m_SkillName);
-            skillDescriptionText.SetValue(skill.m_Description);
+            skillDescriptionText.SetValue(skill.GetDescription(m_PlayerUnit, null));
         }
 
         public void Hide()

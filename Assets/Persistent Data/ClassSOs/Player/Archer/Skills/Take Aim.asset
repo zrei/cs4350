@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: Take Aim
+  m_EditorClassIdentifier: 
+  m_SkillName: Take Aim
+  m_Description: 'Gives yourself a Damage Boost II token and a Crit Token.
+
+    Can
+    only be used in the back 3 rows.'
+  m_Icon: {fileID: 21300000, guid: 801d70e86f16f4742829fadf4e4c9afc, type: 3}
+  m_SkillType: 0
+  m_ConsumedMana: 5
+  m_SkillTypes: 01000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: eb96b45dd1eecc540af4de5cfef3f762, type: 2}
+    m_Tier: 2
+    m_Number: 1
+  - m_TokenTierData: {fileID: 11400000, guid: 83a815389a0744034b7b6743cdd08642, type: 2}
+    m_Tier: 1
+    m_Number: 1
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 1
+  m_HealProportion: 1
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportTargetRules: []
+  m_TargetWillPlayHurtAnimation: 0
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 2
+  m_TargetRules:
+  - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
+  - {fileID: 11400000, guid: 8f8423bc60ccc4a4a95c3efc1f66ed53, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
+  m_SkillFXs:
+  - m_AttachmentType: 1
+    m_WeaponModelIndex: 0
+    m_AttachPointIndex: 0
+    m_FeedbackSystemPrefab: {fileID: 7809357934258581437, guid: 8188a00edf990ab45bc32c9e58c43a34,
+      type: 3}

@@ -14,4 +14,9 @@ public abstract class StatusEffectSO : ScriptableObject
     public Color m_Color = Color.white;
     public virtual StatusEffectType StatusEffectType => StatusEffectType.INFLICT_DAMAGE;
     public int m_MaxStack;
+
+    public override string ToString()
+    {
+        return m_Sprite != null ? $"<sprite name=\"{m_Sprite.name}\" tint>" : m_StatusEffectName;
+    }
 }

@@ -46,15 +46,20 @@ namespace Game.UI
         public IUIScreen LevelUpResultScreen => LoadScreen("LevelUpResultScreen");
         public IUIScreen LevelResultScreen => LoadScreen("LevelResultScreen");
 
+        [SerializeField]
+        private List<GameObject> screenPrefabs = new();
+
         private IUIScreen LoadScreen(string name)
         {
             if (!screens.ContainsKey(name))
             {
-                var prefab = Addressables.LoadAssetAsync<GameObject>($"{name}").WaitForCompletion();
+                //var prefab = Addressables.LoadAssetAsync<GameObject>($"{name}").WaitForCompletion();
+                var prefab = screenPrefabs.Find(x => x.name == name);
+                if (prefab == null) return null;
                 var screen = Instantiate(prefab, hidden).GetComponent<IUIScreen>();
                 screen.Initialize();
                 screens.Add(name, screen);
-                Addressables.Release(prefab);
+                //Addressables.Release(prefab);
             }
             return screens[name];
         }

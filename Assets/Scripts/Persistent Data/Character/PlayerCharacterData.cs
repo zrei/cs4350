@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class PlayerCharacterData
+public class PlayerCharacterData : ICanAttack
 {
     public PlayerCharacterSO m_BaseData;
     [HideInInspector]
@@ -50,6 +50,35 @@ public class PlayerCharacterData
     /// This is only a pointer since the weapon instance itself can change.
     /// </summary>
     public int? m_CurrEquippedWeaponId;
+
+    // temp implementation for skill descriptions to calculate damage in level screen
+    #region ICanAttack
+    public void PerformSkill(ActiveSkillSO attack, List<IHealth> targets)
+    {
+        return;
+    }
+
+    public float GetBaseAttackModifier()
+    {
+        return GetWeaponInstanceSO().m_BaseAttackModifier;
+    }
+
+    public float GetBaseHealModifier()
+    {
+        return GetWeaponInstanceSO().m_BaseHealModifier;
+    }
+
+    public float GetTotalStat(StatType statType, float baseModifier = 1)
+    {
+        // does not account for passives
+        return TotalBaseStats.GetStat(statType) * baseModifier;
+    }
+
+    public float GetFinalCritProportion()
+    {
+        return 1f;
+    }
+    #endregion
 
     public PlayerCharacterBattleData GetBattleData()
     {

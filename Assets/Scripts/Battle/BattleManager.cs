@@ -286,6 +286,8 @@ public class BattleManager : Singleton<BattleManager>
         if (m_AllPlayerUnits.Count == 0)
             return true;
 
+        if (m_SecondaryLoseCondition == null) return false;
+
         foreach (SecondaryLoseCondition loseCondition in m_SecondaryLoseCondition)
         {
             switch (loseCondition)

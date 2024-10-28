@@ -43,7 +43,7 @@ public class LevelManager : MonoBehaviour
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;
-    [SerializeField] private NodeInternal m_StartNode;
+    [SerializeField] private StartNode m_StartNode;
     [SerializeField] private NodeInternal m_GoalNode;
     
     // UI
@@ -124,7 +124,7 @@ public class LevelManager : MonoBehaviour
         
         GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
         
-        StartPlayerPhase();
+        m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
     
     #endregion
@@ -303,8 +303,6 @@ public class LevelManager : MonoBehaviour
             m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
             
             m_LevelTimerLogic.AdvanceTimer(timeCost);
-        
-            if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
             if (m_LevelNodeManager.IsCurrentNodeCleared())
             {
@@ -520,12 +518,6 @@ public class LevelManager : MonoBehaviour
                 m_LevelTimerLogic.AdvanceTimer(-m_PendingRewards[RewardType.TIME]);
             }
             m_PendingRewards[RewardType.TIME] = 0;
-            
-            if (m_LevelTimerLogic.TimeRemaining <= 0)
-            {
-                hasEvent = true;
-                return;
-            }
         }
         
         if (m_PendingRewards.ContainsKey(RewardType.EXP))

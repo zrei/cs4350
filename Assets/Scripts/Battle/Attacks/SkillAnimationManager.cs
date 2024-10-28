@@ -41,12 +41,19 @@ public class SkillAnimationManager : MonoBehaviour
         {
             attacker.AnimationEventHandler.onSkillHit -= OnSkillHit;
 
-            IEnumerator SlowTime()
+            IEnumerator ExecuteWithDelay()
             {
                 yield return new WaitForSeconds(0.1f);
                 TimeManager.Instance.ModifyTime(0.1f, 0.5f);
             }
-            StartCoroutine(SlowTime());
+            StartCoroutine(ExecuteWithDelay());
+
+            if (activeSkill.m_TargetWillPlayHurtAnimation)
+            {
+                foreach (Unit t in targets)
+                    t.PlayAnimations(Unit.HurtAnimParam);
+            }
+            activeSkill.m_SkillFXs.ForEach(x => x.Play(attacker, targets));
         }
         attacker.AnimationEventHandler.onSkillHit += OnSkillHit;
 
@@ -59,35 +66,37 @@ public class SkillAnimationManager : MonoBehaviour
         }
         attacker.AnimationEventHandler.onSkillComplete += OnSkillComplete;
 
+        var battleManager = BattleManager.Instance;
+
         Unit player = null;
         Unit enemy = null;
         var target = targets[0];
-        if (attacker.UnitAllegiance == UnitAllegiance.PLAYER && target.UnitAllegiance == UnitAllegiance.ENEMY)
+        var isOneOnOne = targets.Count == 1 && (attacker.UnitAllegiance != target.UnitAllegiance || m_IsSelfTarget);
+        if (isOneOnOne)
         {
-            player = attacker;
-            enemy = target;
-        }
-        else if (attacker.UnitAllegiance == UnitAllegiance.ENEMY && target.UnitAllegiance == UnitAllegiance.PLAYER)
-        {
-            player = target;
-            enemy = attacker;
-        }
-        else if (m_IsSelfTarget)
-        {
-            player = target;
-        }
-        else if (attacker.UnitAllegiance == target.UnitAllegiance)
-        {
-            player = attacker;
-            enemy = target;
-        }
+            if (attacker.UnitAllegiance == UnitAllegiance.PLAYER && target.UnitAllegiance == UnitAllegiance.ENEMY)
+            {
+                player = attacker;
+                enemy = target;
+            }
+            else if (attacker.UnitAllegiance == UnitAllegiance.ENEMY && target.UnitAllegiance == UnitAllegiance.PLAYER)
+            {
+                player = target;
+                enemy = attacker;
+            }
+            else if (m_IsSelfTarget)
+            {
+                player = target;
+            }
+            else if (attacker.UnitAllegiance == target.UnitAllegiance)
+            {
+                // todo: handle buff skill animation
+                player = attacker;
+                enemy = target;
+            }
 
-        var battleManager = BattleManager.Instance;
-
-        if (!activeSkill.IsAoe && attacker.UnitAllegiance != target.UnitAllegiance)
-        {
             m_SkillAnimVCam.enabled = true;
-            
+
             foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(0, 0.25f);
             foreach (var unit in battleManager.EnemyUnits) unit.FadeMesh(0, 0.25f);
             yield return new WaitForSeconds(0.5f);
@@ -113,18 +122,12 @@ public class SkillAnimationManager : MonoBehaviour
 
         attacker.PlaySkillExecuteAnimation();
 
-        if (activeSkill.m_TargetWillPlayHurtAnimation)
-        {
-            foreach (Unit t in targets)
-                t.PlayAnimations(Unit.HurtAnimParam);
-        }
-
         while (!isSkillComplete) yield return null;
 
-        if (!activeSkill.IsAoe && attacker.UnitAllegiance != target.UnitAllegiance)
-        {
-            m_SkillAnimVCam.enabled = false;
+        m_SkillAnimVCam.enabled = false;
 
+        if (isOneOnOne)
+        {
             player?.FadeMesh(0, 0.25f);
             enemy?.FadeMesh(0, 0.25f);
             yield return new WaitForSeconds(0.5f);

@@ -203,7 +203,7 @@ public class PlayerTurnManager : TurnManager
     {
         if (selectedTileData == null || selectedTileVisual == null) return;
 
-        if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
+        if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, m_CachedTargetTile, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
         {
             m_MapLogic.SetTeleportTarget(selectedTileVisual.GridType, selectedTileVisual.Coordinates, m_CachedTargetTile);
         }
@@ -302,10 +302,10 @@ public class PlayerTurnManager : TurnManager
     {
         if (selectedTileData == null || selectedTileVisual == null) return false;
 
-        if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
+        if (m_MapLogic.IsValidTeleportTile(SelectedSkill, m_CurrUnit, m_CachedTargetTile, selectedTileVisual.Coordinates, selectedTileVisual.GridType))
         {
             m_MapLogic.PerformTeleportSkill(
-                selectedTileVisual.GridType,
+                SelectedSkill.TargetGridType(m_CurrUnit.UnitAllegiance),
                 m_CurrUnit,
                 SelectedSkill,
                 m_CachedTargetTile,
@@ -313,6 +313,9 @@ public class PlayerTurnManager : TurnManager
                 CompleteSkill);
             m_MapLogic.ResetMap();
             Logger.Log(this.GetType().Name, "Attack + Teleport!", LogLevel.LOG);
+
+            GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(null);
+            GlobalEvents.Battle.PreviewUnitEvent?.Invoke(null);
             return true;
         }
         else

@@ -1,18 +1,24 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public interface IFeedback
 {
+    bool IsPlaying { get; }
+
     void Play();
     void Stop();
 }
 
 public class FeedbackSystem : MonoBehaviour, IFeedback
 {
-    IFeedback[] feedbacks;
+    public List<IFeedback> feedbacks;
+
+    public bool IsPlaying { get => feedbacks.Any(x => x.IsPlaying); }
 
     private void Awake()
     {
-        feedbacks = GetComponentsInChildren<IFeedback>();
+        feedbacks = new(GetComponentsInChildren<IFeedback>());
     }
 
     public void Play()

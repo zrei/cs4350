@@ -44,4 +44,9 @@ public static class DamageCalc
 
         return finalHealAmount;
     }
+
+    public static float CalculateManaAlterAmount(ICanAttack healer, ActiveSkillSO attackSO)
+    {
+        return healer.GetTotalStat(StatType.MAG_ATTACK, attackSO.m_ManaAlterProportion);
+    }
 }
