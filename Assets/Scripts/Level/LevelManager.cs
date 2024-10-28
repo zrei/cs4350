@@ -43,7 +43,7 @@ public class LevelManager : MonoBehaviour
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;
-    [SerializeField] private NodeInternal m_StartNode;
+    [SerializeField] private StartNode m_StartNode;
     [SerializeField] private NodeInternal m_GoalNode;
     
     // UI
@@ -124,7 +124,7 @@ public class LevelManager : MonoBehaviour
         
         GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
         
-        StartPlayerPhase();
+        m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
     
     #endregion
@@ -135,9 +135,7 @@ public class LevelManager : MonoBehaviour
     {
         if (m_LevelNodeManager.IsGoalNodeCleared())
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.SUCCESS);
-            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
-            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO, LevelResultType.SUCCESS);
         }
         else
         {
@@ -305,8 +303,6 @@ public class LevelManager : MonoBehaviour
             m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
             
             m_LevelTimerLogic.AdvanceTimer(timeCost);
-        
-            if (m_LevelTimerLogic.TimeRemaining <= 0) return;
 
             if (m_LevelNodeManager.IsCurrentNodeCleared())
             {
@@ -379,7 +375,7 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
         GlobalEvents.Level.DialogueNodeEndEvent -= OnDialogueNodeEnd;
-        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
+        GlobalEvents.Level.LevelEndEvent -= OnLevelEnd;
     }
 
     private void OnBattleNodeStart(BattleNode battleNode)
@@ -425,7 +421,7 @@ public class LevelManager : MonoBehaviour
 
         void OnFailureAnimComplete()
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO.m_LevelId, LevelResultType.DEFEAT);
+            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO, LevelResultType.DEFEAT);
         }
     }
     
@@ -479,9 +475,24 @@ public class LevelManager : MonoBehaviour
         StartPlayerPhase();
     }
 
-    private void OnLevelEnd(int levelId, LevelResultType result)
+    private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
     {
         UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
+
+        if (result == LevelResultType.SUCCESS)
+        {
+            Debug.Log("Receiving Reward Characters");
+            CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
+            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
+            
+            foreach (var weaponReward in levelSo.m_RewardWeapons)
+            {
+                InventoryManager.Instance.ObtainWeapon(weaponReward);
+            }
+            InventoryManager.Instance.SaveWeapons();
+            
+            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
+        }
     }
     
     #endregion
@@ -507,12 +518,6 @@ public class LevelManager : MonoBehaviour
                 m_LevelTimerLogic.AdvanceTimer(-m_PendingRewards[RewardType.TIME]);
             }
             m_PendingRewards[RewardType.TIME] = 0;
-            
-            if (m_LevelTimerLogic.TimeRemaining <= 0)
-            {
-                hasEvent = true;
-                return;
-            }
         }
         
         if (m_PendingRewards.ContainsKey(RewardType.EXP))

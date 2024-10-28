@@ -11,6 +11,11 @@ public class InflictedToken
 
     public int Id => m_TokenTierData.m_Id;
     public TokenType TokenType => m_TokenTierData.TokenType;
+
+    public override string ToString()
+    {
+        return $"<color=#{ColorUtility.ToHtmlStringRGB(m_TokenTierData.m_Color)}>{m_Number}x {m_TokenTierData}{TokenUtil.NumToRomanNumeral(m_Tier)}</color>";
+    }
 }
 
 /*

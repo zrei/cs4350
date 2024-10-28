@@ -1,19 +1,46 @@
+using System.Linq;
 using Game.UI;
 using UnityEngine;
+
+[System.Serializable]
+public struct LevelButtonData
+{
+    public int levelId;
+    public NamedObjectButton button;
+    public FlagCondition[] conditions;
+    
+    public bool IsConditionsSatisfied()
+    {
+        if (conditions == null) return true;
+        return conditions.All(flagCondition => {
+            if (!FlagManager.IsReady) return true;
+            return FlagManager.Instance.GetFlagValue(flagCondition.flagName) == flagCondition.flagValue;
+        });
+    }
+}
 
 // Temp menu for accessing multiple levels from world map
 public class UI_WorldMapMenu : MonoBehaviour
 {
-    [SerializeField] NamedObjectButton m_Level1Button;
-    [SerializeField] NamedObjectButton m_Level2Button;
+    [SerializeField] LevelButtonData[] m_LevelButtons;
     
     private CanvasGroup m_CanvasGroup;
 
     private void Awake()
     {
-        m_Level1Button.onSubmit.AddListener(() => LoadLevel(0));
-        m_Level2Button.onSubmit.AddListener(() => LoadLevel(1));
-        m_Level2Button.interactable = false;
+        foreach (LevelButtonData levelButtonData in m_LevelButtons)
+        {
+            levelButtonData.button.onSubmit.AddListener(OnSubmit);
+            levelButtonData.button.interactable = levelButtonData.IsConditionsSatisfied();
+            continue;
+
+            void OnSubmit()
+            {
+                // Load level then disable button
+                LoadLevel(levelButtonData.levelId);
+                levelButtonData.button.interactable = false;
+            }
+        }
         
         m_CanvasGroup = GetComponent<CanvasGroup>();
         Show();
@@ -44,8 +71,11 @@ public class UI_WorldMapMenu : MonoBehaviour
         m_CanvasGroup.alpha = 1;
         m_CanvasGroup.interactable = true;
         m_CanvasGroup.blocksRaycasts = true;
-        
-        m_Level2Button.interactable = FlagManager.Instance.GetFlagValue("Level1Complete");
+
+        foreach (var levelButtonData in m_LevelButtons)
+        {
+            levelButtonData.button.interactable = levelButtonData.IsConditionsSatisfied();
+        }
     }
     
     private void Hide()

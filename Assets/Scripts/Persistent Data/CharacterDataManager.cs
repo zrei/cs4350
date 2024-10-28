@@ -108,6 +108,15 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     /// <param name="playerCharacterSOs"></param>
     public void ReceiveCharacters(List<PlayerCharacterSO> playerCharacterSOs)
     {
+        foreach (var entry in m_CharacterData)
+        {
+            Debug.Log($"Current: Name: {entry.Value.m_BaseData.m_CharacterName}, Id: {entry.Key}");
+        }
+        foreach (var entry in playerCharacterSOs)
+        {
+            Debug.Log($"To Add: Name: {entry.m_CharacterName}, Id: {entry.m_Id}");
+        }
+        
         playerCharacterSOs.ForEach(x => ReceiveCharacter(x));
     }
 

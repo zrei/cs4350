@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 
 // hack to get around the generic
 public interface IIdHelper
@@ -13,6 +13,7 @@ public interface IIdHelper
     public void ClearPlayerPrefs();
 }
 
+#if UNITY_EDITOR
 public abstract class IdHelper<T> : ScriptableObject, IIdHelper where T : ScriptableObject
 {
     [Tooltip("Whether to limit the search to a separate root folder instead of searching through the entire Assets folder")]
@@ -90,6 +91,7 @@ public abstract class IdHelper<T> : ScriptableObject, IIdHelper where T : Script
         }
     }
 }
+#endif
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(IdHelper<>), true)]

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0a7ebad90a3c4dc4bc704849093ffd4, type: 3}
+  m_Name: PriestPathGroupSO
+  m_EditorClassIdentifier: 
+  m_PathName: Priest
+  m_PathClasses:
+  - m_Class: {fileID: 11400000, guid: 26351872e5f518d439255232b6d3e846, type: 2}
+    m_IsDefault: 1
+    m_UnlockCondition:
+      m_IsLevelLocked: 0
+      m_LevelLock: 0
+      m_IsMoralityLocked: 0
+      m_MoralityThreshold:
+        m_GreaterThan: 0
+        m_Threshold: 0
+      m_IsFlagLocked: 0
+      m_Flags: []

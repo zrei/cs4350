@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5510be21b76ff4def82015b84d96eece, type: 3}
+  m_Name: FinalBattleSO
+  m_EditorClassIdentifier: 
+  m_EnemyUnitsToSpawn:
+  - m_Coordinates:
+      m_Row: 1
+      m_Col: 3
+    m_EnemyCharacterData: {fileID: 11400000, guid: c3c2e1ad391594d4091b962190bff0ac,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 1
+  - m_Coordinates:
+      m_Row: 1
+      m_Col: 1
+    m_EnemyCharacterData: {fileID: 11400000, guid: c3c2e1ad391594d4091b962190bff0ac,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 1
+  - m_Coordinates:
+      m_Row: 4
+      m_Col: 3
+    m_EnemyCharacterData: {fileID: 11400000, guid: 0ea15ef28c3233949a7e4691837dcd60,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 1
+  - m_Coordinates:
+      m_Row: 4
+      m_Col: 1
+    m_EnemyCharacterData: {fileID: 11400000, guid: 0ea15ef28c3233949a7e4691837dcd60,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 1
+  - m_Coordinates:
+      m_Row: 3
+      m_Col: 2
+    m_EnemyCharacterData: {fileID: 11400000, guid: 0ea15ef28c3233949a7e4691837dcd60,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 1
+  - m_Coordinates:
+      m_Row: 2
+      m_Col: 2
+    m_EnemyCharacterData: {fileID: 11400000, guid: c3c2e1ad391594d4091b962190bff0ac,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_DefeatRequired: 1
+  m_PlayerStartingTiles:
+  - m_Row: 1
+    m_Col: 0
+  - m_Row: 1
+    m_Col: 1
+  - m_Row: 1
+    m_Col: 2
+  - m_Row: 1
+    m_Col: 3
+  - m_Row: 1
+    m_Col: 4
+  - m_Row: 2
+    m_Col: 0
+  - m_Row: 2
+    m_Col: 1
+  - m_Row: 2
+    m_Col: 2
+  - m_Row: 2
+    m_Col: 3
+  - m_Row: 2
+    m_Col: 4
+  - m_Row: 3
+    m_Col: 0
+  - m_Row: 3
+    m_Col: 1
+  - m_Row: 3
+    m_Col: 2
+  - m_Row: 3
+    m_Col: 3
+  - m_Row: 3
+    m_Col: 4
+  m_ExpReward: 400
+  m_WinCondition: 0
+  m_TurnsToSurvive: 25
+  m_AdditionalLoseConditions: 
+  m_MaxTurns: 25

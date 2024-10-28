@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName="LevelSO", menuName="ScriptableObject/Level/LevelSO")]
@@ -16,4 +17,7 @@ public class LevelSO : ScriptableObject
     public string PreDialogueFlag => "PRE_DIALOGUE_" + m_LevelId;
     public string PostDialogueFlag => "POST_DIALOGUE_" + m_LevelId;
     public string LevelCompleteFlag => "LEVEL_COMPLETE_" + m_LevelId;
+    
+    public List<PlayerCharacterSO> m_RewardCharacters;
+    public List<WeaponInstanceSO> m_RewardWeapons;
 }

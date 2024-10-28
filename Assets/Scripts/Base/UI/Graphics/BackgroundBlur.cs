@@ -69,7 +69,7 @@ namespace Game.UI
         {
             if (init) return;
 
-            blurMat = new(Addressables.LoadAssetAsync<Shader>("GaussianBlur").WaitForCompletion());
+            blurMat = new Material(Shader.Find("GaussianBlur"));
             background = GetComponent<RawImage>();
             
             init = true;

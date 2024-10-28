@@ -303,7 +303,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 2720
-        y: 2720
+        y: 2713
         width: 512
         height: 512
       alignment: 0
@@ -470,7 +470,7 @@ TextureImporter:
       name: BowShot
       rect:
         serializedVersion: 2
-        x: 544
+        x: 537
         y: 1632
         width: 512
         height: 512
@@ -555,7 +555,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 2720
-        y: 1632
+        y: 1625
         width: 512
         height: 512
       alignment: 0
@@ -576,7 +576,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 1088
+        y: 1081
         width: 512
         height: 512
       alignment: 0
@@ -950,7 +950,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Summon
+      name: AttackDown
       rect:
         serializedVersion: 2
         x: 0
@@ -958,7 +958,7 @@ TextureImporter:
         width: 512
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -971,7 +971,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Teleport
+      name: Summon
       rect:
         serializedVersion: 2
         x: 544
@@ -979,7 +979,7 @@ TextureImporter:
         width: 512
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1000,7 +1000,7 @@ TextureImporter:
         width: 512
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1021,7 +1021,7 @@ TextureImporter:
         width: 512
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1029,6 +1029,27 @@ TextureImporter:
       bones: []
       spriteID: a8924ff602b0a6b4d85ae29aa7e549ac
       internalID: -806908879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Teleport
+      rect:
+        serializedVersion: 2
+        x: 1088
+        y: 3808
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 350a803c081fd53489a5aa71405d1b65
+      internalID: 1797265971
       vertices: []
       indices: 
       edges: []
@@ -1044,6 +1065,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      AttackDown: -927014203
       AttackIntent: -97088158288067470
       Bleed: -5188099564364658938
       BlindingLight: 8314747776392273183
@@ -1057,6 +1079,7 @@ TextureImporter:
       HandOfLight: -6789252460078593350
       Heal: -2519354409239675539
       Hunger: -8828248864853810611
+      Icons_1: -1484437962
       Inspect: -6432770400480951439
       Jab: -7653575836030749839
       Lunge: -1657715152261080285
@@ -1079,11 +1102,11 @@ TextureImporter:
       Speed: 6823316075010515700
       Stack: -3136499987535188048
       Steps: 644687021031443899
-      Summon: -927014203
+      Summon: -1531901422
       SwapIntent: 6947849505947395973
       Sweep: 4745216710218349964
       TacticalRetreat: -1929982818213864919
-      Teleport: -1531901422
+      Teleport: 1797265971
       Thunderstorm: 5930800197632967489
       TimeToAct: 5713308170288447385
       Turn: -3932851293694860304

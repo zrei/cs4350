@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CreateAssetMenu(fileName = "StatusEffectIdHelper", menuName = "ScriptableObject/IdHelpers/StatusEffectIdHelper")]
 public class StatusEffectIdHelper : IdHelper<StatusEffectSO>
 {
@@ -15,3 +16,4 @@ public class StatusEffectIdHelper : IdHelper<StatusEffectSO>
         return statusEffectSO.m_Id;
     }
 }
+#endif

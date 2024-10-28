@@ -23,6 +23,9 @@ public class GridLogic : MonoBehaviour
 
     private CanvasGroup canvasGroup;
 
+    public delegate void TeleportEvent(GridType teleportTargetGrid, CoordPair teleportStartTile, CoordPair teleportDestination);
+    public TeleportEvent OnTeleportUnit;
+
     #region Initialisation
     private void Start()
     {
@@ -145,17 +148,24 @@ public class GridLogic : MonoBehaviour
     public void ShowTeleportRange(ActiveSkillSO skill, Unit unit, CoordPair initialTarget)
     {
         canvasGroup.interactable = true;
+        GridType targetGridType = skill.TargetGridType(unit.UnitAllegiance);
 
         // color the targeted unit's tile
-        if (GridHelper.GetTargetType(skill, unit.UnitAllegiance) == m_GridType)
+        if (targetGridType == m_GridType)
             m_TileVisuals[initialTarget.m_Row, initialTarget.m_Col].ToggleTarget(true);
-        
+
+        CoordPair teleportStartTile = skill.TeleportStartTile(unit, initialTarget);
+        GridType teleportGridType = skill.TeleportTargetGrid(unit);
+        // the teleported unit is the self, and it is different from the targeted unit
+        if (skill.m_TeleportSelf && teleportGridType == m_GridType && (teleportGridType != targetGridType || !teleportStartTile.Equals(initialTarget)))
+            m_TileVisuals[teleportStartTile.m_Row, teleportStartTile.m_Col].ToggleTarget(true);
+
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 var tileVisual = m_TileVisuals[r, c];
-                var isTeleportable = IsValidTeleportTile(skill, unit, tileVisual.Coordinates);
+                var isTeleportable = IsValidTeleportTile(skill, unit, initialTarget, tileVisual.Coordinates);
                 if (isTeleportable)
                 {
                     tileVisual.selectable.interactable = true;
@@ -487,9 +497,9 @@ public class GridLogic : MonoBehaviour
         return IsValidSkillTargetTile(activeSkillSO, unit, targetTile, checkOccupied) && activeSkillSO.IsValidAttackerTile(unit.CurrPosition);
     }
 
-    public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair targetTile)
+    public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair initialTarget, CoordPair targetTile)
     {
-        if (!activeSkillSO.IsValidTeleportTargetTile(targetTile, unit, m_GridType))
+        if (!activeSkillSO.IsValidTeleportTargetTile(initialTarget, targetTile, unit, m_GridType))
             return false;
 
         if (IsTileOccupied(targetTile))
@@ -613,7 +623,10 @@ public class GridLogic : MonoBehaviour
                 if (target.IsDead)
                     GlobalEvents.Battle.UnitDefeatedEvent?.Invoke((Unit) target);
                 else
-                    SwapTiles(targetTile, teleportTile);
+                {
+                    OnTeleportUnit?.Invoke(activeSkill.TeleportTargetGrid(attacker), activeSkill.TeleportStartTile(attacker, targetTile), teleportTile);
+                }
+                    
             }
 
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
@@ -724,16 +737,6 @@ public static class GridHelper
     {
         return (unitSide == UnitAllegiance.PLAYER && targetType == GridType.ENEMY) || (unitSide == UnitAllegiance.ENEMY && targetType == GridType.PLAYER);
     }
-
-    public static GridType GetTargetType(ActiveSkillSO activeSkillSO, UnitAllegiance unitSide)
-    {
-        if (activeSkillSO.IsSelfTarget)
-            return GetSameSide(unitSide);
-        else if (activeSkillSO.IsOpposingSideTarget)
-            return GetOpposingSide(unitSide);
-        else
-            return GetSameSide(unitSide);
-    }   
 
     public static GridType GetSameSide(UnitAllegiance unitSide)
     {

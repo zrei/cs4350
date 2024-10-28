@@ -31,9 +31,7 @@ public class LevelTimerLogic : MonoBehaviour
     public void AddTime(float deltaTime)
     {
         m_TimeRemaining += deltaTime;
-        m_TimeRemaining = deltaTime < 0 
-            ? Mathf.Max(0, m_TimeRemaining) 
-            : Mathf.Min(m_TimeLimit, m_TimeRemaining);
+        m_TimeRemaining = Mathf.Max(0, m_TimeRemaining + deltaTime);
         
         GlobalEvents.Level.TimeRemainingUpdatedEvent(m_TimeRemaining);
     }

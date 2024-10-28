@@ -7,6 +7,10 @@ public abstract class ClassSO : ScriptableObject
     public Sprite m_Icon;
     public OutfitType m_OutfitType;
 
+    [Header("Armor Colour")]
+    public Color m_ArmorPlate;
+    public Color m_ArmorTrim;
+    public Color m_UnderArmor;
 
     [Header("Weapon")]
     public WeaponTypeSO m_WeaponType;
