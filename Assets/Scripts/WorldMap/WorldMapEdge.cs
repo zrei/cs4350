@@ -1,10 +1,10 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 
 /// <summary>
 /// Will be used for set-up only
 /// </summary>
-[ExecuteInEditMode]
 public class WorldMapEdge : MonoBehaviour
 {
     [SerializeField] private WorldMapNode m_StartingNode;
@@ -14,7 +14,7 @@ public class WorldMapEdge : MonoBehaviour
     public SplineContainer Spline => m_SplineContainer;
 
 #if UNITY_EDITOR
-    private void Update()
+    public void UpdateSpline()
     {
         if (m_SplineContainer == null)
             return;
@@ -42,3 +42,25 @@ public class WorldMapEdge : MonoBehaviour
 #endif
 }
 
+#if UNITY_EDITOR
+[CustomEditor(typeof(WorldMapEdge))]
+public class WorldMapEdgeEditor : Editor
+{
+    WorldMapEdge m_Target;
+
+    private void OnEnable()
+    {
+        m_Target = (WorldMapEdge) target;
+    }
+
+    public override void OnInspectorGUI()
+    {   
+        base.OnInspectorGUI();
+
+        if (GUILayout.Button("Update spline"))
+        {
+            m_Target.UpdateSpline();
+        }
+    }
+}
+#endif
