@@ -143,8 +143,7 @@ public class SaveManager : Singleton<SaveManager>
     #region Level Progress
     public int LoadCurrentLevel()
     {
-        return 5;
-        //return PlayerPrefs.GetInt("LEVEL_PROGRESS", 1);
+        return PlayerPrefs.GetInt("LEVEL_PROGRESS", 1);
     }
     #endregion
 
