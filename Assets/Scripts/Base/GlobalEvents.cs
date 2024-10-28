@@ -43,7 +43,7 @@ public static class GlobalEvents {
         public delegate void RewardNodeEvent(RewardNode _);
         public delegate void DialogueNodeEvent(DialogueNode _);
         public delegate void MassLevelUpEvent(List<LevelUpSummary> _);
-        public delegate void LevelResultEvent(int levelId, LevelResultType _);
+        public delegate void LevelResultEvent(LevelSO levelSo, LevelResultType _);
         public static FloatEvent TimeRemainingUpdatedEvent;
         public static NodeEvent NodeEnteredEvent;
         public static NodeEvent NodeClearedEvent;
