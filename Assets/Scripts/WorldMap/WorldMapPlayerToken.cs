@@ -4,14 +4,30 @@ using UnityEngine.Splines;
 
 public class WorldMapPlayerToken : BaseCharacterToken
 {
+    private const float MOVE_SPEED = 6.0f;
+
+    #region Initialisation
     public void Initialise(PlayerCharacterSO lordCharacter, ClassSO lordClass, WeaponInstanceSO lordEquippedWeapon)
     {
         Initialise(lordCharacter.GetUnitModelData(lordClass.m_OutfitType), lordEquippedWeapon, lordClass);
     }
+    #endregion
 
-    public void MoveAlongSpline(SplineContainer splineContainer, float speed, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    #region Follow Path
+    public void MoveAlongSpline(float initialDelay, Quaternion initialRotation, SplineContainer splineContainer, Quaternion finalRotation, VoidEvent completeMovementEvent)
     {
-        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, speed, finalRotation, completeMovementEvent));
+        StartCoroutine(PreRotation(initialDelay, initialRotation, () => PostRotation(splineContainer, finalRotation, completeMovementEvent)));
+    }
+
+    private IEnumerator PreRotation(float initialDelay, Quaternion initialRotation, VoidEvent postRotation)
+    {
+        yield return new WaitForSeconds(initialDelay);
+         StartCoroutine(Rotate(initialRotation, postRotation, ROTATION_TIME));
+    }
+
+    private void PostRotation(SplineContainer splineContainer, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    {
+        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, MOVE_SPEED, finalRotation, completeMovementEvent));
     }
 
     private IEnumerator MoveAlongSpline_Coroutine(SplineContainer splineContainer, float speed, Quaternion finalRotation, VoidEvent completeMovementEvent)
@@ -43,4 +59,12 @@ public class WorldMapPlayerToken : BaseCharacterToken
             completeMovementEvent?.Invoke();
         }
     }
+    #endregion
+
+    #region Graphics
+    public void FadeMesh(float targetOpacity, float duration)
+    {
+        m_ArmorVisual.FadeMesh(targetOpacity, duration);
+    }
+    #endregion
 }

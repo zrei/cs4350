@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelSO : ScriptableObject
 {
     public int m_LevelId;
+    public int m_LevelNum;
     public string m_LevelName;
     [TextArea]
     public string m_LevelDescription;

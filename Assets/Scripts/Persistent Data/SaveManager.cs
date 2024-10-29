@@ -39,6 +39,7 @@ public class SaveManager : Singleton<SaveManager>
     private const string INVENTORY_DATA_KEY = "InventoryData";
     private const string MORALITY_DATA_KEY = "MoralityData";
     private const string FLAG_KEY = "FlagData";
+    private const string LEVEL_KEY = "LevelProgress";
     private const string ITEM_SEPARATOR = "\t";
 
     protected override void HandleAwake()
@@ -143,7 +144,7 @@ public class SaveManager : Singleton<SaveManager>
     #region Level Progress
     public int LoadCurrentLevel()
     {
-        return PlayerPrefs.GetInt("LEVEL_PROGRESS", 1);
+        return PlayerPrefs.GetInt(LEVEL_KEY, 1);
     }
     #endregion
 

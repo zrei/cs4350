@@ -13,16 +13,20 @@ public class WorldMapEdge : MonoBehaviour
     public SplineContainer Spline => m_SplineContainer;
 
     private const float NODE_INTERVALS = 2f;
-    private const float DELAY = 0.5f;
+    private const float NODE_SPAWN_DELAY = 0.3f;
 
-    public void InstantiatePath(float offset, bool instant = true)
+    #region Path
+    public void InstantiatePath(float offset, bool instant = true, VoidEvent onCompleteInstantiation = null)
     {
         float totalDistance = m_SplineContainer.CalculateLength();
         float endingDistance = totalDistance - offset;
         if (instant)
+        {
             InstantiateAll(offset, endingDistance, totalDistance);
+            onCompleteInstantiation?.Invoke();
+        }
         else
-            StartCoroutine(SpawnPathCoroutine(offset, endingDistance, totalDistance));
+            StartCoroutine(SpawnPathCoroutine(offset, endingDistance, totalDistance, onCompleteInstantiation));
     }
 
     private void InstantiateAll(float startingDistance, float endingDistance, float totalDistance)
@@ -34,6 +38,19 @@ public class WorldMapEdge : MonoBehaviour
         }
     }
 
+    private IEnumerator SpawnPathCoroutine(float pathStartLength, float pathEndLength, float totalPathLength, VoidEvent onCompleteInstantiation)
+    {
+        while (pathStartLength < pathEndLength)
+        {
+            yield return new WaitForSeconds(NODE_SPAWN_DELAY);
+            InstantiatePathNode(GetPathNodePosition(pathStartLength / totalPathLength), false, NODE_SPAWN_DELAY);
+            pathStartLength += NODE_INTERVALS;
+        }
+        onCompleteInstantiation?.Invoke();
+    }
+    #endregion
+
+    #region Helper
     private Vector3 GetPathNodePosition(float proportionOfDistance)
     {
         return m_SplineContainer.EvaluatePosition(proportionOfDistance);
@@ -49,15 +66,12 @@ public class WorldMapEdge : MonoBehaviour
             node.Expand(appearTime);
     }
 
-    private IEnumerator SpawnPathCoroutine(float pathStartLength, float pathEndLength, float totalPathLength)
+    public Vector3 GetInitialSplineForwardDirection()
     {
-        while (pathStartLength < pathEndLength)
-        {
-            yield return new WaitForSeconds(DELAY);
-            InstantiatePathNode(GetPathNodePosition(pathStartLength / totalPathLength), false, DELAY);
-            pathStartLength += NODE_INTERVALS;
-        }
+        return ((Vector3) (Spline[0][1].Position - Spline[0][0].Position)).normalized;
     }
+    #endregion
+    
 
 #if UNITY_EDITOR
     public void UpdateSpline()

@@ -83,6 +83,11 @@ public class FlagManager : Singleton<FlagManager>
         GlobalEvents.Flags.SetFlagEvent?.Invoke(flag, value, flagType);
     }
 
+    public void SetFlagValue(Flag flag, bool value, FlagType flagType)
+    {
+        SetFlagValue(flag.ToString(), value, flagType);
+    }
+
     public bool GetFlagValue(string flag)
     {
         if (!m_Flags.TryGetValue(flag, out FlagWrapper flagValue))

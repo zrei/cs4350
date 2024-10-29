@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Splines;
 
 public enum LevelState 
 {
@@ -10,29 +11,51 @@ public enum LevelState
 public class WorldMapNode : MonoBehaviour
 {
     [SerializeField] LevelSO m_LevelInfo;
-    [SerializeField] Transform m_CharacterPosition;
     [SerializeField] WorldMapEdge m_WorldMapEdge;
     [SerializeField] WorldMapVisual m_WorldMapVisual;
 
     // set during initialisation
     private LevelState m_LevelState;
+    public LevelState LevelState => m_LevelState;
     private bool m_IsCurrent = false;
     public bool IsCurrent => m_IsCurrent;
 
+    public int LevelNum => m_LevelInfo.m_LevelNum;
+    public LevelSO LevelSO => m_LevelInfo;
+
+    public SplineContainer Spline => m_WorldMapEdge.Spline;
+    public Vector3 InitialSplineForwardDirection => m_WorldMapEdge.GetInitialSplineForwardDirection();
+
+    #region Initialise
     public void Initialise(LevelState initialState, bool isCurrentLevel)
     {
         m_LevelState = initialState;
-        m_IsCurrent = isCurrentLevel;
         if (initialState != LevelState.LOCKED)
             m_WorldMapVisual.Initialise();
         if (initialState == LevelState.CLEARED && !isCurrentLevel)
             m_WorldMapEdge.InstantiatePath(m_WorldMapVisual.NodeRadiusOffset);
         
-        if (isCurrentLevel)
-            m_WorldMapVisual.ToggleCurrLevel(true);
+        ToggleCurrLevel(isCurrentLevel);
 
         m_WorldMapVisual.OnSelected += OnSelected;
         m_WorldMapVisual.OnDeselected += OnDeselected;
+    }
+
+    private void OnDestroy()
+    {
+        m_WorldMapVisual.OnSelected -= OnSelected;
+        m_WorldMapVisual.OnDeselected -= OnDeselected;
+    }
+    #endregion
+
+    #region Update Graphics
+    public void ToggleCurrLevel(bool isCurrent)
+    {
+        if (m_IsCurrent == isCurrent)
+            return;
+        
+        m_IsCurrent = isCurrent;
+        m_WorldMapVisual.ToggleCurrLevel(m_IsCurrent);
     }
 
     private void OnSelected()
@@ -45,16 +68,25 @@ public class WorldMapNode : MonoBehaviour
     {
         m_WorldMapVisual.ToggleSelected(false);
     }
+    #endregion
 
-    // on... click
-    public void OnGoToLevel()
+    #region Path
+    public void UnlockNode()
     {
-        // do stuff depending on state
+        m_WorldMapVisual.UnlockNode();
     }
-    // move through selection or just next and previous?
 
+    public void UnlockPath(VoidEvent onCompleteInstantiate)
+    {
+        m_WorldMapEdge.InstantiatePath(m_WorldMapVisual.NodeRadiusOffset, false, onCompleteInstantiate);
+    }
+    #endregion
+
+    #region Token
     public void PlacePlayerToken(WorldMapPlayerToken characterToken)
     {
-        characterToken.transform.position = m_CharacterPosition.transform.position;
+        characterToken.transform.position = transform.position + m_WorldMapVisual.TokenOffset;
+
     }
+    #endregion
 }

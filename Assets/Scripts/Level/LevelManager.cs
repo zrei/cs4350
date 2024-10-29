@@ -39,7 +39,7 @@ public class LevelManager : MonoBehaviour
     // Unit Data
     [SerializeField] LevellingManager m_LevellingManager;
 
-    [SerializeField] LevelCameraController m_LevelCameraController;
+    [SerializeField] PlaneCameraController m_LevelCameraController;
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;

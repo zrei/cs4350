@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Encompasses logic for the little nodes that make up a path
+/// </summary>
 public class WorldMapPathNode : MonoBehaviour
 {
     [SerializeField] private Vector3 m_MaxSize = new Vector3(0.4f, 0.4f, 0.4f);

@@ -6,19 +6,19 @@ using UnityEngine;
 /// <summary>
 /// Manages the controls of the level camera
 /// </summary>
-public class LevelCameraController : MonoBehaviour
+public class PlaneCameraController : MonoBehaviour
 {
-    [SerializeField] CinemachineVirtualCamera m_LevelVCam;
-    [SerializeField] Transform m_LevelCameraLookAtTransform;
-    [SerializeField] Transform m_LevelLeftLimitTransform;
-    [SerializeField] Transform m_LevelRightLimitTransform;
-    [SerializeField] Transform m_LevelTopLimitTransform;
-    [SerializeField] Transform m_LevelBottomLimitTransform;
+    [SerializeField] CinemachineVirtualCamera m_VCam;
+    [SerializeField] Transform m_CameraLookAtTransform;
+    [SerializeField] Transform m_LeftLimitTransform;
+    [SerializeField] Transform m_RightLimitTransform;
+    [SerializeField] Transform m_TopLimitTransform;
+    [SerializeField] Transform m_BottomLimitTransform;
     
-    private float LookAtPosXLimit => m_LevelRightLimitTransform.position.x;
-    private float LookAtNegXLimit => m_LevelLeftLimitTransform.position.x;
-    private float LookAtPosZLimit => m_LevelTopLimitTransform.position.z;
-    private float LookAtNegZLimit => m_LevelBottomLimitTransform.position.z;
+    private float LookAtPosXLimit => m_RightLimitTransform.position.x;
+    private float LookAtNegXLimit => m_LeftLimitTransform.position.x;
+    private float LookAtPosZLimit => m_TopLimitTransform.position.z;
+    private float LookAtNegZLimit => m_BottomLimitTransform.position.z;
     
     // Camera Movement
     [SerializeField] const float CAMERA_MOVEMENT_SPEED = 5f;
@@ -27,10 +27,10 @@ public class LevelCameraController : MonoBehaviour
 
     #region Initialisation
 
-    public void Initialise(Transform playerTokenTransform)
+    public void Initialise(Transform followTransform)
     {
-        m_LevelCameraLookAtTransform.parent = playerTokenTransform;
-        m_LevelCameraLookAtTransform.localPosition = Vector3.zero;
+        m_CameraLookAtTransform.parent = followTransform;
+        m_CameraLookAtTransform.localPosition = Vector3.zero;
     }
 
     #endregion
@@ -52,7 +52,7 @@ public class LevelCameraController : MonoBehaviour
     
     public void RecenterCamera()
     {
-        m_LevelCameraLookAtTransform.localPosition = Vector3.zero;
+        m_CameraLookAtTransform.localPosition = Vector3.zero;
     }
     
     private void OnCameraMove(IInput input)
@@ -68,9 +68,9 @@ public class LevelCameraController : MonoBehaviour
             
             while (m_CameraMovementDirection.magnitude > 0.1f)
             {
-                var currPos = m_LevelCameraLookAtTransform.position;
+                var currPos = m_CameraLookAtTransform.position;
                 var posChange = new Vector3(m_CameraMovementDirection.x, 0, m_CameraMovementDirection.y) * (CAMERA_MOVEMENT_SPEED * Time.deltaTime);
-                m_LevelCameraLookAtTransform.position = new Vector3(
+                m_CameraLookAtTransform.position = new Vector3(
                     Mathf.Clamp(currPos.x + posChange.x, LookAtNegXLimit, LookAtPosXLimit),
                     currPos.y,
                     Mathf.Clamp(currPos.z + posChange.z, LookAtNegZLimit, LookAtPosZLimit));

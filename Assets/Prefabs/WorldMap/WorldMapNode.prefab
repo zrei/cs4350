@@ -8,10 +8,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3831763147904999130, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4755246068308688464, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
       propertyPath: m_Name
       value: WorldMapNode
+      objectReference: {fileID: 0}
+    - target: {fileID: 5268485457214556558, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 7512533894349906086, guid: c9071d1592e7143be9c500ec030495ce,
         type: 3}
@@ -112,7 +127,7 @@ MonoBehaviour:
   m_MeshRenderer: {fileID: 281592164769548988}
   m_selectedCursorToken: {fileID: 3755029988610461115}
   m_NormalScale: {x: 1, y: 1, z: 1}
-  m_MinScale: {x: 0.5, y: 1, z: 0.5}
+  m_MinScale: {x: 0.85, y: 1, z: 0.85}
 --- !u!114 &508201963362305752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,6 +141,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LevelInfo: {fileID: 0}
-  m_CharacterPosition: {fileID: 0}
   m_WorldMapEdge: {fileID: 0}
   m_WorldMapVisual: {fileID: 7099161106430741213}

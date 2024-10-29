@@ -7,15 +7,16 @@ public class WorldMapVisual : BaseNodeVisual
     [SerializeField] private Vector3 m_NormalScale = new Vector3(5f, 5f, 5f);
     [SerializeField] private Vector3 m_MinScale = new Vector3(3f, 3f, 3f);
 
-    public override float NodeRadiusOffset => 0.7f;
+    public override float NodeRadiusOffset => 1.0f;
+    public override Vector3 TokenOffset => new Vector3(0f, 1.5f);
 
     public VoidEvent OnSelected;
     public VoidEvent OnDeselected;  
 
     private Coroutine m_CurrLevelCoroutine = null;
-    private bool m_IsCurrent = false;
 
-    private const float HALF_CYCLE_TIME = 1.0f;
+    private const float HALF_CYCLE_TIME = 3.0f;
+    private const float APPEAR_TIME = 0.5f;
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
@@ -37,21 +38,35 @@ public class WorldMapVisual : BaseNodeVisual
         // do nothing
     }
 
-    private void SetToNormalScale()
+    #region Unlock Node    
+    public void UnlockNode()
     {
+        this.transform.localScale = Vector3.zero;
+        StartCoroutine(ExpandToNormalSize_Coroutine());
+    }
+
+    private IEnumerator ExpandToNormalSize_Coroutine()
+    {
+        float t = 0f;
+
+        while (t < APPEAR_TIME)
+        {
+            yield return null;
+            t += Time.deltaTime;
+            float x = Mathf.Lerp(m_MinScale.x, m_NormalScale.x, t / APPEAR_TIME);
+            float y = Mathf.Lerp(m_MinScale.y, m_NormalScale.y, t / APPEAR_TIME);
+            float z = Mathf.Lerp(m_MinScale.z, m_NormalScale.z, t / APPEAR_TIME);
+            this.transform.localScale = new Vector3(x, y, z);
+            
+        }
+        
         this.transform.localScale = m_NormalScale;
     }
+    #endregion
 
-    private void SetToMinScale()
-    {
-        this.transform.localScale = m_MinScale;
-    }
-
+    #region Curr Level Animation
     public void ToggleCurrLevel(bool isCurrent)
     {
-        if (m_IsCurrent == isCurrent)
-            return;
-
         if (m_CurrLevelCoroutine != null)
         {
             StopCoroutine(m_CurrLevelCoroutine);
@@ -63,8 +78,6 @@ public class WorldMapVisual : BaseNodeVisual
         {
             m_CurrLevelCoroutine = StartCoroutine(CurrLevel_Coroutine());
         }
-
-        m_IsCurrent = isCurrent;
     }
 
     private IEnumerator CurrLevel_Coroutine()
@@ -95,6 +108,17 @@ public class WorldMapVisual : BaseNodeVisual
             }
         }
     }
+    #endregion
 
-    
+    #region Size Helpers
+    private void SetToNormalScale()
+    {
+        this.transform.localScale = m_NormalScale;
+    }
+
+    private void SetToMinScale()
+    {
+        this.transform.localScale = m_MinScale;
+    }
+    #endregion
 }
