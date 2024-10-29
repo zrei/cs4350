@@ -46,6 +46,11 @@ namespace Game.UI
                 _ => "???"
             };
 
+            if (result == LevelResultType.SUCCESS)
+            {
+                FlagManager.Instance.SetFlagValue(result == LevelResultType.SUCCESS ? Flag.WIN_LEVEL_FLAG : Flag.LOSE_LEVEL_FLAG, true, FlagType.SESSION);
+            }
+
             currentLevelId = levelSo.m_LevelId;
             
             bool hasRewards = levelSo.m_RewardCharacters.Count > 0 || levelSo.m_RewardWeapons.Count > 0;

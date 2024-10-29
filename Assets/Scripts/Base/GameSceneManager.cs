@@ -43,7 +43,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
         m_WorldLight = FindAnyObjectByType<Light>(FindObjectsInactive.Exclude);
         m_OnSceneChange += () => m_WorldLight.gameObject.SetActive(false);
         
-        var sceneIndex = LEVEL_1_SCENE_INDEX + levelId;
+        var sceneIndex = LEVEL_1_SCENE_INDEX;// + levelId;
         StartCoroutine(LoadAdditiveSceneWithTransition(sceneIndex));
         return;
         
@@ -62,7 +62,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
         m_AfterSceneChange = () => GlobalEvents.Level.ReturnFromLevelEvent?.Invoke();
         
         // Unload the level scene
-        var sceneIndex = LEVEL_1_SCENE_INDEX + levelId;
+        var sceneIndex = LEVEL_1_SCENE_INDEX;// + levelId;
         StartCoroutine(UnloadAdditiveSceneWithTransition(sceneIndex));
     }
 

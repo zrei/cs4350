@@ -1,69 +1,314 @@
 using System.Collections;
 using System.Collections.Generic;
-using Game;
+using Game.Input;
 using UnityEngine;
 
-public class WorldMapManager : MonoBehaviour
+public class WorldMapManager : Singleton<WorldMapManager>
 {
-    [SerializeField] private Level.CharacterToken m_PlayerToken;
+    [Header("Camera")]
+    [SerializeField] private PlaneCameraController m_CameraController;
+
+    [Header("Objects")]
+    [SerializeField] private WorldMapPlayerToken m_PlayerToken;
+    [Tooltip("World map nodes in order of level")]
     [SerializeField] private List<WorldMapNode> m_LevelNodes;
 
-    // can handle camera here for now
+    [Space]
+    // TODO: Grab information from the data instead
+    [SerializeField] private PlayerCharacterSO m_Character;
+    [SerializeField] private WeaponInstanceSO m_EquippedWeapon;
+    [SerializeField] private PlayerClassSO m_PlayerClass;
 
-    private const float TELEPORT_TIME = 1f;
+    private WorldMapPlayerToken m_PlayerTokenInstance = null;
+    private WorldMapNode m_CurrTargetNode = null;
 
-    private int m_CurrLevel;
+    private int m_CurrUnlockedLevel;
+    private int m_CurrSelectedLevel;
 
-    public WorldMapNode GetLevel(int levelNumber)
+    private const float TOKEN_MOVE_DELAY = 0.3f;
+
+    #region Initialisation
+    protected override void HandleAwake()
     {
-        return m_LevelNodes[levelNumber - 1];
+        base.HandleAwake();
+
+        GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
+        GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
+
+        HandleDependencies();
     }
 
-    private void Awake()
+    protected override void HandleDestroy()
     {
-        if (FlagManager.Instance.GetFlagValue(Flags.WIN_LEVEL_FLAG))
+        base.HandleDestroy();
+
+        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
+        GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
+        
+        DisableAllControls();
+    }
+
+    private void HandleDependencies()
+    {
+        if (!SaveManager.IsReady)
         {
-            // proceed to the next level
+            SaveManager.OnReady += HandleDependencies;
+            return;
+        }
+
+        SaveManager.OnReady -= HandleDependencies;
+
+        Initialise();
+    }
+
+    private void Initialise()
+    {
+        m_CurrSelectedLevel = SaveManager.Instance.LoadCurrentLevel();
+        m_CurrUnlockedLevel = m_CurrSelectedLevel;
+
+        // initialise the all unlocked nodes 
+        for (int i = 0; i < m_CurrSelectedLevel; ++i)
+        {
+            bool isCurrLevel = i == m_CurrSelectedLevel - 1;
+            m_LevelNodes[i].Initialise(isCurrLevel ? LevelState.UNLOCKED : LevelState.CLEARED, isCurrLevel);
+            m_LevelNodes[i].gameObject.SetActive(true);
+        }
+
+        // initialise the locked nodes
+        for (int i = m_CurrSelectedLevel; i < m_LevelNodes.Count; ++i)
+        {
+            m_LevelNodes[i].Initialise(LevelState.LOCKED, false);
+            m_LevelNodes[i].gameObject.SetActive(false);
+        }
+
+        // instantiate the player token
+        m_PlayerTokenInstance = Instantiate(m_PlayerToken, Vector3.zero, Quaternion.identity);
+        m_PlayerTokenInstance.Initialise(m_Character, m_PlayerClass, m_EquippedWeapon);
+        
+        // place the player on the current node
+        WorldMapNode currNode = GetWorldMapNode(m_CurrSelectedLevel);
+        currNode.PlacePlayerToken(m_PlayerTokenInstance);
+
+        // initialise the camera
+        m_CameraController.Initialise(m_PlayerTokenInstance.transform);
+        
+        EnableAllControls();
+
+        // initialise the UI
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
+    }
+    #endregion
+
+    #region Selection Controls
+    private void EnableSelection()
+    {
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnSelectInput;
+        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
+    }
+
+    private void DisableSelection()
+    {
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnSelectInput;
+        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
+    }
+
+    private void OnSelectInput(IInput input)
+    {
+        if (m_CurrTargetNode != null && m_CurrTargetNode.LevelNum != m_CurrSelectedLevel)
+        {
+            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, m_CurrTargetNode));
+        }
+    }
+
+    private void OnPointerPosition(IInput input)
+    {
+        var inputVector = input.GetValue<Vector2>();
+        Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
+        TryRetrieveNode(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetNode);
+    }
+
+    private bool TryRetrieveNode(Ray ray, out WorldMapNode node)
+    {
+        RaycastHit[] raycastHits = Physics.RaycastAll(ray, Mathf.Infinity, LayerMask.GetMask("WorldMap"));
+        //Debug.DrawRay(ray.origin, ray.direction * 100, Color.white, 100f, false); 
+        foreach (RaycastHit raycastHit in raycastHits)
+        {
+            node = raycastHit.collider.gameObject.GetComponentInParent<WorldMapNode>();
+
+            if (node)
+                return true;
+        }
+        node = default;
+        
+        return false;
+    }
+    #endregion
+
+    #region Level Loading
+    private void OnBeginLoadLevel()
+    {
+        m_CameraController.RecenterCamera();
+        DisableAllControls();
+    }
+
+    private void OnReturnFromLevel()
+    {
+        m_CameraController.RecenterCamera();
+
+        if (FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
+        {
+            UnlockLevel();
         }
         else
         {
-            // do nothing, the level is not completed
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(GetWorldMapNode(m_CurrUnlockedLevel).LevelSO, false));
+            EnableAllControls();
         }
 
-        /*
         // reset flags
-        FlagManager.Instance.SetFlagValue(Flags.WIN_LEVEL_FLAG, FlagType.SESSION, false);
-        FlagManager.Instance.SetFlagValue(Flags.LOSE_LEVEL_FLAG, FlagType.SESSION, false);
-        */
+        FlagManager.Instance.SetFlagValue(Flag.WIN_LEVEL_FLAG, false, FlagType.SESSION);
+        FlagManager.Instance.SetFlagValue(Flag.LOSE_LEVEL_FLAG, false, FlagType.SESSION);
+    }
+    #endregion
+
+    #region Unlock Level
+    private void UnlockLevel()
+    {
+        WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
+        // TODO: need to handle final level case
+        WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
+
+        // reset curr level animation
+        currNode.ToggleCurrLevel(false);
+
+        // start path animation
+        currNode.UnlockPath(PostUnlockPath);
+
+        // start moving unit
+        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currNode.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currNode.Spline, Quaternion.LookRotation(currNode.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
+
+        // have the next node pop up
+        void PostUnlockPath()
+        {
+            nextNode.gameObject.SetActive(true);
+            nextNode.UnlockNode();
+        }
+
+        // re-enable world map controls
+        void PostMovement()
+        {
+            nextNode.ToggleCurrLevel(true);
+            EnableAllControls();
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(nextNode.LevelSO, false));
+        }
+
+        m_CurrUnlockedLevel += 1;
+        m_CurrSelectedLevel = m_CurrUnlockedLevel;
+    }
+    #endregion
+
+    #region Navigating
+    private void EnableNavigation()
+    {
+        InputManager.Instance.NavigateLevelAction.OnChangeEvent += OnNavigateLevel;
+        InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent += OnFocusCurrentLevel;
     }
 
-    private void MoveToLevel(int newLevelNumber)
+    private void DisableNavigation()
     {
-        if (newLevelNumber == m_CurrLevel)
+        InputManager.Instance.NavigateLevelAction.OnChangeEvent -= OnNavigateLevel;
+        InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent -= OnFocusCurrentLevel;
+    }
+
+    private void OnFocusCurrentLevel(IInput input)
+    {
+        if (m_CurrSelectedLevel != m_CurrUnlockedLevel)
+        {
+            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrUnlockedLevel)));
+        }
+        else
+        {
+            m_CameraController.RecenterCamera();
+        }   
+    }
+
+    private void OnNavigateLevel(IInput input)
+    {
+        float navigateSide = input.GetValue<float>();
+
+        if (navigateSide < 0)
+            NavigateToPrev();
+        else if (navigateSide > 0)
+            NavigateToNext();
+    }
+
+    private void NavigateToPrev()
+    {
+        if (m_CurrSelectedLevel <= 1)
             return;
 
-        MoveToLevel(m_CurrLevel, newLevelNumber);
+        StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel - 1)));
     }
 
-    // literally just teleport them to the level
-    private IEnumerator MoveToLevel(int currLevelNumber, int newLevelNumber)
+    private void NavigateToNext()
     {
-        // do a fade + block inputs
-        yield return new WaitForSeconds(0.5f);
-        Camera worldMapCamera = CameraManager.Instance.MainCamera;
-        // move x and z, dont touch y
-        float t = 0f;
-        while (t < TELEPORT_TIME)
-        {
-            t += Time.deltaTime;
-            float xLerp = Mathf.Lerp(m_LevelNodes[currLevelNumber].transform.position.x, m_LevelNodes[newLevelNumber].transform.position.x, t / TELEPORT_TIME);
-            float zLerp = Mathf.Lerp(m_LevelNodes[currLevelNumber].transform.position.z, m_LevelNodes[newLevelNumber].transform.position.z, t / TELEPORT_TIME);
-            worldMapCamera.transform.position = new Vector3(xLerp, m_LevelNodes[currLevelNumber].transform.position.y, zLerp);
-            yield return null;
-        }
-        worldMapCamera.transform.position = m_LevelNodes[newLevelNumber].transform.position;
-        // fade character token back and change position
-        m_LevelNodes[newLevelNumber].PlacePlayerToken(m_PlayerToken);
-        m_CurrLevel = newLevelNumber;
+        if (m_CurrSelectedLevel >= m_CurrUnlockedLevel)
+            return;
+
+        StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel + 1)));
     }
+
+    private IEnumerator MoveToLevel(int currLevelNumber, WorldMapNode newWorldMapNode)
+    {
+        // disable controls
+        DisableAllControls();
+
+        // fade the unit
+        m_PlayerTokenInstance.FadeMesh(0f, 0.2f);
+        yield return new WaitForSeconds(0.2f);
+
+        // stop the current level animation
+        GetWorldMapNode(currLevelNumber).ToggleCurrLevel(false);
+
+        // fade unit back and change position
+        newWorldMapNode.PlacePlayerToken(m_PlayerTokenInstance);
+        m_PlayerTokenInstance.FadeMesh(1f, 0.2f);
+        
+        // update the current node
+        m_CurrSelectedLevel = newWorldMapNode.LevelNum;
+        newWorldMapNode.ToggleCurrLevel(true);
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(newWorldMapNode.LevelSO, newWorldMapNode.LevelState == LevelState.CLEARED));
+        
+        // re-enable controls
+        EnableAllControls();
+    }
+    #endregion
+
+    #region Overall Controls
+    private void DisableAllControls()
+    {
+        m_CameraController.DisableCameraMovement();
+        DisableSelection();
+        DisableNavigation();
+    }
+
+    private void EnableAllControls()
+    {
+        m_CameraController.EnableCameraMovement();
+        EnableSelection();
+        EnableNavigation();
+    }
+    #endregion
+
+    #region Helper
+    /// <summary>
+    /// Helper to get the world map node based on the 1-indexed level number
+    /// </summary>
+    /// <param name="levelNumber"></param>
+    /// <returns></returns>
+    private WorldMapNode GetWorldMapNode(int levelNumber)
+    {
+        return m_LevelNodes[levelNumber - 1];
+    }
+    #endregion
 }

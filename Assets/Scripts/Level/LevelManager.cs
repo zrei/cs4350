@@ -36,7 +36,7 @@ public class LevelManager : MonoBehaviour
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
 
-    [SerializeField] LevelCameraController m_LevelCameraController;
+    [SerializeField] PlaneCameraController m_LevelCameraController;
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;

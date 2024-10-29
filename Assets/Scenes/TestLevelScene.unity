@@ -6532,10 +6532,10 @@ GameObject:
   m_Component:
   - component: {fileID: 975374358}
   - component: {fileID: 975374359}
-  - component: {fileID: 975374364}
   - component: {fileID: 975374365}
   - component: {fileID: 975374366}
   - component: {fileID: 975374367}
+  - component: {fileID: 975374368}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -6578,27 +6578,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_LevelNodeManager: {fileID: 517906213}
   m_LevelNodeVisualManager: {fileID: 1864550199}
-  m_LevelTokenManager: {fileID: 975374364}
+  m_LevelTokenManager: {fileID: 975374368}
   m_LevelTimerLogic: {fileID: 2123650211}
   m_LevellingManager: {fileID: 975374366}
   m_LevelCameraController: {fileID: 975374365}
   m_LevelSO: {fileID: 11400000, guid: c68e0084b280d40cfacf6bf8f65a3f72, type: 2}
   m_StartNode: {fileID: 9059603446000607190}
   m_GoalNode: {fileID: 1318922018}
---- !u!114 &975374364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975374356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4307351c54a44a4ac3c7f4942ce7064, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_CharacterToken: {fileID: 5286906893726745741, guid: db6c6533ba6a249e49bd9617058474a7,
-    type: 3}
 --- !u!114 &975374365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6732,6 +6718,20 @@ MonoBehaviour:
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
   m_LevelManager: {fileID: 975374359}
+--- !u!114 &975374368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975374356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4307351c54a44a4ac3c7f4942ce7064, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PlayerToken: {fileID: 8280771122343421941, guid: db6c6533ba6a249e49bd9617058474a7,
+    type: 3}
 --- !u!1001 &1148106120
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -29,27 +29,9 @@ public delegate void TrackedValueEvent(float change, float current, float max);
 
 public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange, IMultStatChange, ICritModifier, ITauntTarget
 {
-    #region Animation
-    private static readonly int DirXAnimParam = Animator.StringToHash("DirX");
-    private static readonly int DirYAnimParam = Animator.StringToHash("DirY");
-    private static readonly int IsMoveAnimParam = Animator.StringToHash("IsMove");
+    [SerializeField] private ArmorVisual m_ArmorVisual;
 
-    private static readonly int SkillStartAnimParam = Animator.StringToHash("SkillStart");
-    private static readonly int SkillExecuteAnimParam = Animator.StringToHash("SkillExecute");
-    private static readonly int SkillCancelAnimParam = Animator.StringToHash("SkillCancel");
-    private static readonly int SkillIDAnimParam = Animator.StringToHash("SkillID");
-
-    private static readonly int PoseIDAnimParam = Animator.StringToHash("PoseID");
-
-    public static readonly int HurtAnimParam = Animator.StringToHash("Hurt");
-    private static readonly int DeathAnimParam = Animator.StringToHash("IsDead");
-
-    private Animator m_Animator;
-    private bool m_IsSkillAnimStarted;
-    private AnimationEventHandler m_AnimationEventHandler;
-
-    public AnimationEventHandler AnimationEventHandler => m_AnimationEventHandler;
-    #endregion
+    public AnimationEventHandler AnimationEventHandler => m_ArmorVisual.AnimationEventHandler;
 
     #region Current Status
     // current health
@@ -93,15 +75,18 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     private WeaponInstanceSO m_EquippedWeapon;
-    private List<WeaponModel> m_WeaponModels = new();
     private readonly List<TokenStack> m_PermanentTokens = new();
 
-    public List<WeaponModel> WeaponModels => m_WeaponModels;
+    public List<WeaponModel> WeaponModels => m_ArmorVisual.WeaponModels;
 
     #region Initialisation
     protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
-        InstantiateModel(unitModelData, weaponInstanceSO, classSo);
+        m_ArmorVisual.InstantiateModel(unitModelData, weaponInstanceSO, classSo);
+        m_EquippedWeapon = weaponInstanceSO;
+        WeaponAnimationType = classSo.WeaponAnimationType;
+        GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
+
         // initialise permanent tokens first just in case there's something that affects max mana or max health
         InitialisePermanentTokens(weaponInstanceSO, permanentTokens);
 
@@ -110,61 +95,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_CurrHealth = GetTotalStat(StatType.HEALTH);
         m_CurrMana = GetTotalStat(StatType.MANA);
         m_Class = classSo;
-    }
-
-    /// <summary>
-    /// Helps to instantiate the correct base model, and equip it with the class' equipment + weapons
-    /// </summary>
-    /// <param name="unitModelData"></param>
-    /// <param name="weaponSO"></param>
-    private void InstantiateModel(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
-    {
-        GameObject model = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, this.transform);
-        EquippingArmor equipArmor = model.GetComponent<EquippingArmor>();
-        equipArmor.Initialize(unitModelData.m_AttachItems);
-
-        ChangeArmorMaterial(model, classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
-
-        m_EquippedWeapon = weaponSO;
-        foreach (var weaponModelPrefab in m_EquippedWeapon.m_WeaponModels)
-        {
-            if (weaponModelPrefab != null)
-            {
-                var weaponModel = Instantiate(weaponModelPrefab);
-                var attachPoint = weaponModel.attachmentType switch
-                {
-                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
-                    _ => null,
-                };
-                weaponModel.transform.SetParent(attachPoint, false);
-                m_WeaponModels.Add(weaponModel);
-            }
-        }
-
-        m_Animator = model.GetComponentInChildren<Animator>();
-        if (m_Animator == null)
-        {
-            Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
-        }
-        m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
-
-        WeaponAnimationType = classSO.WeaponAnimationType;
-        m_Animator.SetInteger(PoseIDAnimParam, (int)WeaponAnimationType);
-
-        GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
-
-        m_MeshFader = gameObject.AddComponent<MeshFader>();
-        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
-    }
-    #endregion
-
-    #region Rendering
-    private MeshFader m_MeshFader;
-
-    public void FadeMesh(float targetOpacity, float duration)
-    {
-        m_MeshFader.Fade(targetOpacity, duration);
     }
 
     private void InitialisePermanentTokens(WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
@@ -179,6 +109,13 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             m_PermanentTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier));
         }
     }
+    #endregion
+
+    #region Rendering
+    public void FadeMesh(float targetOpacity, float targetDuration)
+    {
+        m_ArmorVisual.FadeMesh(targetOpacity, targetDuration);
+    }    
     #endregion
 
     #region Placement
@@ -238,14 +175,14 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             StopCoroutine(moveCoroutine);
         }
 
-        m_Animator.SetBool(IsMoveAnimParam, true);
+        m_ArmorVisual.SetMoveAnimator(true);
         m_CurrPosition = endPosition;
         moveCoroutine = StartCoroutine(MoveThroughCheckpoints(positionsToMoveThrough, FinishMovement));
 
         void FinishMovement()
         {
             moveCoroutine = null;
-            m_Animator.SetBool(IsMoveAnimParam, false);
+            m_ArmorVisual.SetMoveAnimator(false);
             onCompleteMovement?.Invoke();
         }
     }
@@ -267,9 +204,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             // TODO: Handle this better later
             Vector3 directionVec = (nextPos - currPos).normalized;
             Vector3 localVec = transform.InverseTransformVector(directionVec);
-            m_Animator.SetFloat(DirXAnimParam, directionVec.x);
-            m_Animator.SetFloat(DirYAnimParam, directionVec.z);
-            print($"x: {m_Animator.GetFloat(DirXAnimParam)}; z: {m_Animator.GetFloat(DirYAnimParam)}");
+            m_ArmorVisual.SetDirAnim(ArmorVisual.DirXAnimParam, directionVec.x);
+            m_ArmorVisual.SetDirAnim(ArmorVisual.DirYAnimParam, directionVec.z);
+            print($"x: {m_ArmorVisual.GetDirAnim(ArmorVisual.DirXAnimParam)}; z: {m_ArmorVisual.GetDirAnim(ArmorVisual.DirYAnimParam)}");
             currDirectionVec = directionVec;
             while (time < CHECKPOINT_MOVE_TIME)
             {
@@ -292,7 +229,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         {
             StopCoroutine(moveCoroutine);
             moveCoroutine = null;
-            m_Animator.SetBool(IsMoveAnimParam, false);
+            m_ArmorVisual.SetMoveAnimator(false);
         }
     }
     #endregion
@@ -494,56 +431,29 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void Die()
     {
         OnDeath?.Invoke();
-        m_Animator.SetBool(DeathAnimParam, true);
-
-        IEnumerator DeathCoroutine()
-        {
-            yield return new WaitForSeconds(1f);
-            FadeMesh(0, 0.5f);
-            yield return new WaitForSeconds(1f);
-            Destroy(gameObject);
-        }
-        StartCoroutine(DeathCoroutine());
+        m_ArmorVisual.Die(null);
     }
     #endregion
 
     #region Attack Animations
     public void PlayAnimations(int triggerID)
     {
-        m_Animator.SetTrigger(triggerID);
+        m_ArmorVisual.PlayAnimations(triggerID);
     }
 
     public void PlaySkillStartAnimation(int skillID)
     {
-        m_Animator.SetInteger(SkillIDAnimParam, skillID);
-        m_Animator.ResetTrigger(SkillCancelAnimParam);
-        m_Animator.ResetTrigger(SkillExecuteAnimParam);
-        m_Animator.SetTrigger(SkillStartAnimParam);
-        m_IsSkillAnimStarted = true;
-
-        m_WeaponModels.ForEach(x => x.PlaySkillStartAnimation(skillID));
+        m_ArmorVisual.PlaySkillStartAnimation(skillID);
     }
 
     public void PlaySkillExecuteAnimation()
     {
-        if (!m_IsSkillAnimStarted) return;
-
-        m_Animator.SetTrigger(SkillExecuteAnimParam);
-        m_IsSkillAnimStarted = false;
-        m_Animator.SetInteger(SkillIDAnimParam, 0);
-
-        m_WeaponModels.ForEach(x => x.PlaySkillExecuteAnimation());
+        m_ArmorVisual.PlaySkillExecuteAnimation();
     }
 
     public void CancelSkillAnimation()
     {
-        if (!m_IsSkillAnimStarted) return;
-
-        m_Animator.SetTrigger(SkillCancelAnimParam);
-        m_IsSkillAnimStarted = false;
-        m_Animator.SetInteger(SkillIDAnimParam, 0);
-
-        m_WeaponModels.ForEach(x => x.CancelSkillAnimation());
+        m_ArmorVisual.CancelSkillAnimation();
     }
     #endregion
 
@@ -642,24 +552,5 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     }
 
     public VoidEvent PostSkillEvent;
-    #endregion
-
-    #region Armor Material Change
-    public void ChangeArmorMaterial(GameObject model, Color armorPlate, Color armorTrim, Color underArmor) {
-        SkinnedMeshRenderer[] armorPieces = model.GetComponentsInChildren<SkinnedMeshRenderer>();
-        for (int i = 0; i < armorPieces.Length; i++) {
-            Material[] newArmorMats = armorPieces[i].materials;
-            for (int j = 0; j < newArmorMats.Length; j++) {
-                if (newArmorMats[j].name == "ArmorPlate (Instance)") {
-                    newArmorMats[j].color = armorPlate;
-                } else if (newArmorMats[j].name == "ArmorTrim (Instance)") {
-                    newArmorMats[j].color = armorTrim;
-                } else if (newArmorMats[j].name == "UnderArmor (Instance)") {
-                    newArmorMats[j].color = underArmor;
-                }
-            }
-            armorPieces[i].materials = newArmorMats;
-        }
-    }
     #endregion
 }
