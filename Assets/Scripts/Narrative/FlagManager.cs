@@ -4,10 +4,10 @@ using System.Collections.Generic;
 /// For easy access and constant flags
 /// Can be used for game state
 /// </summary>
-public static class Flags
+public enum Flag
 {
-    public static string WIN_LEVEL_FLAG = "WIN_LEVEL";
-    public static string LOSE_LEVEL_FLAG = "LOSE_LEVEL";
+    WIN_LEVEL_FLAG,
+    LOSE_LEVEL_FLAG
 }
 
 public enum FlagType
@@ -18,13 +18,13 @@ public enum FlagType
 
 public class FlagManager : Singleton<FlagManager>
 {
-    private struct Flag 
+    private struct FlagWrapper 
     {
         public bool m_Value;
         public FlagType m_FlagType;
     }
 
-    private readonly Dictionary<string, Flag> m_Flags = new();
+    private readonly Dictionary<string, FlagWrapper> m_Flags = new();
 
     protected override void HandleAwake()
     {
@@ -67,7 +67,7 @@ public class FlagManager : Singleton<FlagManager>
     public void SavePersistentFlags()
     {
         List<string> flagsToSave = new();
-        foreach (KeyValuePair<string, Flag> flag in m_Flags)
+        foreach (KeyValuePair<string, FlagWrapper> flag in m_Flags)
         {
             if (flag.Value.m_FlagType == FlagType.PERSISTENT && flag.Value.m_Value)
             {
@@ -83,12 +83,22 @@ public class FlagManager : Singleton<FlagManager>
         GlobalEvents.Flags.SetFlagEvent?.Invoke(flag, value, flagType);
     }
 
+    public void SetFlagValue(Flag flag, bool value, FlagType flagType)
+    {
+        SetFlagValue(flag.ToString(), value, flagType);
+    }
+
     public bool GetFlagValue(string flag)
     {
-        if (!m_Flags.TryGetValue(flag, out Flag flagValue))
+        if (!m_Flags.TryGetValue(flag, out FlagWrapper flagValue))
         {
             return false;
         }
         return flagValue.m_Value;
+    }
+
+    public bool GetFlagValue(Flag flag)
+    {
+        return GetFlagValue(flag.ToString());
     }
 }

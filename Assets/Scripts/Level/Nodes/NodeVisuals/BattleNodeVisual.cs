@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 public class BattleNodeVisual : NodeVisual
 {
     [Header("Tokens")]
-    [SerializeField] CharacterToken m_CharacterToken;
+    [SerializeField] EnemyToken m_CharacterToken;
     [SerializeField] Transform m_EnemyTokenTransform;
     [SerializeField] Transform m_PlayerTokenTransform;
     
@@ -17,7 +17,7 @@ public class BattleNodeVisual : NodeVisual
     private const float CLEAR_ANIM_TIME = 0.3f;
     
     private BattleNode m_BattleNode;
-    private CharacterToken m_EnemyUnitToken;
+    private EnemyToken m_EnemyUnitToken;
     
     public override void Initialise()
     {
@@ -58,7 +58,7 @@ public class BattleNodeVisual : NodeVisual
         return !m_BattleNode.IsCleared;
     }
 
-    public override void PlayEntryAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    public override void PlayEntryAnimation(PlayerToken playerToken, VoidEvent onComplete)
     {
         playerToken.MoveToPosition(m_PlayerTokenTransform.position, 
             m_PlayerTokenTransform.rotation, null, ENTRY_ANIM_TIME);
@@ -71,7 +71,7 @@ public class BattleNodeVisual : NodeVisual
         return !m_BattleNode.IsCleared;
     }
     
-    public override void PlayClearAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    public override void PlayClearAnimation(PlayerToken playerToken, VoidEvent onComplete)
     {
         m_EnemyUnitToken.Die(OnEnemyDeathComplete);
         return;
@@ -88,7 +88,7 @@ public class BattleNodeVisual : NodeVisual
         return true;
     }
     
-    public override void PlayFailureAnimation(CharacterToken playerToken, VoidEvent onComplete)
+    public override void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete)
     {
         playerToken.Defeat(onComplete);
     }

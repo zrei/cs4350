@@ -9,19 +9,19 @@ using UnityEngine;
 public class LevelTokenManager : MonoBehaviour
 {
     // Character Token Prefab
-    [SerializeField] CharacterToken m_CharacterToken;
+    [SerializeField] PlayerToken m_PlayerToken;
     
     // Animation time to move to a node
     private const float MOVE_TO_NODE_TIME = 0.8f;
     
-    private CharacterToken m_PlayerUnitToken;
+    private PlayerToken m_PlayerUnitToken;
     private NodeVisual m_CurrentNodeVisual;
 
     #region Initialisation
 
     public void Initialise(PlayerCharacterBattleData characterBattleData, NodeVisual currNodeVisual)
     {
-        m_PlayerUnitToken = Instantiate(m_CharacterToken);
+        m_PlayerUnitToken = Instantiate(m_PlayerToken);
         m_PlayerUnitToken.Initialise(characterBattleData);
         m_PlayerUnitToken.transform.position = currNodeVisual.GetPlayerTargetPosition();
         
@@ -50,10 +50,12 @@ public class LevelTokenManager : MonoBehaviour
     /// <param name="origin">Origin node position</param>
     /// <param name="dest">Destination node position</param>
     /// <returns></returns>
-    private Vector3 GetNodeEdgePos(Vector3 origin, Vector3 dest)
+    private Vector3 GetNodeEdgePos(NodeVisual startNode, NodeVisual destNode)
     {
+        Vector3 origin = startNode.transform.position;
+        Vector3 dest = destNode.GetPlayerTargetPosition();
         var direction = (dest - origin).normalized;
-        return dest - direction * NodeVisual.NODE_RADIUS_OFFSET;
+        return dest - direction * destNode.NodeRadiusOffset;
     }
 
     #endregion
@@ -76,7 +78,7 @@ public class LevelTokenManager : MonoBehaviour
     {
         if (destNodeVisual.HasEntryAnimation())
         {
-            Vector3 destPos = GetNodeEdgePos(m_CurrentNodeVisual.transform.position, destNodeVisual.GetPlayerTargetPosition());
+            Vector3 destPos = GetNodeEdgePos(m_CurrentNodeVisual, destNodeVisual);
             m_PlayerUnitToken.MoveToPosition(destPos, OnMoveToEdgeComplete, MOVE_TO_NODE_TIME);
             
             void OnMoveToEdgeComplete()

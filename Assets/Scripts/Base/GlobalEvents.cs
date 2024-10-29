@@ -88,4 +88,11 @@ public static class GlobalEvents {
         public delegate void FlagEvent(string flag, bool value, FlagType flagType);
         public static FlagEvent SetFlagEvent;
     }
+
+    public static class WorldMap 
+    {
+        public delegate void LevelEvent(LevelData levelData);
+        public static LevelEvent OnGoToLevel;
+        public static VoidEvent OnBeginLoadLevelEvent;
+    }
 }
