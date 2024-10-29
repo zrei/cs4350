@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEditor;
 
 [System.Serializable]
 public struct InflictedStatusEffect
@@ -176,6 +177,7 @@ public class ActiveSkillSO : ScriptableObject
     public bool IsSelfTarget => m_TargetRules.Any(x => x is LockToSelfTargetRuleSO);
     public bool IsOpposingSideTarget => !IsSelfTarget && m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     public bool HasAttackerLimitations => m_TargetRules.Any(x => x is IAttackerRule);
+    public bool HasTargetLimitations => m_TargetRules.Any(x => x is TargetLocationRuleSO);
     public GridType TargetGridType(UnitAllegiance unitAllegiance) => IsOpposingSideTarget ? GridHelper.GetOpposingSide(unitAllegiance) : GridHelper.GetSameSide(unitAllegiance);
     // depends on whether attacks that target the opposing side but only deal status effects will still use the attack animation
     // public bool WillPlaySupportAnimation => !DealsDamage && !m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
@@ -237,6 +239,62 @@ public class ActiveSkillSO : ScriptableObject
             builder.AppendLine(m_Description);
         }
         return builder.ToString();
+    }
+
+    public string GetTargetRange()
+    {
+        if (!HasTargetLimitations)
+        {
+            if (IsOpposingSideTarget)
+                return "All Enemies";
+            else if (IsSelfTarget)
+                return "Self";
+            else
+                return "All Allies";
+        }
+        else
+        {
+            StringBuilder stringBuilder = new();
+            if (IsOpposingSideTarget)
+                stringBuilder.Append("Enemies in ");
+            else if (IsSelfTarget)
+                stringBuilder.Append("Self in ");
+            else
+                stringBuilder.Append("Allies in ");
+
+            List<SkillTargetRuleSO> targetLocationRules = m_TargetRules.Where(x => x is TargetLocationRuleSO).ToList();
+            int numRules = targetLocationRules.Count();
+            for (int i = 0; i < numRules; ++i)
+            {
+                stringBuilder.Append(targetLocationRules[i].m_Description);
+                if (i < numRules - 1)
+                {
+                    stringBuilder.Append(", ");
+                }
+            }
+
+            return stringBuilder.ToString();
+        }
+    }
+
+    public string GetAttackerRange()
+    {
+        if (!HasAttackerLimitations)
+            return "All Tiles";
+        
+        StringBuilder stringBuilder = new();
+        List<SkillTargetRuleSO> attackerRules = m_TargetRules.Where(x => x is IAttackerRule).ToList();
+        int numRules = attackerRules.Count();
+        for (int i = 0; i < numRules; ++i)
+        {
+            stringBuilder.Append(attackerRules[i].m_Description);
+            if (i < numRules - 1)
+            {
+                stringBuilder.Append(", ");
+            }
+        }
+        
+        return stringBuilder.ToString();
     }
 
     public bool ContainsSkillType(SkillEffectType skillType)
@@ -335,3 +393,26 @@ public struct Adds
     public EnemyCharacterSO m_EnemyCharacterSO;
     public Stats m_StatAugments;
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(ActiveSkillSO))]
+public class ActiveSkillSOCustomEditor : Editor
+{
+    ActiveSkillSO m_ActiveSkill;
+
+    void OnEnable()
+    {
+        m_ActiveSkill = (ActiveSkillSO) target;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        GUILayout.Space(30f);
+
+        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
+        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
+    }
+}
+#endif
