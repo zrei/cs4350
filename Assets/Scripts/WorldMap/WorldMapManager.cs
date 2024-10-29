@@ -22,7 +22,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
 
-    private int m_CurrLevel;
+    private int m_CurrUnlockedLevel;
+    private int m_CurrSelectedLevel;
 
     private const float TOKEN_MOVE_DELAY = 0.3f;
 
@@ -34,8 +35,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
         GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
         GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
 
-        EnableSelection();
-
         HandleDependencies();
     }
 
@@ -46,7 +45,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
         GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
         
-        DisableSelection();
+        DisableAllControls();
     }
 
     private void HandleDependencies()
@@ -64,18 +63,19 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void Initialise()
     {
-        m_CurrLevel = SaveManager.Instance.LoadCurrentLevel();
+        m_CurrSelectedLevel = SaveManager.Instance.LoadCurrentLevel();
+        m_CurrUnlockedLevel = m_CurrSelectedLevel;
 
         // initialise the all unlocked nodes 
-        for (int i = 0; i < m_CurrLevel; ++i)
+        for (int i = 0; i < m_CurrSelectedLevel; ++i)
         {
-            bool isCurrLevel = i == m_CurrLevel - 1;
+            bool isCurrLevel = i == m_CurrSelectedLevel - 1;
             m_LevelNodes[i].Initialise(isCurrLevel ? LevelState.UNLOCKED : LevelState.CLEARED, isCurrLevel);
             m_LevelNodes[i].gameObject.SetActive(true);
         }
 
         // initialise the locked nodes
-        for (int i = m_CurrLevel; i < m_LevelNodes.Count; ++i)
+        for (int i = m_CurrSelectedLevel; i < m_LevelNodes.Count; ++i)
         {
             m_LevelNodes[i].Initialise(LevelState.LOCKED, false);
             m_LevelNodes[i].gameObject.SetActive(false);
@@ -86,12 +86,13 @@ public class WorldMapManager : Singleton<WorldMapManager>
         m_PlayerTokenInstance.Initialise(m_Character, m_PlayerClass, m_EquippedWeapon);
         
         // place the player on the current node
-        WorldMapNode currNode = m_LevelNodes[m_CurrLevel - 1];
+        WorldMapNode currNode = GetWorldMapNode(m_CurrSelectedLevel);
         currNode.PlacePlayerToken(m_PlayerTokenInstance);
 
         // initialise the camera
         m_CameraController.Initialise(m_PlayerTokenInstance.transform);
-        m_CameraController.EnableCameraMovement();
+        
+        EnableAllControls();
 
         // initialise the UI
         GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
@@ -113,9 +114,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void OnSelectInput(IInput input)
     {
-        if (m_CurrTargetNode != null && m_CurrTargetNode.LevelNum != m_CurrLevel)
+        if (m_CurrTargetNode != null && m_CurrTargetNode.LevelNum != m_CurrSelectedLevel)
         {
-            StartCoroutine(MoveToLevel(m_CurrLevel, m_CurrTargetNode));
+            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, m_CurrTargetNode));
         }
     }
 
@@ -147,8 +148,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private void OnBeginLoadLevel()
     {
         m_CameraController.RecenterCamera();
-        m_CameraController.DisableCameraMovement();
-        DisableSelection();
+        DisableAllControls();
     }
 
     private void OnReturnFromLevel()
@@ -161,7 +161,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         }
         else
         {
-            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(m_LevelNodes[m_CurrLevel - 1].LevelSO, false));
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(GetWorldMapNode(m_CurrUnlockedLevel).LevelSO, false));
+            EnableAllControls();
         }
 
         // reset flags
@@ -173,9 +174,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #region Unlock Level
     private void UnlockLevel()
     {
-        WorldMapNode currNode = m_LevelNodes[m_CurrLevel - 1];
+        WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
         // TODO: need to handle final level case
-        WorldMapNode nextNode = m_LevelNodes[m_CurrLevel];
+        WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
 
         // reset curr level animation
         currNode.ToggleCurrLevel(false);
@@ -197,41 +198,117 @@ public class WorldMapManager : Singleton<WorldMapManager>
         void PostMovement()
         {
             nextNode.ToggleCurrLevel(true);
-            m_CameraController.EnableCameraMovement();
-            EnableSelection();
+            EnableAllControls();
             GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(nextNode.LevelSO, false));
         }
 
-        m_CurrLevel += 1;
+        m_CurrUnlockedLevel += 1;
+        m_CurrSelectedLevel = m_CurrUnlockedLevel;
     }
     #endregion
 
     #region Navigating
+    private void EnableNavigation()
+    {
+        InputManager.Instance.NavigateLevelAction.OnChangeEvent += OnNavigateLevel;
+        InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent += OnFocusCurrentLevel;
+    }
+
+    private void DisableNavigation()
+    {
+        InputManager.Instance.NavigateLevelAction.OnChangeEvent -= OnNavigateLevel;
+        InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent -= OnFocusCurrentLevel;
+    }
+
+    private void OnFocusCurrentLevel(IInput input)
+    {
+        if (m_CurrSelectedLevel != m_CurrUnlockedLevel)
+        {
+            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrUnlockedLevel)));
+        }
+        else
+        {
+            m_CameraController.RecenterCamera();
+        }   
+    }
+
+    private void OnNavigateLevel(IInput input)
+    {
+        float navigateSide = input.GetValue<float>();
+
+        if (navigateSide < 0)
+            NavigateToPrev();
+        else if (navigateSide > 0)
+            NavigateToNext();
+    }
+
+    private void NavigateToPrev()
+    {
+        if (m_CurrSelectedLevel <= 1)
+            return;
+
+        StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel - 1)));
+    }
+
+    private void NavigateToNext()
+    {
+        if (m_CurrSelectedLevel >= m_CurrUnlockedLevel)
+            return;
+
+        StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel + 1)));
+    }
+
     private IEnumerator MoveToLevel(int currLevelNumber, WorldMapNode newWorldMapNode)
     {
         // disable controls
-        m_CameraController.DisableCameraMovement();
-        DisableSelection();
+        DisableAllControls();
 
         // fade the unit
         m_PlayerTokenInstance.FadeMesh(0f, 0.2f);
         yield return new WaitForSeconds(0.2f);
 
         // stop the current level animation
-        m_LevelNodes[currLevelNumber - 1].ToggleCurrLevel(false);
+        GetWorldMapNode(currLevelNumber).ToggleCurrLevel(false);
 
         // fade unit back and change position
         newWorldMapNode.PlacePlayerToken(m_PlayerTokenInstance);
         m_PlayerTokenInstance.FadeMesh(1f, 0.2f);
         
         // update the current node
-        m_CurrLevel = newWorldMapNode.LevelNum;
+        m_CurrSelectedLevel = newWorldMapNode.LevelNum;
         newWorldMapNode.ToggleCurrLevel(true);
         GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(newWorldMapNode.LevelSO, newWorldMapNode.LevelState == LevelState.CLEARED));
         
         // re-enable controls
+        EnableAllControls();
+    }
+    #endregion
+
+    #region Overall Controls
+    private void DisableAllControls()
+    {
+        m_CameraController.DisableCameraMovement();
+        DisableSelection();
+        DisableNavigation();
+    }
+
+    private void EnableAllControls()
+    {
         m_CameraController.EnableCameraMovement();
         EnableSelection();
+        EnableNavigation();
+    }
+    #endregion
+
+    #region Helper
+    /// <summary>
+    /// Helper to get the world map node based on the 1-indexed level number
+    /// </summary>
+    /// <param name="levelNumber"></param>
+    /// <returns></returns>
+    private WorldMapNode GetWorldMapNode(int levelNumber)
+    {
+        return m_LevelNodes[levelNumber - 1];
     }
     #endregion
 }
