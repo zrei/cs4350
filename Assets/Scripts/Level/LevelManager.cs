@@ -35,9 +35,6 @@ public class LevelManager : MonoBehaviour
     
     // Level Timer
     [SerializeField] LevelTimerLogic m_LevelTimerLogic;
-    
-    // Unit Data
-    [SerializeField] LevellingManager m_LevellingManager;
 
     [SerializeField] LevelCameraController m_LevelCameraController;
     
@@ -555,7 +552,7 @@ public class LevelManager : MonoBehaviour
         {
             var initialLevel = characterData.m_CurrLevel;
                 
-            m_LevellingManager.LevelCharacter(characterData, expAmount,
+            LevellingManager.Instance.LevelCharacter(characterData, expAmount,
                 out var levelledUp, out var totalStatGrowth);
                 
             if (levelledUp)

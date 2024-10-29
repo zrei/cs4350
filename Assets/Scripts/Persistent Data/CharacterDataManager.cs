@@ -33,8 +33,15 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
             return;
         }
 
+        if (!LevellingManager.IsReady)
+        {
+            LevellingManager.OnReady += HandleDependencies;
+            return;
+        }
+
         SaveManager.OnReady -= HandleDependencies;
         PersistentDataManager.OnReady -= HandleDependencies;
+        LevellingManager.OnReady -= HandleDependencies;
         
         if (SaveManager.Instance.TryLoadCharacterSaveData(out List<CharacterSaveData> characterSaveData))
         {
@@ -123,8 +130,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     private void ReceiveCharacter(PlayerCharacterSO playerCharacterSO)
     {
         PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClassIndex = playerCharacterSO.StartingClassIndex, m_CurrExp = 0,
-                m_CurrLevel = playerCharacterSO.m_StartingLevel, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress(),
+                m_CurrLevel = 1, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress(),
                 m_CurrUnlockedClasses = playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)};
+        LevellingManager.Instance.LevelCharacterToLevel(persistentData, playerCharacterSO.m_StartingLevel);
         m_CharacterData.Add(persistentData.Id, persistentData);
     }
 
