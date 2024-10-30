@@ -26,6 +26,15 @@ namespace Game.UI
             m_RemoveButton.onSubmit.AddListener(removeButtonCallback);
         }
 
+        public void SetLocked()
+        {
+            IsFilled = false;
+            CharacterId = -1;
+            m_RemoveButton.gameObject.SetActive(false);
+            m_SelectionButton.nameText.text = "LOCKED";
+            m_SelectionButton.interactable = false;
+        }
+
         public void SetEmpty()
         {
             IsFilled = false;

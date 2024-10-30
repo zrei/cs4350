@@ -7,10 +7,14 @@ namespace Game.UI
 {
     public class PartySelectScreen : BaseUIScreen
     {
-        [SerializeField] PartySelectionSlotButton m_PartySelectionSlotButton;
+        [Header("Party Slots")]
+        [SerializeField] List<PartySelectionSlotButton> m_PartySelectionSlotButtons;
+
+        [Header("Character Buttons")]
         [SerializeField] NamedObjectButton m_CharacterButton;
-        [SerializeField] Transform m_PartySelectionSlotParent;
         [SerializeField] Transform m_CharacterButtonParent;
+
+        [Space]
         [SerializeField] TextMeshProUGUI m_PartyText;
         [SerializeField] NamedObjectButton m_BeginLevelButton;
 
@@ -22,6 +26,7 @@ namespace Game.UI
         private int m_NumUnitsSelected = 0;
 
         private const string PARTY_TEXT_FORMAT = "Party ({0}/{1})";
+        private const string PARTY_TEXT_MAX_FORMAT = "Party <color=red>({0}/{1})</color>";
 
         #region Initialise
         public override void Initialize()
@@ -79,13 +84,20 @@ namespace Game.UI
             }
 
             PartySelectionSlotButton firstButton = null;
-            for (int i = 0; i < m_PartyLimit; ++i)
+            for (int i = 0; i < m_PartySelectionSlotButtons.Count; ++i)
             {
                 // also instantiate slot
-                PartySelectionSlotButton partySelectionSlotButton = Instantiate(m_PartySelectionSlotButton, m_PartySelectionSlotParent);
+                PartySelectionSlotButton partySelectionSlotButton = m_PartySelectionSlotButtons[i];
                 partySelectionSlotButton.Initialise(i, () => OnSelectPartySlot(partySelectionSlotButton), () => OnRemovePartySlot(partySelectionSlotButton));
-                partySelectionSlotButton.SetEmpty();
-                m_SelectedData.Add(-1);
+
+                if (i < m_PartyLimit)
+                {
+                    partySelectionSlotButton.SetEmpty();
+                    m_SelectedData.Add(-1);
+                }   
+                else
+                    partySelectionSlotButton.SetLocked();
+                
 
                 if (i == 0)
                     firstButton = partySelectionSlotButton;
@@ -109,7 +121,10 @@ namespace Game.UI
 
         private void UpdateState()
         {
-            m_PartyText.text = string.Format(PARTY_TEXT_FORMAT, m_NumUnitsSelected, m_PartyLimit);
+            if (m_NumUnitsSelected == m_PartyLimit)
+                m_PartyText.text = string.Format(PARTY_TEXT_MAX_FORMAT, m_NumUnitsSelected, m_PartyLimit);
+            else
+                m_PartyText.text = string.Format(PARTY_TEXT_FORMAT, m_NumUnitsSelected, m_PartyLimit);
         }
         #endregion
 
@@ -128,7 +143,7 @@ namespace Game.UI
             else
             {
                 ++m_NumUnitsSelected;
-                m_PartyText.text = string.Format(PARTY_TEXT_FORMAT, m_NumUnitsSelected, m_PartyLimit);
+                UpdateState();
                 m_BeginLevelButton.interactable = m_NumUnitsSelected > 0;
             }
 
@@ -159,7 +174,7 @@ namespace Game.UI
             m_SelectedData[partySelectionSlotButton.Index] = -1;
             InstantiateCharacterButton(CharacterDataManager.Instance.RetrieveCharacterData(partySelectionSlotButton.CharacterId));
             --m_NumUnitsSelected;
-            m_PartyText.text = string.Format(PARTY_TEXT_FORMAT, m_NumUnitsSelected, m_PartyLimit);
+            UpdateState();
             m_BeginLevelButton.interactable = m_NumUnitsSelected > 0;
             partySelectionSlotButton.SetEmpty();
         }
@@ -176,11 +191,6 @@ namespace Game.UI
 
         private void ResetButtons()
         {
-            foreach (Transform child in m_PartySelectionSlotParent)
-            {
-                Destroy(child.gameObject);
-            }
-
             foreach (Transform child in m_CharacterButtonParent)
             {
                 Destroy(child.gameObject);
