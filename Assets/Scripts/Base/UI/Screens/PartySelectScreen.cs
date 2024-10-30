@@ -23,6 +23,7 @@ namespace Game.UI
 
         private const string PARTY_TEXT_FORMAT = "Party ({0}/{1})";
 
+        #region Initialise
         public override void Initialize()
         {
             base.Initialize();
@@ -48,7 +49,9 @@ namespace Game.UI
         {
             GlobalEvents.WorldMap.OnPartySelectEvent -= OnPartySelect;
         }
+        #endregion
 
+        #region Load Level
         private void OnBeginLevel()
         {
             if (m_NumUnitsSelected <= 0)
@@ -59,22 +62,23 @@ namespace Game.UI
             IEnumerable<int> selectedIds = m_SelectedData.Where(x => x != -1);
             GameSceneManager.Instance.LoadLevelScene(m_LevelId, CharacterDataManager.Instance.RetrieveCharacterData(selectedIds));
         }
+        #endregion
 
+        #region Display
         private void OnPartySelect(LevelSO levelSO)
         {
             ResetButtons();
             m_SelectedData = new();
             m_PartyLimit = levelSO.m_UnitLimit;
             m_LevelId = levelSO.m_LevelId;
-            m_NumUnitsSelected = 0;
-            m_BeginLevelButton.interactable = false;
-            m_PartyText.text = string.Format(PARTY_TEXT_FORMAT, m_NumUnitsSelected, m_PartyLimit);
 
-            foreach (PlayerCharacterData data in CharacterDataManager.Instance.RetrieveAllCharacterData())
+            // exclude the lord because they cannot be swapped out
+            foreach (PlayerCharacterData data in CharacterDataManager.Instance.RetrieveAllCharacterData(excludeLord: true))
             {
                 InstantiateCharacterButton(data);
             }
 
+            PartySelectionSlotButton firstButton = null;
             for (int i = 0; i < m_PartyLimit; ++i)
             {
                 // also instantiate slot
@@ -82,17 +86,34 @@ namespace Game.UI
                 partySelectionSlotButton.Initialise(i, () => OnSelectPartySlot(partySelectionSlotButton), () => OnRemovePartySlot(partySelectionSlotButton));
                 partySelectionSlotButton.SetEmpty();
                 m_SelectedData.Add(-1);
+
+                if (i == 0)
+                    firstButton = partySelectionSlotButton;
             }
+
+            // if there is a lord, always fill the first slot with the lord
+            // and lock interaction as it cannot be removed from the party
+            if (CharacterDataManager.Instance.TryRetrieveLordCharacterData(out PlayerCharacterData lordData))
+            {
+                m_SelectedData[0] = lordData.Id;
+                firstButton.SetDisplay(lordData, true);
+                m_NumUnitsSelected = 1;
+            }
+            else
+            {
+                m_NumUnitsSelected = 0;
+            }
+
+            UpdateState();
         }
 
-        private void InstantiateCharacterButton(PlayerCharacterData playerCharacterData)
+        private void UpdateState()
         {
-            NamedObjectButton characterButton = Instantiate(m_CharacterButton, m_CharacterButtonParent);
-            characterButton.nameText.text = playerCharacterData.m_BaseData.m_CharacterName;
-            characterButton.onSubmit.RemoveAllListeners();
-            characterButton.onSubmit.AddListener(() => OnSelectCharacterButton(characterButton, playerCharacterData));
+            m_PartyText.text = string.Format(PARTY_TEXT_FORMAT, m_NumUnitsSelected, m_PartyLimit);
         }
+        #endregion
 
+        #region Callback
         private void OnSelectCharacterButton(NamedObjectButton button, PlayerCharacterData playerCharacterData)
         {
             if (m_SelectedSlot == null)
@@ -111,7 +132,7 @@ namespace Game.UI
                 m_BeginLevelButton.interactable = m_NumUnitsSelected > 0;
             }
 
-            m_SelectedSlot.SetDisplay(playerCharacterData);
+            m_SelectedSlot.SetDisplay(playerCharacterData, false);
             m_SelectedData[m_SelectedSlot.Index] = playerCharacterData.m_BaseData.m_Id;
         }
 
@@ -142,6 +163,16 @@ namespace Game.UI
             m_BeginLevelButton.interactable = m_NumUnitsSelected > 0;
             partySelectionSlotButton.SetEmpty();
         }
+        #endregion
+
+        #region Helper
+        private void InstantiateCharacterButton(PlayerCharacterData playerCharacterData)
+        {
+            NamedObjectButton characterButton = Instantiate(m_CharacterButton, m_CharacterButtonParent);
+            characterButton.nameText.text = playerCharacterData.m_BaseData.m_CharacterName;
+            characterButton.onSubmit.RemoveAllListeners();
+            characterButton.onSubmit.AddListener(() => OnSelectCharacterButton(characterButton, playerCharacterData));
+        }
 
         private void ResetButtons()
         {
@@ -157,6 +188,7 @@ namespace Game.UI
 
             m_SelectedSlot = null;
         }
+        #endregion
 
         public override void ScreenUpdate()
         {

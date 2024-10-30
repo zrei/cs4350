@@ -46,11 +46,10 @@ namespace Game.UI
         private void OpenPartySelect(LevelSO levelSO)
         {
             CloseScreen();
+            // TODO: this is a bit messy will refactor once this is made? part of the ui system?
             InputManager.Instance.CancelInput.OnPressEvent += OnPartySelectCancel;
             UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PartySelectScreen);
             GlobalEvents.WorldMap.OnPartySelectEvent?.Invoke(levelSO);
-            //GlobalEvents.WorldMap.OnBeginLoadLevelEvent?.Invoke();
-            //GameSceneManager.Instance.LoadLevelScene(levelId, CharacterDataManager.Instance.RetrieveAllCharacterData());
         }
 
         private void OnBeginLoadLevel()

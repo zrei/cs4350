@@ -30,27 +30,24 @@ namespace Game.UI
         {
             IsFilled = false;
             CharacterId = -1;
-            ToggleDisplay(false);
+            m_RemoveButton.gameObject.SetActive(false);
             m_SelectionButton.nameText.text = "EMPTY";
         }
 
-        public void SetDisplay(PlayerCharacterData playerCharacterData)
+        public void SetDisplay(PlayerCharacterData playerCharacterData, bool isLord)
         {
-            ToggleDisplay(true);
-
+            m_RemoveButton.gameObject.SetActive(!isLord);
+            m_SelectionButton.interactable = !isLord;
             m_SelectionButton.nameText.text = playerCharacterData.m_BaseData.m_CharacterName;
             IsFilled = true;
             CharacterId = playerCharacterData.m_BaseData.m_Id;
+
+            
         }
 
         public void SetSelected(bool isSelected)
         {
             m_SelectionButton.SetGlowActive(isSelected);
-        }
-
-        private void ToggleDisplay(bool isFilled)
-        {
-            m_RemoveButton.gameObject.SetActive(isFilled);
         }
     }
 }
