@@ -92,7 +92,9 @@ public static class GlobalEvents {
     public static class WorldMap 
     {
         public delegate void LevelEvent(LevelData levelData);
+        public delegate void LevelSOEvent(LevelSO levelSO);
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
+        public static LevelSOEvent OnPartySelectEvent;
     }
 }

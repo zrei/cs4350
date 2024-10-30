@@ -6,9 +6,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 {
     [SerializeField] List<PlayerCharacterSO> m_StartingCharacters;
 
-    // mapping character IDs to their data?
     private readonly Dictionary<int, PlayerCharacterData> m_CharacterData = new();
 
+    #region Initialisation
     protected override void HandleAwake()
     {
         base.HandleAwake();
@@ -54,7 +54,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Morality.MoralitySetEvent -= OnMoralitySet;
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
     }
+    #endregion
 
+    #region Saving
     private void ParseSaveData(List<CharacterSaveData> characterSaveData)
     {
         m_CharacterData.Clear();
@@ -79,17 +81,45 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         ReceiveCharacters(m_StartingCharacters);
     }
+    #endregion
 
-    public List<PlayerCharacterData> RetrieveAllCharacterData()
+    #region Retrievers
+    public List<PlayerCharacterData> RetrieveAllCharacterData(bool excludeLord = false)
     {
-        return m_CharacterData.Values.ToList();
+        return m_CharacterData.Values.Where(x => !excludeLord || !x.IsLord).ToList();
     }
 
-    public List<PlayerCharacterData> RetrieveCharacterData(List<int> IDs)
+    public PlayerCharacterData RetrieveCharacterData(int id)
     {
-        return m_CharacterData.Values.Where(x => IDs.Contains(x.Id)).ToList();
+        return m_CharacterData.Values.Where(x => x.Id == id).First();
     }
 
+    public List<PlayerCharacterData> RetrieveCharacterData(IEnumerable<int> IDs, bool excludeLord = false)
+    {
+        return m_CharacterData.Values.Where(x => IDs.Contains(x.Id) && (!excludeLord || !x.IsLord)).ToList();
+    }
+
+    /// <summary>
+    /// Retrieves the character data belonging to the lord
+    /// This makes the assumption that there is only one lord in the entire roster
+    /// </summary>
+    /// <returns></returns>
+    public bool TryRetrieveLordCharacterData(out PlayerCharacterData lordData)
+    {
+        foreach (PlayerCharacterData data in m_CharacterData.Values)
+        {
+            if (data.IsLord)
+            {
+                lordData = data;
+                return true;
+            }
+        }
+        lordData = default;
+        return false;
+    }
+    #endregion
+
+    #region Edit
     /// <summary>
     /// Update the persistent data with the newly updated data from a finished level
     /// </summary>
@@ -127,6 +157,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 m_CurrUnlockedClasses = playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)};
         m_CharacterData.Add(persistentData.Id, persistentData);
     }
+    #endregion
 
     #region Helper
     /// <summary>

@@ -10,7 +10,7 @@ public class LevelSO : ScriptableObject
     [TextArea]
     public string m_LevelDescription;
     public float m_TimeLimit;
-    public int m_UnitLimit;
+    public int m_UnitLimit = 8;
     public GameObject m_BiomeObject;
     public Dialogue m_PreDialogue;
     public Dialogue m_PostDialogue;
