@@ -1,3 +1,4 @@
+using Game.Input;
 using TMPro;
 using UnityEngine;
 
@@ -25,10 +26,13 @@ namespace Game.UI
 
         private const string LEVEL_TITLE_FORMAT = "Level {0}: {1}";
 
+        private LevelSO m_CurrentLevelSO;
+
         #region Initialisation
         private void Awake()
         {
             GlobalEvents.WorldMap.OnGoToLevel += OnGoToLevel;
+            GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
             ToggleShown(true);
         }
 
@@ -39,15 +43,29 @@ namespace Game.UI
         #endregion
         
         #region Transition
-        private void LoadLevel(int levelId)
+        private void OpenPartySelect(LevelSO levelSO)
         {
             CloseScreen();
-            GlobalEvents.WorldMap.OnBeginLoadLevelEvent?.Invoke();
-            GameSceneManager.Instance.LoadLevelScene(levelId, CharacterDataManager.Instance.RetrieveAllCharacterData());
+            // TODO: this is a bit messy will refactor once this is made? part of the ui system?
+            InputManager.Instance.CancelInput.OnPressEvent += OnPartySelectCancel;
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PartySelectScreen);
+            GlobalEvents.WorldMap.OnPartySelectEvent?.Invoke(levelSO);
+        }
+
+        private void OnBeginLoadLevel()
+        {
+            InputManager.Instance.CancelInput.OnPressEvent -= OnPartySelectCancel;
         }
         #endregion
 
         #region Helper
+
+        private void OnPartySelectCancel(IInput input)
+        {
+            ToggleShown(true);
+            m_StartLevelButton.onSubmit.AddListener(() => OpenPartySelect(m_CurrentLevelSO));
+        }
+
         private void CloseScreen()
         {
             ToggleShown(false);
@@ -70,6 +88,8 @@ namespace Game.UI
 
             m_StartLevelButton.onSubmit.RemoveAllListeners();
 
+            m_CurrentLevelSO = levelData.m_LevelSO;
+
             if (levelData.m_IsCleared)
             {
                 m_StartLevelButton.interactable = false;
@@ -79,7 +99,7 @@ namespace Game.UI
             {
                 m_StartLevelButton.nameText.text = "START";
                 m_StartLevelButton.interactable = true;
-                m_StartLevelButton.onSubmit.AddListener(() => LoadLevel(levelData.m_LevelSO.m_LevelId));
+                m_StartLevelButton.onSubmit.AddListener(() => OpenPartySelect(m_CurrentLevelSO));
             }
 
             ToggleShown(true);

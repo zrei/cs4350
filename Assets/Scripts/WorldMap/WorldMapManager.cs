@@ -13,12 +13,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Tooltip("World map nodes in order of level")]
     [SerializeField] private List<WorldMapNode> m_LevelNodes;
 
-    [Space]
-    // TODO: Grab information from the data instead
-    [SerializeField] private PlayerCharacterSO m_Character;
-    [SerializeField] private WeaponInstanceSO m_EquippedWeapon;
-    [SerializeField] private PlayerClassSO m_PlayerClass;
-
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
 
@@ -50,13 +44,13 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void HandleDependencies()
     {
-        if (!SaveManager.IsReady)
+        if (!CharacterDataManager.IsReady)
         {
-            SaveManager.OnReady += HandleDependencies;
+            CharacterDataManager.OnReady += HandleDependencies;
             return;
         }
 
-        SaveManager.OnReady -= HandleDependencies;
+        CharacterDataManager.OnReady -= HandleDependencies;
 
         Initialise();
     }
@@ -83,7 +77,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         // instantiate the player token
         m_PlayerTokenInstance = Instantiate(m_PlayerToken, Vector3.zero, Quaternion.identity);
-        m_PlayerTokenInstance.Initialise(m_Character, m_PlayerClass, m_EquippedWeapon);
+        if (CharacterDataManager.Instance.TryRetrieveLordCharacterData(out PlayerCharacterData lordData))
+            // retrieve data from character data manager
+            m_PlayerTokenInstance.Initialise(lordData.m_BaseData, lordData.CurrClass, lordData.GetWeaponInstanceSO());
         
         // place the player on the current node
         WorldMapNode currNode = GetWorldMapNode(m_CurrSelectedLevel);
