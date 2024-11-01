@@ -13,6 +13,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Tooltip("World map nodes in order of level")]
     [SerializeField] private List<WorldMapNode> m_LevelNodes;
 
+    [Header("Cutscenes")]
+    [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
+
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
 
@@ -174,7 +177,22 @@ public class WorldMapManager : Singleton<WorldMapManager>
         // TODO: need to handle final level case
         WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
 
-        // reset curr level animation
+        LevelSO levelSO = currNode.LevelSO;
+
+        if (currNode.HasPostCutscene)
+        {
+            m_CutsceneManager.ShowCutscene(currNode.PostCutscene, () => PostLevelEndCutscene(currNode, nextNode));
+        }
+        else
+        {
+            PostLevelEndCutscene(currNode, nextNode);
+        }
+    }
+
+    private void PostLevelEndCutscene(WorldMapNode currNode, WorldMapNode nextNode)
+    {
+        FlagManager.Instance.SetFlagValue(currNode.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
+
         currNode.ToggleCurrLevel(false);
 
         // start path animation
@@ -193,13 +211,26 @@ public class WorldMapManager : Singleton<WorldMapManager>
         // re-enable world map controls
         void PostMovement()
         {
-            nextNode.ToggleCurrLevel(true);
-            EnableAllControls();
-            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(nextNode.LevelSO, false));
+            if (nextNode.HasPreCutscene)
+            {
+                m_CutsceneManager.ShowCutscene(nextNode.PreCutscene, () => PostLevelBeginCutscene(nextNode));
+            }
+            else
+            {
+                PostLevelBeginCutscene(nextNode);
+            }
         }
 
         m_CurrUnlockedLevel += 1;
         m_CurrSelectedLevel = m_CurrUnlockedLevel;
+    }
+
+    private void PostLevelBeginCutscene(WorldMapNode nextNode)
+    {
+        FlagManager.Instance.SetFlagValue(nextNode.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
+        nextNode.ToggleCurrLevel(true);
+        EnableAllControls();
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(nextNode.LevelSO, false));
     }
     #endregion
 

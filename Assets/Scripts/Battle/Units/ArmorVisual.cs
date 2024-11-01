@@ -40,7 +40,10 @@ public class ArmorVisual : MonoBehaviour
     /// <param name="weaponSO"></param>
     public void InstantiateModel(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
     {
-        m_Model = Instantiate(unitModelData.m_Model, Vector3.zero, Quaternion.identity, transform);
+        m_Model = Instantiate(unitModelData.m_Model, transform);
+        m_Model.transform.localPosition = Vector3.zero;
+        m_Model.transform.rotation = Quaternion.identity;
+
         EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
         equipArmor.Initialize(unitModelData.m_AttachItems);
 
