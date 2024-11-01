@@ -52,6 +52,11 @@ public class StartingDataSetterHelper : Editor
 
         GUILayout.Space(10);
 
+        if (GUILayout.Button("Clear player prefs"))
+        {
+            PlayerPrefs.DeleteAll();
+        }
+
         if (GUILayout.Button("Set starting data"))
         {
             m_Target.SetStartingData();
