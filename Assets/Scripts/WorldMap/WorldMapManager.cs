@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class WorldMapManager : Singleton<WorldMapManager>
 {
+    [Header("Level")]
+    [SerializeField] private int m_StartingLevel = 1;
+
     [Header("Camera")]
     [SerializeField] private PlaneCameraController m_CameraController;
 
@@ -57,8 +60,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void Initialise()
     {
-        m_CurrSelectedLevel = SaveManager.Instance.LoadCurrentLevel();
-        m_CurrUnlockedLevel = m_CurrSelectedLevel;
+        if (!SaveManager.Instance.TryLoadCurrentLevel(out m_CurrUnlockedLevel))
+        {
+            m_CurrUnlockedLevel = m_StartingLevel;
+        }
+        m_CurrSelectedLevel = m_CurrUnlockedLevel;
 
         // initialise the all unlocked nodes 
         for (int i = 0; i < m_CurrSelectedLevel; ++i)
@@ -200,6 +206,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         m_CurrUnlockedLevel += 1;
         m_CurrSelectedLevel = m_CurrUnlockedLevel;
+
+        SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
+        SaveManager.Instance.Save();
     }
     #endregion
 
@@ -307,4 +316,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
         return m_LevelNodes[levelNumber - 1];
     }
     #endregion
+
+#if UNITY_EDITOR
+    public void SetStartingLevel(int startingLevel)
+    {
+        m_StartingLevel = startingLevel;
+    }
+#endif
 }

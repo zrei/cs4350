@@ -58,7 +58,14 @@ public static class GlobalEvents {
         public static DialogueNodeEvent DialogueNodeEndEvent;
         public static MassLevelUpEvent MassLevellingEvent;
         public static VoidEvent CloseLevellingScreenEvent;
-        public static LevelResultEvent LevelEndEvent;
+        /// <summary>
+        /// This event is called the moment the level ends
+        /// </summary>
+        public static VoidEvent LevelEndEvent;
+        /// <summary>
+        /// This event is called to pass out the results
+        /// </summary>
+        public static LevelResultEvent LevelResultsEvent;
         public static VoidEvent ReturnFromLevelEvent;
         public static NodeEvent NodeHoverStartEvent;
         public static BattleNodeEvent BattleNodeHoverStartEvent;
