@@ -23,6 +23,17 @@ public class PathGroupSO : ScriptableObject
         return default;
     }
 
+    public PlayerClassSO GetDefaultClass()
+    {
+        foreach (PathClass pathClass in m_PathClasses)
+        {
+            if (pathClass.m_IsDefault)
+                return pathClass.m_Class;
+        }
+        Logger.Log(this.GetType().Name, $"Path group {this.name} has no default class", LogLevel.ERROR);
+        return default;
+    }
+
     public PlayerClassSO GetClass(int index)
     {
         return m_PathClasses[index].m_Class;

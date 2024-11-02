@@ -9,6 +9,7 @@ public class PlayerCharacterSO : CharacterSO
     public PathGroupSO m_PathGroup;
     public int StartingClassIndex => m_PathGroup.GetDefaultClassIndex();
     public int NumClasses => m_PathGroup.NumClasses;
+    public PlayerClassSO StartingClass => m_PathGroup.GetDefaultClass();
     public int m_StartingLevel;
     [Tooltip("Starting stats when first unlocked by the player")]
     public Stats m_StartingStats;

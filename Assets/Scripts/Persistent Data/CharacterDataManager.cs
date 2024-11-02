@@ -157,6 +157,11 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         return m_CharacterData.Values.Where(x => !excludeLord || !x.IsLord).ToList();
     }
 
+    public bool TryRetrieveCharacterData(int id, out PlayerCharacterData characterData)
+    {
+        return m_CharacterData.TryGetValue(id, out characterData);
+    }
+
     public PlayerCharacterData RetrieveCharacterData(int id)
     {
         return m_CharacterData.Values.Where(x => x.Id == id).First();

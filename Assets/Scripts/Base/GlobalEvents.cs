@@ -104,4 +104,10 @@ public static class GlobalEvents {
         public static VoidEvent OnBeginLoadLevelEvent;
         public static LevelSOEvent OnPartySelectEvent;
     }
+
+    public static class Save
+    {
+        public static VoidEvent OnBeginSaveEvent;
+        public static VoidEvent OnCompleteSaveEvent;
+    }
 }
