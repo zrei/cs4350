@@ -13,6 +13,7 @@ public class PlayerCharacterData : ICanAttack
     /// At each index, indicate if that class is unlocked or not
     /// </summary>
     public List<bool> m_CurrUnlockedClasses;
+    public int NumClasses => m_BaseData.NumClasses;
     public bool IsClassUnlocked(int index) => m_CurrUnlockedClasses[index];
     public int m_CurrLevel;
     public int m_CurrExp;
@@ -50,6 +51,18 @@ public class PlayerCharacterData : ICanAttack
     /// This is only a pointer since the weapon instance itself can change.
     /// </summary>
     public int? m_CurrEquippedWeaponId;
+
+    public PlayerCharacterData(PlayerCharacterSO baseData, int currClassIndex, int currExp, int currLevel, Stats currStats, StatProgress statProgress, List<bool> currUnlockedClasses, int? currEquippedWeaponId = null)
+    {
+        m_BaseData = baseData;
+        m_CurrClassIndex = currClassIndex;
+        m_CurrExp = currExp;
+        m_CurrLevel = currLevel;
+        m_CurrStats = currStats;
+        m_CurrStatsProgress = statProgress;
+        m_CurrUnlockedClasses = currUnlockedClasses;
+        m_CurrEquippedWeaponId = currEquippedWeaponId;
+    }
 
     // temp implementation for skill descriptions to calculate damage in level screen
     #region ICanAttack
