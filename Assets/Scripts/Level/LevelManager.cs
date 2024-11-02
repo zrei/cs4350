@@ -132,7 +132,7 @@ public class LevelManager : MonoBehaviour
     {
         if (m_LevelNodeManager.IsGoalNodeCleared())
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO, LevelResultType.SUCCESS);
+            OnLevelEnd(m_LevelSO, LevelResultType.SUCCESS);
         }
         else
         {
@@ -363,7 +363,6 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
         GlobalEvents.Level.DialogueNodeEndEvent += OnDialogueNodeEnd;
-        GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
     }
     
     private void RemoveNodeEventCallbacks()
@@ -372,7 +371,6 @@ public class LevelManager : MonoBehaviour
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
         GlobalEvents.Level.DialogueNodeEndEvent -= OnDialogueNodeEnd;
-        GlobalEvents.Level.LevelEndEvent -= OnLevelEnd;
     }
 
     private void OnBattleNodeStart(BattleNode battleNode)
@@ -418,7 +416,7 @@ public class LevelManager : MonoBehaviour
 
         void OnFailureAnimComplete()
         {
-            GlobalEvents.Level.LevelEndEvent?.Invoke(m_LevelSO, LevelResultType.DEFEAT);
+            OnLevelEnd(m_LevelSO, LevelResultType.DEFEAT);
         }
     }
     
@@ -474,22 +472,28 @@ public class LevelManager : MonoBehaviour
 
     private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
     {
+        GlobalEvents.Level.LevelEndEvent?.Invoke();
+
         UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
+
+        FlagManager.Instance.SetFlagValue(result == LevelResultType.SUCCESS ? Flag.WIN_LEVEL_FLAG : Flag.LOSE_LEVEL_FLAG, true, FlagType.SESSION);
 
         if (result == LevelResultType.SUCCESS)
         {
             Debug.Log("Receiving Reward Characters");
             CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
-            CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty);
+            // CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty); // TODO: Testing if this works first
             
             foreach (var weaponReward in levelSo.m_RewardWeapons)
             {
                 InventoryManager.Instance.ObtainWeapon(weaponReward);
             }
-            InventoryManager.Instance.SaveWeapons();
+            // InventoryManager.Instance.SaveWeapons();
             
             FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
         }
+
+        GlobalEvents.Level.LevelResultsEvent?.Invoke(levelSo, result);
     }
     
     #endregion

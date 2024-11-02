@@ -2,9 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
+public class StartingPlayerCharacter
+{
+    public PlayerCharacterSO m_PlayerCharacter;
+    public bool m_OverrideStartingLevel = false;
+    public int m_OverriddenStartingLevel = 1;
+}
+
 public class CharacterDataManager : Singleton<CharacterDataManager>
 {
-    [SerializeField] List<PlayerCharacterSO> m_StartingCharacters;
+    [Tooltip("Characters to start with")]
+    [SerializeField] List<StartingPlayerCharacter> m_StartingCharacters;
 
     private readonly Dictionary<int, PlayerCharacterData> m_CharacterData = new();
 
@@ -15,6 +24,8 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         GlobalEvents.Morality.MoralitySetEvent += OnMoralitySet;
         GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
+
+        GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
     
         HandleDependencies();
     }
@@ -43,15 +54,11 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         PersistentDataManager.OnReady -= HandleDependencies;
         LevellingManager.OnReady -= HandleDependencies;
         
-        if (SaveManager.Instance.TryLoadCharacterSaveData(out List<CharacterSaveData> characterSaveData))
-        {
-            ParseSaveData(characterSaveData); 
-        }
-        else
+        if (!TryLoadSaveData())
         {
             LoadStartingCharacters();
+            SaveCharacterData();
         }
-        
     }
 
     protected override void HandleDestroy()
@@ -60,10 +67,36 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         GlobalEvents.Morality.MoralitySetEvent -= OnMoralitySet;
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
+
+        GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
+    }
+    #endregion
+
+    #region Level Result
+    private void OnLevelEnd(LevelSO _, LevelResultType result)
+    {
+        if (result == LevelResultType.DEFEAT)
+        {
+            TryLoadSaveData();
+        }
+        else if (result == LevelResultType.SUCCESS)
+        {
+            SaveCharacterData();
+        }
     }
     #endregion
 
     #region Saving
+    private bool TryLoadSaveData()
+    {
+        if (!SaveManager.Instance.TryLoadCharacterSaveData(out List<CharacterSaveData> characterSaveData))
+        {
+            return false;
+        }
+        ParseSaveData(characterSaveData); 
+        return true;
+    }
+
     private void ParseSaveData(List<CharacterSaveData> characterSaveData)
     {
         m_CharacterData.Clear();
@@ -76,8 +109,17 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
                 continue;
             }
 
-            PlayerCharacterData persistentData = new() {m_BaseData = characterSO, m_CurrClassIndex = data.m_ClassIndex, m_CurrExp = data.m_CurrExp,
-                m_CurrLevel = data.m_CurrLevel, m_CurrStats = data.m_CurrStats, m_CurrStatsProgress = data.m_CurrStatProgress};
+            PlayerCharacterData persistentData = new(
+                baseData: characterSO, 
+                currClassIndex: 
+                data.m_ClassIndex, 
+                currExp: data.m_CurrExp,
+                currLevel: data.m_CurrLevel, 
+                currStats: data.m_CurrStats, 
+                statProgress: data.m_CurrStatProgress, 
+                currUnlockedClasses: ParseUnlockedClasses(data.m_UnlockedClasses, characterSO.NumClasses),
+                currEquippedWeaponId: data.m_CurrEquippedWeaponId
+            );
             m_CharacterData.Add(persistentData.Id, persistentData);
         }
     }
@@ -86,7 +128,26 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     {
         m_CharacterData.Clear();
 
-        ReceiveCharacters(m_StartingCharacters);
+        ReceiveStartingCharacters(m_StartingCharacters);
+    }
+
+    private void SaveCharacterData()
+    {
+        SaveManager.Instance.SaveCharacterData(m_CharacterData.Values.Select(x => GetCharacterSaveData(x)));
+    }
+
+    private CharacterSaveData GetCharacterSaveData(PlayerCharacterData playerCharacterData)
+    {
+        return new CharacterSaveData(
+            characterId: playerCharacterData.Id, 
+            classIndex: playerCharacterData.m_CurrClassIndex, 
+            currLevel: playerCharacterData.m_CurrLevel, 
+            currExp: playerCharacterData.m_CurrExp, 
+            currStats: playerCharacterData.m_CurrStats, 
+            currStatProgress: playerCharacterData.m_CurrStatsProgress, 
+            unlockedClasses: SerializeUnlockedClasses(playerCharacterData.m_CurrUnlockedClasses, playerCharacterData.NumClasses), 
+            currEquippedWeaponId: playerCharacterData.m_CurrEquippedWeaponId
+        );
     }
     #endregion
 
@@ -159,15 +220,26 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
             Debug.Log($"To Add: Name: {entry.m_CharacterName}, Id: {entry.m_Id}");
         }
         
-        playerCharacterSOs.ForEach(x => ReceiveCharacter(x));
+        playerCharacterSOs.ForEach(x => ReceiveCharacter(x, x.m_StartingLevel));
     }
 
-    private void ReceiveCharacter(PlayerCharacterSO playerCharacterSO)
+    private void ReceiveStartingCharacters(List<StartingPlayerCharacter> startingPlayerCharacters)
     {
-        PlayerCharacterData persistentData = new() {m_BaseData = playerCharacterSO, m_CurrClassIndex = playerCharacterSO.StartingClassIndex, m_CurrExp = 0,
-                m_CurrLevel = 1, m_CurrStats = playerCharacterSO.m_StartingStats, m_CurrStatsProgress = new StatProgress(),
-                m_CurrUnlockedClasses = playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)};
-        LevellingManager.Instance.LevelCharacterToLevel(persistentData, playerCharacterSO.m_StartingLevel);
+        startingPlayerCharacters.ForEach(x => ReceiveCharacter(x.m_PlayerCharacter, x.m_OverrideStartingLevel ? x.m_OverriddenStartingLevel : x.m_PlayerCharacter.m_StartingLevel));
+    }
+
+    private void ReceiveCharacter(PlayerCharacterSO playerCharacterSO, int startingLevel)
+    {
+        PlayerCharacterData persistentData = new(
+            baseData: playerCharacterSO, 
+            currClassIndex: playerCharacterSO.StartingClassIndex, 
+            currExp: 0,
+            currLevel: 1, 
+            currStats: playerCharacterSO.m_StartingStats, 
+            statProgress: new StatProgress(),
+            currUnlockedClasses: playerCharacterSO.GetUnlockedClassIndexes(playerCharacterSO.m_StartingLevel)
+        );
+        LevellingManager.Instance.LevelCharacterToLevel(persistentData, startingLevel);
         m_CharacterData.Add(persistentData.Id, persistentData);
     }
     #endregion
@@ -229,4 +301,11 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         }
     }
     #endregion
+
+#if UNITY_EDITOR
+    public void SetStartingCharacters(List<StartingPlayerCharacter> startingPlayerCharacters)
+    {
+        m_StartingCharacters = startingPlayerCharacters;
+    }
+#endif
 }

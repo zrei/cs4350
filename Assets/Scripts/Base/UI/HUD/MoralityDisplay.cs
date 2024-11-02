@@ -1,8 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Game.UI;
-using UnityEngine.UI;
 using TMPro;
 
 public class MoralityDisplay : MonoBehaviour
@@ -86,20 +84,42 @@ public class MoralityDisplay : MonoBehaviour
         isHidden = true;
 
         GlobalEvents.Morality.MoralityChangeEvent += OnMoralityChange;
-        GlobalEvents.Scene.LevelSceneLoadedEvent += Show;
+        GlobalEvents.Morality.MoralitySetEvent += OnMoralitySet;
+        GlobalEvents.Level.LevelEndEvent += Hide;
+
+        Show();
+        
+        //GlobalEvents.Scene.LevelSceneLoadedEvent += Show;
         GlobalEvents.Battle.ReturnFromBattleEvent += Show;
         GlobalEvents.Scene.BattleSceneLoadedEvent += Hide;
-        GlobalEvents.Level.ReturnFromLevelEvent += Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent += Show;        
 
         Morality = MoralityManager.Instance.CurrMoralityPercentage;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.Scene.LevelSceneLoadedEvent -= Show;
+
+        GlobalEvents.Morality.MoralityChangeEvent -= OnMoralityChange;
+        GlobalEvents.Morality.MoralitySetEvent -= OnMoralitySet;
+        GlobalEvents.Level.LevelEndEvent -= Hide;
+
+        //GlobalEvents.Scene.LevelSceneLoadedEvent -= Show;
         GlobalEvents.Battle.ReturnFromBattleEvent -= Show;
         GlobalEvents.Scene.BattleSceneLoadedEvent -= Hide;
-        GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent -= Show;
+        
+    }
+
+    private void OnMoralitySet(int value)
+    {
+        StopAllCoroutines();
+        morality = value;
+        goodBar.SetValue(Mathf.Max(0, morality), 1f, 0f);
+        evilBar.SetValue(Mathf.Max(0, -morality), 1f, 0f);
+        marker.transform.localPosition = new Vector3(morality * displayLength, marker.transform.localPosition.y, marker.transform.localPosition.z);
+        marker.color = Color.Lerp(evilGraphicGroup.color, goodGraphicGroup.color, morality / 2f + 0.5f);
+        text.text = $"{Mathf.RoundToInt(morality * 100)}<sprite name=\"Morality\" tint>";
     }
 
     private void OnMoralityChange(int value)

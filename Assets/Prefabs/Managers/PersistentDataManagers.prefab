@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &459883615024003552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 889830446101687118}
+  - component: {fileID: 8560702349128244421}
+  - component: {fileID: 2256563400846694447}
+  - component: {fileID: 2946851532025570698}
+  - component: {fileID: 8741455040478328525}
+  - component: {fileID: 4355165026412671249}
+  - component: {fileID: 8143879764849532209}
+  m_Layer: 0
+  m_Name: PersistentDataManagers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &889830446101687118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8560702349128244421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2acb1b6bba1fb4b21bc319dad65611a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StartingPersistentFlags: 
+--- !u!114 &2256563400846694447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b4e64e64a1e75c47b93920162ca8e0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StartingWeapons: []
+--- !u!114 &2946851532025570698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92a24ead4821e3a49b192d900cb72693, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StartingCharacters:
+  - m_PlayerCharacter: {fileID: 11400000, guid: 2541a19dc80e4469fb97bcf9977abc8c,
+      type: 2}
+    m_OverrideStartingLevel: 0
+    m_OverriddenStartingLevel: 0
+  - m_PlayerCharacter: {fileID: 11400000, guid: ce0f14bc27742264fbcc405e9b6baca0,
+      type: 2}
+    m_OverrideStartingLevel: 0
+    m_OverriddenStartingLevel: 0
+  - m_PlayerCharacter: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5,
+      type: 2}
+    m_OverrideStartingLevel: 0
+    m_OverriddenStartingLevel: 0
+  - m_PlayerCharacter: {fileID: 11400000, guid: d16acff93580bce49924bd065822a936,
+      type: 2}
+    m_OverrideStartingLevel: 0
+    m_OverriddenStartingLevel: 0
+  - m_PlayerCharacter: {fileID: 11400000, guid: 75bb8482b596e473296f970cfa2cbbef,
+      type: 2}
+    m_OverrideStartingLevel: 0
+    m_OverriddenStartingLevel: 0
+--- !u!114 &8741455040478328525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6818a4c9c181d48afb6200be7a5b2f32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MoralitySetting: {fileID: 11400000, guid: 5dc1fb52912ed45c9a27b967ddd3460c, type: 2}
+  m_StartingMoralityPercentage: 0
+--- !u!114 &4355165026412671249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a581b5de163804153936d0f3ad0a92e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CharacterSOs:
+  - {fileID: 11400000, guid: 2541a19dc80e4469fb97bcf9977abc8c, type: 2}
+  - {fileID: 11400000, guid: ce0f14bc27742264fbcc405e9b6baca0, type: 2}
+  - {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
+  - {fileID: 11400000, guid: d16acff93580bce49924bd065822a936, type: 2}
+  - {fileID: 11400000, guid: 75bb8482b596e473296f970cfa2cbbef, type: 2}
+  - {fileID: 11400000, guid: fd194f8c0f7a24a79ad5372cd50b88b8, type: 2}
+  m_WeaponInstanceSOs:
+  - {fileID: 11400000, guid: 7341cf388b5db445e8f24d9a864b5710, type: 2}
+  - {fileID: 11400000, guid: 3312b58472c204e149af01ee4e4b08e1, type: 2}
+  - {fileID: 11400000, guid: 20cd6de5abba3684d8d971aeaa184c70, type: 2}
+  - {fileID: 11400000, guid: c78499bd7bf1743f38f1d26b5a87986a, type: 2}
+  - {fileID: 11400000, guid: df43ae67a2aa34767987a0c99fec88c4, type: 2}
+  - {fileID: 11400000, guid: 93e08f2306b584830a0e37e275582707, type: 2}
+  - {fileID: 11400000, guid: e4d17d5b01e024d46a7a812087d88082, type: 2}
+  - {fileID: 11400000, guid: 73708942088154b99abf90b7091f8ec3, type: 2}
+  m_OverrideWeaponRootFolder: 1
+  m_OverriddenWeaponRootFolder: Assets/Persistent Data/Weapons/WeaponInstances/
+  m_OverrideCharacterRootFolder: 1
+  m_OverriddenCharacterRootFolder: Assets/Persistent Data
+--- !u!114 &8143879764849532209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459883615024003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aa1dedaab093594d93d8cc2f32b7a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LevellingSO: {fileID: 11400000, guid: 846403b45fae6482caba2842c5472a0f, type: 2}

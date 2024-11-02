@@ -28,12 +28,12 @@ namespace Game.UI
         public override void Initialize()
         {
             base.Initialize();
-            GlobalEvents.Level.LevelEndEvent += OnLevelEnd;
+            GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
         }
 
         private void OnDestroy()
         {
-            GlobalEvents.Level.LevelEndEvent -= OnLevelEnd;
+            GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
         }
         
         private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
@@ -45,11 +45,6 @@ namespace Game.UI
                 LevelResultType.OUT_OF_TIME => "Out of time...",
                 _ => "???"
             };
-
-            if (result == LevelResultType.SUCCESS)
-            {
-                FlagManager.Instance.SetFlagValue(result == LevelResultType.SUCCESS ? Flag.WIN_LEVEL_FLAG : Flag.LOSE_LEVEL_FLAG, true, FlagType.SESSION);
-            }
 
             currentLevelId = levelSo.m_LevelId;
             

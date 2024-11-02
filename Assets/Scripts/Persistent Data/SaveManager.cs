@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -42,6 +43,13 @@ public class SaveManager : Singleton<SaveManager>
     private const string LEVEL_KEY = "LevelProgress";
     private const string ITEM_SEPARATOR = "\t";
 
+    /// <summary>
+    /// Initial guaranteed save delay to ensure the save indicator shows up
+    /// </summary>
+    private const float SAVE_DELAY = 3.0f;
+
+    private Coroutine m_SaveCoroutine = null;
+
     protected override void HandleAwake()
     {
         base.HandleAwake();
@@ -53,10 +61,22 @@ public class SaveManager : Singleton<SaveManager>
     }
 
     #region Save
-    // not sure how slow this is... leaving it synchronous for now
-    public void Save()
+    private IEnumerator Save_Coroutine(VoidEvent postSaveEvent = null)
     {
+        yield return new WaitForSeconds(SAVE_DELAY);
         PlayerPrefs.Save();
+        postSaveEvent?.Invoke();
+        m_SaveCoroutine = null;
+    }
+    
+    public void Save(VoidEvent postSaveEvent = null)
+    {
+        if (m_SaveCoroutine != null)
+        {
+            Logger.Log(this.GetType().Name, "There is already a save process occurring!", LogLevel.ERROR);
+            return;
+        }
+        m_SaveCoroutine = StartCoroutine(Save_Coroutine(postSaveEvent));
     }
 
     public void ClearSave()
@@ -142,9 +162,23 @@ public class SaveManager : Singleton<SaveManager>
     #endregion
 
     #region Level Progress
-    public int LoadCurrentLevel()
+    public bool TryLoadCurrentLevel(out int currLevel)
     {
-        return PlayerPrefs.GetInt(LEVEL_KEY, 1);
+        if (PlayerPrefs.HasKey(LEVEL_KEY))
+        {
+            currLevel = PlayerPrefs.GetInt(LEVEL_KEY, 1);
+            return true;
+        }
+        else
+        {
+            currLevel = 1;
+            return false;
+        }
+    }
+
+    public void SetCurrentLevel(int currLevel)
+    {
+        PlayerPrefs.SetInt(LEVEL_KEY, currLevel);
     }
     #endregion
 

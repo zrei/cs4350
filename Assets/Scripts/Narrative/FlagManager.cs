@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// For easy access and constant flags
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 public enum Flag
 {
     WIN_LEVEL_FLAG,
-    LOSE_LEVEL_FLAG
+    LOSE_LEVEL_FLAG,
 }
 
 public enum FlagType
@@ -22,10 +23,20 @@ public class FlagManager : Singleton<FlagManager>
     {
         public bool m_Value;
         public FlagType m_FlagType;
+
+        public FlagWrapper(FlagType flagType, bool value = false)
+        {
+            m_FlagType = flagType;
+            m_Value = value;
+        }
     }
 
     private readonly Dictionary<string, FlagWrapper> m_Flags = new();
 
+    [Tooltip("Persistent flags that start off as true")]
+    [SerializeField] private List<Flag> m_StartingPersistentFlags;
+
+    #region Initialisation
     protected override void HandleAwake()
     {
         base.HandleAwake();
@@ -48,23 +59,60 @@ public class FlagManager : Singleton<FlagManager>
 
         SaveManager.OnReady -= HandleDependencies;
 
-        LoadFlags();
+        LoadPersistentFlags();
     }
+    #endregion
 
-    private void LoadFlags()
+    #region Level Result
+    private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        m_Flags.Clear();
-
-        if (SaveManager.Instance.TryLoadPersistentFlags(out List<string> persistentFlags))
+        if (levelResultType == LevelResultType.SUCCESS)
         {
-            foreach (string flag in persistentFlags)
-            {
-                m_Flags[flag] = new() {m_Value = true, m_FlagType = FlagType.PERSISTENT};
-            }
+            SavePersistentFlags();
+        }
+        else if (levelResultType == LevelResultType.DEFEAT)
+        {
+            ClearPersistentFlags();
+            TryLoadSavedPersistentFlags();
+        }
+    }
+    #endregion
+
+    #region Save
+    private void LoadPersistentFlags()
+    {
+        ClearPersistentFlags();
+
+        if (!TryLoadSavedPersistentFlags())
+        {
+            LoadStartingFlags();
+            SavePersistentFlags();
         }
     }
 
-    public void SavePersistentFlags()
+    private bool TryLoadSavedPersistentFlags()
+    {
+        if (!SaveManager.Instance.TryLoadPersistentFlags(out List<string> persistentFlags))
+        {
+            return false;
+        }
+        
+        foreach (string flag in persistentFlags)
+        {
+            m_Flags[flag] = new() {m_Value = true, m_FlagType = FlagType.PERSISTENT};
+        }
+        return true;
+    }
+
+    private void LoadStartingFlags()
+    {
+        foreach (Flag flag in m_StartingPersistentFlags)
+        {
+            m_Flags[flag.ToString()] = new() {m_Value = true, m_FlagType = FlagType.PERSISTENT};
+        }
+    }
+
+    private void SavePersistentFlags()
     {
         List<string> flagsToSave = new();
         foreach (KeyValuePair<string, FlagWrapper> flag in m_Flags)
@@ -76,10 +124,11 @@ public class FlagManager : Singleton<FlagManager>
         }
         SaveManager.Instance.SavePersistentFlags(flagsToSave);
     } 
+    #endregion
 
     public void SetFlagValue(string flag, bool value, FlagType flagType)
     {
-        m_Flags[flag] = new() {m_Value = value, m_FlagType = flagType};
+        m_Flags[flag] = new(flagType: flagType, value: value);
         GlobalEvents.Flags.SetFlagEvent?.Invoke(flag, value, flagType);
     }
 
@@ -101,4 +150,24 @@ public class FlagManager : Singleton<FlagManager>
     {
         return GetFlagValue(flag.ToString());
     }
+
+    #region Helper
+    private void ClearPersistentFlags()
+    {
+        foreach (KeyValuePair<string, FlagWrapper> pair in m_Flags)
+        {
+            if (pair.Value.m_FlagType == FlagType.PERSISTENT)
+            {
+                m_Flags[pair.Key] = new FlagWrapper(FlagType.PERSISTENT, false);
+            }
+        }
+    }
+    #endregion
+
+#if UNITY_EDITOR
+    public void SetStartingFlags(List<Flag> persistentFlags)
+    {
+        m_StartingPersistentFlags = persistentFlags;
+    }
+#endif
 }

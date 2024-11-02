@@ -26,7 +26,7 @@ public abstract class IdHelper<T> : ScriptableObject, IIdHelper where T : Script
     public void CheckForDuplicateIds()
     {
         Dictionary<int, List<string>> idMap = new();
-        foreach (string instancePath in FindAssetPathsByType())
+        foreach (string instancePath in AssetHelpers.FindAssetPathsByType<T>(m_OverrideRootFolder, new string[] {m_OverriddenRootFolder}))
         {
             T instanceSO = AssetDatabase.LoadAssetAtPath<T>(instancePath);
             
@@ -58,7 +58,7 @@ public abstract class IdHelper<T> : ScriptableObject, IIdHelper where T : Script
     {
         int id = 0;
 
-        foreach (string instancePath in FindAssetPathsByType())
+        foreach (string instancePath in AssetHelpers.FindAssetPathsByType<T>(m_OverrideRootFolder, new string[] {m_OverriddenRootFolder}))
         {
             T instanceSO = AssetDatabase.LoadAssetAtPath<T>(instancePath);
             
@@ -80,16 +80,6 @@ public abstract class IdHelper<T> : ScriptableObject, IIdHelper where T : Script
     protected abstract int GetInstanceSoId(T instanceSO);
 
     protected abstract void EditInstanceSoId(T instanceSO, int newId);
-
-    private IEnumerable<string> FindAssetPathsByType() {
-        string[] guids = m_OverrideRootFolder
-            ? AssetDatabase.FindAssets($"t:{typeof(T)}", new string[] {m_OverriddenRootFolder})
-            : AssetDatabase.FindAssets($"t:{typeof(T)}");
-        foreach (string guid in guids) {
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            yield return assetPath;
-        }
-    }
 }
 #endif
 
