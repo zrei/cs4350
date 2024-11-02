@@ -63,9 +63,11 @@ public class SaveManager : Singleton<SaveManager>
     #region Save
     private IEnumerator Save_Coroutine(VoidEvent postSaveEvent = null)
     {
+        GlobalEvents.Save.OnBeginSaveEvent?.Invoke();
         yield return new WaitForSeconds(SAVE_DELAY);
         PlayerPrefs.Save();
         postSaveEvent?.Invoke();
+        GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
         m_SaveCoroutine = null;
     }
     

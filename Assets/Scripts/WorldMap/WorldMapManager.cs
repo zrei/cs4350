@@ -185,13 +185,22 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         LevelSO levelSO = currNode.LevelSO;
 
-        if (currNode.HasPostCutscene)
+        m_CurrUnlockedLevel += 1;
+        m_CurrSelectedLevel = m_CurrUnlockedLevel;
+
+        SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
+        SaveManager.Instance.Save(PostSave);
+
+        void PostSave()
         {
-            m_CutsceneManager.ShowCutscene(currNode.PostCutscene, () => PostLevelEndCutscene(currNode, nextNode));
-        }
-        else
-        {
-            PostLevelEndCutscene(currNode, nextNode);
+            if (currNode.HasPostCutscene)
+            {
+                m_CutsceneManager.ShowCutscene(currNode.PostCutscene, () => PostLevelEndCutscene(currNode, nextNode));
+            }
+            else
+            {
+                PostLevelEndCutscene(currNode, nextNode);
+            }
         }
     }
 
@@ -226,12 +235,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
                 PostLevelBeginCutscene(nextNode);
             }
         }
-
-        m_CurrUnlockedLevel += 1;
-        m_CurrSelectedLevel = m_CurrUnlockedLevel;
-
-        SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
-        SaveManager.Instance.Save();
     }
 
     private void PostLevelBeginCutscene(WorldMapNode nextNode)
