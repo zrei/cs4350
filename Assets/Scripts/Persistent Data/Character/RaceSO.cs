@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "RaceSO", menuName = "ScriptableObject/Characters/RaceSO")]
 public class RaceSO : ScriptableObject
@@ -49,48 +50,87 @@ public class RaceSO : ScriptableObject
 
 #if UNITY_EDITOR
     [Header("Male - Helper")]
-    public string m_FemaleMageFolder;
-    public string m_FemaleHoodedFolder;
-    public string m_FemaleArmorFolder;
+    public string m_MaleArmorFolder = "Assets/Models/Armors/";
+    public string m_MaleMagePrefix = "M_Mage";
+    public string m_MaleHoodedPrefix = "M_Rogue";
+    public string m_MaleArmorPrefix = "M_Heavy";
 
     [Header("Female - helper")]
-    public string m_MaleMageFolder;
-    public string m_MaleHoodedFolder;
-    public string m_MaleArmorFolder;
+    public string m_FemaleArmorFolder = "Assets/Models/Armors/";
+    public string m_FemaleMagePrefix = "F_Mage";
+    public string m_FemaleHoodedPrefix = "F_Rogue";
+    public string m_FemaleArmorPrefix = "F_Heavy";
 
-    public void FillFemaleMageMeshes()
+    public void FillFemale()
     {
-
+        FillFemaleArmorMeshes();
+        FillFemaleHoodedMeshes();
+        FillFemaleMageMeshes();
+        EditorUtility.SetDirty(this);
     }
 
-    public void FillFemaleHoodedMeshes()
+    public void FillMale()
     {
-
+        FillMaleArmorMeshes();
+        FillMaleHoodedMeshes();
+        FillMaleMageMeshes();
+        EditorUtility.SetDirty(this);
     }
 
-    public void FillFemaleArmorMeshes()
+    #region Armor
+    private void FillFemaleMageMeshes()
     {
-
+        m_FemaleItems.m_MageMeshes = GetSkinnedMeshRenderersInFolder(m_FemaleArmorFolder, m_FemaleMagePrefix);
     }
 
-    public void FillMaleMageMeshes()
+    private void FillFemaleHoodedMeshes()
     {
-
+        m_FemaleItems.m_HoodedMeshes = GetSkinnedMeshRenderersInFolder(m_FemaleArmorFolder, m_FemaleHoodedPrefix);
     }
 
-    public void FillMaleHoodedMeshes()
+    private void FillFemaleArmorMeshes()
     {
-
+        m_FemaleItems.m_ArmorMeshes = GetSkinnedMeshRenderersInFolder(m_FemaleArmorFolder, m_FemaleArmorPrefix);
     }
 
-    public void FillMaleArmorMeshes()
+    private void FillMaleMageMeshes()
     {
-
+        m_MaleItems.m_MageMeshes = GetSkinnedMeshRenderersInFolder(m_MaleArmorFolder, m_MaleMagePrefix);
     }
 
-    private SkinnedMeshRenderer[] GetSkinnedMeshRenderersInFolder(string folderPath)
+    private void FillMaleHoodedMeshes()
     {
-        foreach (string path in Asset)
+        m_MaleItems.m_HoodedMeshes = GetSkinnedMeshRenderersInFolder(m_MaleArmorFolder, m_MaleHoodedPrefix);
+    }
+
+    private void FillMaleArmorMeshes()
+    {
+        m_MaleItems.m_ArmorMeshes = GetSkinnedMeshRenderersInFolder(m_MaleArmorFolder, m_MaleArmorPrefix);
+    }
+    #endregion
+
+    private SkinnedMeshRenderer[] GetSkinnedMeshRenderersInFolder(string folderPath, string prefix)
+    {
+        List<SkinnedMeshRenderer> meshRenderers = new();
+        foreach (string instancePath in AssetHelpers.FindAssetPathsByType("t: Model", true, folderPath))
+        {
+            if (!instancePath.Contains(prefix))
+                continue;
+
+            foreach (Object obj in AssetDatabase.LoadAllAssetRepresentationsAtPath(instancePath))
+            {
+                if (!(obj is GameObject))
+                    continue;
+
+                SkinnedMeshRenderer meshRenderer = ((GameObject) obj).GetComponent<SkinnedMeshRenderer>();
+            
+                if (meshRenderer == null)
+                    continue;
+
+                meshRenderers.Add(meshRenderer);
+            }
+        }
+        return meshRenderers.ToArray();
     }
 #endif
 }
@@ -122,6 +162,18 @@ public class RaceSOEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
+
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("Fill male"))
+        {
+            m_Target.FillMale();
+        }
+
+        if (GUILayout.Button("Fill female"))
+        {
+            m_Target.FillFemale();
+        }
     }
 }
 #endif
