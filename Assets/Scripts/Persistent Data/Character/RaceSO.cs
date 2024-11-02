@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
 
 [CreateAssetMenu(fileName = "RaceSO", menuName = "ScriptableObject/Characters/RaceSO")]
 public class RaceSO : ScriptableObject
@@ -45,10 +46,57 @@ public class RaceSO : ScriptableObject
             _ => new SkinnedMeshRenderer[] {}
         };
     }
+
+#if UNITY_EDITOR
+    [Header("Male - Helper")]
+    public string m_FemaleMageFolder;
+    public string m_FemaleHoodedFolder;
+    public string m_FemaleArmorFolder;
+
+    [Header("Female - helper")]
+    public string m_MaleMageFolder;
+    public string m_MaleHoodedFolder;
+    public string m_MaleArmorFolder;
+
+    public void FillFemaleMageMeshes()
+    {
+
+    }
+
+    public void FillFemaleHoodedMeshes()
+    {
+
+    }
+
+    public void FillFemaleArmorMeshes()
+    {
+
+    }
+
+    public void FillMaleMageMeshes()
+    {
+
+    }
+
+    public void FillMaleHoodedMeshes()
+    {
+
+    }
+
+    public void FillMaleArmorMeshes()
+    {
+
+    }
+
+    private SkinnedMeshRenderer[] GetSkinnedMeshRenderersInFolder(string folderPath)
+    {
+        foreach (string path in Asset)
+    }
+#endif
 }
 
 [System.Serializable]
-public struct GenderItems
+public class GenderItems
 {
     [Header("Model")]
     public GameObject m_BaseModel;
@@ -58,5 +106,22 @@ public struct GenderItems
     public SkinnedMeshRenderer[] m_MageMeshes;
     public SkinnedMeshRenderer[] m_HoodedMeshes;
     public SkinnedMeshRenderer[] m_ArmorMeshes;
-
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(RaceSO))]
+public class RaceSOEditor : Editor
+{
+    private RaceSO m_Target;
+
+    private void OnEnable()
+    {
+        m_Target = (RaceSO) target;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+    }
+}
+#endif
