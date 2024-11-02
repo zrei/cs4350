@@ -45,16 +45,20 @@ public struct WeaponInstanceSaveData
 
 public class InventoryManager : Singleton<InventoryManager>
 {
+    [Tooltip("Weapons to start with")]
     [SerializeField] private List<WeaponInstanceSO> m_StartingWeapons;
 
     private readonly Dictionary<int, WeaponInstance> m_Inventory = new();
     private int m_CurrNextId;
 
+    #region Initialisation
     protected override void HandleAwake()
     {
         base.HandleAwake();
 
         HandleDependencies();
+
+        GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
     }
 
     private void HandleDependencies()
@@ -77,12 +81,46 @@ public class InventoryManager : Singleton<InventoryManager>
         LoadWeapons();
     }
 
+    protected override void HandleDestroy()
+    {
+        base.HandleDestroy();
+
+        GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
+    }
+    #endregion
+
+    #region Level Result
+    private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
+    {
+        if (levelResultType == LevelResultType.SUCCESS)
+        {
+            SaveWeapons();
+        }
+        else if (levelResultType == LevelResultType.DEFEAT)
+        {
+            TryLoadSaveData();
+        }
+    }
+    #endregion
+
+    #region Save Data
     private void LoadWeapons()
     {
-        if (SaveManager.Instance.TryLoadInventory(out List<WeaponInstanceSaveData> weaponInstanceSaveData))
-            ParseSaveData(weaponInstanceSaveData);
-        else
+        if (!TryLoadSaveData())
+        {
             LoadStartingInventory();
+            SaveWeapons();
+        }
+            
+    }
+
+    private bool TryLoadSaveData()
+    {
+        if (!SaveManager.Instance.TryLoadInventory(out List<WeaponInstanceSaveData> weaponInstanceSaveData))
+            return false;
+
+        ParseSaveData(weaponInstanceSaveData);
+        return true;
     }
 
     private void LoadStartingInventory()
@@ -119,11 +157,13 @@ public class InventoryManager : Singleton<InventoryManager>
         m_CurrNextId = m_Inventory.Count;
     }
 
-    public void SaveWeapons()
+    private void SaveWeapons()
     {
         SaveManager.Instance.SaveInventoryData(m_Inventory.Values.Select(x => x.GetSaveData()));
     }
+    #endregion
 
+    #region Edit
     public void ChangeWeaponEquipStatus(int weaponInstanceId, bool isEquipped)
     {
         m_Inventory[weaponInstanceId].ChangeEquipStatus(isEquipped);
@@ -134,7 +174,9 @@ public class InventoryManager : Singleton<InventoryManager>
         m_Inventory.Add(m_CurrNextId, new() {m_InstanceId = m_CurrNextId, m_IsEquipped = false, m_WeaponInstanceSO = weaponInstanceSO});
         ++m_CurrNextId;
     }
+    #endregion
 
+    #region Getters
     public bool TryRetrieveWeapon(int weaponInstanceId, out WeaponInstanceSO weaponInstanceSO)
     {
         if (!m_Inventory.TryGetValue(weaponInstanceId, out WeaponInstance weaponInstance))
@@ -153,4 +195,12 @@ public class InventoryManager : Singleton<InventoryManager>
     {
         return m_Inventory.Values.Where(x => x.m_WeaponInstanceSO.m_WeaponType == weaponType).ToList();
     }
+    #endregion
+
+#if UNITY_EDITOR
+    public void SetStartingInventory(List<WeaponInstanceSO> startingWeaponInstances)
+    {
+        m_StartingWeapons = startingWeaponInstances;
+    }
+#endif
 }
