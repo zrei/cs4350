@@ -20,6 +20,7 @@ namespace Game.Input
         void RemoveInputBlocker(string id);
     }
 
+    [DefaultExecutionOrder(-99)]
     public class InputManager : Singleton<InputManager>
     {
         private class Input : IInput
