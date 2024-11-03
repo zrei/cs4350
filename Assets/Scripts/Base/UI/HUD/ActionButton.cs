@@ -8,9 +8,9 @@ namespace Game.UI
         public Image icon;
         public Image glow;
 
-        protected override void Awake()
+        protected override void Start()
         {
-            base.Awake();
+            base.Start();
             glow.CrossFadeAlpha(0, 0, true);
         }
 

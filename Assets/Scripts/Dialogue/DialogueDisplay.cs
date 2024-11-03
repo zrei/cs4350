@@ -11,8 +11,7 @@ namespace Game.UI
 {
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(CanvasGroup))]
-    public class DialogueDisplay : Singleton<DialogueDisplay>,
-        IPointerClickHandler
+    public class DialogueDisplay : Singleton<DialogueDisplay>
     {
         private const int MaxOptions = 5;
 
@@ -111,6 +110,7 @@ namespace Game.UI
             dialogue.onEnterState?.Invoke();
 
             InputManager.Instance.SubmitInput.OnPressEvent += OnSubmit;
+            InputManager.Instance.PointerSelectInput.OnPressEvent += OnSubmit;
             
             GlobalEvents.Dialogue.DialogueStartEvent?.Invoke();
         }
@@ -132,6 +132,7 @@ namespace Game.UI
             CurrentDialogue = null;
             Hide();
             InputManager.Instance.SubmitInput.OnPressEvent -= OnSubmit;
+            InputManager.Instance.PointerSelectInput.OnPressEvent -= OnSubmit;
             GlobalEvents.Dialogue.DialogueEndEvent?.Invoke();
         }
 
@@ -215,11 +216,6 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            OnSubmit(null);
         }
     }
 }

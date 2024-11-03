@@ -47,11 +47,9 @@ namespace Game.UI
         {
             m_RemoveButton.gameObject.SetActive(!isLord);
             m_SelectionButton.interactable = !isLord;
-            m_SelectionButton.nameText.text = playerCharacterData.m_BaseData.m_CharacterName;
+            m_SelectionButton.nameText.text = $"{playerCharacterData.m_BaseData.m_CharacterName} / {playerCharacterData.CurrClass.m_ClassName}";
             IsFilled = true;
             CharacterId = playerCharacterData.m_BaseData.m_Id;
-
-            
         }
 
         public void SetSelected(bool isSelected)

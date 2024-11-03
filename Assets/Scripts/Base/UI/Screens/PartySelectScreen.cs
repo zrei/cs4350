@@ -184,7 +184,7 @@ namespace Game.UI
         private void InstantiateCharacterButton(PlayerCharacterData playerCharacterData)
         {
             NamedObjectButton characterButton = Instantiate(m_CharacterButton, m_CharacterButtonParent);
-            characterButton.nameText.text = playerCharacterData.m_BaseData.m_CharacterName;
+            characterButton.nameText.text = $"{playerCharacterData.m_BaseData.m_CharacterName} / {playerCharacterData.CurrClass.m_ClassName}";
             characterButton.onSubmit.RemoveAllListeners();
             characterButton.onSubmit.AddListener(() => OnSelectCharacterButton(characterButton, playerCharacterData));
         }
