@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game.UI
@@ -16,6 +17,12 @@ namespace Game.UI
         public void SetGlowActive(bool active)
         {
             glow.CrossFadeAlpha(active ? 1 : 0, 0.2f, false);
+        }
+
+        public void SetActive(bool active)
+        {
+            interactable = active;
+            icon.color = active ? Color.red : Color.clear;
         }
     }
 }

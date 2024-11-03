@@ -19,17 +19,17 @@ namespace Game.UI
 
         public override void CrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha, bool useRGB)
         {
-            graphics.ForEach(x => x.graphic.CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha, useRGB));
+            graphics.ForEach(x => { if (x.graphic != null) x.graphic.CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha, useRGB); });
         }
 
         public override void CrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha)
         {
-            graphics.ForEach(x => x.graphic.CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha));
+            graphics.ForEach(x => { if (x.graphic != null) x.graphic.CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha); });
         }
 
         public override void CrossFadeAlpha(float alpha, float duration, bool ignoreTimeScale)
         {
-            graphics.ForEach(x => x.graphic.CrossFadeAlpha(alpha, duration, ignoreTimeScale));
+            graphics.ForEach(x => { if (x.graphic != null)  x.graphic.CrossFadeAlpha(alpha, duration, ignoreTimeScale); });
         }
 
         private void UpdateColors()
