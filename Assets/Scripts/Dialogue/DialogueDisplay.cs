@@ -16,7 +16,7 @@ namespace Game.UI
         private const int MaxOptions = 5;
 
         [SerializeField]
-        private DialogueButton dialogueButtonPrefab;
+        private NamedObjectButton dialogueButtonPrefab;
 
         #region Component References
         #region Character Sprite
@@ -72,9 +72,9 @@ namespace Game.UI
         }
         private Dialogue currentDialogue;
 
-        private HashSet<DialogueButton> activeDisplays = new();
+        private HashSet<NamedObjectButton> activeDisplays = new();
 
-        private ObjectPool<DialogueButton> displayPool;
+        private ObjectPool<NamedObjectButton> displayPool;
 
         protected override void HandleAwake()
         {
@@ -91,7 +91,7 @@ namespace Game.UI
 
             displayPool = new(
                 createFunc: () => Instantiate(dialogueButtonPrefab, buttonsLayout.transform),
-                actionOnGet: display => { activeDisplays.Add(display); display.gameObject.SetActive(true); },
+                actionOnGet: display => { activeDisplays.Add(display); display.gameObject.SetActive(true); display.transform.SetAsFirstSibling(); },
                 actionOnRelease: display => { activeDisplays.Remove(display); display.gameObject.SetActive(false); },
                 actionOnDestroy: display => Destroy(display.gameObject),
                 collectionCheck: true,
@@ -161,7 +161,7 @@ namespace Game.UI
                     if (!isUnlocked && option.hideIfConditionsUnmet) continue;
 
                     var button = displayPool.Get();
-                    button.text.text = isUnlocked ? option.text : $"{option.lockedText} {option.text}";
+                    button.nameText.text = isUnlocked ? option.text : $"{option.lockedText} {option.text}";
                     button.interactable = isUnlocked;
 
                     if (!isUnlocked) continue;

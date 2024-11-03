@@ -10,7 +10,8 @@ namespace Game.UI
         [SerializeField] TextMeshProUGUI m_TitleText;
         [SerializeField] TextMeshProUGUI m_TimeTakenText;
         [SerializeField] TextMeshProUGUI m_ResultText;
-        [SerializeField] Button m_ReturnButton;
+        [SerializeField] SelectableBase m_ReturnButton;
+        [SerializeField] GraphicGroup m_GraphicGroup;
 
         public override void Initialize()
         {
@@ -30,24 +31,26 @@ namespace Game.UI
                 var expReward = battleNode.BattleSO.m_ExpReward;
                 
                 m_TitleText.text = "Victory!";
-                m_TimeTakenText.text = $"Time taken: {numTurns}";
+                //m_TimeTakenText.text = $"Time taken: {numTurns}";
                 m_ResultText.text = $"Gained {expReward} EXP!";
+                m_GraphicGroup.color = UIConstants.VictoryColor;
             }
             else
             {
                 m_TitleText.text = "Defeat...";
-                m_TimeTakenText.text = $"Time taken: {numTurns}";
+                //m_TimeTakenText.text = $"Time taken: {numTurns}";
                 m_ResultText.text = "";
+                m_GraphicGroup.color = UIConstants.DefeatColor;
             }
             
-            m_ReturnButton.onClick.AddListener(CloseResults);
+            m_ReturnButton.onSubmit.AddListener(CloseResults);
         }
     
         private void CloseResults()
         {
             UIScreenManager.Instance.CloseScreen();
             GlobalEvents.Level.CloseRewardScreenEvent?.Invoke();
-            m_ReturnButton.onClick.RemoveListener(CloseResults);
+            m_ReturnButton.onSubmit.RemoveListener(CloseResults);
         }
         
         public override void ScreenUpdate()

@@ -17,11 +17,11 @@ namespace Game.UI
     {
         [SerializeField] GameObject m_ResultPanel;
         [SerializeField] TextMeshProUGUI m_ResultText;
-        [SerializeField] Button m_ReturnButton;
+        [SerializeField] SelectableBase m_ReturnButton;
         
         [SerializeField] GameObject m_RewardsPanel;
         [SerializeField] TextMeshProUGUI m_RewardsText;
-        [SerializeField] Button m_RewardsReturnButton;
+        [SerializeField] SelectableBase m_RewardsReturnButton;
         
         private int currentLevelId;
 
@@ -50,9 +50,9 @@ namespace Game.UI
             
             bool hasRewards = levelSo.m_RewardCharacters.Count > 0 || levelSo.m_RewardWeapons.Count > 0;
             if (result == LevelResultType.SUCCESS && hasRewards)
-                m_ReturnButton.onClick.AddListener(ShowRewards);
+                m_ReturnButton.onSubmit.AddListener(ShowRewards);
             else
-                m_ReturnButton.onClick.AddListener(ReturnFromLevel);
+                m_ReturnButton.onSubmit.AddListener(ReturnFromLevel);
             
             m_ResultPanel.SetActive(true);
             m_RewardsPanel.SetActive(false);
@@ -77,15 +77,15 @@ namespace Game.UI
                 }
 
                 m_RewardsText.text = builder.ToString();
-                m_RewardsReturnButton.onClick.AddListener(ReturnFromLevel);
+                m_RewardsReturnButton.onSubmit.AddListener(ReturnFromLevel);
                 m_RewardsPanel.SetActive(true);
             }
         }
         
         private void ReturnFromLevel()
         {
-            m_ReturnButton.onClick.RemoveListener(ReturnFromLevel);
-            m_RewardsReturnButton.onClick.RemoveListener(ReturnFromLevel);
+            m_ReturnButton.onSubmit.RemoveListener(ReturnFromLevel);
+            m_RewardsReturnButton.onSubmit.RemoveListener(ReturnFromLevel);
             
             UIScreenManager.Instance.CloseScreen();
             GameSceneManager.Instance.UnloadLevelScene(currentLevelId);

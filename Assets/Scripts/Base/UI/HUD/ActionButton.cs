@@ -12,6 +12,9 @@ namespace Game.UI
         {
             base.Start();
             glow.CrossFadeAlpha(0, 0, true);
+            Color color = icon.color;
+            color.a = glow.color.a;
+            glow.color = color;
         }
 
         public void SetGlowActive(bool active)
