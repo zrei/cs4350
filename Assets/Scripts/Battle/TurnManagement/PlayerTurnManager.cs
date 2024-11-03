@@ -267,7 +267,7 @@ public class PlayerTurnManager : TurnManager
         if (unit == null || skill == null) return true;
         if (unit.HasEnoughManaForSkill(skill)) return true;
 
-        ToastNotificationDisplay.Instance.Show($"Insufficient Mana: {unit.CurrentMana:F1} ({skill.m_ConsumedMana:F1})", Color.red);
+        ToastNotificationManager.Instance.Show($"Insufficient Mana: {unit.CurrentMana:F1} ({skill.m_ConsumedMana:F1})", Color.red);
         return false;
     }
 
@@ -441,7 +441,7 @@ public class PlayerTurnManager : TurnManager
 
                 if (m_MapLogic.IsAttackerOutOfPosition(m_CurrUnit, selectedSkill))
                 {
-                    ToastNotificationDisplay.Instance.Show("<sprite name=\"Blocked\" tint>: Out of position", Color.red);
+                    ToastNotificationManager.Instance.Show("<sprite name=\"Blocked\" tint>: Out of position", Color.red);
                 }
                 else
                 {

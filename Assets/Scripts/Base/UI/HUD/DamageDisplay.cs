@@ -11,6 +11,12 @@ namespace Game.UI
         private TextMeshProUGUI text;
 
         [SerializeField]
+        private GraphicGroup graphicGroup;
+
+        [SerializeField]
+        private RectTransform root;
+
+        [SerializeField]
         private Vector3 offset = new(0, 2, 0);
 
         [SerializeField]
@@ -42,14 +48,17 @@ namespace Game.UI
             return anchor.position + offset + randomOffset;
         }
 
-        public void Show(string damageText, Transform anchor)
+        public void Show(string damageText, Color color, Transform anchor)
         {
             animator.enabled = true;
             animator.Play(UIConstants.ShowAnimHash);
 
             text.text = damageText;
+            graphicGroup.color = color;
             this.anchor = anchor;
             randomOffset = Random.insideUnitSphere * randomOffsetScale;
+            //randomOffset.z = -0.35f;
+            //root.transform.localPosition = randomOffset;
             //StopAllCoroutines();
             //StartCoroutine(Follow());
         }

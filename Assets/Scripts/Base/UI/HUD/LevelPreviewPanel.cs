@@ -16,6 +16,7 @@ public struct LevelData
 
 namespace Game.UI
 {
+    [DefaultExecutionOrder(-1)]
     // TODO: Link it back to the UI Manager
     public class LevelPreviewPanel : MonoBehaviour
     {

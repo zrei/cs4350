@@ -2,6 +2,8 @@ using Game.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public enum UnitAllegiance
@@ -140,7 +142,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, m_CurrHealth, max);
 
-        DamageDisplayManager.Instance?.ShowDamage($"<color=#33ff33>{change:F1}", transform);
+        DamageDisplayManager.Instance?.ShowDamage($"{change:F1}", new(0.25f, 1, 0.25f), transform);
     }
 
     void IHealth.SetHealth(float health)
@@ -159,7 +161,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, value, MaxHealth);
 
-        DamageDisplayManager.Instance?.ShowDamage($"<color=#ff3333>{change:F1}", transform);
+        DamageDisplayManager.Instance?.ShowDamage($"{change:F1}", new(1, 0.25f, 0.25f), transform);
     }
 
     public event TrackedValueEvent OnHealthChange;
@@ -372,13 +374,21 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void InflictStatus(StatusEffect statusEffect)
     {
         m_StatusManager.AddEffect(statusEffect);
-        DamageDisplayManager.Instance?.ShowDamage($"<color=#{ColorUtility.ToHtmlStringRGB(statusEffect.Color)}><sprite name=\"{statusEffect.Icon.name}\" tint>", transform);
+        DamageDisplayManager.Instance?.ShowDamage($"<sprite name=\"{statusEffect.Icon.name}\" tint>", statusEffect.Color, transform);
     }
 
     public void InflictStatus(List<StatusEffect> statusEffects)
     {
+        var sb = new StringBuilder();
+        var color = Color.clear;
         foreach (StatusEffect statusEffect in statusEffects)
-            InflictStatus(statusEffect);
+        {
+            m_StatusManager.AddEffect(statusEffect);
+            sb.Append($"<sprite name=\"{statusEffect.Icon.name}\" color=#{ColorUtility.ToHtmlStringRGB(statusEffect.Color)}> ");
+            color += statusEffect.Color;
+        }
+        color /= statusEffects.Count;
+        DamageDisplayManager.Instance?.ShowDamage(sb.ToString(), color, transform);
     }
 
     public bool IsTaunted(out Unit forceTarget)
@@ -396,13 +406,21 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void InflictToken(InflictedToken token, Unit inflicter)
     {
         m_StatusManager.AddToken(token, inflicter);
-        DamageDisplayManager.Instance?.ShowDamage($"<color=#{ColorUtility.ToHtmlStringRGB(token.m_TokenTierData.m_Color)}><sprite name=\"{token.m_TokenTierData.m_Icon.name}\" tint>", transform);
+        DamageDisplayManager.Instance?.ShowDamage($"<sprite name=\"{token.m_TokenTierData.m_Icon.name}\" tint>", token.m_TokenTierData.m_Color, transform);
     }
 
     public void InflictTokens(List<InflictedToken> tokens, Unit inflicter)
     {
+        var sb = new StringBuilder();
+        var color = Color.clear;
         foreach (InflictedToken token in tokens)
-            InflictToken(token, inflicter);
+        {
+            m_StatusManager.AddToken(token, inflicter);
+            sb.Append($"<sprite name=\"{token.m_TokenTierData.m_Icon.name}\" color=#{ColorUtility.ToHtmlStringRGB(token.m_TokenTierData.m_Color)}> ");
+            color += token.m_TokenTierData.m_Color;
+        }
+        color /= tokens.Count;
+        DamageDisplayManager.Instance?.ShowDamage(sb.ToString(), color, transform);
     }
     #endregion
 

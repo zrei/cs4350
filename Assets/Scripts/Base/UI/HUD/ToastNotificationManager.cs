@@ -3,7 +3,7 @@ using UnityEngine.Pool;
 
 namespace Game.UI
 {
-    public class ToastNotificationDisplay : Singleton<ToastNotificationDisplay>
+    public class ToastNotificationManager : Singleton<ToastNotificationManager>
     {
         [SerializeField]
         private ToastNotification toastNotificationPrefab;
