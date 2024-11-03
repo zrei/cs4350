@@ -26,6 +26,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
+        GlobalEvents.UI.OnClosePartyOverviewEvent += SaveCharacterData;
     
         HandleDependencies();
     }
@@ -69,6 +70,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
+        GlobalEvents.UI.OnClosePartyOverviewEvent -= SaveCharacterData;
     }
     #endregion
 
