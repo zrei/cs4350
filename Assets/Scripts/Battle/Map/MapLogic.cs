@@ -220,6 +220,17 @@ public class MapLogic : MonoBehaviour
         return RetrieveGrid(gridType).HasAnyUnitWithToken(tokenType);
     }
 
+    public bool IsAttackerOutOfPosition(Unit unit, ActiveSkillSO skill)
+    {
+        var gridType = unit.UnitAllegiance switch
+        {
+            UnitAllegiance.PLAYER => GridType.PLAYER,
+            UnitAllegiance.ENEMY => GridType.ENEMY,
+            _ => GridType.PLAYER,
+        };
+        return RetrieveGrid(gridType).IsAttackerOutOfPosition(unit, skill);
+    }
+
     public int GetNumUnitsTargeted(GridType gridType, ActiveSkillSO activeSkillSO, CoordPair targetTile)
     {
         return RetrieveGrid(gridType).GetNumberOfUnitsTargeted(activeSkillSO, targetTile);

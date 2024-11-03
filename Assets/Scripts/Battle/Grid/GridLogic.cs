@@ -145,6 +145,11 @@ public class GridLogic : MonoBehaviour
         }
     }
 
+    public bool IsAttackerOutOfPosition(Unit unit, ActiveSkillSO skill)
+    {
+        return skill.HasAttackerLimitations && !skill.IsValidAttackerTile(unit.CurrPosition);
+    }
+
     public void ShowTeleportRange(ActiveSkillSO skill, Unit unit, CoordPair initialTarget)
     {
         canvasGroup.interactable = true;

@@ -15,7 +15,7 @@ namespace Game.UI
 
         private ToastNotification activeDisplay;
 
-        public bool DebugNotification
+        private bool DebugNotification
         {
             get => debugNotification;
             set
@@ -61,12 +61,12 @@ namespace Game.UI
             );
         }
 
-        public void Show(string message, float duration = 2f)
+        public void Show(string message, float duration = 1)
         {
             Show(message, Color.white, duration);
         }
 
-        public void Show(string message, Color color, float duration = 2f)
+        public void Show(string message, Color color, float duration = 1)
         {
             if (activeDisplay != null)
             {

@@ -411,6 +411,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public float MaxMana => GetTotalStat(StatType.MANA);
     public float CurrentManaProportion => m_CurrMana / MaxMana;
 
+    public bool HasEnoughManaForSkill(ActiveSkillSO skill)
+    {
+        return CurrentMana >= skill.m_ConsumedMana;
+    }
+
     private void AlterMana(float amount)
     {
         Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
