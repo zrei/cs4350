@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Game.Input;
+using Game.UI;
 using UnityEngine;
 
 public class WorldMapManager : Singleton<WorldMapManager>
@@ -251,12 +252,14 @@ public class WorldMapManager : Singleton<WorldMapManager>
     {
         InputManager.Instance.NavigateLevelAction.OnChangeEvent += OnNavigateLevel;
         InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent += OnFocusCurrentLevel;
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += TogglePartyManagement;
     }
 
     private void DisableNavigation()
     {
         InputManager.Instance.NavigateLevelAction.OnChangeEvent -= OnNavigateLevel;
         InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent -= OnFocusCurrentLevel;
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= TogglePartyManagement;
     }
 
     private void OnFocusCurrentLevel(IInput input)
@@ -336,6 +339,23 @@ public class WorldMapManager : Singleton<WorldMapManager>
         m_CameraController.EnableCameraMovement();
         EnableSelection();
         EnableNavigation();
+    }
+    #endregion
+
+    #region Party Management
+    private void TogglePartyManagement(IInput _)
+    {
+        if (!UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen))
+        {
+            Debug.Log("Opening Party Management Screen");
+            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(), false);
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen);
+        }
+        else if (UIScreenManager.Instance.IsScreenActive(UIScreenManager.Instance.CharacterManagementScreen))
+        {
+            Debug.Log("Closing Party Management Screen");
+            UIScreenManager.Instance.CloseScreen();
+        }
     }
     #endregion
 

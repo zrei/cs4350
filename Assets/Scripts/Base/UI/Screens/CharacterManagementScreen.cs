@@ -36,6 +36,8 @@ namespace Game.UI
         }
         private NamedObjectButton m_SelectedPartyMemberButton;
 
+        private bool m_IsInLevel = false;
+
         public override void Initialize()
         {
             base.Initialize();
@@ -46,9 +48,23 @@ namespace Game.UI
         {
             GlobalEvents.UI.OpenPartyOverviewEvent -= OnOpenPartyOverview;
         }
-        
-        private void OnOpenPartyOverview(List<PlayerCharacterData> partyMembers)
+
+        protected override void HideDone()
         {
+            base.HideDone();
+
+            Debug.Log("?");
+            if (!m_IsInLevel)
+            {
+                GlobalEvents.UI.OnClosePartyOverviewEvent?.Invoke();
+                SaveManager.Instance.Save();
+            }
+        }
+
+        private void OnOpenPartyOverview(List<PlayerCharacterData> partyMembers, bool inLevel)
+        {
+            m_IsInLevel = inLevel;
+
             // Clear existing party members
             foreach (var button in m_PartyMemberButtons)
             {

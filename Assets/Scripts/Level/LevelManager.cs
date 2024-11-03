@@ -182,7 +182,7 @@ public class LevelManager : MonoBehaviour
         if (!UIScreenManager.Instance.IsScreenOpen(m_CharacterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_CurrParty);
+            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_CurrParty, true);
             UIScreenManager.Instance.OpenScreen(m_CharacterManagementScreen);
         }
         else if (UIScreenManager.Instance.IsScreenActive(m_CharacterManagementScreen))
