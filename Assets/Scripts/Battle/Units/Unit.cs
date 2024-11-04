@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public enum UnitAllegiance
@@ -67,6 +66,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public string CharacterName { get; protected set; }
     public string DisplayName => !string.IsNullOrEmpty(CharacterName) ? $"{CharacterName} / {ClassName}" : ClassName;
+    private AudioDataSO m_HurtSFX;
+    private AudioDataSO m_DeathSFX;
+
     public Sprite Sprite { get; private set; }
 
     public Vector3 GridYOffset { get; private set; }
@@ -82,7 +84,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public List<WeaponModel> WeaponModels => m_ArmorVisual.WeaponModels;
 
     #region Initialisation
-    protected void Initialise(Stats stats, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
+    protected void Initialise(Stats stats, RaceSO raceSO, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
         m_ArmorVisual.InstantiateModel(unitModelData, weaponInstanceSO, classSo);
         m_EquippedWeapon = weaponInstanceSO;
@@ -97,6 +99,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_CurrHealth = GetTotalStat(StatType.HEALTH);
         m_CurrMana = GetTotalStat(StatType.MANA);
         m_Class = classSo;
+
+        m_HurtSFX = raceSO.m_HurtSound;
+        m_DeathSFX = raceSO.m_DeathSound;
     }
 
     private void InitialisePermanentTokens(WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
@@ -455,6 +460,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         OnDeath?.Invoke();
         m_ArmorVisual.Die(null);
+        GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(this);
     }
     #endregion
 
@@ -575,5 +581,17 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     }
 
     public VoidEvent PostSkillEvent;
+    #endregion
+
+    #region SFX
+    public void PlayHurtSound(float volumeModifier = 1f)
+    {
+        SoundManager.Instance.Play(m_HurtSFX, volumeModifier);
+    }
+
+    public void PlayDeathSound(float volumeModifier = 1f)
+    {
+        SoundManager.Instance.Play(m_DeathSFX, volumeModifier);
+    }
     #endregion
 }

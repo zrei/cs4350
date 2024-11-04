@@ -18,4 +18,6 @@ public class LevelSO : ScriptableObject
     
     public List<PlayerCharacterSO> m_RewardCharacters;
     public List<WeaponInstanceSO> m_RewardWeapons;
+
+    public AudioDataSO m_LevelBGM;
 }

@@ -107,6 +107,7 @@ GameObject:
   - component: {fileID: 5373745960631551195}
   - component: {fileID: 4816518582758593564}
   - component: {fileID: 8558531022822808858}
+  - component: {fileID: 1270537460043287758}
   m_Layer: 0
   m_Name: WorldMapManager
   m_TagString: Untagged
@@ -185,6 +186,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_CutsceneVCam: {fileID: 3094989001876549483}
+--- !u!114 &1270537460043287758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5453577421739028348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd87fcdb34614c6b987becd019f3b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_WorldMapBGM: {fileID: 11400000, guid: 7db6eda3e7f30480d801d3a08ffec795, type: 2}
 --- !u!1 &5492859159003525180
 GameObject:
   m_ObjectHideFlags: 0
