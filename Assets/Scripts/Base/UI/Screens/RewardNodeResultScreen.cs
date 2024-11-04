@@ -8,7 +8,7 @@ namespace Game.UI
     public class RewardNodeResultScreen : BaseUIScreen
     {
         [SerializeField] TextMeshProUGUI m_ResultText;
-        [SerializeField] Button m_ReturnButton;
+        [SerializeField] SelectableBase m_ReturnButton;
 
         public override void Initialize()
         {
@@ -35,14 +35,14 @@ namespace Game.UI
                 m_ResultText.text = $"Gained {weaponReward.m_WeaponName}!";
             }
         
-            m_ReturnButton.onClick.AddListener(CloseResults);
+            m_ReturnButton.onSubmit.AddListener(CloseResults);
         }
     
         private void CloseResults()
         {
             GlobalEvents.Level.CloseRewardScreenEvent?.Invoke();
             UIScreenManager.Instance.CloseScreen();
-            m_ReturnButton.onClick.RemoveListener(CloseResults);
+            m_ReturnButton.onSubmit.RemoveListener(CloseResults);
         }
         
         public override void ScreenUpdate()

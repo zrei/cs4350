@@ -16,6 +16,7 @@ public struct LevelData
 
 namespace Game.UI
 {
+    [DefaultExecutionOrder(-1)]
     // TODO: Link it back to the UI Manager
     public class LevelPreviewPanel : MonoBehaviour
     {
@@ -24,7 +25,7 @@ namespace Game.UI
         [SerializeField] NamedObjectButton m_StartLevelButton;
         [SerializeField] CanvasGroup m_CanvasGroup;
 
-        private const string LEVEL_TITLE_FORMAT = "Level {0}: {1}";
+        private const string LEVEL_TITLE_FORMAT = "Level {0}:\n{1}";
 
         private LevelSO m_CurrentLevelSO;
 

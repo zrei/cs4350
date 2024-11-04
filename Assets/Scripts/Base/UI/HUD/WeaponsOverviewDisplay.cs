@@ -24,7 +24,7 @@ namespace Game.UI
         private FormattedTextDisplay weaponDescriptionText;
         
         [SerializeField]
-        private Button equipButton;
+        private SelectableBase equipButton;
         
         [SerializeField]
         private TextMeshProUGUI equipButtonText;
@@ -79,7 +79,7 @@ namespace Game.UI
                 button.onSubmit.AddListener(() => OnSelectWeapon(index));
             }
             
-            equipButton.onClick.AddListener(ToggleWeaponEquip);
+            equipButton.onSubmit.AddListener(ToggleWeaponEquip);
         }
 
         public void DisplayUnitWeapons(PlayerCharacterData playerUnit)

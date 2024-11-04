@@ -114,6 +114,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void DisableSelection()
     {
+        if (!InputManager.IsReady) return;
+
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnSelectInput;
         InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
     }

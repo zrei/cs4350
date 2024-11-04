@@ -1,3 +1,4 @@
+using Game.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -261,9 +262,19 @@ public class PlayerTurnManager : TurnManager
         return false;
     }
 
+    private bool CheckSkillManaRequirement(Unit unit, ActiveSkillSO skill)
+    {
+        if (unit == null || skill == null) return true;
+        if (unit.HasEnoughManaForSkill(skill)) return true;
+
+        ToastNotificationManager.Instance.Show($"Insufficient Mana: {unit.CurrentMana:F1} ({skill.m_ConsumedMana:F1})", Color.red);
+        return false;
+    }
+
     private bool TryPerformSkill()
     {
         if (selectedTileData == null || selectedTileVisual == null) return false;
+        if (!CheckSkillManaRequirement(m_CurrUnit, selectedSkill)) return false;
 
         if (m_MapLogic.CanPerformSkill(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
         {
@@ -427,6 +438,15 @@ public class PlayerTurnManager : TurnManager
                 }
                 m_MapLogic.ShowAttackable(GridType.PLAYER, m_CurrUnit, SelectedSkill);
                 m_MapLogic.ShowAttackable(GridType.ENEMY, m_CurrUnit, SelectedSkill);
+
+                if (m_MapLogic.IsAttackerOutOfPosition(m_CurrUnit, selectedSkill))
+                {
+                    ToastNotificationManager.Instance.Show("<sprite name=\"Blocked\" tint>: Out of position", Color.red);
+                }
+                else
+                {
+                    CheckSkillManaRequirement(m_CurrUnit, selectedSkill);
+                }
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 m_MapLogic.ColorMap(GridType.PLAYER, m_ReachablePoints);

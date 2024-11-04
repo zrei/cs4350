@@ -44,7 +44,10 @@ public class PlaneCameraController : MonoBehaviour
 
     public void DisableCameraMovement()
     {
-        InputManager.Instance.NavigateInput.OnChangeEvent -= OnCameraMove;
+        if (InputManager.IsReady)
+        {
+            InputManager.Instance.NavigateInput.OnChangeEvent -= OnCameraMove;
+        }
         
         // Stop current movement
         m_CameraMovementDirection = Vector2.zero;

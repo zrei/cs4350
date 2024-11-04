@@ -50,8 +50,8 @@ namespace Game.UI
 
                 CurrentSkillPageIndex = 0;
 
-                leftScrollButton.gameObject.SetActive(hasMultiPage);
-                rightScrollButton.gameObject.SetActive(hasMultiPage);
+                leftScrollButton.interactable = hasMultiPage;
+                rightScrollButton.interactable = hasMultiPage;
             }
         }
         private List<ActiveSkillSO> availableSkills = new();
@@ -61,6 +61,13 @@ namespace Game.UI
             get => currentSkillPageIndex;
             set
             {
+                if (availableSkills.Count == 0)
+                {
+                    currentSkillPageIndex = 0;
+                    skillButtons.ForEach(x => x.SetActive(false));
+                    return;
+                }
+
                 var skillPageCount = SkillPageCount;
                 value %= skillPageCount;
                 if (value < 0) value += skillPageCount;
@@ -75,12 +82,12 @@ namespace Game.UI
                     {
                         var skill = availableSkills[startIndex + i];
                         
-                        button.gameObject.SetActive(true);
+                        button.SetActive(true);
                         button.icon.sprite = skill.m_Icon;
                     }
                     else
                     {
-                        button.gameObject.SetActive(false);
+                        button.SetActive(false);
                     }
                 }
             }
@@ -409,9 +416,16 @@ namespace Game.UI
         {
             CurrentSkillPageIndex += delta;
 
-            if (lockedInActionButton != null)
+            if (lockedInActionButton == moveButton || lockedInActionButton == inspectButton || lockedInActionButton == passButton)
+                return;
+
+            foreach (var button in skillButtons)
             {
-                lockedInActionButton.OnSubmit(null);
+                if (button.interactable)
+                {
+                    button.OnSubmit(null);
+                    return;
+                }
             }
         }
 

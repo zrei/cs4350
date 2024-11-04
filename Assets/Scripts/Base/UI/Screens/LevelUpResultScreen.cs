@@ -11,7 +11,7 @@ namespace Game.UI
     {
         [SerializeField] TextMeshProUGUI m_CharacterNameText;
         [SerializeField] TextMeshProUGUI m_ResultText;
-        [SerializeField] Button m_ReturnButton;
+        [SerializeField] SelectableBase m_ReturnButton;
         
         // Temporary List of level up summaries
         private List<LevelUpSummary> m_LevelUpSummaries;
@@ -33,7 +33,7 @@ namespace Game.UI
         
             DisplayLevelUp();
             
-            m_ReturnButton.onClick.AddListener(CloseResults);
+            m_ReturnButton.onSubmit.AddListener(CloseResults);
         }
         
         private void DisplayLevelUp()
@@ -95,7 +95,7 @@ namespace Game.UI
         
             UIScreenManager.Instance.CloseScreen();
             GlobalEvents.Level.CloseLevellingScreenEvent?.Invoke();
-            m_ReturnButton.onClick.RemoveListener(CloseResults);
+            m_ReturnButton.onSubmit.RemoveListener(CloseResults);
         }
         
         public override void ScreenUpdate()

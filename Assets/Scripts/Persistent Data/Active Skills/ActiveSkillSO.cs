@@ -187,6 +187,11 @@ public class ActiveSkillSO : ScriptableObject
     {
         var builder = new StringBuilder();
 
+        if (m_ConsumedMana > 0)
+        {
+            builder.AppendLine($"Mana Cost: {m_ConsumedMana:F1}");
+        }
+
         var skillTypesSet = new HashSet<SkillEffectType>(m_SkillTypes);
         if (skillTypesSet.Contains(SkillEffectType.DEALS_DAMAGE))
         {
