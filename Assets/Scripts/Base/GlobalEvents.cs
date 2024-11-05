@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public delegate void IntEvent(int _);
@@ -110,7 +111,8 @@ public static class GlobalEvents {
 
     public static class MainMenu
     {
-
+        public static VoidEvent OnBeginLoadWorldMap;
+        public static VoidEvent OnReturnToMainMenu;
     }
 
     public static class Save

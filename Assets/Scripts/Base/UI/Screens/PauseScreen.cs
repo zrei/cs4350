@@ -31,6 +31,7 @@ namespace Game.UI
 
         private void B_MainMenu()
         {
+            GlobalEvents.MainMenu.OnReturnToMainMenu?.Invoke();
             GameSceneManager.Instance.LoadMainMenuScene();
         }
     }

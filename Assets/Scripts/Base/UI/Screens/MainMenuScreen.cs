@@ -46,11 +46,17 @@ public class MainMenuScreen : MonoBehaviour
     private void B_StartNewGame()
     {
         SaveManager.Instance.CreateNewSave();
-        GameSceneManager.Instance.LoadWorldMapScene();
+        GoToWorldMap();
     }
 
     private void B_Continue()
     {
+        GoToWorldMap();
+    }
+
+    private void GoToWorldMap()
+    {
+        GlobalEvents.MainMenu.OnBeginLoadWorldMap?.Invoke();
         GameSceneManager.Instance.LoadWorldMapScene();
     }
 

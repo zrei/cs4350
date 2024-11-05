@@ -88,8 +88,9 @@ GameObject:
   - component: {fileID: 1488002783913677545}
   - component: {fileID: 5388358852769691842}
   - component: {fileID: 5386107828933816300}
+  - component: {fileID: 6355113039036517106}
   m_Layer: 5
-  m_Name: MainMenuCanvas
+  m_Name: MainMenuScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -195,6 +196,19 @@ MonoBehaviour:
   m_NewGameButton: {fileID: 7930918539409791821}
   m_ContinueButton: {fileID: 3009158675049962361}
   m_QuitButton: {fileID: 6692872540838014026}
+--- !u!114 &6355113039036517106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6257242371608671824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5539466f53cb04192946f9e7b7a9e1a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MainMenuBGM: {fileID: 11400000, guid: 2902442577dc949cd874479ecc9c0ff9, type: 2}
 --- !u!1 &7594677408506899995
 GameObject:
   m_ObjectHideFlags: 0

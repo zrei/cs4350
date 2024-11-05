@@ -96,6 +96,7 @@ public class SaveManager : Singleton<SaveManager>
     public void ClearSave()
     {
         PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
     }
     #endregion
 
