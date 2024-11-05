@@ -165,6 +165,7 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
         }
 
         #region Global Events
@@ -173,13 +174,25 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        }
+
+        private void OnEarlyQuit()
+        {
+            HandleQuit();
         }
         
         private void OnBattleEnd(UnitAllegiance unitAllegiance, int numTurns)
         {
+            HandleQuit();
+        }
+
+        private void HandleQuit()
+        {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
 
             Hide();
         }

@@ -88,7 +88,7 @@ public class BattleManager : Singleton<BattleManager>
     #endregion
 
     #region BGM
-    private int m_BattleBGM;
+    private int? m_BattleBGM = null;
     #endregion
 
     #region Initialisation
@@ -113,12 +113,15 @@ public class BattleManager : Singleton<BattleManager>
     {
         base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+
         if (InputManager.IsReady)
         {
             InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
@@ -309,6 +312,12 @@ public class BattleManager : Singleton<BattleManager>
         return false;
     }
 
+    private void OnEarlyQuit()
+    {
+        SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
+        m_BattleBGM = null;
+    }
+
     private void CompleteBattle(UnitAllegiance victoriousSide)
     {
         // once a single battle end condition has been reached, don't re-invoke this method
@@ -318,7 +327,8 @@ public class BattleManager : Singleton<BattleManager>
         m_WithinBattle = false;
         m_HasBattleConcluded = true;
         Logger.Log(this.GetType().Name, $"Side that has won: {victoriousSide}", LogLevel.LOG);
-        SoundManager.Instance.FadeOutAndStop(m_BattleBGM);
+        SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
+        m_BattleBGM = null;
 
         if (victoriousSide == UnitAllegiance.PLAYER)
         {

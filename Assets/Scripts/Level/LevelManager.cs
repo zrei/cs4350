@@ -73,10 +73,19 @@ public class LevelManager : MonoBehaviour
     #endregion
 
     #region BGM
-    private int m_LevelBGM;
+    private int? m_LevelBGM = null;
     #endregion
     
     #region Initialisation
+    private void Awake()
+    {
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+    }
 
     private void Start()
     {
@@ -383,7 +392,8 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("LevelManager: Starting Battle Node");
         
-        SoundManager.Instance.FadeOutAndStop(m_LevelBGM);
+        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+        m_LevelBGM = null;
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
     }
     
@@ -502,8 +512,18 @@ public class LevelManager : MonoBehaviour
             FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
         }
         
-        SoundManager.Instance.FadeOutAndStop(m_LevelBGM);
+        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+        m_LevelBGM = null;
         GlobalEvents.Level.LevelResultsEvent?.Invoke(levelSo, result);
+    }
+
+    private void OnEarlyQuit()
+    {
+        if (m_LevelBGM.HasValue)
+        {
+            SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+            m_LevelBGM = null;
+        }
     }
     
     #endregion

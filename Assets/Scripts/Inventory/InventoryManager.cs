@@ -60,6 +60,8 @@ public class InventoryManager : Singleton<InventoryManager>
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
         GlobalEvents.UI.OnClosePartyOverviewEvent += SaveWeapons;
+
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     }
 
     private void HandleDependencies()
@@ -88,17 +90,29 @@ public class InventoryManager : Singleton<InventoryManager>
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
         GlobalEvents.UI.OnClosePartyOverviewEvent -= SaveWeapons;
+
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
     }
     #endregion
 
     #region Level Result
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        if (levelResultType == LevelResultType.SUCCESS)
+        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
+    }
+
+    private void OnEarlyQuit()
+    {
+        HandleLevelResult(false);
+    }
+
+    private void HandleLevelResult(bool save)
+    {
+        if (save)
         {
             SaveWeapons();
         }
-        else if (levelResultType == LevelResultType.DEFEAT)
+        else
         {
             TryLoadSaveData();
         }
