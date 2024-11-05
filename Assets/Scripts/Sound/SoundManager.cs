@@ -36,8 +36,6 @@ public class PlayingAudio
 
     public bool HasFinishedPlaying()
     {
-        Debug.Log(m_AudioState);
-        Debug.Log(m_AudioSourceInstance.isPlaying);
         return m_AudioState != AudioState.PAUSED && !m_AudioSourceInstance.isPlaying;
     }
 }
