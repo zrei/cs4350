@@ -77,6 +77,8 @@ public static class GlobalEvents {
     {
         public static VoidEvent BattleSceneLoadedEvent;
         public static VoidEvent LevelSceneLoadedEvent;
+        public static VoidEvent WorldMapSceneLoadedEvent;
+        public static VoidEvent MainMenuSceneLoadedEvent;
     }
 
     public static class Dialogue
@@ -104,6 +106,11 @@ public static class GlobalEvents {
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
         public static LevelSOEvent OnPartySelectEvent;
+    }
+
+    public static class MainMenu
+    {
+
     }
 
     public static class Save
