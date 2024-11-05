@@ -25,6 +25,7 @@ public class BattleSO : ScriptableObject
     /// </summary>
     public List<CoordPair> m_PlayerStartingTiles;
     public int m_ExpReward;
+    public AudioDataSO m_BattleBGM;
 
     [Header("Win Conditions")]
     // only one win condition is allowed

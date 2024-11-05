@@ -18,6 +18,13 @@ public struct InflictedStatusEffect
 }
 
 [System.Serializable]
+public struct VFXAudio
+{
+    public AudioDataSO m_AudioDataSO;
+    public float m_AudioDelay;
+}
+
+[System.Serializable]
 public class SkillFX
 {
     public enum AttachmentType
@@ -33,6 +40,9 @@ public class SkillFX
     public int m_AttachPointIndex;
     // todo: refactor this to feedback system
     public ParticleSystem m_FeedbackSystemPrefab;
+
+    [Tooltip("Additional audio to play independent of the audio already played by the VFX")]
+    public List<VFXAudio> m_AudioToPlay;
 
     public void Play(Unit caster, List<Unit> targets)
     {
@@ -56,6 +66,11 @@ public class SkillFX
                 // target is caster for self-target i.e. no need separate handling
             case AttachmentType.Target:
                 break;
+        }
+
+        foreach (VFXAudio vFXAudio in m_AudioToPlay)
+        {
+            SoundManager.Instance.Play(vFXAudio.m_AudioDataSO, vFXAudio.m_AudioDelay);
         }
 
         if (m_AttachmentType == AttachmentType.Target || m_AttachmentType == AttachmentType.Caster)
