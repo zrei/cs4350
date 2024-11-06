@@ -9,7 +9,7 @@ public enum Flag
 {
     WIN_LEVEL_FLAG,
     LOSE_LEVEL_FLAG,
-    TEST_PERSISTENT
+    QUIT_LEVEL_FLAG
 }
 
 public enum FlagType
@@ -43,11 +43,17 @@ public class FlagManager : Singleton<FlagManager>
         base.HandleAwake();
 
         HandleDependencies();
+
+        GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
+
+        GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
     }
 
     private void HandleDependencies()
@@ -67,11 +73,21 @@ public class FlagManager : Singleton<FlagManager>
     #region Level Result
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        if (levelResultType == LevelResultType.SUCCESS)
+        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
+    }
+
+    private void OnEarlyQuit()
+    {
+        HandleLevelResult(false);
+    }
+
+    private void HandleLevelResult(bool save)
+    {
+        if (save)
         {
             SavePersistentFlags();
         }
-        else if (levelResultType == LevelResultType.DEFEAT)
+        else
         {
             ClearPersistentFlags();
             TryLoadSavedPersistentFlags();

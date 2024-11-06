@@ -18,6 +18,7 @@ public class MoralityManager : Singleton<MoralityManager>
 
         GlobalEvents.Morality.MoralityChangeEvent += ChangeMorality;
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
 
         HandleDependencies();
     }
@@ -28,6 +29,7 @@ public class MoralityManager : Singleton<MoralityManager>
 
         GlobalEvents.Morality.MoralityChangeEvent -= ChangeMorality;
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
     }
 
     private void HandleDependencies()
@@ -51,11 +53,21 @@ public class MoralityManager : Singleton<MoralityManager>
     #region Level Result
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        if (levelResultType == LevelResultType.SUCCESS)
+        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
+    }
+
+    private void OnEarlyQuit()
+    {
+        HandleLevelResult(false);
+    }
+
+    private void HandleLevelResult(bool save)
+    {
+        if (save)
         {
             SaveMorality();
         }
-        else if (levelResultType == LevelResultType.DEFEAT)
+        else
         {
             TryLoadMoralitySave();
         }

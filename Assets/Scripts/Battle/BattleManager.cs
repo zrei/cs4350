@@ -30,6 +30,9 @@ public class BattleManager : Singleton<BattleManager>
     [SerializeField] private Transform m_CameraLookAtPoint;
     [SerializeField] private Transform m_MapBiomeParent;
 
+    [Header("SFX")]
+    [SerializeField] private AudioDataSO m_VictorySFX;
+
     #region Player Setup
     // for initial battlefield setup
     private PlayerUnitSetup m_PlayerUnitSetup;
@@ -84,6 +87,10 @@ public class BattleManager : Singleton<BattleManager>
     private const float CAMERA_ROTATION_SPEED = 50f;
     #endregion
 
+    #region BGM
+    private int? m_BattleBGM = null;
+    #endregion
+
     #region Initialisation
     private bool isBattleInitialised = false;
     
@@ -106,12 +113,15 @@ public class BattleManager : Singleton<BattleManager>
     {
         base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+
         if (InputManager.IsReady)
         {
             InputManager.Instance.PrimaryAxisInput.OnHoldEvent -= OnRotateCamera;
@@ -140,6 +150,7 @@ public class BattleManager : Singleton<BattleManager>
         m_PermanentFatigueTokens = fatigueTokens;
 
         InstantiateBiome(mapBiome);
+        m_BattleBGM = SoundManager.Instance.PlayWithFadeIn(battleSO.m_BattleBGM);
         StartCoroutine(BattleInitialise(battleSO, playerUnitData));
     }
 
@@ -301,6 +312,12 @@ public class BattleManager : Singleton<BattleManager>
         return false;
     }
 
+    private void OnEarlyQuit()
+    {
+        SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
+        m_BattleBGM = null;
+    }
+
     private void CompleteBattle(UnitAllegiance victoriousSide)
     {
         // once a single battle end condition has been reached, don't re-invoke this method
@@ -310,6 +327,14 @@ public class BattleManager : Singleton<BattleManager>
         m_WithinBattle = false;
         m_HasBattleConcluded = true;
         Logger.Log(this.GetType().Name, $"Side that has won: {victoriousSide}", LogLevel.LOG);
+        SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
+        m_BattleBGM = null;
+
+        if (victoriousSide == UnitAllegiance.PLAYER)
+        {
+            SoundManager.Instance.Play(m_VictorySFX);
+        }
+
         GlobalEvents.Battle.BattleEndEvent?.Invoke(victoriousSide, m_TurnQueue.GetCyclesElapsed());
     }
     #endregion
@@ -329,8 +354,6 @@ public class BattleManager : Singleton<BattleManager>
     private void OnUnitDeath(Unit unit)
     {
         m_TurnQueue.RemoveUnit(unit);
-        // TODO: move this somewhere else
-        unit.Die();
 
         if (unit.UnitAllegiance == UnitAllegiance.PLAYER)
         {
