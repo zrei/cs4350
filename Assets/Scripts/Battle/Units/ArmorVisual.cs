@@ -78,6 +78,50 @@ public class ArmorVisual : MonoBehaviour
         m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
     }
 
+    public void ChangeArmorAndWeapons(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
+    {
+        ResetModel();
+
+        EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
+        equipArmor.Initialize(unitModelData.m_AttachItems);
+
+        ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
+
+        foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
+        {
+            if (weaponModelPrefab != null)
+            {
+                var weaponModel = Instantiate(weaponModelPrefab);
+                var attachPoint = weaponModel.attachmentType switch
+                {
+                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                    _ => null,
+                };
+                weaponModel.transform.SetParent(attachPoint, false);
+                m_WeaponModels.Add(weaponModel);
+            }
+        }
+
+        m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
+    }
+
+    private void ResetModel()
+    {
+        foreach (WeaponModel weaponModel in m_WeaponModels)
+        {
+            Destroy(weaponModel.gameObject);
+        }
+
+        m_WeaponModels.Clear();
+
+        SkinnedMeshRenderer[] armorPieces = m_Model.GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (SkinnedMeshRenderer skinnedMeshRenderer in armorPieces)
+        {
+            Destroy(skinnedMeshRenderer.gameObject);
+        }
+    }
+
     private void ChangeArmorMaterial(Color armorPlate, Color armorTrim, Color underArmor)
     {
         SkinnedMeshRenderer[] armorPieces = m_Model.GetComponentsInChildren<SkinnedMeshRenderer>();

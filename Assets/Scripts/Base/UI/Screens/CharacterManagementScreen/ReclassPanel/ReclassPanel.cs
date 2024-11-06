@@ -69,7 +69,6 @@ namespace Game.UI
 
             PlayerClassSO playerClassSO = pathClass.m_Class;
 
-            
             m_ClassDescription.text = playerClassSO.m_ClassDescription;
 
             m_ReclassButton.interactable = !isLocked && m_CurrEquippedClassIndex != classIndex;
@@ -109,6 +108,9 @@ namespace Game.UI
             GlobalEvents.CharacterManagement.OnReclass?.Invoke();
             m_ReclassButton.interactable = false;
             SetClassTitle(false);
+
+            if (m_CurrCharacterData.IsLord)
+                GlobalEvents.CharacterManagement.OnLordUpdate?.Invoke();
         }
 
         private void ResetDisplay()

@@ -155,6 +155,8 @@ namespace Game.UI
             UpdateWeaponDisplay(m_SelectedWeapon);
             UpdateEquippedWeaponButtonText();
             GlobalEvents.CharacterManagement.OnWeaponChangedEvent?.Invoke();
+            if (m_PlayerUnit.IsLord)
+                GlobalEvents.CharacterManagement.OnLordUpdate?.Invoke();
         }
 
         private void UpdateWeaponDisplay(WeaponInstance weapon)

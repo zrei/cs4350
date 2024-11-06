@@ -76,7 +76,6 @@ namespace Game.UI
 
         protected void UnhoverSkill()
         {
-            Debug.Log("Stop showing tooltip");
             GlobalEvents.CharacterManagement.OnHideTooltipEvent?.Invoke();
         }
     }

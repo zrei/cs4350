@@ -79,6 +79,16 @@ public class LevelManager : MonoBehaviour
         OnReady?.Invoke(this);
     }
 
+    private void Awake()
+    {
+        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
+    } 
+
+    private void OnDestroy()
+    {
+        GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
+    }
+
     public void Initialise(List<PlayerCharacterData> partyMembers)
     {
         m_CurrParty = partyMembers;
@@ -124,6 +134,10 @@ public class LevelManager : MonoBehaviour
         m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
     
+    private void OnLordUpdate()
+    {
+        m_LevelTokenManager.UpdateAppearance(m_CurrParty[0].GetBattleData());
+    }
     #endregion
 
     #region Player Phase

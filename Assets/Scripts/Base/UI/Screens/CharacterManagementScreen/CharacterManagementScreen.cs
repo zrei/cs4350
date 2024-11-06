@@ -79,7 +79,6 @@ namespace Game.UI
         {
             base.HideDone();
 
-            Debug.Log("?");
             if (!m_IsInLevel)
             {
                 GlobalEvents.UI.OnClosePartyOverviewEvent?.Invoke();

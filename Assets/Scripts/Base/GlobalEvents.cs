@@ -123,5 +123,6 @@ public static class GlobalEvents {
         public static VoidEvent OnHideTooltipEvent;
         public static PlayerClassSOEvent OnPreviewReclass;
         public static VoidEvent OnReclass;
+        public static VoidEvent OnLordUpdate;
     }
 }
