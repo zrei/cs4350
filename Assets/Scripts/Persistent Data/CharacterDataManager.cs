@@ -185,7 +185,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
     public List<PlayerCharacterData> RetrieveCharacterData(IEnumerable<int> IDs, bool excludeLord = false)
     {
-        return m_CharacterData.Values.Where(x => IDs.Contains(x.Id) && (!excludeLord || !x.IsLord)).ToList();
+        return IDs.Select(x => RetrieveCharacterData(x)).Where(x => !excludeLord || !x.IsLord).ToList();        
     }
 
     /// <summary>
