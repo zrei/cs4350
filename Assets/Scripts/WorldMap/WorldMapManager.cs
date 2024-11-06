@@ -177,6 +177,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         FlagManager.Instance.SetFlagValue(Flag.WIN_LEVEL_FLAG, false, FlagType.SESSION);
         FlagManager.Instance.SetFlagValue(Flag.LOSE_LEVEL_FLAG, false, FlagType.SESSION);
         FlagManager.Instance.SetFlagValue(Flag.QUIT_LEVEL_FLAG, false, FlagType.SESSION);
+
+        UpdateCharacterToken();
     }
     #endregion
 
@@ -335,6 +337,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         m_CameraController.DisableCameraMovement();
         DisableSelection();
         DisableNavigation();
+
+        GlobalEvents.CharacterManagement.OnLordUpdate -= UpdateCharacterToken;
     }
 
     private void EnableAllControls()
@@ -342,6 +346,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         m_CameraController.EnableCameraMovement();
         EnableSelection();
         EnableNavigation();
+
+        GlobalEvents.CharacterManagement.OnLordUpdate += UpdateCharacterToken;
     }
     #endregion
 
@@ -359,6 +365,13 @@ public class WorldMapManager : Singleton<WorldMapManager>
             Debug.Log("Closing Party Management Screen");
             UIScreenManager.Instance.CloseScreen();
         }
+    }
+
+    private void UpdateCharacterToken()
+    {
+        if (CharacterDataManager.Instance.TryRetrieveLordCharacterData(out PlayerCharacterData lordData))
+            // retrieve data from character data manager
+            m_PlayerTokenInstance.UpdateAppearance(lordData.m_BaseData, lordData.CurrClass, lordData.GetWeaponInstanceSO());
     }
     #endregion
 

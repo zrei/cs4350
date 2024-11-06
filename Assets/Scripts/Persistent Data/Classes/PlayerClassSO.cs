@@ -47,6 +47,10 @@ public struct ClassPassiveEffect
     [Tooltip("Conditions that must be met for this set of tokens to be applied - leave untouched if there are no conditions")]
     public UnlockCondition m_UnlockCondition;
     public List<InflictedToken> m_InflictedTokens;
+    public Sprite m_PassiveEffectIcon;
+    public string m_Name;
+    [TextArea]
+    public string m_Description;
 
     public List<InflictedToken> GetInflictedTokens(int characterLevel)
     {

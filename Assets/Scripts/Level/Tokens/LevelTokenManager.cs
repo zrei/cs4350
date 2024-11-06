@@ -27,6 +27,11 @@ public class LevelTokenManager : MonoBehaviour
         
         m_CurrentNodeVisual = currNodeVisual;
     }
+
+    public void UpdateAppearance(PlayerCharacterBattleData characterBattleData)
+    {
+        m_PlayerUnitToken.UpdateAppearance(characterBattleData);
+    }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
     {

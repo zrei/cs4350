@@ -80,11 +80,13 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
 
     private void OnDestroy()
     {
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
     }
 
     private void Start()
@@ -139,6 +141,10 @@ public class LevelManager : MonoBehaviour
         m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
     
+    private void OnLordUpdate()
+    {
+        m_LevelTokenManager.UpdateAppearance(m_CurrParty[0].GetBattleData());
+    }
     #endregion
 
     #region Player Phase
