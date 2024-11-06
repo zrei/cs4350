@@ -80,11 +80,13 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
 
     private void OnDestroy()
     {
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
     }
 
     private void Start()
@@ -92,16 +94,6 @@ public class LevelManager : MonoBehaviour
         OnReady?.Invoke(this);
 
         m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
-    }
-
-    private void Awake()
-    {
-        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
-    } 
-
-    private void OnDestroy()
-    {
-        GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
     }
 
     public void Initialise(List<PlayerCharacterData> partyMembers)

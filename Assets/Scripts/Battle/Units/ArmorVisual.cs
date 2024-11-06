@@ -103,7 +103,9 @@ public class ArmorVisual : MonoBehaviour
             }
         }
 
+        m_Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
+        m_Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
     }
 
     private void ResetModel()
