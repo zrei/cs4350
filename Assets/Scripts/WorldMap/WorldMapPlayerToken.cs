@@ -11,6 +11,11 @@ public class WorldMapPlayerToken : BaseCharacterToken
     {
         Initialise(lordCharacter.GetUnitModelData(lordClass.m_OutfitType), lordEquippedWeapon, lordClass);
     }
+
+    public void UpdateAppearance(PlayerCharacterSO lordCharacter, ClassSO lordClass, WeaponInstanceSO lordEquippedWeapon)
+    {
+        ChangeAppearance(lordCharacter.GetUnitModelData(lordClass.m_OutfitType), lordEquippedWeapon, lordClass);
+    }
     #endregion
 
     #region Follow Path

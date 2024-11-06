@@ -127,6 +127,16 @@ public class PlayerCharacterData : ICanAttack
             // call an event if need to display popup or something
         }  
     }
+
+    public void Reclass(int index)
+    {
+        if (!IsClassUnlocked(index))
+        {
+            Logger.Log(this.GetType().Name, $"Class {index} is not unlocked!", LogLevel.ERROR);
+            return;
+        }
+        m_CurrClassIndex = index;
+    }
 }
 
 // TODO: This shouldn't be serializable once the data is being passed from level to battle
