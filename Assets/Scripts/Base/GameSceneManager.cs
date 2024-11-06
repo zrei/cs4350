@@ -18,10 +18,12 @@ public class GameSceneManager : Singleton<GameSceneManager>
     private static readonly int Start = Animator.StringToHash("Start");
     private static readonly int End = Animator.StringToHash("End");
     
-    const int BATTLE_SCENE_INDEX = 1;
+    const int MAIN_MENU_INDEX = 0;
+    const int WORLD_MAP_INDEX = 1;
+    const int BATTLE_SCENE_INDEX = 2;
     
     // Respective level scenes indexes will accessed by adding the level id to the level 1 value
-    const int LEVEL_1_SCENE_INDEX = 2;
+    const int LEVEL_1_SCENE_INDEX = 3;
     
     private VoidEvent m_OnSceneChange;
     private VoidEvent m_AfterSceneChange;
@@ -34,8 +36,47 @@ public class GameSceneManager : Singleton<GameSceneManager>
     private GameObject m_MapBiome;
 
     #endregion
-    
+
+    #region Initialisation
+    protected override void HandleAwake()
+    {
+        base.HandleAwake();
+        transform.SetParent(null);
+        DontDestroyOnLoad(this.gameObject);
+    }
+    #endregion
+
     #region Scene Management
+    public void LoadMainMenuScene()
+    {
+        m_OnSceneChange = () => GlobalEvents.Scene.MainMenuSceneLoadedEvent?.Invoke();
+        StartCoroutine(LoadScene_NonAdditive(MAIN_MENU_INDEX));
+    }
+
+    public void LoadWorldMapScene()
+    {
+        m_OnSceneChange = () => GlobalEvents.Scene.WorldMapSceneLoadedEvent?.Invoke();
+        StartCoroutine(LoadScene_NonAdditive(WORLD_MAP_INDEX));
+    }
+
+    private IEnumerator LoadScene_NonAdditive(int sceneIndex)
+    {
+        m_Transition.SetTrigger(Start);
+        
+        yield return new WaitForSeconds(m_TransitionTime);
+        
+        var asyncHandle = SceneManager.LoadSceneAsync(sceneIndex);
+        void OnSceneLoadComplete(AsyncOperation handle)
+        {
+            asyncHandle.completed -= OnSceneLoadComplete;
+
+            m_OnSceneChange?.Invoke();
+            m_OnSceneChange = null;
+            
+            m_Transition.SetTrigger(End);
+        }
+        asyncHandle.completed += OnSceneLoadComplete;
+    }
 
     public void LoadLevelScene(int levelId, List<PlayerCharacterData> partyMembers)
     {

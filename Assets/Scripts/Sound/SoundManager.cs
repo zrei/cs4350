@@ -63,6 +63,11 @@ public class SoundManager : Singleton<SoundManager>
     {
         base.HandleAwake();
         InitVolumes();
+
+        transform.SetParent(null);
+        DontDestroyOnLoad(this.gameObject);
+
+        GlobalEvents.MainMenu.OnReturnToMainMenu += OnReturnToMainMenu;
     }
 
     private void InitVolumes()
@@ -73,6 +78,13 @@ public class SoundManager : Singleton<SoundManager>
         {
             m_AudioVolumes[audioChannel] = m_InitialAudioSettings.GetVolumeLevel(audioChannel);
         }
+    }
+
+    protected override void HandleDestroy()
+    {
+        base.HandleDestroy();
+
+        GlobalEvents.MainMenu.OnReturnToMainMenu -= OnReturnToMainMenu;
     }
     #endregion
 
@@ -205,6 +217,21 @@ public class SoundManager : Singleton<SoundManager>
         audioSource.clip = audioDataSO.m_AudioClip;
         float volume = m_AudioVolumes[audioDataSO.m_AudioChannel] * audioDataSO.m_Volume * OVERALL_VOLUME * volumeModifier;
         return (audioSource, volume);
+    }
+    #endregion
+
+    #region Event Callbacks
+    private void OnReturnToMainMenu()
+    {
+        // fade out current bgm
+        foreach (KeyValuePair<int, PlayingAudio> keyValuePair in m_PlayingAudio)
+        {
+            if (keyValuePair.Value.AudioChannel == AudioChannel.BGM)
+            {
+                FadeOutAndStop(keyValuePair.Key);
+                return;
+            }
+        }
     }
     #endregion
 }
