@@ -176,6 +176,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         // reset flags
         FlagManager.Instance.SetFlagValue(Flag.WIN_LEVEL_FLAG, false, FlagType.SESSION);
         FlagManager.Instance.SetFlagValue(Flag.LOSE_LEVEL_FLAG, false, FlagType.SESSION);
+        FlagManager.Instance.SetFlagValue(Flag.QUIT_LEVEL_FLAG, false, FlagType.SESSION);
     }
     #endregion
 

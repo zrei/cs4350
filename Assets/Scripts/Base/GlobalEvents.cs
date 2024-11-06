@@ -80,6 +80,7 @@ public static class GlobalEvents {
         public static VoidEvent LevelSceneLoadedEvent;
         public static VoidEvent WorldMapSceneLoadedEvent;
         public static VoidEvent MainMenuSceneLoadedEvent;
+        public static VoidEvent EarlyQuitEvent;
     }
 
     public static class Dialogue
