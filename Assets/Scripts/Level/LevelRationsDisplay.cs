@@ -1,5 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using Game.UI;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -10,6 +13,16 @@ public class LevelRationsDisplay : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI m_CurrRationsText;
     [SerializeField] private Image m_CurrRationsFill;
+    [SerializeField] private Image m_Outline;
+    
+    [Tooltip("Gradient for the display color as rations drop further below zero.")]
+    [SerializeField] private Gradient m_HungerGradient;
+    
+    [Tooltip("Rations value for the maximum hunger color change on the gradient.")]
+    [SerializeField] private float m_RationsForMaxHungerColor = -15;
+    
+    [Tooltip("List of thresholds that, once rations falls below, will have an effect.")]
+    public HungerDisplayThreshold[] m_HungerDisplayThresholds;
     
     private LevelRationsManager m_LevelRationsManager;
     
@@ -20,9 +33,27 @@ public class LevelRationsDisplay : MonoBehaviour
         get => m_CurrRations;
         set
         {
-            m_CurrRations = value;
-            SetCurrRationsText(m_CurrRations);
-            m_CurrRationsFill.fillAmount = m_CurrRations / m_StartingRations;
+            IEnumerator Animate()
+            {
+                var startRations = m_CurrRations;
+                var targetRations = value;
+
+                var t = 0f;
+                var duration = 0.25f;
+                while (t < duration)
+                {
+                    t += Time.deltaTime;
+                    m_CurrRations = Mathf.Lerp(startRations, targetRations, t / duration);
+                    UpdateCurrRationsDisplay();
+                    yield return null;
+                }
+
+                m_CurrRations = targetRations;
+                UpdateCurrRationsDisplay();
+            }
+
+            StopAllCoroutines();
+            StartCoroutine(Animate());
         }
     }
     
@@ -91,7 +122,9 @@ public class LevelRationsDisplay : MonoBehaviour
     
     private void OnRationsSet(float newRations)
     {
-        CurrRations = m_LevelRationsManager.CurrRations;
+        StopAllCoroutines();
+        m_CurrRations = m_LevelRationsManager.CurrRations;
+        UpdateCurrRationsDisplay();
     }
 
     private void OnRationsChange(float changeAmount)
@@ -112,6 +145,22 @@ public class LevelRationsDisplay : MonoBehaviour
     #endregion
     
     #region Graphics
+    
+    private void UpdateCurrRationsDisplay()
+    {
+        SetCurrRationsText(m_CurrRations);
+        m_CurrRationsFill.fillAmount = m_CurrRations / m_StartingRations;
+        
+        var hungerValue = math.clamp(m_CurrRations, m_RationsForMaxHungerColor, 0);
+        hungerValue /= m_RationsForMaxHungerColor;
+        m_CurrRationsText.color = m_HungerGradient.Evaluate(hungerValue);
+        m_Outline.color = m_HungerGradient.Evaluate(hungerValue);
+        
+        foreach (HungerDisplayThreshold threshold in m_HungerDisplayThresholds)
+        {
+            threshold.m_HungerIcon.enabled = threshold.IsThresholdMet(m_CurrRations, true);
+        }
+    }
     
     private void SetCurrRationsText(float currRations)
     {
@@ -140,4 +189,27 @@ public class LevelRationsDisplay : MonoBehaviour
     }
     
     #endregion
+}
+
+[System.Serializable]
+public struct HungerDisplayThreshold
+{
+    public float m_Threshold;
+
+    public Image m_HungerIcon;
+
+    /// <summary>
+    /// Checks whether the threshold has been met
+    /// </summary>
+    /// <param name="currRations"></param>
+    /// <param name="lessThan">Whether to check for less than the threshold or greater than the threshold</param>
+    /// <returns></returns>
+    public bool IsThresholdMet(float currRations, bool lessThan)
+    {
+        if (lessThan && currRations <= m_Threshold)
+            return true;
+        else if (!lessThan && currRations >= m_Threshold)
+            return true;
+        return false;
+    }
 }

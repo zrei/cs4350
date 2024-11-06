@@ -35,7 +35,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] LevelTokenManager m_LevelTokenManager;
     
     // Level Timer
-    [FormerlySerializedAs("m_LevelTimerLogic")] [SerializeField] LevelRationsManager levelRationsManager;
+    [FormerlySerializedAs("levelRationsManager")] [FormerlySerializedAs("m_LevelTimerLogic")] [SerializeField] LevelRationsManager m_LevelRationsManager;
 
     [SerializeField] PlaneCameraController m_LevelCameraController;
     
@@ -109,7 +109,7 @@ public class LevelManager : MonoBehaviour
         m_LevelNodeManager.SetGoalNode(m_GoalNode);
         
         // Initialise the timer
-        levelRationsManager.Initialise(m_LevelSO.m_StartingRations);
+        m_LevelRationsManager.Initialise(m_LevelSO.m_StartingRations);
         
         // Initialise the visuals of the level
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
@@ -400,7 +400,8 @@ public class LevelManager : MonoBehaviour
         
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            m_LevelSO.m_BiomeObject, m_LevelRationsManager.GetInflictedTokens());
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
