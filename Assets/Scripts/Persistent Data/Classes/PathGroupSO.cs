@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -72,7 +73,35 @@ public struct UnlockCondition
     public Threshold m_MoralityThreshold;
     [Space]
     public bool m_IsFlagLocked;
-    public List<string> m_Flags;
+    public List<Flag> m_Flags;
+
+    public string GetDescription()
+    {
+        StringBuilder stringBuilder = new();
+        if (m_IsLevelLocked)
+        {
+            stringBuilder.Append($"Reach level {m_LevelLock}\n");
+        }
+
+        if (m_IsMoralityLocked)
+        {
+            if (m_MoralityThreshold.m_GreaterThan)
+            {
+                stringBuilder.Append($"Morality greater than {m_MoralityThreshold.m_Threshold}%\n");
+            }
+            else
+            {
+                stringBuilder.Append($"Morality less than {m_MoralityThreshold.m_Threshold}%\n");
+            }
+        }
+
+        return stringBuilder.ToString();
+    }
+
+    public bool HasConditions()
+    {
+        return m_IsLevelLocked || m_IsMoralityLocked || m_IsFlagLocked;
+    }
 
     public bool IsSatisfied(int characterLevel)
     {

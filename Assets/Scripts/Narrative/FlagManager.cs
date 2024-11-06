@@ -9,6 +9,7 @@ public enum Flag
 {
     WIN_LEVEL_FLAG,
     LOSE_LEVEL_FLAG,
+    TEST_PERSISTENT
 }
 
 public enum FlagType

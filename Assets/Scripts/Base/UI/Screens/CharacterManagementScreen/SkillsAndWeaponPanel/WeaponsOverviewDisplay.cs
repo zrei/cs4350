@@ -1,16 +1,11 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace Game.UI
 {
     public class WeaponsOverviewDisplay : MonoBehaviour
     {
-        
-        public UnityEvent OnWeaponChanged = new UnityEvent();
-
         #region Component References
         private CanvasGroup canvasGroup;
         
@@ -31,7 +26,6 @@ namespace Game.UI
         
         #endregion
 
-        private List<PlayerCharacterData> m_PartyMembers = new();
         private PlayerCharacterData m_PlayerUnit;
         private List<WeaponInstance> m_AvailableWeapons;
 
@@ -138,7 +132,7 @@ namespace Game.UI
                 // Unequip selected weapon from previous unit
                 if (m_SelectedWeapon.m_IsEquipped)
                 {
-                    foreach (var partyMember in m_PartyMembers)
+                    foreach (var partyMember in CharacterDataManager.Instance.RetrieveAllCharacterData())
                     {
                         if (partyMember.m_CurrEquippedWeaponId == m_SelectedWeapon.m_InstanceId)
                         {
@@ -160,7 +154,7 @@ namespace Game.UI
             
             UpdateWeaponDisplay(m_SelectedWeapon);
             UpdateEquippedWeaponButtonText();
-            OnWeaponChanged.Invoke();
+            GlobalEvents.CharacterManagement.OnWeaponChangedEvent?.Invoke();
         }
 
         private void UpdateWeaponDisplay(WeaponInstance weapon)
@@ -214,12 +208,6 @@ namespace Game.UI
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1;
-        }
-        
-        // Temporary method to get party members for unequipping
-        public void SetPartyMembers(List<PlayerCharacterData> partyMembers)
-        {
-            m_PartyMembers = partyMembers;
         }
     }
 }
