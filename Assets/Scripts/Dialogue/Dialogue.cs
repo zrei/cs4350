@@ -14,6 +14,8 @@ public class Dialogue : MonoBehaviour
     public string characterName;
     public Color characterColor = Color.white;
 
+    public AudioDataSO audioCue;
+
     [TextArea(6, 12)]
     public string text;
 

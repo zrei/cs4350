@@ -599,15 +599,20 @@ public class GridLogic : MonoBehaviour
             // TODO: Clean this up further?
             List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
 
+            float volumeModifier = 1f / deadUnits.Count + (attacker.IsDead ? 1 : 0);
+
             foreach (Unit deadUnit in deadUnits)
             {
-                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(deadUnit);
+                deadUnit.PlayDeathSound(volumeModifier);
+                deadUnit.Die();
+                
             }
 
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
             if (attacker.IsDead)
             {
-                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(attacker);
+                attacker.PlayDeathSound(volumeModifier);
+                attacker.Die();
             }
 
             completeSkillEvent?.Invoke();
@@ -623,10 +628,15 @@ public class GridLogic : MonoBehaviour
         {
             attacker.PostSkillEvent = null;
 
+            float volumeModifier = 1f / (1 + (attacker.IsDead ? 1 : 0));
             foreach (IHealth target in targets)
             {
                 if (target.IsDead)
-                    GlobalEvents.Battle.UnitDefeatedEvent?.Invoke((Unit) target);
+                {
+                    Unit unit = (Unit) target;
+                    unit.PlayDeathSound(volumeModifier);
+                    unit.Die();
+                }
                 else
                 {
                     OnTeleportUnit?.Invoke(activeSkill.TeleportTargetGrid(attacker), activeSkill.TeleportStartTile(attacker, targetTile), teleportTile);
@@ -637,7 +647,8 @@ public class GridLogic : MonoBehaviour
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
             if (attacker.IsDead)
             {
-                GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(attacker);
+                attacker.PlayDeathSound(volumeModifier);
+                attacker.Die();
             }
 
             completeSkillEvent?.Invoke();
