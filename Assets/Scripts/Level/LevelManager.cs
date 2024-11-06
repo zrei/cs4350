@@ -71,12 +71,29 @@ public class LevelManager : MonoBehaviour
     private bool m_HasHitNode;
     
     #endregion
+
+    #region BGM
+    private int? m_LevelBGM = null;
+    #endregion
     
     #region Initialisation
+    private void Awake()
+    {
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
+    }
 
     private void Start()
     {
         OnReady?.Invoke(this);
+
+        m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
     }
 
     public void Initialise(List<PlayerCharacterData> partyMembers)
@@ -124,6 +141,10 @@ public class LevelManager : MonoBehaviour
         m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
     
+    private void OnLordUpdate()
+    {
+        m_LevelTokenManager.UpdateAppearance(m_CurrParty[0].GetBattleData());
+    }
     #endregion
 
     #region Player Phase
@@ -377,11 +398,15 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("LevelManager: Starting Battle Node");
         
+        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+        m_LevelBGM = null;
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
     {
+        m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
+
         Debug.Log("LevelManager: Ending Battle Node");
 
         NodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
@@ -492,8 +517,19 @@ public class LevelManager : MonoBehaviour
             
             FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
         }
-
+        
+        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+        m_LevelBGM = null;
         GlobalEvents.Level.LevelResultsEvent?.Invoke(levelSo, result);
+    }
+
+    private void OnEarlyQuit()
+    {
+        if (m_LevelBGM.HasValue)
+        {
+            SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+            m_LevelBGM = null;
+        }
     }
     
     #endregion

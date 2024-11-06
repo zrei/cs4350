@@ -108,6 +108,10 @@ namespace Game.UI
 
             CurrentDialogue = dialogue;
             dialogue.onEnterState?.Invoke();
+            if (dialogue.audioCue != null)
+            {
+                SoundManager.Instance.Play(dialogue.audioCue);
+            }
 
             InputManager.Instance.SubmitInput.OnPressEvent += OnSubmit;
             InputManager.Instance.PointerSelectInput.OnPressEvent += OnSubmit;
@@ -125,6 +129,10 @@ namespace Game.UI
 
             CurrentDialogue = dialogue;
             dialogue.onEnterState?.Invoke();
+            if (dialogue.audioCue != null)
+            {
+                SoundManager.Instance.Play(dialogue.audioCue);
+            }
         }
 
         private void ExitDialogue()

@@ -16,6 +16,11 @@ public abstract class BaseCharacterToken : MonoBehaviour
         m_ArmorVisual.InstantiateModel(unitModelData, weaponSO, classSO);
     }
 
+    protected void ChangeAppearance(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
+    {
+        m_ArmorVisual.ChangeArmorAndWeapons(unitModelData, weaponSO, classSO);
+    }
+
     protected IEnumerator Rotate(Quaternion targetRot, VoidEvent onCompleteRotation, float rotateTime)
     {
         float time = 0f;

@@ -5,14 +5,26 @@ namespace Game.UI
 {
     public class CharacterManagementScreen : BaseUIScreen
     {
-        [SerializeField]
-        private CharacterOverviewDisplay m_CharacterOverviewDisplay;
+        private enum Tab 
+        {
+            OVERVIEW,
+            RECLASS
+        }
+
+        [Header("Panel")]
+        [SerializeField] private CharacterOverviewDisplay m_CharacterOverviewDisplay;
+        [SerializeField] private ReclassPanel m_ReclassPanel;
+        [SerializeField] private SkillsAndWeaponPanel m_SkillsAndWeaponPanel;
         
+        [Header("Party List")]
         [SerializeField]
         private Transform m_PartyMemberButtonContainer;
         
         [SerializeField]
         private NamedObjectButton m_PartyMemberButtonPrefab;
+
+        [Header("Tooltip")]
+        [SerializeField] private SkillDisplayTooltip m_SkillDisplayTooltip;
         
         private List<NamedObjectButton> m_PartyMemberButtons = new();
         
@@ -38,27 +50,42 @@ namespace Game.UI
 
         private bool m_IsInLevel = false;
 
+        private Tab m_CurrTab;
+
+        private void Awake()
+        {
+            m_ReclassPanel.OnOverviewEvent += () => TabSwitch(Tab.OVERVIEW);
+            m_SkillsAndWeaponPanel.OnReclassEvent += () => TabSwitch(Tab.RECLASS);
+
+            HideTooltip();
+        }
+
         public override void Initialize()
         {
             base.Initialize();
             GlobalEvents.UI.OpenPartyOverviewEvent += OnOpenPartyOverview;
+            GlobalEvents.CharacterManagement.OnTooltipEvent += ShowTooltip;
+            GlobalEvents.CharacterManagement.OnHideTooltipEvent += HideTooltip;
         }
         
         private void OnDestroy()
         {
             GlobalEvents.UI.OpenPartyOverviewEvent -= OnOpenPartyOverview;
+            GlobalEvents.CharacterManagement.OnTooltipEvent -= ShowTooltip;
+            GlobalEvents.CharacterManagement.OnHideTooltipEvent -= HideTooltip;
         }
 
         protected override void HideDone()
         {
             base.HideDone();
 
-            Debug.Log("?");
             if (!m_IsInLevel)
             {
                 GlobalEvents.UI.OnClosePartyOverviewEvent?.Invoke();
                 SaveManager.Instance.Save();
             }
+
+            HideTooltip();
         }
 
         private void OnOpenPartyOverview(List<PlayerCharacterData> partyMembers, bool inLevel)
@@ -82,27 +109,56 @@ namespace Game.UI
             {
                 var partyMemberButton = Instantiate(m_PartyMemberButtonPrefab, m_PartyMemberButtonContainer);
                 partyMemberButton.SetObjectName(playerUnit.m_BaseData.m_CharacterName);
-                partyMemberButton.onSubmit.AddListener(DisplayPartyMember);
+                partyMemberButton.onSubmit.AddListener(() => B_DisplayPartyMemnber(partyMemberButton, playerUnit));
                 m_PartyMemberButtons.Add(partyMemberButton);
                 continue;
-
-                void DisplayPartyMember()
-                {
-                    SelectedPartyMemberButton = partyMemberButton;
-                    m_CharacterOverviewDisplay.ViewUnit(playerUnit);
-                }
             }
             
-            SelectedPartyMemberButton = m_PartyMemberButtons[0];
-            m_CharacterOverviewDisplay.ViewUnit(partyMembers[0]);
-            m_CharacterOverviewDisplay.gameObject.SetActive(true);
+            B_DisplayPartyMemnber(m_PartyMemberButtons[0], partyMembers[0]);
             
             // Temporary way to pass party members
-            m_CharacterOverviewDisplay.SetPartyMembers(partyMembers);
+            //m_CharacterOverviewDisplay.SetPartyMembers(partyMembers);
         }
         
         public override void ScreenUpdate()
         {
         }
+
+        void B_DisplayPartyMemnber(NamedObjectButton partyMemberButton, PlayerCharacterData playerCharacterData)
+        {
+            SelectedPartyMemberButton = partyMemberButton;
+            m_CharacterOverviewDisplay.ViewUnit(playerCharacterData);
+            m_ReclassPanel.SetDisplay(playerCharacterData);
+            m_SkillsAndWeaponPanel.ViewUnit(playerCharacterData);
+            UpdateDisplay(Tab.OVERVIEW);
+        }
+
+        private void TabSwitch(Tab tab)
+        {
+            if (m_CurrTab == tab)
+                return;
+
+            UpdateDisplay(tab);
+        }
+
+        private void UpdateDisplay(Tab tab)
+        {
+            m_ReclassPanel.gameObject.SetActive(tab == Tab.RECLASS);
+            m_SkillsAndWeaponPanel.gameObject.SetActive(tab == Tab.OVERVIEW);
+
+            m_CurrTab = tab;
+        }
+
+        #region Tooltip
+        private void ShowTooltip(TooltipContents tooltipContents)
+        {
+            m_SkillDisplayTooltip.SetDisplay(tooltipContents);
+        }
+
+        private void HideTooltip()
+        {
+            m_SkillDisplayTooltip.gameObject.SetActive(false);
+        }
+        #endregion
     }
 }

@@ -50,8 +50,13 @@ public class SkillAnimationManager : MonoBehaviour
 
             if (activeSkill.m_TargetWillPlayHurtAnimation)
             {
+                float volumeModifier = 1f / targets.Count;
+
                 foreach (Unit t in targets)
+                {
                     t.PlayAnimations(ArmorVisual.HurtAnimParam);
+                    t.PlayHurtSound(volumeModifier);
+                }
             }
             activeSkill.m_SkillFXs.ForEach(x => x.Play(attacker, targets));
         }

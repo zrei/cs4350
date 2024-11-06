@@ -41,6 +41,7 @@ public class SaveManager : Singleton<SaveManager>
     private const string MORALITY_DATA_KEY = "MoralityData";
     private const string FLAG_KEY = "FlagData";
     private const string LEVEL_KEY = "LevelProgress";
+    private const string HAS_SAVE = "HasSave";
     private const string ITEM_SEPARATOR = "\t";
 
     /// <summary>
@@ -53,6 +54,8 @@ public class SaveManager : Singleton<SaveManager>
     protected override void HandleAwake()
     {
         base.HandleAwake();
+        transform.SetParent(null);
+        DontDestroyOnLoad(this.gameObject);
     }
 
     protected override void HandleDestroy()
@@ -61,6 +64,15 @@ public class SaveManager : Singleton<SaveManager>
     }
 
     #region Save
+    public bool HasSave => PlayerPrefs.HasKey(HAS_SAVE);
+
+    public void CreateNewSave()
+    {
+        ClearSave();
+        // key to indicate a save exists
+        PlayerPrefs.SetInt(HAS_SAVE, 1);
+    }
+
     private IEnumerator Save_Coroutine(VoidEvent postSaveEvent = null)
     {
         GlobalEvents.Save.OnBeginSaveEvent?.Invoke();
@@ -84,6 +96,7 @@ public class SaveManager : Singleton<SaveManager>
     public void ClearSave()
     {
         PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
     }
     #endregion
 

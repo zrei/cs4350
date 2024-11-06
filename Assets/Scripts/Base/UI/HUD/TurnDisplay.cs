@@ -65,6 +65,7 @@ namespace Game.UI
             GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
         }
 
         private void OnSceneLoad()
@@ -72,6 +73,7 @@ namespace Game.UI
             GlobalEvents.Battle.PlayerUnitSetupEndEvent += OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
+            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
         }
 
         private void OnSetupEnd()
@@ -83,8 +85,19 @@ namespace Game.UI
 
         private void OnBattleEnd(UnitAllegiance _, int _2)
         {
+            HandleQuit();
+        }
+
+        private void OnEarlyQuit()
+        {
+            HandleQuit();
+        }
+
+        private void HandleQuit()
+        {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
+            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
 
             // Clear leftover mapping
             foreach (var display in mapping.Values)

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using Game.UI;
 using UnityEngine;
 
 public delegate void IntEvent(int _);
 public delegate void VoidEvent();
 public delegate void FloatEvent(float _);
 public delegate void Vector3Event(Vector3 _);
+public delegate void StringEvent(string _);
 
 public static class GlobalEvents {
 
@@ -77,6 +79,9 @@ public static class GlobalEvents {
     {
         public static VoidEvent BattleSceneLoadedEvent;
         public static VoidEvent LevelSceneLoadedEvent;
+        public static VoidEvent WorldMapSceneLoadedEvent;
+        public static VoidEvent MainMenuSceneLoadedEvent;
+        public static VoidEvent EarlyQuitEvent;
     }
 
     public static class Dialogue
@@ -106,9 +111,27 @@ public static class GlobalEvents {
         public static LevelSOEvent OnPartySelectEvent;
     }
 
+    public static class MainMenu
+    {
+        public static VoidEvent OnBeginLoadWorldMap;
+        public static VoidEvent OnReturnToMainMenu;
+    }
+
     public static class Save
     {
         public static VoidEvent OnBeginSaveEvent;
         public static VoidEvent OnCompleteSaveEvent;
+    }
+
+    public static class CharacterManagement 
+    {
+        public delegate void PlayerClassSOEvent(PlayerClassSO _);
+        public delegate void TooltipEvent(TooltipContents _);
+        public static VoidEvent OnWeaponChangedEvent;
+        public static TooltipEvent OnTooltipEvent;
+        public static VoidEvent OnHideTooltipEvent;
+        public static PlayerClassSOEvent OnPreviewReclass;
+        public static VoidEvent OnReclass;
+        public static VoidEvent OnLordUpdate;
     }
 }

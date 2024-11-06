@@ -27,6 +27,8 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
         GlobalEvents.UI.OnClosePartyOverviewEvent += SaveCharacterData;
+
+        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     
         HandleDependencies();
     }
@@ -71,19 +73,31 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
         GlobalEvents.UI.OnClosePartyOverviewEvent -= SaveCharacterData;
+
+        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
     }
     #endregion
 
     #region Level Result
     private void OnLevelEnd(LevelSO _, LevelResultType result)
     {
-        if (result == LevelResultType.DEFEAT)
-        {
-            TryLoadSaveData();
-        }
-        else if (result == LevelResultType.SUCCESS)
+        HandleLevelResult(result == LevelResultType.SUCCESS);
+    }
+
+    private void OnEarlyQuit()
+    {
+        HandleLevelResult(false);
+    }
+
+    private void HandleLevelResult(bool save)
+    {
+        if (save)
         {
             SaveCharacterData();
+        }
+        else
+        {
+            TryLoadSaveData();
         }
     }
     #endregion
@@ -171,7 +185,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
     public List<PlayerCharacterData> RetrieveCharacterData(IEnumerable<int> IDs, bool excludeLord = false)
     {
-        return m_CharacterData.Values.Where(x => IDs.Contains(x.Id) && (!excludeLord || !x.IsLord)).ToList();
+        return IDs.Select(x => RetrieveCharacterData(x)).Where(x => !excludeLord || !x.IsLord).ToList();        
     }
 
     /// <summary>

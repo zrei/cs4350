@@ -11,6 +11,10 @@ public class RaceSO : ScriptableObject
     [Header("Gender differences")]
     public GenderItems m_MaleItems;
     public GenderItems m_FemaleItems;
+
+    [Header("Voice")]
+    public AudioDataSO m_HurtSound;
+    public AudioDataSO m_DeathSound;
    
     public UnitModelData GetUnitModelData(Gender gender, OutfitType outfitType)
     {
