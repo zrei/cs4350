@@ -1,16 +1,30 @@
 using Game.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(CanvasGroup))]
-public class LevelTimerDisplay : MonoBehaviour
+public class LevelRationsDisplay : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI m_TimeRemainingText;
-    [SerializeField] private Image m_TimeRemainingFill;
+    [SerializeField] private TextMeshProUGUI m_CurrRationsText;
+    [SerializeField] private Image m_CurrRationsFill;
     
-    private LevelTimerLogic m_LevelTimerLogic;
+    private LevelRationsManager m_LevelRationsManager;
+    
+    private float m_StartingRations;
+    private float m_CurrRations;
+    public float CurrRations
+    {
+        get => m_CurrRations;
+        set
+        {
+            m_CurrRations = value;
+            SetCurrRationsText(m_CurrRations);
+            m_CurrRationsFill.fillAmount = m_CurrRations / m_StartingRations;
+        }
+    }
     
     private Animator m_Animator;
     private CanvasGroup m_CanvasGroup;
@@ -34,13 +48,10 @@ public class LevelTimerDisplay : MonoBehaviour
         GlobalEvents.Scene.LevelSceneLoadedEvent += OnSceneLoad;
     }
 
-    public void Initialise(LevelTimerLogic levelTimerLogic)
+    public void Initialise(LevelRationsManager levelRationsManager)
     {
-        m_LevelTimerLogic = levelTimerLogic;
-        GlobalEvents.Level.TimeRemainingUpdatedEvent += OnTimeRemainingUpdate;
-        
-        SetTimeRemainingText(m_LevelTimerLogic.TimeRemaining);
-        m_TimeRemainingFill.fillAmount = 1;
+        m_StartingRations = levelRationsManager.StartingRations;
+        CurrRations = levelRationsManager.CurrRations;
     }
     
     #endregion
@@ -49,16 +60,18 @@ public class LevelTimerDisplay : MonoBehaviour
 
     private void OnSceneLoad()
     {
-        m_LevelTimerLogic = FindObjectOfType<LevelTimerLogic>();
+        m_LevelRationsManager = FindObjectOfType<LevelRationsManager>();
         
-        if (m_LevelTimerLogic == null)
+        if (m_LevelRationsManager == null)
         {
-            Debug.LogError("LevelTimerVisual: LevelTimerLogic not found in scene");
+            Debug.LogError("LevelRationsDisplay: LevelRationsManager not found in scene!");
             return;
         }
         
-        Initialise(m_LevelTimerLogic);
+        Initialise(m_LevelRationsManager);
         
+        GlobalEvents.Rations.RationsSetEvent += OnRationsSet;
+        GlobalEvents.Rations.RationsChangeEvent += OnRationsChange;
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
         GlobalEvents.Level.ReturnFromLevelEvent += Hide;
@@ -69,16 +82,21 @@ public class LevelTimerDisplay : MonoBehaviour
     private void OnDestroy()
     {
         GlobalEvents.Scene.LevelSceneLoadedEvent -= OnSceneLoad;
-        GlobalEvents.Level.TimeRemainingUpdatedEvent -= OnTimeRemainingUpdate;
+        GlobalEvents.Rations.RationsSetEvent -= OnRationsSet;
+        GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
         GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
     }
-
-    private void OnTimeRemainingUpdate(float timeRemaining)
+    
+    private void OnRationsSet(float newRations)
     {
-        SetTimeRemainingText(m_LevelTimerLogic.TimeRemaining);
-        m_TimeRemainingFill.fillAmount = m_LevelTimerLogic.TimeRemaining / m_LevelTimerLogic.TimeLimit;
+        CurrRations = m_LevelRationsManager.CurrRations;
+    }
+
+    private void OnRationsChange(float changeAmount)
+    {
+        CurrRations = m_LevelRationsManager.CurrRations;
     }
 
     private void OnBattleNodeStart(BattleNode _)
@@ -95,9 +113,9 @@ public class LevelTimerDisplay : MonoBehaviour
     
     #region Graphics
     
-    private void SetTimeRemainingText(float timeRemaining)
+    private void SetCurrRationsText(float currRations)
     {
-        m_TimeRemainingText.text = $"{timeRemaining:F0}<sprite name=\"Rations\" tint>";
+        m_CurrRationsText.text = $"{currRations:F0}<sprite name=\"Rations\" tint>";
     }
 
     private void Hide()

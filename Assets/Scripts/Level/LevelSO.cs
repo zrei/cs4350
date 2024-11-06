@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName="LevelSO", menuName="ScriptableObject/Level/LevelSO")]
 public class LevelSO : ScriptableObject
@@ -9,7 +10,7 @@ public class LevelSO : ScriptableObject
     public string m_LevelName;
     [TextArea]
     public string m_LevelDescription;
-    public float m_TimeLimit;
+    public float m_StartingRations;
     public int m_UnitLimit = 8;
     public GameObject m_BiomeObject;
 

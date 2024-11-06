@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4744883154501141305}
   - component: {fileID: 3746061727783482711}
   m_Layer: 0
-  m_Name: LevelTimerDisplay
+  m_Name: LevelRationsDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,8 +87,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af67135d7f8c4d7486681b1f84021548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TimeRemainingText: {fileID: 4600159854599081509}
-  m_TimeRemainingFill: {fileID: 4269022304225155760}
+  m_CurrRationsText: {fileID: 4600159854599081509}
+  m_CurrRationsFill: {fileID: 4269022304225155760}
 --- !u!1 &3799619653025543488
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 7177259973919572717}
   - component: {fileID: 4269022304225155760}
   m_Layer: 5
-  m_Name: TimerFore
+  m_Name: RationsBarFore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 3513603242800700625}
   - component: {fileID: 4600159854599081509}
   m_Layer: 5
-  m_Name: TimeLeftText
+  m_Name: CurrRationsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -386,7 +386,7 @@ GameObject:
   - component: {fileID: 8636266922906071604}
   - component: {fileID: 7061226805331389067}
   m_Layer: 5
-  m_Name: TimerBack
+  m_Name: RationsBarBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
