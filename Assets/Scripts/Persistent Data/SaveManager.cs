@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [System.Serializable]
 public struct CharacterSaveData
@@ -32,6 +33,67 @@ public struct CharacterSaveData
 }
 
 /// <summary>
+/// Why am I reimplementing player prefs
+/// </summary>
+public class SessionSave
+{
+    private readonly Dictionary<string, int> m_IntKeyValuePairs = new();
+    private readonly Dictionary<string, string> m_StringKeyValuePairs = new();
+
+    private MonoBehaviour m_MonoBehaviour;
+    private Coroutine m_SaveCoroutine;
+
+    public SessionSave(MonoBehaviour monoBehaviour)
+    {
+        m_MonoBehaviour = monoBehaviour;
+    }
+
+    public void Clear()
+    {
+        m_IntKeyValuePairs.Clear();
+        m_StringKeyValuePairs.Clear();
+    }
+
+    public void SetString(string key, string value)
+    {
+        m_StringKeyValuePairs[key] = value;
+    }
+
+    public void SetInt(string key, int value)
+    {
+        m_IntKeyValuePairs[key] = value;
+    }
+
+    public void Save(float initialSaveTime, VoidEvent postSaveEvent = null)
+    {
+        if (m_SaveCoroutine != null)
+        {
+            Logger.Log(this.GetType().Name, "There is already a save process occurring!", LogLevel.ERROR);
+            return;
+        }
+        m_SaveCoroutine = m_MonoBehaviour.StartCoroutine(Save_Coroutine(initialSaveTime, postSaveEvent));
+    }
+
+    private IEnumerator Save_Coroutine(float initialSaveTime, VoidEvent postSaveEvent = null)
+    {
+        GlobalEvents.Save.OnBeginSaveEvent?.Invoke();
+        foreach (KeyValuePair<string, int> keyValuePair in m_IntKeyValuePairs)
+        {
+            PlayerPrefs.SetInt(keyValuePair.Key, keyValuePair.Value);
+        }
+        yield return null;
+        foreach (KeyValuePair<string, string> keyValuePair in m_StringKeyValuePairs)
+        {
+            PlayerPrefs.SetString(keyValuePair.Key, keyValuePair.Value);
+        }
+        yield return new WaitForSeconds(initialSaveTime);
+        PlayerPrefs.Save();
+        postSaveEvent?.Invoke();
+        GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
+    }
+}
+
+/// <summary>
 /// Saves to JSON only
 /// </summary>
 public class SaveManager : Singleton<SaveManager>
@@ -49,18 +111,28 @@ public class SaveManager : Singleton<SaveManager>
     /// </summary>
     private const float SAVE_DELAY = 3.0f;
 
-    private Coroutine m_SaveCoroutine = null;
+    private SessionSave m_SessionSave;
 
     protected override void HandleAwake()
     {
         base.HandleAwake();
         transform.SetParent(null);
         DontDestroyOnLoad(this.gameObject);
+        m_SessionSave = new(this);
+
+        GlobalEvents.MainMenu.OnReturnToMainMenu += OnQuitGame;
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
+
+        GlobalEvents.MainMenu.OnReturnToMainMenu -= OnQuitGame;
+    }
+
+    private void OnQuitGame()
+    {
+        m_SessionSave.Clear();
     }
 
     #region Save
@@ -70,33 +142,19 @@ public class SaveManager : Singleton<SaveManager>
     {
         ClearSave();
         // key to indicate a save exists
-        PlayerPrefs.SetInt(HAS_SAVE, 1);
-    }
-
-    private IEnumerator Save_Coroutine(VoidEvent postSaveEvent = null)
-    {
-        GlobalEvents.Save.OnBeginSaveEvent?.Invoke();
-        yield return new WaitForSeconds(SAVE_DELAY);
-        PlayerPrefs.Save();
-        postSaveEvent?.Invoke();
-        GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
-        m_SaveCoroutine = null;
+        m_SessionSave.SetInt(HAS_SAVE, 1);
     }
     
     public void Save(VoidEvent postSaveEvent = null)
     {
-        if (m_SaveCoroutine != null)
-        {
-            Logger.Log(this.GetType().Name, "There is already a save process occurring!", LogLevel.ERROR);
-            return;
-        }
-        m_SaveCoroutine = StartCoroutine(Save_Coroutine(postSaveEvent));
+        m_SessionSave.Save(SAVE_DELAY, postSaveEvent);
     }
 
     public void ClearSave()
     {
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
+        m_SessionSave.Clear();
     }
     #endregion
 
@@ -172,7 +230,7 @@ public class SaveManager : Singleton<SaveManager>
 
     public void SaveMorality(int morality)
     {
-        PlayerPrefs.SetInt(MORALITY_DATA_KEY, morality);
+        m_SessionSave.SetInt(MORALITY_DATA_KEY, morality);
     }
     #endregion
 
@@ -193,7 +251,7 @@ public class SaveManager : Singleton<SaveManager>
 
     public void SetCurrentLevel(int currLevel)
     {
-        PlayerPrefs.SetInt(LEVEL_KEY, currLevel);
+        m_SessionSave.SetInt(LEVEL_KEY, currLevel);
     }
     #endregion
 
@@ -225,7 +283,7 @@ public class SaveManager : Singleton<SaveManager>
         {
             finalString.Append(val + ITEM_SEPARATOR);
         }
-        PlayerPrefs.SetString(saveKey, finalString.ToString());
+        m_SessionSave.SetString(saveKey, finalString.ToString());
     }
 
     private List<string> LoadSaveDataStrings(string saveKey)
