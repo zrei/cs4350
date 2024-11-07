@@ -90,6 +90,7 @@ public class SessionSave
         PlayerPrefs.Save();
         postSaveEvent?.Invoke();
         GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
+        m_SaveCoroutine = null;
     }
 }
 
