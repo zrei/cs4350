@@ -4,6 +4,7 @@ using UnityEngine;
 namespace Game.UI
 {
     [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public abstract class BaseUIScreen : MonoBehaviour, IUIScreen
     {
         [SerializeField]
@@ -11,6 +12,7 @@ namespace Game.UI
 
         private Animator animator;
         private AnimatorCallbackExecuter animatorCallbackExecuter;
+        private CanvasGroup canvasGroup;
         private RectTransform rectTransform;
         private BackgroundBlur backgroundBlur;
 
@@ -24,11 +26,15 @@ namespace Game.UI
         {
             animator = GetComponentInChildren<Animator>();
             animator.enabled = false;
+
             animatorCallbackExecuter = animator.GetBehaviour<AnimatorCallbackExecuter>();
-
+            canvasGroup = GetComponent<CanvasGroup>();
             rectTransform = transform as RectTransform;
-
             backgroundBlur = GetComponentInChildren<BackgroundBlur>();
+
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
         }
 
         public virtual void Show()
@@ -61,6 +67,10 @@ namespace Game.UI
         {
             animator.enabled = false;
             OnShowDone?.Invoke(this);
+
+            canvasGroup.alpha = 1;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
         }
 
         public virtual void Hide()
@@ -77,6 +87,10 @@ namespace Game.UI
 
             animator.enabled = false;
             OnHideDone?.Invoke(this);
+
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
         }
 
         public abstract void ScreenUpdate();

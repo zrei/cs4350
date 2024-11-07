@@ -208,6 +208,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
         // TODO: need to handle final level case
         WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
 
+        FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
+        nextNodeFog.gameObject.SetActive(false);
+
         LevelSO levelSO = currNode.LevelSO;
 
         m_CurrUnlockedLevel += 1;
@@ -405,6 +408,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private WorldMapNode GetWorldMapNode(int levelNumber)
     {
         return m_WorldMapRegions[levelNumber - 1].m_LevelNode;
+    }
+
+    private FogFader GetWorldMapFog(int levelNumber)
+    {
+        return m_WorldMapRegions[levelNumber - 1].m_FogFade;
     }
     #endregion
 
