@@ -67,15 +67,23 @@ public class BattleManager : Singleton<BattleManager>
     #endregion
 
     #region Win Condition
+    public WinCondition WinCondition => m_WinCondition;
+    public float TurnsToSurvive => m_TurnsToSurvive;
+    public IEnumerator<Unit> TrackedEnemyUnits => m_TrackedEnemyUnits.GetEnumerator();
+
     private WinCondition m_WinCondition;
     private float m_TurnsToSurvive;
     private HashSet<Unit> m_TrackedEnemyUnits = new HashSet<Unit>();
     #endregion
 
     #region Lose Condition
-    private HashSet<Unit> m_TrackedPlayerUnits = new HashSet<Unit>();
+    public SecondaryLoseCondition[] SecondaryLoseConditions => m_SecondaryLoseCondition;
+    public float MaxTurns => m_MaxTurns;
+    public IEnumerator<Unit> TrackedPlayerUnits => m_TrackedPlayerUnits.GetEnumerator();
+
     private SecondaryLoseCondition[] m_SecondaryLoseCondition;
     private float m_MaxTurns;
+    private HashSet<Unit> m_TrackedPlayerUnits = new HashSet<Unit>();
     #endregion
 
     #region Current Level State

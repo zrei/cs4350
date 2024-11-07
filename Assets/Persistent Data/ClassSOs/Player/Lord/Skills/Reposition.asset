@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: Reposition
   m_EditorClassIdentifier: 
   m_SkillName: Reposition
-  m_Description: 'Moves an ally to one space away from you.
+  m_Description: 'Moves an ally to one space.
 
-    GIve them a Crit
-    I token.'
+    GIve them a Crit I token.'
   m_Icon: {fileID: -6913803671930707150, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 3
@@ -30,8 +29,9 @@ MonoBehaviour:
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
+  m_TeleportSelf: 0
   m_TeleportTargetRules:
-  - {fileID: 11400000, guid: cc45ea8061ec83a46b6960ad032d87f1, type: 2}
+  - {fileID: 11400000, guid: c9f011266e8194937af212845ba22dca, type: 2}
   m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0
@@ -39,10 +39,10 @@ MonoBehaviour:
   m_TargetRules:
   - {fileID: 11400000, guid: 3c85fb4aacd7243b7ac57ed4a8c4e74b, type: 2}
   m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
-  m_TargetSquares: []
   m_SkillFXs:
   - m_AttachmentType: 2
     m_WeaponModelIndex: 0
     m_AttachPointIndex: 0
     m_FeedbackSystemPrefab: {fileID: 7809357934258581437, guid: 8188a00edf990ab45bc32c9e58c43a34,
       type: 3}
+    m_AudioToPlay: []

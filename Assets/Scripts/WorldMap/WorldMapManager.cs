@@ -23,6 +23,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [SerializeField] private WorldMapPlayerToken m_PlayerToken;
     [Tooltip("World map nodes in order of level")]
     [SerializeField] private List<WorldMapRegion> m_WorldMapRegions;
+    [SerializeField] private GameObject m_WorldMap;
 
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
@@ -42,6 +43,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
         GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
+        GlobalEvents.Scene.LevelSceneLoadedEvent += OnLevelSceneLoaded;
 
         HandleDependencies();
     }
@@ -52,6 +54,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
         GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
+        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnLevelSceneLoaded;
         
         DisableAllControls();
     }
@@ -162,6 +165,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #endregion
 
     #region Level Loading
+    private void OnLevelSceneLoaded()
+    {
+        m_WorldMap.SetActive(false);
+    }
+
     private void OnBeginLoadLevel()
     {
         m_CameraController.RecenterCamera();
@@ -170,6 +178,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void OnReturnFromLevel()
     {
+        m_WorldMap.SetActive(true);
+
         m_CameraController.RecenterCamera();
 
         if (FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
@@ -197,6 +207,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
         WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
         // TODO: need to handle final level case
         WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
+
+        FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
+        nextNodeFog.gameObject.SetActive(false);
 
         LevelSO levelSO = currNode.LevelSO;
 
@@ -395,6 +408,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private WorldMapNode GetWorldMapNode(int levelNumber)
     {
         return m_WorldMapRegions[levelNumber - 1].m_LevelNode;
+    }
+
+    private FogFader GetWorldMapFog(int levelNumber)
+    {
+        return m_WorldMapRegions[levelNumber - 1].m_FogFade;
     }
     #endregion
 
