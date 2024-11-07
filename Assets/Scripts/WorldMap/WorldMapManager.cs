@@ -4,6 +4,12 @@ using Game.Input;
 using Game.UI;
 using UnityEngine;
 
+public struct WorldMapRegion
+{
+    public WorldMapNode m_LevelNode;
+    public MeshFader m_FogFade;
+}
+
 public class WorldMapManager : Singleton<WorldMapManager>
 {
     [Header("Level")]
@@ -19,6 +25,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
+
+    [Header("Fog")]
+    [SerializeField] private FogFader m_FogFader;
 
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
@@ -102,6 +111,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         // initialise the UI
         GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
+
+        m_FogFader.Fade(0f, 5f);
     }
     #endregion
 
