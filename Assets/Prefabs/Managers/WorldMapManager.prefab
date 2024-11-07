@@ -147,13 +147,8 @@ MonoBehaviour:
   m_CameraController: {fileID: 4816518582758593564}
   m_PlayerToken: {fileID: -4290046962421772772, guid: a062cdc7cebcd41e1b298352fbfd2551,
     type: 3}
-  m_LevelNodes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  m_WorldMapRegions: []
+  m_WorldMap: {fileID: 0}
   m_CutsceneManager: {fileID: 8558531022822808858}
 --- !u!114 &4816518582758593564
 MonoBehaviour:
@@ -173,6 +168,7 @@ MonoBehaviour:
   m_RightLimitTransform: {fileID: 0}
   m_TopLimitTransform: {fileID: 0}
   m_BottomLimitTransform: {fileID: 0}
+  m_CameraMovementSpeed: 25
 --- !u!114 &8558531022822808858
 MonoBehaviour:
   m_ObjectHideFlags: 0
