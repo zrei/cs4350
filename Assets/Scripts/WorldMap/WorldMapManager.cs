@@ -4,10 +4,11 @@ using Game.Input;
 using Game.UI;
 using UnityEngine;
 
+[System.Serializable]
 public struct WorldMapRegion
 {
     public WorldMapNode m_LevelNode;
-    public MeshFader m_FogFade;
+    public FogFader m_FogFade;
 }
 
 public class WorldMapManager : Singleton<WorldMapManager>
@@ -21,13 +22,10 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Header("Objects")]
     [SerializeField] private WorldMapPlayerToken m_PlayerToken;
     [Tooltip("World map nodes in order of level")]
-    [SerializeField] private List<WorldMapNode> m_LevelNodes;
+    [SerializeField] private List<WorldMapRegion> m_WorldMapRegions;
 
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
-
-    [Header("Fog")]
-    [SerializeField] private FogFader m_FogFader;
 
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
@@ -83,15 +81,17 @@ public class WorldMapManager : Singleton<WorldMapManager>
         for (int i = 0; i < m_CurrSelectedLevel; ++i)
         {
             bool isCurrLevel = i == m_CurrSelectedLevel - 1;
-            m_LevelNodes[i].Initialise(isCurrLevel ? LevelState.UNLOCKED : LevelState.CLEARED, isCurrLevel);
-            m_LevelNodes[i].gameObject.SetActive(true);
+            m_WorldMapRegions[i].m_LevelNode.Initialise(isCurrLevel ? LevelState.UNLOCKED : LevelState.CLEARED, isCurrLevel);
+            m_WorldMapRegions[i].m_LevelNode.gameObject.SetActive(true);
+            m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(false);
         }
 
         // initialise the locked nodes
-        for (int i = m_CurrSelectedLevel; i < m_LevelNodes.Count; ++i)
+        for (int i = m_CurrSelectedLevel; i < m_WorldMapRegions.Count; ++i)
         {
-            m_LevelNodes[i].Initialise(LevelState.LOCKED, false);
-            m_LevelNodes[i].gameObject.SetActive(false);
+            m_WorldMapRegions[i].m_LevelNode.Initialise(LevelState.LOCKED, false);
+            m_WorldMapRegions[i].m_LevelNode.gameObject.SetActive(false);
+            m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(true);
         }
 
         // instantiate the player token
@@ -111,8 +111,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         // initialise the UI
         GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
-
-        m_FogFader.Fade(0f, 5f);
     }
     #endregion
 
@@ -212,18 +210,20 @@ public class WorldMapManager : Singleton<WorldMapManager>
         {
             if (currNode.HasPostCutscene)
             {
-                m_CutsceneManager.ShowCutscene(currNode.PostCutscene, () => PostLevelEndCutscene(currNode, nextNode));
+                m_CutsceneManager.ShowCutscene(currNode.PostCutscene, () => PostLevelEndCutscene(currNode, nextNode, m_WorldMapRegions[m_CurrSelectedLevel - 1].m_FogFade));
             }
             else
             {
-                PostLevelEndCutscene(currNode, nextNode);
+                PostLevelEndCutscene(currNode, nextNode, m_WorldMapRegions[m_CurrSelectedLevel - 1].m_FogFade);
             }
         }
     }
 
-    private void PostLevelEndCutscene(WorldMapNode currNode, WorldMapNode nextNode)
+    private void PostLevelEndCutscene(WorldMapNode currNode, WorldMapNode nextNode, FogFader nextRegionFog)
     {
         FlagManager.Instance.SetFlagValue(currNode.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
+
+        nextRegionFog.gameObject.SetActive(false);
 
         currNode.ToggleCurrLevel(false);
 
@@ -394,7 +394,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
     /// <returns></returns>
     private WorldMapNode GetWorldMapNode(int levelNumber)
     {
-        return m_LevelNodes[levelNumber - 1];
+        return m_WorldMapRegions[levelNumber - 1].m_LevelNode;
     }
     #endregion
 
