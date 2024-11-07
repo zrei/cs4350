@@ -205,7 +205,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
 
             numHandlesLoaded += 1;
             
-            if (numHandles < numHandlesLoaded)
+            if (numHandlesLoaded < numHandles)
                 return;
 
             m_OnSceneChange?.Invoke();
