@@ -148,12 +148,8 @@ public class GameSceneManager : Singleton<GameSceneManager>
         StartCoroutine(UnloadAdditiveSceneWithTransition(sceneIndex));
     }
 
-    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, GameObject mapBiome)
+    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, GameObject mapBiome, List<InflictedToken> fatigueTokens)
     {
-        m_CurrentBattle = battleSo;
-        m_UnitBattleData = unitBattleData;
-        m_MapBiome = mapBiome;
-        
         // Set up the callback to initialize battle parameters for when the battle scene is loaded
         GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
         
@@ -164,6 +160,14 @@ public class GameSceneManager : Singleton<GameSceneManager>
 
         // Load the battle scene
         StartCoroutine(LoadAdditiveSceneWithTransition(BATTLE_SCENE_INDEX));
+        
+        void OnBattleSceneLoaded()
+        {
+            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
+        
+            Debug.Log("Battle scene loaded. Initialising battle.");
+            BattleManager.Instance.InitialiseBattle(battleSo, unitBattleData, mapBiome, fatigueTokens);
+        }
     }
     
     public void UnloadBattleScene()
@@ -177,21 +181,6 @@ public class GameSceneManager : Singleton<GameSceneManager>
         StartCoroutine(UnloadAdditiveSceneWithTransition(BATTLE_SCENE_INDEX));
     }
 
-    #endregion
-
-    #region Callbacks
-
-    private void OnBattleSceneLoaded()
-    {
-        GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
-        
-        Debug.Log("Battle scene loaded. Initialising battle.");
-        BattleManager.Instance.InitialiseBattle(m_CurrentBattle, m_UnitBattleData, m_MapBiome, new());
-        
-        m_CurrentBattle = null;
-        m_UnitBattleData = null;
-        m_MapBiome = null;
-    }
     #endregion
 
     #region Transition

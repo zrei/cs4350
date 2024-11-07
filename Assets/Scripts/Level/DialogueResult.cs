@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Level
 {
@@ -17,8 +18,7 @@ namespace Level
     /// </summary>
     public class DialogueResult : MonoBehaviour
     {
-        // To change to ration in the future
-        public float timeChangeAmt;
+        [FormerlySerializedAs("timeChangeAmt")] public float rationChangeAmt;
         
         public int moralityChangeAmt;
         
@@ -26,17 +26,16 @@ namespace Level
         
         public void ApplyResults()
         {
-            ApplyTimeChange();
+            ApplyRationsChange();
             ApplyMoralityChange();
             ApplyFlagTriggers();
         }
         
-        private void ApplyTimeChange()
+        private void ApplyRationsChange()
         {
-            if (timeChangeAmt == 0) return;
+            if (rationChangeAmt == 0) return;
             
-            var levelTimerLogic = FindObjectOfType<LevelTimerLogic>();
-            levelTimerLogic.AddTime(timeChangeAmt);
+            GlobalEvents.Rations.RationsChangeEvent(rationChangeAmt);
         }
         
         private void ApplyMoralityChange()

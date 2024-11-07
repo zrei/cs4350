@@ -17,7 +17,7 @@ public class LevelNodeManager : MonoBehaviour
 
     #region Initialisation
 
-    public void Initialise(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges, float timeLimit)
+    public void Initialise(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
     {
         // Initialise the internal graph representation of the level
         InitialiseMap(levelNodes, levelEdges);
@@ -60,13 +60,13 @@ public class LevelNodeManager : MonoBehaviour
         m_CurrentNodeInternal.EnterNode();
     }
 
-    public void MoveToNode(NodeInternal destNode, out float timeCost)
+    public void MoveToNode(NodeInternal destNode, out float cost)
     {
         m_CurrentNodeInternal.ClearNode();
         m_CurrentNodeInternal.ExitNode();
             
         // Retrieve cost to move to the node
-        timeCost = m_CurrentNodeInternal.AdjacentNodes[destNode];
+        cost = m_CurrentNodeInternal.AdjacentNodes[destNode];
         
         GlobalEvents.Level.NodeMovementEvent(m_CurrentNodeInternal, destNode);
         

@@ -40,7 +40,7 @@ public class RewardNodeVisual : NodeVisual
         else
         {
             SetNodeState(m_RewardNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
-            if (m_RewardNode.RewardType == RewardType.TIME)
+            if (m_RewardNode.RewardType == RewardType.RATION)
                 m_rationToken.SetActive(!m_RewardNode.IsCleared);
             else if (m_RewardNode.RewardType == RewardType.WEAPON)
                 m_chestToken.SetActive(!m_RewardNode.IsCleared);

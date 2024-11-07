@@ -7,6 +7,7 @@ using Game.UI;
 using Level;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
 {
@@ -18,7 +19,7 @@ public enum PlayerLevelSelectionState
 public enum RewardType
 {
     EXP,
-    TIME,
+    RATION,
     WEAPON
 }
 
@@ -34,7 +35,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] LevelTokenManager m_LevelTokenManager;
     
     // Level Timer
-    [SerializeField] LevelTimerLogic m_LevelTimerLogic;
+    [FormerlySerializedAs("levelRationsManager")] [FormerlySerializedAs("m_LevelTimerLogic")] [SerializeField] LevelRationsManager m_LevelRationsManager;
 
     [SerializeField] PlaneCameraController m_LevelCameraController;
     
@@ -102,14 +103,13 @@ public class LevelManager : MonoBehaviour
 
         var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
-        var timeLimit = m_LevelSO.m_TimeLimit;
         
         // Initialise the internal graph representation of the level
-        m_LevelNodeManager.Initialise(levelNodes, levelEdges, timeLimit);
+        m_LevelNodeManager.Initialise(levelNodes, levelEdges);
         m_LevelNodeManager.SetGoalNode(m_GoalNode);
         
         // Initialise the timer
-        m_LevelTimerLogic.Initialise(timeLimit);
+        m_LevelRationsManager.Initialise(m_LevelSO.m_StartingRations);
         
         // Initialise the visuals of the level
         m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
@@ -318,9 +318,9 @@ public class LevelManager : MonoBehaviour
 
         void OnMovementComplete()
         {
-            m_LevelNodeManager.MoveToNode(destNode, out var timeCost);
+            m_LevelNodeManager.MoveToNode(destNode, out var rationCost);
             
-            m_LevelTimerLogic.AdvanceTimer(timeCost);
+            GlobalEvents.Rations.RationsChangeEvent?.Invoke(-rationCost);
 
             if (m_LevelNodeManager.IsCurrentNodeCleared())
             {
@@ -400,7 +400,8 @@ public class LevelManager : MonoBehaviour
         
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(), m_LevelSO.m_BiomeObject);
+        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            m_LevelSO.m_BiomeObject, m_LevelRationsManager.GetInflictedTokens());
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
@@ -431,7 +432,7 @@ public class LevelManager : MonoBehaviour
                                               + battleNode.BattleSO.m_ExpReward;
             
             // Add time cost to pending rewards
-            m_PendingRewards[RewardType.TIME] = m_PendingRewards.GetValueOrDefault(RewardType.TIME, 0) 
+            m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) 
                                                - numTurns;
         
             UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
@@ -455,8 +456,8 @@ public class LevelManager : MonoBehaviour
         m_LevelNodeManager.ClearCurrentNode();
         
         // Add reward to pending rewards
-        if (rewardNode.RewardType == RewardType.TIME)
-            m_PendingRewards[RewardType.TIME] = m_PendingRewards.GetValueOrDefault(RewardType.TIME, 0) + rewardNode.RationReward;
+        if (rewardNode.RewardType == RewardType.RATION)
+            m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) + rewardNode.RationReward;
         else if (rewardNode.RewardType == RewardType.WEAPON)
             m_PendingWeaponRewards.Add(rewardNode.WeaponReward);
         
@@ -544,17 +545,10 @@ public class LevelManager : MonoBehaviour
     {
         hasEvent = false;
 
-        if (m_PendingRewards.ContainsKey(RewardType.TIME))
+        if (m_PendingRewards.ContainsKey(RewardType.RATION) && m_PendingRewards[RewardType.RATION] != 0)
         {
-            if (m_PendingRewards[RewardType.TIME] > 0)
-            {
-                m_LevelTimerLogic.AddTime(m_PendingRewards[RewardType.TIME]);
-            }
-            else
-            {
-                m_LevelTimerLogic.AdvanceTimer(-m_PendingRewards[RewardType.TIME]);
-            }
-            m_PendingRewards[RewardType.TIME] = 0;
+            GlobalEvents.Rations.RationsChangeEvent?.Invoke(m_PendingRewards[RewardType.RATION]);
+            m_PendingRewards[RewardType.RATION] = 0;
         }
         
         if (m_PendingRewards.ContainsKey(RewardType.EXP))

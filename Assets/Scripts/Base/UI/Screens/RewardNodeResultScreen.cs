@@ -24,7 +24,7 @@ namespace Game.UI
         
         private void OnRewardNodeStart(RewardNode rewardNode)
         {
-            if (rewardNode.RewardType == RewardType.TIME)
+            if (rewardNode.RewardType == RewardType.RATION)
             {
                 var rationReward = rewardNode.RationReward;
                 m_ResultText.text = $"Gained {rationReward} rations!";

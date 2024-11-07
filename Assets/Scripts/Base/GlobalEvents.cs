@@ -47,7 +47,6 @@ public static class GlobalEvents {
         public delegate void DialogueNodeEvent(DialogueNode _);
         public delegate void MassLevelUpEvent(List<LevelUpSummary> _);
         public delegate void LevelResultEvent(LevelSO levelSo, LevelResultType _);
-        public static FloatEvent TimeRemainingUpdatedEvent;
         public static NodeEvent NodeEnteredEvent;
         public static NodeEvent NodeClearedEvent;
         public static NodeEvent NodeExitedEvent;
@@ -94,6 +93,12 @@ public static class GlobalEvents {
     {
         public static IntEvent MoralityChangeEvent;
         public static IntEvent MoralitySetEvent;
+    }
+    
+    public static class Rations
+    {
+        public static FloatEvent RationsChangeEvent;
+        public static FloatEvent RationsSetEvent;
     }
 
     public static class Flags
