@@ -131,10 +131,7 @@ public static class GlobalEvents {
     public static class CharacterManagement 
     {
         public delegate void PlayerClassSOEvent(PlayerClassSO _);
-        public delegate void TooltipEvent(TooltipContents _);
         public static VoidEvent OnWeaponChangedEvent;
-        public static TooltipEvent OnTooltipEvent;
-        public static VoidEvent OnHideTooltipEvent;
         public static PlayerClassSOEvent OnPreviewReclass;
         public static VoidEvent OnReclass;
         public static VoidEvent OnLordUpdate;

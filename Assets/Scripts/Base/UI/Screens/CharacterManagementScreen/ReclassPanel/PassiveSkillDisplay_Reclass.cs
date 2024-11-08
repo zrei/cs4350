@@ -18,19 +18,23 @@ namespace Game.UI
             for (int i = 0; i < minSkillNumber; ++i)
             {
                 m_SkillButtons[i].icon.sprite = m_CurrClass.m_PassiveEffects[startingIndex + i].m_PassiveEffectIcon;
-                m_SkillButtons[i].gameObject.SetActive(true);
+                ToggleCanvasGroup(m_SkillBtnCgs[i], true);
             }
 
             for (int i = minSkillNumber; i < m_NumSkillButtons; ++i)
             {
-                m_SkillButtons[i].gameObject.SetActive(false);
+                ToggleCanvasGroup(m_SkillBtnCgs[i], false);
             }
         }
 
         protected override void HoverSkill(int index)
         {
             ClassPassiveEffect classPassiveEffect = m_CurrClass.m_PassiveEffects[(m_CurrPage - 1) * m_NumSkillButtons + index];
-            GlobalEvents.CharacterManagement.OnTooltipEvent?.Invoke(new TooltipContents(classPassiveEffect.m_Name, classPassiveEffect.m_Description));
+
+            m_SkillTitle.gameObject.SetActive(true);
+            m_SkillTitle?.SetValue(classPassiveEffect.m_Name);
+
+            m_SkillDescription?.SetValue(classPassiveEffect.m_Description);
         }
     }
 }

@@ -95,6 +95,11 @@ public struct UnlockCondition
             }
         }
 
+        if (m_IsFlagLocked)
+        {
+            stringBuilder.Append($"Experience story event(s)");
+        }
+
         return stringBuilder.ToString();
     }
 

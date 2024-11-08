@@ -7,11 +7,11 @@ namespace Game.UI
     public class ReclassPanel : MonoBehaviour
     {
         [Header("Tab")]
-        [SerializeField] private NamedObjectButton m_OverviewButton;
+        [SerializeField] private NamedObjectButton m_ConfirmBtn;
+        [SerializeField] private NamedObjectButton m_CancelBtn;
 
         [Header("UI References")]
         [SerializeField] private FormattedTextDisplay m_PathGroupTitle;
-        [SerializeField] private NamedObjectButton m_ReclassButton;
         [SerializeField] private FormattedTextDisplay m_ClassTitle;
         [SerializeField] private TextMeshProUGUI m_ClassDescription;        
 
@@ -35,18 +35,18 @@ namespace Game.UI
 
         private void Start()
         {
-            m_OverviewButton.onSubmit.RemoveAllListeners();
-            m_OverviewButton.onSubmit.AddListener(OnOverviewEvent);
+            m_CancelBtn.onSubmit.RemoveAllListeners();
+            m_CancelBtn.onSubmit.AddListener(OnOverviewEvent);
 
-            m_ReclassButton.onSubmit.RemoveAllListeners();
-            m_ReclassButton.onSubmit.AddListener(B_Reclass);
+            m_ConfirmBtn.onSubmit.RemoveAllListeners();
+            m_ConfirmBtn.onSubmit.AddListener(B_Reclass);
         }
 
         public void SetDisplay(PlayerCharacterData playerCharacterData)
         {
             m_CurrCharacterData = playerCharacterData;
             PathGroupSO pathGroupSO = playerCharacterData.m_BaseData.m_PathGroup;
-            m_PathGroupTitle?.SetValue(pathGroupSO.m_PathName);
+            m_PathGroupTitle?.SetValue(pathGroupSO.m_PathName, playerCharacterData.CurrClass.m_ClassName);
             ResetDisplay();
 
             for (int i = 0; i < playerCharacterData.NumClasses; ++i)
@@ -60,24 +60,38 @@ namespace Game.UI
                 classButtonInstance.onSubmit.AddListener(() => SelectClass(pathGroupSO.m_PathClasses[cachedIndex], cachedIndex, !playerCharacterData.IsClassUnlocked(cachedIndex)));            
             }
 
+            m_ConfirmBtn.interactable = false;
             ToggleShown(false);
         }
 
         private void SelectClass(PathClass pathClass, int classIndex, bool isLocked)
         {
+            if (m_CurrSelectedClassIndex == classIndex)
+                return;
             m_CurrSelectedClassIndex = classIndex;
 
             PlayerClassSO playerClassSO = pathClass.m_Class;
 
             m_ClassDescription.text = playerClassSO.m_ClassDescription;
 
-            m_ReclassButton.interactable = !isLocked && m_CurrEquippedClassIndex != classIndex;
-            m_ActiveSkillDisplay.SetDisplay(m_CurrCharacterData, playerClassSO);
-            m_PassiveSkillDisplay.SetDisplay(m_CurrCharacterData, playerClassSO);
-            m_ConditionDisplay.SetDisplay(pathClass);
+            m_ConfirmBtn.interactable = !isLocked && m_CurrEquippedClassIndex != classIndex;
+
+            m_ActiveSkillDisplay.gameObject.SetActive(!isLocked);
+            m_PassiveSkillDisplay.gameObject.SetActive(!isLocked);
+            m_ConditionDisplay.gameObject.SetActive(isLocked);
+            
+            if (!isLocked)
+            {
+                m_ActiveSkillDisplay.SetDisplay(m_CurrCharacterData, playerClassSO);
+                m_PassiveSkillDisplay.SetDisplay(m_CurrCharacterData, playerClassSO);
+            }
+            else
+            {
+                m_ConditionDisplay.SetDisplay(pathClass);
+            }
 
             SetClassTitle(isLocked);
-    
+
             ToggleShown(true);
 
             GlobalEvents.CharacterManagement.OnPreviewReclass?.Invoke(playerClassSO);
@@ -106,8 +120,9 @@ namespace Game.UI
             m_CurrCharacterData.Reclass(m_CurrSelectedClassIndex);
             m_CurrEquippedClassIndex = m_CurrSelectedClassIndex;
             GlobalEvents.CharacterManagement.OnReclass?.Invoke();
-            m_ReclassButton.interactable = false;
+            m_ConfirmBtn.interactable = false;
             SetClassTitle(false);
+            m_PathGroupTitle?.SetValue(m_CurrCharacterData.m_BaseData.m_PathGroup.m_PathName, m_CurrCharacterData.CurrClass.m_ClassName);
 
             if (m_CurrCharacterData.IsLord)
                 GlobalEvents.CharacterManagement.OnLordUpdate?.Invoke();
