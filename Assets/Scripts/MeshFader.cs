@@ -69,6 +69,7 @@ public class MeshFader : MonoBehaviour
 
     public void SetRenderers(IEnumerable<Renderer> renderers)
     {
+        m_Renderers.Clear();
         foreach (var renderer in renderers) AddRenderer(renderer);
     }
 

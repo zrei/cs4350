@@ -33,6 +33,8 @@ public class WorldMapNode : MonoBehaviour
     public SplineContainer Spline => m_WorldMapEdge.Spline;
     public Vector3 InitialSplineForwardDirection => m_WorldMapEdge.GetInitialSplineForwardDirection();
 
+    public Vector3 PositioningOffset => m_WorldMapVisual.TokenOffset;
+
     #region Initialise
     public void Initialise(LevelState initialState, bool isCurrentLevel)
     {

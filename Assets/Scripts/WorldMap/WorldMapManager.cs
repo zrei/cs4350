@@ -94,7 +94,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
             bool isCurrLevel = i == m_CurrSelectedLevel - 1;
             m_WorldMapRegions[i].m_LevelNode.Initialise(isCurrLevel ? LevelState.UNLOCKED : LevelState.CLEARED, isCurrLevel);
             m_WorldMapRegions[i].m_LevelNode.gameObject.SetActive(true);
-            m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(false);
+            if (m_WorldMapRegions[i].m_FogFade != null)
+                m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(false);
         }
 
         // initialise the locked nodes
@@ -102,7 +103,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         {
             m_WorldMapRegions[i].m_LevelNode.Initialise(LevelState.LOCKED, false);
             m_WorldMapRegions[i].m_LevelNode.gameObject.SetActive(false);
-            m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(true);
+            if (m_WorldMapRegions[i].m_FogFade != null)
+                m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(true);
         }
 
         // instantiate the player token
@@ -257,7 +259,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     {
         FlagManager.Instance.SetFlagValue(currNode.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
 
-        nextRegionFog.gameObject.SetActive(false);
+        if (nextRegionFog != null)
+            nextRegionFog.gameObject.SetActive(false);
 
         currNode.ToggleCurrLevel(false);
 
@@ -265,7 +268,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         currNode.UnlockPath(PostUnlockPath);
 
         // start moving unit
-        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currNode.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currNode.Spline, Quaternion.LookRotation(currNode.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
+        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currNode.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currNode.Spline, currNode.PositioningOffset, Quaternion.LookRotation(currNode.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
 
         // have the next node pop up
         void PostUnlockPath()
