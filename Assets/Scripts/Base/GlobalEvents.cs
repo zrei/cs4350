@@ -139,4 +139,10 @@ public static class GlobalEvents {
         public static VoidEvent OnReclass;
         public static VoidEvent OnLordUpdate;
     }
+
+    public static class CutsceneEvents
+    {
+        public delegate void CutsceneEvent(Cutscene _);
+        public static CutsceneEvent StartCutsceneEvent;
+    }
 }
