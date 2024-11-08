@@ -11,8 +11,8 @@ public enum LevelState
 public class WorldMapNode : MonoBehaviour
 {
     [SerializeField] LevelSO m_LevelInfo;
-    [SerializeField] Cutscene m_PreCutscene;
-    [SerializeField] Cutscene m_PostCutscene;
+    [SerializeField] CutsceneSpawner m_PreCutscene;
+    [SerializeField] CutsceneSpawner m_PostCutscene;
     [SerializeField] WorldMapEdge m_WorldMapEdge;
     [SerializeField] WorldMapVisual m_WorldMapVisual;
 
@@ -26,9 +26,9 @@ public class WorldMapNode : MonoBehaviour
     public LevelSO LevelSO => m_LevelInfo;
 
     public bool HasPreCutscene => m_PreCutscene != null;
-    public Cutscene PreCutscene => m_PreCutscene;
+    public CutsceneSpawner PreCutscene => m_PreCutscene;
     public bool HasPostCutscene => m_PostCutscene != null;
-    public Cutscene PostCutscene => m_PostCutscene;
+    public CutsceneSpawner PostCutscene => m_PostCutscene;
 
     public SplineContainer Spline => m_WorldMapEdge.Spline;
     public Vector3 InitialSplineForwardDirection => m_WorldMapEdge.GetInitialSplineForwardDirection();

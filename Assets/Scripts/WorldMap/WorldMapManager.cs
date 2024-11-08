@@ -67,13 +67,21 @@ public class WorldMapManager : Singleton<WorldMapManager>
             return;
         }
 
-        CharacterDataManager.OnReady -= HandleDependencies;
+        if (!FlagManager.IsReady)
+        {
+            FlagManager.OnReady += HandleDependencies;
+            return;
+        }
 
-        Initialise();
+        CharacterDataManager.OnReady -= HandleDependencies;
+        FlagManager.OnReady -= HandleDependencies;
+
+        StartCoroutine(Initialise());
     }
 
-    private void Initialise()
+    private IEnumerator Initialise()
     {
+        yield return null;
         if (!SaveManager.Instance.TryLoadCurrentLevel(out m_CurrUnlockedLevel))
         {
             m_CurrUnlockedLevel = m_StartingLevel;
@@ -110,10 +118,23 @@ public class WorldMapManager : Singleton<WorldMapManager>
         // initialise the camera
         m_CameraController.Initialise(m_PlayerTokenInstance.transform);
         
-        EnableAllControls();
+        if (currNode.HasPreCutscene && !FlagManager.Instance.GetFlagValue(currNode.LevelSO.PreDialogueFlag))
+        {
+            m_CutsceneManager.ShowCutscene(currNode.PreCutscene, PostPreCutscene);
+        }
+        else
+        {
+            PostPreCutscene();
+        }
 
-        // initialise the UI
-        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
+        void PostPreCutscene()
+        {
+            FlagManager.Instance.SetFlagValue(currNode.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
+            EnableAllControls();
+
+            // initialise the UI
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
+        }
     }
     #endregion
 
@@ -269,7 +290,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void PostLevelBeginCutscene(WorldMapNode nextNode)
     {
-        FlagManager.Instance.SetFlagValue(nextNode.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
+        FlagManager.Instance.SetFlagValue(nextNode.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
         nextNode.ToggleCurrLevel(true);
         EnableAllControls();
         GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(nextNode.LevelSO, false));

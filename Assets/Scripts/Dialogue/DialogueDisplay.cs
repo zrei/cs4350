@@ -1,9 +1,9 @@
 using Game.Input;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 
@@ -104,19 +104,31 @@ namespace Game.UI
         {
             if (currentDialogue != null || dialogue == null) return;
 
-            Show();
-
-            CurrentDialogue = dialogue;
             dialogue.onEnterState?.Invoke();
-            if (dialogue.audioCue != null)
-            {
-                SoundManager.Instance.Play(dialogue.audioCue);
-            }
 
-            InputManager.Instance.SubmitInput.OnPressEvent += OnSubmit;
-            InputManager.Instance.PointerSelectInput.OnPressEvent += OnSubmit;
+            StartCoroutine(Delay(dialogue.delayUntilShown, PostDelay));
+    
+            void PostDelay()
+            {
+                Show();
             
-            GlobalEvents.Dialogue.DialogueStartEvent?.Invoke();
+                CurrentDialogue = dialogue;
+                if (dialogue.audioCue != null)
+                {
+                    SoundManager.Instance.Play(dialogue.audioCue);
+                }
+
+                InputManager.Instance.SubmitInput.OnPressEvent += OnSubmit;
+                InputManager.Instance.PointerSelectInput.OnPressEvent += OnSubmit;
+                
+                GlobalEvents.Dialogue.DialogueStartEvent?.Invoke();
+            }
+        }
+
+        private IEnumerator Delay(float delay, VoidEvent postDelay)
+        {
+            yield return new WaitForSeconds(delay);
+            postDelay?.Invoke();
         }
 
         private void TryNextDialogue(Dialogue dialogue)
@@ -127,11 +139,24 @@ namespace Game.UI
                 return;
             }
 
-            CurrentDialogue = dialogue;
+            InputManager.Instance.SubmitInput.OnPressEvent -= OnSubmit;
+            InputManager.Instance.PointerSelectInput.OnPressEvent -= OnSubmit;
+
             dialogue.onEnterState?.Invoke();
-            if (dialogue.audioCue != null)
+
+            StartCoroutine(Delay(dialogue.delayUntilShown, PostDelay));
+
+            void PostDelay()
             {
-                SoundManager.Instance.Play(dialogue.audioCue);
+                CurrentDialogue = dialogue;
+
+                InputManager.Instance.SubmitInput.OnPressEvent += OnSubmit;
+                InputManager.Instance.PointerSelectInput.OnPressEvent += OnSubmit;
+            
+                if (dialogue.audioCue != null)
+                {
+                    SoundManager.Instance.Play(dialogue.audioCue);
+                }
             }
         }
 
@@ -181,6 +206,11 @@ namespace Game.UI
                         if (option.changesMorality)
                         {
                             GlobalEvents.Morality.MoralityChangeEvent?.Invoke(option.moralityChange);
+                        }
+
+                        foreach (Flag flag in option.setFlags)
+                        {
+                            FlagManager.Instance.SetFlagValue(flag, true, FlagType.PERSISTENT);
                         }
 
                         TryNextDialogue(nextState);

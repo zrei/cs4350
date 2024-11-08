@@ -47,8 +47,10 @@ public class ArmorVisual : MonoBehaviour
         EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
         equipArmor.Initialize(unitModelData.m_AttachItems);
 
-        ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
+        if (Application.isPlaying)
+            ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
 
+        m_WeaponModels.Clear();
         foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
         {
             if (weaponModelPrefab != null)
@@ -65,6 +67,9 @@ public class ArmorVisual : MonoBehaviour
             }
         }
 
+        if (!Application.isPlaying)
+            return;
+
         m_Animator = m_Model.GetComponentInChildren<Animator>();
         if (m_Animator == null)
         {
@@ -73,7 +78,7 @@ public class ArmorVisual : MonoBehaviour
 
         m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
         m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
-            
+
         m_MeshFader = gameObject.AddComponent<MeshFader>();
         m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
     }
