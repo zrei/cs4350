@@ -3,21 +3,8 @@ using UnityEngine;
 
 public class WorldMapCutsceneManager : MonoBehaviour
 {    
-    [SerializeField] CutsceneSpawner m_TestSpawner;
-    
     private CutsceneSpawner m_CurrCutscene = null;
     private int m_InitialCullingMask = -1;
-
-    private void Start()
-    {
-        StartCoroutine(StartingCutscene());
-    }
-
-    private IEnumerator StartingCutscene()
-    {
-        yield return null;
-        ShowCutscene(m_TestSpawner, null);
-    }
 
     public void ShowCutscene(CutsceneSpawner cutscene, VoidEvent postCutscene)
     {
