@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ArmorVisual : MonoBehaviour
 {
+    private EquippingArmor m_EquippingArmor;
+
     #region Animation
     public static readonly int DirXAnimParam = Animator.StringToHash("DirX");
     public static readonly int DirYAnimParam = Animator.StringToHash("DirY");
@@ -44,8 +46,8 @@ public class ArmorVisual : MonoBehaviour
         m_Model.transform.localPosition = Vector3.zero;
         m_Model.transform.rotation = Quaternion.identity;
 
-        EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
-        equipArmor.Initialize(unitModelData.m_AttachItems);
+        m_EquippingArmor = m_Model.GetComponent<EquippingArmor>();
+        m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
 
         ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
 
@@ -56,8 +58,8 @@ public class ArmorVisual : MonoBehaviour
                 var weaponModel = Instantiate(weaponModelPrefab);
                 var attachPoint = weaponModel.attachmentType switch
                 {
-                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                    WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
+                    WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
                     _ => null,
                 };
                 weaponModel.transform.SetParent(attachPoint, false);
@@ -82,8 +84,7 @@ public class ArmorVisual : MonoBehaviour
     {
         ResetModel();
 
-        EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
-        equipArmor.Initialize(unitModelData.m_AttachItems);
+        m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
 
         ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
 
@@ -94,8 +95,8 @@ public class ArmorVisual : MonoBehaviour
                 var weaponModel = Instantiate(weaponModelPrefab);
                 var attachPoint = weaponModel.attachmentType switch
                 {
-                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                    WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
+                    WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
                     _ => null,
                 };
                 weaponModel.transform.SetParent(attachPoint, false);
@@ -106,6 +107,14 @@ public class ArmorVisual : MonoBehaviour
         m_Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
         m_Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+
+        StartCoroutine(MeshFadeSet());
+    }
+
+    private IEnumerator MeshFadeSet()
+    {
+        yield return null;
+        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
     }
 
     private void ResetModel()
@@ -117,7 +126,7 @@ public class ArmorVisual : MonoBehaviour
 
         m_WeaponModels.Clear();
 
-        SkinnedMeshRenderer[] armorPieces = m_Model.GetComponentsInChildren<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer[] armorPieces = m_EquippingArmor.BonesParent.GetComponentsInChildren<SkinnedMeshRenderer>();
         foreach (SkinnedMeshRenderer skinnedMeshRenderer in armorPieces)
         {
             Destroy(skinnedMeshRenderer.gameObject);

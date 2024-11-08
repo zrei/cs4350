@@ -247,7 +247,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         currNode.UnlockPath(PostUnlockPath);
 
         // start moving unit
-        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currNode.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currNode.Spline, Quaternion.LookRotation(currNode.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
+        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currNode.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currNode.Spline, currNode.PositioningOffset, Quaternion.LookRotation(currNode.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
 
         // have the next node pop up
         void PostUnlockPath()
