@@ -2,20 +2,11 @@ using UnityEngine;
 
 public class Cutscene : MonoBehaviour
 {
-    [SerializeField] private GameObject m_CutsceneObj;
-    [SerializeField] private Transform m_CutsceneTransform;
-    public Dialogue m_Dialogue;
-
-    private GameObject m_CutsceneInstance = null;
-
-    public void InstantiateCutscene()
+    /// <summary>
+    /// For use in spawning this cutscene when a certain dialogue plays
+    /// </summary>
+    public void SpawnCutscene()
     {
-        m_CutsceneInstance = Instantiate(m_CutsceneObj, m_CutsceneTransform.position, m_CutsceneTransform.rotation, m_CutsceneTransform);
-    }
-
-    public void EndCutscene()
-    {
-        Destroy(m_CutsceneInstance);
-        m_CutsceneInstance = null;
+        GlobalEvents.CutsceneEvents.StartCutsceneEvent?.Invoke(this);
     }
 }
