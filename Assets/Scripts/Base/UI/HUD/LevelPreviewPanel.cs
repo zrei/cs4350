@@ -34,7 +34,7 @@ namespace Game.UI
         {
             GlobalEvents.WorldMap.OnGoToLevel += OnGoToLevel;
             GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-            ToggleShown(true);
+            ToggleShown(false);
         }
 
         private void OnDestroy()
