@@ -42,6 +42,14 @@ public class ObjectiveMarker : MonoBehaviour
         emission = m_LordIconParticles.emission;
         emission.enabled = false;
         SetMarkerType(Type.Default);
+
+        GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+    }
+
+    private void OnBattleEnd(UnitAllegiance _, int numTurns)
+    {
+        GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        SetActive(false);
     }
 
     public void SetColor(Color color)
