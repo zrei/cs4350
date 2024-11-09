@@ -27,7 +27,7 @@ namespace Game.UI
         {
             displayPool = new(
                 createFunc: () => { var display = Instantiate(objectiveDisplayPrefab, layout.transform); display.gameObject.SetActive(false); return display; },
-                actionOnGet: display => { display.gameObject.SetActive(true); display.transform.SetAsFirstSibling(); activeDisplays.Add(display); },
+                actionOnGet: display => { display.gameObject.SetActive(true); display.transform.SetAsLastSibling(); activeDisplays.Add(display); },
                 actionOnRelease: display => { display.gameObject.SetActive(false); activeDisplays.Remove(display); },
                 actionOnDestroy: display => Destroy(display.gameObject),
                 collectionCheck: true,
