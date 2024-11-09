@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -178,11 +179,12 @@ public class FlagManager : Singleton<FlagManager>
     #region Helper
     private void ClearPersistentFlags()
     {
-        foreach (KeyValuePair<string, FlagWrapper> pair in m_Flags)
+        List<string> flags = m_Flags.Keys.ToList();
+        foreach (string flag in flags)
         {
-            if (pair.Value.m_FlagType == FlagType.PERSISTENT)
+            if (m_Flags[flag].m_FlagType == FlagType.PERSISTENT)
             {
-                m_Flags[pair.Key] = new FlagWrapper(FlagType.PERSISTENT, false);
+                m_Flags[flag] = new FlagWrapper(FlagType.PERSISTENT, false);
             }
         }
     }
