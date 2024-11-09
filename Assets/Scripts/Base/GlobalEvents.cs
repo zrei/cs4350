@@ -70,7 +70,6 @@ public static class GlobalEvents {
         public static LevelResultEvent LevelResultsEvent;
         public static VoidEvent ReturnFromLevelEvent;
         public static NodeEvent NodeHoverStartEvent;
-        public static BattleNodeEvent BattleNodeHoverStartEvent;
         public static VoidEvent NodeHoverEndEvent;
     }
 

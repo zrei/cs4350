@@ -10,6 +10,14 @@ public struct NodeInfo
     public string m_NodeDescription;
 }
 
+public class NodePreviewData
+{
+    public string NodeName;
+    public string NodeDescription;
+    public bool IsMoralityLocked;
+    public Threshold MoralityThreshold;
+}
+
 /// <summary>
 /// Base class that maintains the internal representation of a node in the graph
 /// (node information and connected nodes),
@@ -30,6 +38,17 @@ public abstract class NodeInternal : MonoBehaviour
     
     // Adjacent nodes and their costs
     private Dictionary<NodeInternal, float> m_AdjacentNodes = new();
+
+    public virtual NodePreviewData GetNodePreviewData()
+    {
+        return new NodePreviewData
+        {
+            NodeName = m_NodeInfo.m_NodeName,
+            NodeDescription = m_NodeInfo.m_NodeDescription,
+            IsMoralityLocked = m_IsMoralityLocked,
+            MoralityThreshold = m_MoralityThreshold
+        };
+    }
     
     #endregion
 
