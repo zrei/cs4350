@@ -12,6 +12,7 @@ public class TurnQueue
     #endregion
 
     #region Turn
+    public float TotalTime => m_AccumulatedTime;
     private float m_AccumulatedTime = 0;
     
     private class TurnWrapper
@@ -112,6 +113,7 @@ public class TurnQueue
             turnWrapper.TickTime(tick);
         }
         m_AccumulatedTime += tick;
+        GlobalEvents.Battle.BattleTimeTickEvent?.Invoke(m_AccumulatedTime);
     }
 
     #region Helper
@@ -140,7 +142,17 @@ public class TurnQueue
     
     public int GetCyclesElapsed()
     {
-        return Mathf.FloorToInt(m_AccumulatedTime / TIME_PER_CYCLE);
+        return Mathf.FloorToInt(TimeToCycles(m_AccumulatedTime));
+    }
+
+    public static float CyclesToTime(float cycles)
+    {
+        return TIME_PER_CYCLE * cycles;
+    }
+
+    public static float TimeToCycles(float time)
+    {
+        return time / TIME_PER_CYCLE;
     }
     #endregion
 }
