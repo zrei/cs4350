@@ -48,6 +48,12 @@ namespace Game.UI
             isHidden = true;
         }
 
+        private void OnDestroy()
+        {
+            GlobalEvents.Battle.BattleInitializedEvent -= Initialize;
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        }
+
         private void Initialize()
         {
             Clear();

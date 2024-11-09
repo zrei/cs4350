@@ -46,6 +46,11 @@ public class ObjectiveMarker : MonoBehaviour
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
     }
 
+    private void OnDestroy()
+    {
+        GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+    }
+
     private void OnBattleEnd(UnitAllegiance _, int numTurns)
     {
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
