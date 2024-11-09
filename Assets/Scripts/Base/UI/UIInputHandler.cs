@@ -5,9 +5,13 @@ namespace Game.UI
 {
     public class UIInputHandler : MonoBehaviour
     {
+        private bool m_PauseAllowed = true;
+
         private void Start()
         {
             InputManager.Instance.CancelInput.OnPressEvent += OnCancel;
+            GlobalEvents.Dialogue.DialogueStartEvent += OnDialogueStart;
+            GlobalEvents.Dialogue.DialogueEndEvent += OnDialogueEnd;
         }
 
         private void OnCancel(IInput input)
@@ -22,6 +26,9 @@ namespace Game.UI
                 return;
             }
             
+            if (!m_PauseAllowed)
+                return;
+
             var pauseScreen = UIScreenManager.Instance.PauseScreen;
             UIScreenManager.Instance.OpenScreen(pauseScreen);
         }
@@ -32,6 +39,19 @@ namespace Game.UI
             {
                 InputManager.Instance.CancelInput.OnPressEvent -= OnCancel;
             }
+
+            GlobalEvents.Dialogue.DialogueStartEvent -= OnDialogueStart;
+            GlobalEvents.Dialogue.DialogueEndEvent -= OnDialogueEnd;
+        }
+
+        private void OnDialogueStart()
+        {
+            m_PauseAllowed = false;
+        }
+
+        private void OnDialogueEnd()
+        {
+            m_PauseAllowed = true;
         }
     }
 }
