@@ -44,8 +44,10 @@ namespace Game.UI
 
         public void SetDisplay(PlayerCharacterData playerCharacterData)
         {
+            m_CurrSelectedClassIndex = -1;
             m_CurrCharacterData = playerCharacterData;
             PathGroupSO pathGroupSO = playerCharacterData.m_BaseData.m_PathGroup;
+            m_CurrEquippedClassIndex = playerCharacterData.m_CurrClassIndex;
             m_PathGroupTitle?.SetValue(pathGroupSO.m_PathName, playerCharacterData.CurrClass.m_ClassName);
             ResetDisplay();
 
@@ -68,6 +70,7 @@ namespace Game.UI
         {
             if (m_CurrSelectedClassIndex == classIndex)
                 return;
+
             m_CurrSelectedClassIndex = classIndex;
 
             PlayerClassSO playerClassSO = pathClass.m_Class;
