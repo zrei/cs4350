@@ -48,6 +48,11 @@ namespace Game.UI
             selectable.onDeselect.AddListener(() => trackedObjective?.Show(false));
         }
 
+        private void OnDestroy()
+        {
+            TrackedObjective = null;
+        }
+
         private void OnObjectiveUpdate(IObjective objective)
         {
             if (objective == null) return;
