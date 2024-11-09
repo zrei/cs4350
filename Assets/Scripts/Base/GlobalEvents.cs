@@ -114,6 +114,7 @@ public static class GlobalEvents {
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
         public static LevelSOEvent OnPartySelectEvent;
+        public static VoidEvent OnEndPreCutsceneEvent;
     }
 
     public static class MainMenu

@@ -46,6 +46,7 @@ public class FlagManager : Singleton<FlagManager>
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.WorldMap.OnEndPreCutsceneEvent += OnEndPreCutscene;
     }
 
     protected override void HandleDestroy()
@@ -54,6 +55,7 @@ public class FlagManager : Singleton<FlagManager>
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.WorldMap.OnEndPreCutsceneEvent -= OnEndPreCutscene;
     }
 
     private void HandleDependencies()
@@ -74,6 +76,11 @@ public class FlagManager : Singleton<FlagManager>
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
         HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
+    }
+
+    private void OnEndPreCutscene()
+    {
+        HandleLevelResult(true);
     }
 
     private void OnEarlyQuit()

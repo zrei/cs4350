@@ -110,7 +110,7 @@ public class SaveManager : Singleton<SaveManager>
     /// <summary>
     /// Initial guaranteed save delay to ensure the save indicator shows up
     /// </summary>
-    private const float SAVE_DELAY = 3.0f;
+    private const float SAVE_DELAY = 1.5f;
 
     private SessionSave m_SessionSave;
 
