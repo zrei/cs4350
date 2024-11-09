@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,6 +33,12 @@ public class BattleNode : NodeInternal
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         GlobalEvents.Battle.ReturnFromBattleEvent += OnReturnFromBattle;
         GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        GlobalEvents.Battle.ReturnFromBattleEvent -= OnReturnFromBattle;
     }
 
     private void OnBattleEnd(UnitAllegiance victor, int numTurns)
