@@ -22,6 +22,8 @@ public static class GlobalEvents {
         public delegate void PhaseEvent(PlayerTurnState _);
         public delegate void BattleOutcomeEvent(UnitAllegiance _, int numTurns);
         public delegate void AttackEvent(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target);
+        public static VoidEvent BattleInitializedEvent;
+        public static FloatEvent BattleTimeTickEvent;
         public static UnitEvent UnitDefeatedEvent;
         public static TurnOrderEvent TurnOrderUpdatedEvent;
         public static PhaseEvent PlayerPhaseUpdateEvent;

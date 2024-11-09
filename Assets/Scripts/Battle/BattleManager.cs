@@ -3,18 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Game.Input;
 using Game;
-
-public enum WinCondition
-{
-    DEFEAT_REQUIRED,
-    SURVIVE_TURNS
-}
-
-// additional lose conditions
-public enum SecondaryLoseCondition
-{
-    TOO_MANY_TURNS
-}
+using System.Linq;
 
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
@@ -48,9 +37,9 @@ public class BattleManager : Singleton<BattleManager>
     #endregion
 
     #region Turn Queue
+    public float TotalBattleTime => m_TurnQueue.TotalTime;
+
     private TurnQueue m_TurnQueue = new TurnQueue();
-    // TODO: This isn't actually required but given the data is still in flux right now
-    // I'm leaving this here
     private HashSet<Unit> m_AllPlayerUnits = new HashSet<Unit>();
     private HashSet<Unit> m_AllEnemyUnits = new HashSet<Unit>();
 
@@ -66,23 +55,11 @@ public class BattleManager : Singleton<BattleManager>
     private bool m_HasBattleConcluded = false;
     #endregion
 
-    #region Win Condition
-    public WinCondition WinCondition => m_WinCondition;
-    public float TurnsToSurvive => m_TurnsToSurvive;
-    public IEnumerator<Unit> TrackedEnemyUnits => m_TrackedEnemyUnits.GetEnumerator();
-
-    private WinCondition m_WinCondition;
-    private float m_TurnsToSurvive;
-    private HashSet<Unit> m_TrackedEnemyUnits = new HashSet<Unit>();
-    #endregion
-
-    #region Lose Condition
-    public SecondaryLoseCondition[] SecondaryLoseConditions => m_SecondaryLoseCondition;
-    public float MaxTurns => m_MaxTurns;
-    public IEnumerator<Unit> TrackedPlayerUnits => m_TrackedPlayerUnits.GetEnumerator();
-
-    private SecondaryLoseCondition[] m_SecondaryLoseCondition;
-    private float m_MaxTurns;
+    #region Objectives
+    public IEnumerable<IObjective> Objectives => m_Objectives;
+    private HashSet<IObjective> m_Objectives = new();
+    
+    // still use this for tracking whether Lord character is Alive
     private HashSet<Unit> m_TrackedPlayerUnits = new HashSet<Unit>();
     #endregion
 
@@ -146,13 +123,8 @@ public class BattleManager : Singleton<BattleManager>
         m_TurnQueue.Clear();
         m_AllPlayerUnits.Clear();
         m_AllEnemyUnits.Clear();
-        m_TrackedEnemyUnits.Clear();
+        
         m_TrackedPlayerUnits.Clear();
-
-        m_WinCondition = battleSO.m_WinCondition;
-        m_SecondaryLoseCondition = battleSO.m_AdditionalLoseConditions;
-        m_TurnsToSurvive = battleSO.m_TurnsToSurvive;
-        m_MaxTurns = battleSO.m_MaxTurns;
 
         m_CurrMoralityPercentage = MoralityManager.Instance.CurrMoralityPercentage;
         m_PermanentFatigueTokens = fatigueTokens;
@@ -184,8 +156,21 @@ public class BattleManager : Singleton<BattleManager>
 
         m_TurnQueue.OrderTurnQueue();
         m_PlayerUnitSetup.BeginSetup(battleSO.m_PlayerStartingTiles);
-        
+
+        foreach (var objective in m_Objectives)
+        {
+            objective.Dispose();
+        }
+        m_Objectives.Clear();
+        foreach (var objectiveSO in battleSO.m_Objectives)
+        {
+            var objective = objectiveSO.CreateInstance();
+            objective.Initialize(this);
+            m_Objectives.Add(objective);
+        }
+
         isBattleInitialised = true;
+        GlobalEvents.Battle.BattleInitializedEvent?.Invoke();
     }
 
     private void InstantiateBiome(GameObject biomeObj)
@@ -210,8 +195,7 @@ public class BattleManager : Singleton<BattleManager>
         m_MapLogic.PlaceUnit(GridType.ENEMY, enemyUnit, unitPlacement.m_Coordinates);
         m_TurnQueue.AddUnit(enemyUnit);
         m_AllEnemyUnits.Add(enemyUnit);
-        if (unitPlacement.m_DefeatRequired)
-            m_TrackedEnemyUnits.Add(enemyUnit);
+        enemyUnit.m_EnemyTags = unitPlacement.m_EnemyTags;
     }
 
     /// <summary>
@@ -282,12 +266,7 @@ public class BattleManager : Singleton<BattleManager>
     /// <returns></returns>
     private bool CheckForVictory()
     {
-        return m_WinCondition switch
-        {
-            WinCondition.DEFEAT_REQUIRED => m_TrackedEnemyUnits.Count == 0,
-            WinCondition.SURVIVE_TURNS => m_TurnQueue.GetCyclesElapsed() >= m_TurnsToSurvive,
-            _ => false
-        };
+        return m_Objectives.Any(x => x.CompletionStatus == ObjectiveState.Completed && x.ObjectiveTags.HasFlag(ObjectiveTag.WinOnComplete));
     }
 
     /// <summary>
@@ -305,19 +284,7 @@ public class BattleManager : Singleton<BattleManager>
         if (m_AllPlayerUnits.Count == 0)
             return true;
 
-        if (m_SecondaryLoseCondition == null) return false;
-
-        foreach (SecondaryLoseCondition loseCondition in m_SecondaryLoseCondition)
-        {
-            switch (loseCondition)
-            {
-                case SecondaryLoseCondition.TOO_MANY_TURNS:
-                    if (m_TurnQueue.GetCyclesElapsed() >= m_MaxTurns)
-                        return true;
-                    break;
-            }
-        }
-        return false;
+        return m_Objectives.Any(x => x.CompletionStatus == ObjectiveState.Failed && x.ObjectiveTags.HasFlag(ObjectiveTag.LoseOnFail));
     }
 
     private void OnEarlyQuit()
@@ -374,8 +341,6 @@ public class BattleManager : Singleton<BattleManager>
         else
         {
             m_AllEnemyUnits.Remove(unit);
-            if (m_TrackedEnemyUnits.Contains(unit))
-                m_TrackedEnemyUnits.Remove(unit);
             m_MapLogic.RemoveUnit(GridType.ENEMY, unit);
 
             if (CheckForVictory())
