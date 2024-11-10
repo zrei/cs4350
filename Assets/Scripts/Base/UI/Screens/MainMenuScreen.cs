@@ -27,9 +27,7 @@ public class MainMenuScreen : MonoBehaviour
 
     private void OnDestroy()
     {
-        m_NewGameButton.onSubmit.RemoveListener(B_StartNewGame);
-        m_ContinueButton.onSubmit.RemoveListener(B_Continue);
-        m_QuitButton.onSubmit.RemoveListener(B_QuitGame);
+        RemoveListeners();
     }
 
     private void HandleDependencies()
@@ -48,12 +46,14 @@ public class MainMenuScreen : MonoBehaviour
     #region Btn Callbacks
     private void B_StartNewGame()
     {
+        RemoveListeners();
         SaveManager.Instance.CreateNewSave();
         GoToWorldMap();
     }
 
     private void B_Continue()
     {
+        RemoveListeners();
         GoToWorldMap();
     }
 
@@ -65,6 +65,7 @@ public class MainMenuScreen : MonoBehaviour
 
     private void B_QuitGame()
     {
+        RemoveListeners();
         Application.Quit();
     }
 
@@ -73,6 +74,15 @@ public class MainMenuScreen : MonoBehaviour
         var rect = m_BottomGlow.uvRect;
         rect.x = Time.time * m_TextureAnimSpeed;
         m_BottomGlow.uvRect = rect;
+    }
+    #endregion
+
+    #region Btn Listeners
+    private void RemoveListeners()
+    {
+        m_NewGameButton.onSubmit.RemoveListener(B_StartNewGame);
+        m_ContinueButton.onSubmit.RemoveListener(B_Continue);
+        m_QuitButton.onSubmit.RemoveListener(B_QuitGame);
     }
     #endregion
 }

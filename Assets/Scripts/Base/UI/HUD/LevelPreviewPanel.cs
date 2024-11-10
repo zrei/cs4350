@@ -40,6 +40,7 @@ namespace Game.UI
         private void OnDestroy()
         {
             GlobalEvents.WorldMap.OnGoToLevel -= OnGoToLevel;
+            InputManager.Instance.CancelInput.OnPressEvent -= OnPartySelectCancel;
         }
         #endregion
         

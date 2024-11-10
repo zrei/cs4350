@@ -50,6 +50,16 @@ namespace Game.UI
             m_BeginLevelButton.onSubmit.RemoveListener(OnBeginLevel);
         }
 
+        protected override void HideDone()
+        {
+            base.HideDone();
+
+            foreach (PartySelectionSlotButton partySelectionSlotButton in m_PartySelectionSlotButtons)
+            {
+                partySelectionSlotButton.SetSelected(false);
+            }
+        }
+
         private void OnDestroy()
         {
             GlobalEvents.WorldMap.OnPartySelectEvent -= OnPartySelect;
