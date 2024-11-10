@@ -5,6 +5,7 @@ using UnityEngine;
 public class BattleNodePreviewData : NodePreviewData
 {
     public List<EnemyUnitPlacement> EnemyUnits;
+    public List<ObjectiveSO> Objectives;
 }
     
 public class BattleNode : NodeInternal
@@ -23,7 +24,8 @@ public class BattleNode : NodeInternal
             NodeDescription = NodeInfo.m_NodeDescription,
             IsMoralityLocked = IsMoralityLocked,
             MoralityThreshold = MoralityThreshold,
-            EnemyUnits = m_BattleSO.m_EnemyUnitsToSpawn
+            EnemyUnits = m_BattleSO.m_EnemyUnitsToSpawn,
+            Objectives = m_BattleSO.m_Objectives
         };
     }
     

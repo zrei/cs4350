@@ -1,9 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Game;
+using Game.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Pool;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class UI_NodePreview : MonoBehaviour
 {
@@ -12,11 +17,11 @@ public class UI_NodePreview : MonoBehaviour
     
     [SerializeField] TextMeshProUGUI m_NodeNameText;
     [SerializeField] TextMeshProUGUI m_DescriptionText;
-    [SerializeField] GameObject m_EnemiesSection;
-    [SerializeField] TextMeshProUGUI m_EnemiesText;
+    [SerializeField] GameObject m_BattleDataSection;
+    [SerializeField] TextDisplayPooler m_ObjectivesTextDisplay;
+    [SerializeField] TextDisplayPooler m_EnemiesTextDisplay;
     [SerializeField] GameObject m_UnlockConditionSection;
     [SerializeField] TextMeshProUGUI m_UnlockConditionText;
-    
     
     private CanvasGroup m_CanvasGroup;
     private RectTransform m_RectTransform;
@@ -57,8 +62,7 @@ public class UI_NodePreview : MonoBehaviour
         }
         else
         {
-            m_EnemiesSection.SetActive(false);
-            m_EnemiesText.text = "";
+            m_BattleDataSection.SetActive(false);
         }
 
         if (previewData.IsMoralityLocked)
@@ -77,8 +81,8 @@ public class UI_NodePreview : MonoBehaviour
     
     private void SetUpBattleDisplay(BattleNodePreviewData battleData)
     {
-        m_EnemiesSection.SetActive(true);
-
+        m_BattleDataSection.SetActive(true);
+        
         // Get number of enemies by class
         Dictionary<string, int> enemyClassCount = new Dictionary<string, int>();
         foreach (var enemy in battleData.EnemyUnits)
@@ -88,12 +92,24 @@ public class UI_NodePreview : MonoBehaviour
         }
         
         // List enemies by their classes
-        StringBuilder builder = new StringBuilder();
+        m_EnemiesTextDisplay.Clear();
+        
         foreach (var enemyClass in enemyClassCount)
         {
-            builder.Append($"{enemyClass.Key}\tx{enemyClass.Value}\n");
+            var enemiesDisplay = m_EnemiesTextDisplay.Get();
+            enemiesDisplay.PrimaryText.SetValue(enemyClass.Key);
+            enemiesDisplay.SecondaryText.SetValue(enemyClass.Value);
         }
-        m_EnemiesText.text = builder.ToString();
+        
+        // List objectives
+        m_ObjectivesTextDisplay.Clear();
+        
+        foreach (var objective in battleData.Objectives)
+        {
+            var objectiveDisplay = m_ObjectivesTextDisplay.Get();
+            objectiveDisplay.PrimaryText.SetValue(objective.ToString());
+            objectiveDisplay.PrimaryText.SetColor(objective.m_Color);
+        }
     }
     
     private void SetUpUnlockConditionsDisplay(NodePreviewData previewData)
