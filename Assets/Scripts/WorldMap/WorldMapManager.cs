@@ -410,7 +410,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         // update the current node
         m_CurrSelectedLevel = newWorldMapNode.LevelNum;
         newWorldMapNode.ToggleCurrLevel(true);
-        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(newWorldMapNode.LevelSO, newWorldMapNode.LevelState == LevelState.CLEARED));
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(newWorldMapNode.LevelSO, newWorldMapNode.LevelNum < m_CurrUnlockedLevel));
         
         // re-enable controls
         EnableAllControls();
