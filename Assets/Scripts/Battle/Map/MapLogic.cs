@@ -205,6 +205,11 @@ public class MapLogic : MonoBehaviour
         return RetrieveGrid(gridType).GetUnoccupiedTiles();
     }
 
+    public bool IsTileOccupied(GridType gridType, CoordPair coordPair)
+    {
+        return RetrieveGrid(gridType).IsTileOccupied(coordPair);
+    }
+
     public bool HasAnyUnitWithHealthThreshold(GridType gridType, Threshold threshold, bool isFlat)
     {
         return RetrieveGrid(gridType).HasAnyUnitWithHealthThreshold(threshold, isFlat);
