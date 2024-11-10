@@ -38,7 +38,7 @@ public class PlayingAudio
 
     public bool HasFinishedPlaying()
     {
-        return m_AudioState == AudioState.PLAYING && !m_AudioSourceInstance.isPlaying;
+        return Application.isFocused && m_AudioState == AudioState.PLAYING && !m_AudioSourceInstance.isPlaying;
     }
 }
 
