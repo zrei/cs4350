@@ -97,4 +97,9 @@ public class DefeatEnemiesObjectiveSO : ObjectiveSO
             objectiveMarker.SetActive(active);
         }
     }
+    
+    public override string ToString()
+    {
+        return "Defeat all enemies";
+    }
 }

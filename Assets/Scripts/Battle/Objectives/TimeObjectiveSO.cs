@@ -66,4 +66,9 @@ public class TimeObjectiveSO : ObjectiveSO
     protected override void Show(Objective objectiveInstance, bool active)
     {
     }
+    
+    public override string ToString()
+    {
+        return m_IsFailOnTimeLimitReached ? $"Time limit: {m_TurnLimit}" : $"Survive: {m_TurnLimit}";
+    }
 }
