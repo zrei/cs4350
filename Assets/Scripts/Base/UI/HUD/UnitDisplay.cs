@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,6 +50,7 @@ namespace Game.UI
         #endregion
 
         private Animator animator;
+        private CanvasGroup canvasGroup;
         private bool isHidden;
 
         private Unit TrackedUnit
@@ -89,7 +91,7 @@ namespace Game.UI
                         }
                     }
 
-                    statusDisplay.TrackedStatusManager = trackedUnit.StatusManager;
+                    statusDisplay.TrackedUnit = trackedUnit;
                 }
             }
         }
@@ -100,7 +102,10 @@ namespace Game.UI
             animator = GetComponent<Animator>();
             animator.enabled = false;
 
-            GetComponent<CanvasGroup>().alpha = 0;
+            canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             isHidden = true;
 
             GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
@@ -119,6 +124,7 @@ namespace Game.UI
 
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
         }
 
         private void OnBattleEnd(UnitAllegiance _, int _2)
@@ -131,12 +137,18 @@ namespace Game.UI
             HandleQuit();
         }
 
+        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+        {
+            Hide();
+        }
+
         private void HandleQuit()
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
 
             Hide();
         }
@@ -148,6 +160,7 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
         }
 
         private void OnPreviewUnit(Unit currentUnit)
@@ -197,6 +210,8 @@ namespace Game.UI
 
         private void Show()
         {
+            if (!isHidden) return;
+
             isHidden = false;
             animator.enabled = true;
             animator.Play(UIConstants.ShowAnimHash);
@@ -204,9 +219,13 @@ namespace Game.UI
 
         private void Hide()
         {
+            if (isHidden) return;
+
             TrackedUnit = null;
 
             isHidden = true;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);
         }
@@ -214,6 +233,9 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = false;
+            canvasGroup.alpha = isHidden ? 0 : 1;
+            canvasGroup.interactable = !isHidden;
+            canvasGroup.blocksRaycasts = !isHidden;
         }
     }
 }

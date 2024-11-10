@@ -53,7 +53,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3423253924159433175}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -66,8 +66,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 7a7157707f14c7f4d97b5ac0942a554c, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -90,7 +90,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
   m_MinWidth: -1
-  m_MinHeight: 1
+  m_MinHeight: 2
   m_PreferredWidth: -1
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 8202026748727661424}
   - component: {fileID: 3115897143111418332}
   m_Layer: 0
-  m_Name: Inflicted
+  m_Name: Regular
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -150,7 +150,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 12
   m_ChildAlignment: 6
-  m_Spacing: 8
+  m_Spacing: 12
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -213,7 +213,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   individualStatusDisplayPrefab: {fileID: 289850053901320149, guid: 20b5557072741004b8ff8f8bf8e738a1,
     type: 3}
-  layout: {fileID: 3115897143111418332}
+  regularStatusLayout: {fileID: 3115897143111418332}
+  divider: {fileID: 3423253924159433175}
+  permanentStatusLayout: {fileID: 151460796734871873}
 --- !u!114 &4734163412682688738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,7 +232,7 @@ MonoBehaviour:
     m_Left: 0
     m_Right: 0
     m_Top: 0
-    m_Bottom: 0
+    m_Bottom: 15
   m_ChildAlignment: 7
   m_Spacing: 12
   m_ChildForceExpandWidth: 1
@@ -265,7 +267,7 @@ GameObject:
   - component: {fileID: 3975937207895143999}
   - component: {fileID: 151460796734871873}
   m_Layer: 0
-  m_Name: Character
+  m_Name: Permanent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -308,7 +310,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 8
+  m_Spacing: 12
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1

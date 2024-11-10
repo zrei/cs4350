@@ -51,12 +51,14 @@ public class LevelRationsManager : MonoBehaviour
 
     public List<InflictedToken> GetInflictedTokens()
     {
+        // assume sorted in ascending tier, pick highest tier
+        List<InflictedToken> tokens = new();
         foreach (RationsThreshold rationsThreshold in m_LessThanRationsThresholds)
         {
             if (rationsThreshold.IsThresholdMet(m_CurrRations, true))
-                return rationsThreshold.m_Tokens;
+                tokens = rationsThreshold.m_Tokens;
         }
-        return new List<InflictedToken>();
+        return tokens;
     }
 
     #endregion

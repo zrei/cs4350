@@ -84,6 +84,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     private WeaponInstanceSO m_EquippedWeapon;
     private readonly List<TokenStack> m_PermanentTokens = new();
+    public IEnumerable<TokenStack> PermanentTokens => m_PermanentTokens;
 
     public List<WeaponModel> WeaponModels => m_ArmorVisual.WeaponModels;
 

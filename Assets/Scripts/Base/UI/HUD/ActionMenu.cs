@@ -486,6 +486,7 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = false;
+            canvasGroup.alpha = isHidden ? 0: 1;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
 

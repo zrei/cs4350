@@ -54,9 +54,7 @@ public interface IStatus
 
 namespace Game.UI
 {
-    public class IndividualStatusDisplay : MonoBehaviour,
-        IPointerEnterHandler,
-        IPointerExitHandler
+    public class IndividualStatusDisplay : MonoBehaviour
     {
         private const int MaxDisplays = 20;
 
@@ -70,6 +68,9 @@ namespace Game.UI
 
         [SerializeField]
         private Image icon;
+
+        [SerializeField]
+        private Image outline;
 
         [SerializeField]
         private TextMeshProUGUI tier;
@@ -147,6 +148,23 @@ namespace Game.UI
         }
         private List<int> numStacksPerTier;
 
+        private SelectableBase selectable;
+        private TooltipDisplay TooltipDisplay
+        {
+            set
+            {
+                if (tooltipDisplay == value) return;
+
+                if (tooltipDisplay != null)
+                {
+                    tooltipDisplay.Hide();
+                }
+                
+                tooltipDisplay = value;
+            }
+        }
+        private TooltipDisplay tooltipDisplay;
+
         private void Awake()
         {
             displayPool = new(
@@ -158,6 +176,10 @@ namespace Game.UI
                 defaultCapacity: 0,
                 maxSize: MaxDisplays
             );
+            
+            selectable = GetComponent<SelectableBase>();
+            selectable.onSelect.AddListener(() => ShowTooltip());
+            selectable.onDeselect.AddListener(() => TooltipDisplay = null);
         }
 
         public void OnChange()
@@ -167,12 +189,22 @@ namespace Game.UI
             NumStacksPerTier = numStacksPerTier;
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public void SetIsPermanentToken(bool isPermanentToken)
         {
+            outline.gameObject.SetActive(isPermanentToken);
+            stacks.gameObject.SetActive(!isPermanentToken);
+            tokenStackLayout.gameObject.SetActive(!isPermanentToken);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        public void ShowTooltip()
         {
+            if (!TooltipDisplayManager.IsReady) return;
+
+            TooltipDisplay = TooltipDisplayManager.Instance.ShowTooltip(
+                transform.position,
+                trackedStatus.Name,
+                trackedStatus.Description,
+                trackedStatus.Color);
         }
     }
 }
