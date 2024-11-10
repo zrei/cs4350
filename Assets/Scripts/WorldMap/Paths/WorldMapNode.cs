@@ -16,9 +16,6 @@ public class WorldMapNode : MonoBehaviour
     [SerializeField] WorldMapEdge m_WorldMapEdge;
     [SerializeField] WorldMapVisual m_WorldMapVisual;
 
-    // set during initialisation
-    private LevelState m_LevelState;
-    public LevelState LevelState => m_LevelState;
     private bool m_IsCurrent = false;
     public bool IsCurrent => m_IsCurrent;
 
@@ -38,7 +35,6 @@ public class WorldMapNode : MonoBehaviour
     #region Initialise
     public void Initialise(LevelState initialState, bool isCurrentLevel)
     {
-        m_LevelState = initialState;
         if (initialState != LevelState.LOCKED)
             m_WorldMapVisual.Initialise();
         if (initialState == LevelState.CLEARED && !isCurrentLevel)
