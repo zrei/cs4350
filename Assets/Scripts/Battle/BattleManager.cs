@@ -151,7 +151,7 @@ public class BattleManager : Singleton<BattleManager>
 
         for (int i = 0; i < playerUnitData.Count; ++i)
         {
-            InstantiatePlayerUnit(playerUnitData[i], battleSO.m_PlayerStartingTiles[i]);
+            InstantiatePlayerUnit(playerUnitData[i], GetAvailableStartingPosition(playerUnitData[i], battleSO.m_PlayerStartingTiles));
         }
 
         m_TurnQueue.OrderTurnQueue();
@@ -171,6 +171,32 @@ public class BattleManager : Singleton<BattleManager>
 
         isBattleInitialised = true;
         GlobalEvents.Battle.BattleInitializedEvent?.Invoke();
+    }
+
+    private CoordPair GetAvailableStartingPosition(PlayerCharacterBattleData playerBattleData, List<CoordPair> startingTiles)
+    {
+        PlayerClassPlacement playerClassPlacement = playerBattleData.m_ClassSO.m_PlayerClassPlacement;
+        for (int r = 0; r < 3; ++r)
+        {
+            int currRow = (int) playerClassPlacement + r;
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                CoordPair coordPair = new CoordPair(currRow, c);
+                if (startingTiles.Contains(coordPair) && !m_MapLogic.IsTileOccupied(GridType.PLAYER, coordPair))
+                    return coordPair;
+            }
+        }
+        return GetFirstUnoccupiedStartingPosition(startingTiles);
+    }
+
+    private CoordPair GetFirstUnoccupiedStartingPosition(List<CoordPair> startingTiles)
+    {
+        foreach (CoordPair coordPair in startingTiles)
+        {
+            if (!m_MapLogic.IsTileOccupied(GridType.PLAYER, coordPair))
+                return coordPair;
+        }
+        return default;
     }
 
     private void InstantiateBiome(GameObject biomeObj)

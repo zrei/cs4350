@@ -67,15 +67,15 @@ namespace Game.UI
                     case StatType.HEALTH:
                     case StatType.MANA:
                     case StatType.SPEED:
-                        m_ResultText.text += $"{stat}: \t\t\t";
+                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t\t";
                         break;
                     case StatType.PHYS_ATTACK:
                     case StatType.MAG_ATTACK:
-                        m_ResultText.text += $"{stat}: \t\t";
+                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t";
                         break;
                     case StatType.PHYS_DEFENCE:
                     case StatType.MAG_DEFENCE:
-                        m_ResultText.text += $"{stat}: \t";
+                        m_ResultText.text += $"{FormatStatName(stat)}: \t";
                         break;
                 }
                 
@@ -83,6 +83,11 @@ namespace Game.UI
                     ? $"{finalStat}\n"
                     : $"{finalStat} (+{statGrowth})\n";
             }
+        }
+
+        private string FormatStatName(StatType stat)
+        {
+            return stat.ToString().Replace("_", " ");
         }
     
         private void CloseResults()

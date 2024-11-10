@@ -21,5 +21,10 @@ namespace Game.UI
         {
             Text.text = string.Format(textFormat, args);
         }
+        
+        public void SetColor(Color color)
+        {
+            Text.color = color;
+        }
     }
 }

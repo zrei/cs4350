@@ -171,4 +171,25 @@ public class UnitAliveObjectiveSO : ObjectiveSO
             objectiveMarker.SetActive(active);
         }
     }
+
+    public override string ToString()
+    {
+        var actionText = string.Empty;
+        switch (m_Mode)
+        {
+            case Mode.FailIfAnyDie:
+            case Mode.FailIfAllDie:
+                actionText = "Protect";
+                break;
+            case Mode.CompleteIfAnyDie:
+            case Mode.CompleteIfAllDie:
+                actionText = "Defeat";
+                break;
+        }
+        
+        var trackedUnitNames = m_PlayerCharacterSOs.ConvertAll(x => x.m_CharacterName);
+        trackedUnitNames.AddRange(m_EnemyCharacterSOs.ConvertAll(x => x.m_CharacterName));
+        
+        return $"{actionText}: {string.Join(", ", trackedUnitNames)}";
+    }
 }
