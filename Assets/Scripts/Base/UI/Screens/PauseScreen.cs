@@ -26,8 +26,7 @@ namespace Game.UI
         {
             base.Hide();
 
-            m_MainMenuBtn.onSubmit.RemoveListener(B_MainMenu);
-            m_QuitLevelBtn.onSubmit.RemoveListener(B_QuitLevel);
+            RemoveListeners();
         }
 
         public override void ScreenUpdate()
@@ -37,15 +36,23 @@ namespace Game.UI
 
         private void B_MainMenu()
         {
+            RemoveListeners();
             GlobalEvents.MainMenu.OnReturnToMainMenu?.Invoke();
             GameSceneManager.Instance.LoadMainMenuScene();
         }
 
         private void B_QuitLevel()
         {
+            RemoveListeners();
             GlobalEvents.Scene.EarlyQuitEvent?.Invoke();
             UIScreenManager.Instance.CloseScreen();
             GameSceneManager.Instance.ReturnToWorldMap();
+        }
+
+        private void RemoveListeners()
+        {
+            m_MainMenuBtn.onSubmit.RemoveListener(B_MainMenu);
+            m_QuitLevelBtn.onSubmit.RemoveListener(B_QuitLevel);
         }
     }
 }
