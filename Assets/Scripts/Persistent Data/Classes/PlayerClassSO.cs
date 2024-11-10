@@ -1,16 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerClassPlacement
+{
+    FRONT = 0,
+    MIDDLE = 1,
+    BACK = 2
+}
+
 /// <summary>
 /// Packages the information on a class
 /// </summary>
 [CreateAssetMenu(fileName = "PlayerClassSO", menuName = "ScriptableObject/Classes/PlayerClassSO")]
 public class PlayerClassSO : ClassSO
 {
-    /*
-    [Header("Player-Only Details")]
-    public int m_Id;
-    */
+    [Header("Placement")]
+    public PlayerClassPlacement m_PlayerClassPlacement = PlayerClassPlacement.MIDDLE;
 
     [Header("Unlock Details")]
     [Tooltip("Level at which this class is unlocked")]
