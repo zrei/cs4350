@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
@@ -48,6 +50,7 @@ namespace Game.UI
         [SerializeField]
         private LayoutGroup regularStatusLayout;
         private Dictionary<IStatus, IndividualStatusDisplay> activeDisplays = new();
+        private HashSet<IndividualStatusDisplay> untrackedActiveDisplays = new();
         private ObjectPool<IndividualStatusDisplay> displayPool;
 
         private IStatusManager TrackedStatusManager
@@ -178,6 +181,13 @@ namespace Game.UI
                 displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
             }
 
+            if (untrackedActiveDisplays.Count > 0)
+            {
+                var displays = untrackedActiveDisplays.ToList();
+                untrackedActiveDisplays.Clear();
+                displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
+            }
+
             permanentStatusCount = 0;
             regularStatusCount = 0;
         }
@@ -191,12 +201,16 @@ namespace Game.UI
 
             foreach (var regularStatus in regularStatuses)
             {
-                Get(false).TrackedStatus = regularStatus;
+                var display = Get(false);
+                display.TrackedStatus = regularStatus;
+                untrackedActiveDisplays.Add(display);
             }
 
             foreach (var permanentStatus in permanentStatuses)
             {
-                Get(true).TrackedStatus = permanentStatus;
+                var display = Get(true);
+                display.TrackedStatus = permanentStatus;
+                untrackedActiveDisplays.Add(display);
             }
 
             UpdateActiveLayoutGroups();

@@ -38,12 +38,12 @@ namespace Game.UI
                 hasStatus = true;
             }
 
-            var classTokens = playerCharacterData.CurrClass.GetInflictedTokens(playerCharacterData.m_CurrLevel);
-            foreach (var token in classTokens)
-            {
-                permanentStatuses.Add(token);
-                hasStatus = true;
-            }
+            //var classTokens = playerCharacterData.CurrClass.GetInflictedTokens(playerCharacterData.m_CurrLevel);
+            //foreach (var token in classTokens)
+            //{
+            //    permanentStatuses.Add(token);
+            //    hasStatus = true;
+            //}
 
             if (LevelRationsManager.IsReady)
             {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.UI
 {
@@ -21,7 +22,15 @@ namespace Game.UI
 
         [SerializeField] 
         private FormattedTextDisplay skillDescriptionText;
-        
+
+        [SerializeField]
+        private Image m_AoESprite;
+
+        [SerializeField]
+        private Image m_SelfPositioningSprite;
+
+        [SerializeField]
+        private Image m_TargetPositioningSprite;
         #endregion
 
         private List<ActiveSkillSO> activeSkills;
@@ -84,6 +93,10 @@ namespace Game.UI
             {
                 passiveSkillButtons[i].gameObject.SetActive(i < passiveSkills.Count);
             }
+
+            m_AoESprite.gameObject.SetActive(false);
+            m_SelfPositioningSprite.gameObject.SetActive(false);
+            m_TargetPositioningSprite.gameObject.SetActive(false);
         }
 
         private void OnSelectSkill(int index)
@@ -102,6 +115,21 @@ namespace Game.UI
             
             skillHeaderText.SetValue(skill.m_SkillName);
             skillDescriptionText.SetValue(skill.GetDescription(m_PlayerUnit, null));
+
+            m_AoESprite.sprite = skill.m_TargetSO.m_TargetRepSprite;
+            m_SelfPositioningSprite.sprite = skill.GetCasterPositioningSprite;
+            var targetPosDisplayInfo = skill.GetTargetPositioningSprite;
+            m_TargetPositioningSprite.sprite = targetPosDisplayInfo.sprite;
+            m_TargetPositioningSprite.gameObject.transform.localEulerAngles = targetPosDisplayInfo.isAlly
+                ? new(0, 0, 180)
+                : Vector3.zero;
+            m_TargetPositioningSprite.color = targetPosDisplayInfo.isAlly
+                ? ColorUtils.AllyColor
+                : ColorUtils.EnemyColor;
+
+            m_AoESprite.gameObject.SetActive(m_AoESprite.sprite != null);
+            m_SelfPositioningSprite.gameObject.SetActive(m_SelfPositioningSprite.sprite != null);
+            m_TargetPositioningSprite.gameObject.SetActive(m_TargetPositioningSprite.sprite != null);
         }
 
         public void Hide()

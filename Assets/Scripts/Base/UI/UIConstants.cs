@@ -24,5 +24,8 @@ namespace Game.UI
     {
         public static readonly Color VictoryColor = new Color(0.9f, 0.9f, 0.2f);
         public static readonly Color DefeatColor = new Color(0.9f, 0.2f, 0.2f);
+
+        public static readonly Color AllyColor = new Color32(0, 201, 255, 255);
+        public static readonly Color EnemyColor = new Color32(255, 0, 0, 255);
     }
 }
