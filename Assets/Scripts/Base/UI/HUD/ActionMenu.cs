@@ -1,5 +1,6 @@
 using Game.Input;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -213,7 +214,7 @@ namespace Game.UI
             Show();
 
             currentUnit = unit;
-            AvailableSkills = playerUnit.GetAvailableActiveSkills();
+            AvailableSkills = playerUnit.GetActiveSkills().ToList();
 
             if (canvasGroup.interactable)
             {
@@ -486,6 +487,7 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = false;
+            canvasGroup.alpha = isHidden ? 0: 1;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
 

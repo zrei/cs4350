@@ -88,13 +88,20 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 6109161183965275862}
   isWorldSpace: 0
+  deselectOnPointerExit: 0
   onSelect:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeselect:
     m_PersistentCalls:
       m_Calls: []
   onSubmit:
     m_PersistentCalls:
       m_Calls: []
   onPointerEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onPointerExit:
     m_PersistentCalls:
       m_Calls: []
   icon: {fileID: 7157839309508286742}
@@ -199,7 +206,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -10, y: 4}
+  m_SizeDelta: {x: -10, y: 2}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &6946585410070587797
 CanvasRenderer:
@@ -848,7 +855,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

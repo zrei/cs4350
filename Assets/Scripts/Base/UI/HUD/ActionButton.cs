@@ -8,13 +8,17 @@ namespace Game.UI
         public Image icon;
         public Image glow;
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
-            glow.CrossFadeAlpha(0, 0, true);
-            Color color = icon.color;
-            color.a = glow.color.a;
-            glow.color = color;
+            base.Awake();
+            
+            if (Application.isPlaying)
+            {
+                Color color = icon.color;
+                color.a = glow.color.a;
+                glow.color = color;
+                glow.CrossFadeAlpha(0, 0, true);
+            }
         }
 
         public void SetGlowActive(bool active)
