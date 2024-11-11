@@ -1,5 +1,13 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+public class BattleNodePreviewData : NodePreviewData
+{
+    public List<EnemyUnitPlacement> EnemyUnits;
+    public List<ObjectiveSO> Objectives;
+}
+    
 public class BattleNode : NodeInternal
 {
     [SerializeField] private BattleSO m_BattleSO;
@@ -8,12 +16,31 @@ public class BattleNode : NodeInternal
     private UnitAllegiance m_Victor;
     private int m_NumTurns;
     
+    public override NodePreviewData GetNodePreviewData()
+    {
+        return new BattleNodePreviewData
+        {
+            NodeName = NodeInfo.m_NodeName,
+            NodeDescription = NodeInfo.m_NodeDescription,
+            IsMoralityLocked = IsMoralityLocked,
+            MoralityThreshold = MoralityThreshold,
+            EnemyUnits = m_BattleSO.m_EnemyUnitsToSpawn,
+            Objectives = m_BattleSO.m_Objectives
+        };
+    }
+    
     public override void StartNodeEvent()
     {
         Debug.Log("Starting Battle Node");
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         GlobalEvents.Battle.ReturnFromBattleEvent += OnReturnFromBattle;
         GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        GlobalEvents.Battle.ReturnFromBattleEvent -= OnReturnFromBattle;
     }
 
     private void OnBattleEnd(UnitAllegiance victor, int numTurns)

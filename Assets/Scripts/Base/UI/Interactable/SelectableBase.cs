@@ -13,6 +13,7 @@ namespace Game.UI
         private bool isWorldSpace;
 
         public UnityEvent onSelect;
+        public UnityEvent onDeselect;
         public UnityEvent onSubmit;
         public UnityEvent onPointerEnter;
 
@@ -22,6 +23,12 @@ namespace Game.UI
 
             base.OnSelect(eventData);
             onSelect?.Invoke();
+        }
+
+        public override void OnDeselect(BaseEventData eventData)
+        {
+            base.OnDeselect(eventData);
+            onDeselect?.Invoke();
         }
 
         public override void OnPointerEnter(PointerEventData eventData)

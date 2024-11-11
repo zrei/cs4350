@@ -22,6 +22,8 @@ public static class GlobalEvents {
         public delegate void PhaseEvent(PlayerTurnState _);
         public delegate void BattleOutcomeEvent(UnitAllegiance _, int numTurns);
         public delegate void AttackEvent(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target);
+        public static VoidEvent BattleInitializedEvent;
+        public static FloatEvent BattleTimeTickEvent;
         public static UnitEvent UnitDefeatedEvent;
         public static TurnOrderEvent TurnOrderUpdatedEvent;
         public static PhaseEvent PlayerPhaseUpdateEvent;
@@ -70,7 +72,6 @@ public static class GlobalEvents {
         public static LevelResultEvent LevelResultsEvent;
         public static VoidEvent ReturnFromLevelEvent;
         public static NodeEvent NodeHoverStartEvent;
-        public static BattleNodeEvent BattleNodeHoverStartEvent;
         public static VoidEvent NodeHoverEndEvent;
     }
 
@@ -114,6 +115,7 @@ public static class GlobalEvents {
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
         public static LevelSOEvent OnPartySelectEvent;
+        public static VoidEvent OnEndPreCutsceneEvent;
     }
 
     public static class MainMenu
@@ -131,12 +133,15 @@ public static class GlobalEvents {
     public static class CharacterManagement 
     {
         public delegate void PlayerClassSOEvent(PlayerClassSO _);
-        public delegate void TooltipEvent(TooltipContents _);
         public static VoidEvent OnWeaponChangedEvent;
-        public static TooltipEvent OnTooltipEvent;
-        public static VoidEvent OnHideTooltipEvent;
         public static PlayerClassSOEvent OnPreviewReclass;
         public static VoidEvent OnReclass;
         public static VoidEvent OnLordUpdate;
+    }
+
+    public static class CutsceneEvents
+    {
+        public delegate void CutsceneEvent(Cutscene _);
+        public static CutsceneEvent StartCutsceneEvent;
     }
 }

@@ -31,8 +31,10 @@ public delegate void TrackedValueEvent(float change, float current, float max);
 public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange, IMultStatChange, ICritModifier, ITauntTarget
 {
     [SerializeField] private ArmorVisual m_ArmorVisual;
-
     public AnimationEventHandler AnimationEventHandler => m_ArmorVisual.AnimationEventHandler;
+
+    [SerializeField] private ObjectiveMarker m_ObjectiveMarker;
+    public ObjectiveMarker ObjectiveMarker => m_ObjectiveMarker;
 
     #region Current Status
     // current health
@@ -56,6 +58,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     #region Static Data
+    public int CharacterSOInstanceID { get; protected set; }
+
     public WeaponAnimationType WeaponAnimationType { get; private set; }
 
     protected ClassSO m_Class;
@@ -460,6 +464,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         OnDeath?.Invoke();
         m_ArmorVisual.Die(null);
+        m_ObjectiveMarker.SetActive(false);
         GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(this);
     }
     #endregion

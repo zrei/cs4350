@@ -1,14 +1,17 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class EquippingArmor : MonoBehaviour
 {
     [Header("Bones")]
-    public List<Transform> m_UnitBonesArray;
-    [SerializeField] Transform m_RootBone;
-    [SerializeField] Transform m_RightArmBone;
-    [SerializeField] Transform m_LeftArmBone;
+    [SerializeField] private List<Transform> m_UnitBonesArray;
+    [SerializeField] private Transform m_RootBone;
+    [SerializeField] private Transform m_RightArmBone;
+    [SerializeField] private Transform m_LeftArmBone;    
+    [SerializeField] private Transform m_BonesParent;
 
+    public Transform BonesParent => m_BonesParent; 
     public Transform RightArmBone => m_RightArmBone;
     public Transform LeftArmBone => m_LeftArmBone;
     
@@ -49,4 +52,56 @@ public class EquippingArmor : MonoBehaviour
         newMesh.transform.SetParent(m_RootBone.parent);
         newMesh.gameObject.layer = LayerMask.NameToLayer("Objects");
     }
+
+    #if UNITY_EDITOR
+    public void PopulateBones()
+    {
+        if (m_BonesParent == null)
+        {
+            Logger.LogEditor(this.GetType().Name, "No bone parent set!", LogLevel.ERROR);
+        }
+        List<Transform> transformArray = m_UnitBonesArray;
+        transformArray.Clear();
+        LookIntoChildren(transformArray, m_BonesParent, false);
+    }
+
+    private void LookIntoChildren(List<Transform> transformArray, Transform parent, bool include = true)
+    {
+        if (include)
+        {
+            transformArray.Add(parent);
+        }
+
+        foreach (Transform child in parent)
+        {
+            LookIntoChildren(transformArray, child);
+        }
+    }
+    #endif
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(EquippingArmor))]
+public class EquippingArmorEditor : Editor
+{
+    private EquippingArmor m_EquippingArmor;
+
+    private void OnEnable()
+    {
+        m_EquippingArmor = (EquippingArmor) target;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        GUILayout.Space(10f);
+
+        if (GUILayout.Button("Populate bones array"))
+        {
+            m_EquippingArmor.PopulateBones();
+            Logger.LogEditor(this.GetType().Name, "Successfully populated bones for " + target.name, LogLevel.LOG);
+        }
+    }
+}
+#endif

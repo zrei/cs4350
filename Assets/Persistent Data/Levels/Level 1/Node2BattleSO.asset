@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5510be21b76ff4def82015b84d96eece, type: 3}
   m_Name: Node2BattleSO
   m_EditorClassIdentifier: 
+  m_Objectives:
+  - {fileID: 11400000, guid: ebf379d0be579ab4f83708746a24cb7c, type: 2}
+  - {fileID: 11400000, guid: 11bd86be2f6a01a46834e575dab5218b, type: 2}
+  - {fileID: 11400000, guid: 5fc7d83e640de6f449f0b8da27e0adea, type: 2}
   m_EnemyUnitsToSpawn:
   - m_Coordinates:
       m_Row: 1
@@ -27,7 +31,7 @@ MonoBehaviour:
       m_MagicDefence: 0
       m_Speed: 0
       m_MovementRange: 0
-    m_DefeatRequired: 1
+    m_EnemyTags: 1
   - m_Coordinates:
       m_Row: 3
       m_Col: 2
@@ -42,7 +46,7 @@ MonoBehaviour:
       m_MagicDefence: 0
       m_Speed: 0
       m_MovementRange: 0
-    m_DefeatRequired: 1
+    m_EnemyTags: 1
   m_PlayerStartingTiles:
   - m_Row: 1
     m_Col: 0
@@ -76,7 +80,3 @@ MonoBehaviour:
     m_Col: 4
   m_ExpReward: 100
   m_BattleBGM: {fileID: 11400000, guid: de5eca94e3fbc45c9aeb31a34a8c05d2, type: 2}
-  m_WinCondition: 0
-  m_TurnsToSurvive: 25
-  m_AdditionalLoseConditions: 
-  m_MaxTurns: 25

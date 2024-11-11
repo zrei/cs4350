@@ -13,6 +13,7 @@ public class PlayerUnit : Unit
     public void Initialise(PlayerCharacterBattleData characterBattleData, List<InflictedToken> additionalPermanentTokens, float currMoralityPercentage)
     {
         CharacterName = characterBattleData.m_BaseData.m_CharacterName;
+        CharacterSOInstanceID = characterBattleData.m_BaseData.GetInstanceID();
         List<InflictedToken> permanentTokens = new();
         permanentTokens.AddRange(additionalPermanentTokens);
         permanentTokens.AddRange(characterBattleData.GetInflictedTokens(currMoralityPercentage));

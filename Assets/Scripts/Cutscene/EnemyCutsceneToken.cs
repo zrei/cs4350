@@ -1,11 +1,19 @@
 using UnityEngine;
 
-public class EnemyCutsceneToken : BaseCharacterToken
+public class EnemyCutsceneToken : CutsceneToken
 {
     [SerializeField] EnemyCharacterSO m_EnemyCharacterSO;
 
-    private void Start()
+    protected override void Initialise()
     {
+        base.Initialise();
+
+        if (m_EnemyCharacterSO == null)
+        {
+            Logger.Log(this.GetType().Name, this.name, "Enemy character SO not set!", this.gameObject, LogLevel.ERROR);
+            return;
+        }
+
         Initialise(m_EnemyCharacterSO.GetUnitModelData(), m_EnemyCharacterSO.m_EquippedWeapon, m_EnemyCharacterSO.m_EnemyClass);
     }
 }
