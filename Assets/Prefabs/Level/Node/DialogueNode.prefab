@@ -11,17 +11,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: e9a55566900dd4ac69caa650052002d8,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 15
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e9a55566900dd4ac69caa650052002d8,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e9a55566900dd4ac69caa650052002d8,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e9a55566900dd4ac69caa650052002d8,
         type: 3}
@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: e9a55566900dd4ac69caa650052002d8,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.299
+      value: 0.26
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e9a55566900dd4ac69caa650052002d8,
         type: 3}
@@ -243,7 +243,8 @@ MonoBehaviour:
   m_MoralityThreshold:
     m_GreaterThan: 0
     m_Threshold: 0
-  m_Dialogue: {fileID: 0}
+  m_DefaultDialogue: {fileID: 0}
+  m_ConditionalDialogues: []
 --- !u!114 &662664019987882140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,10 +258,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_MeshRenderer: {fileID: 1077917451733676772}
+  m_selectedCursorToken: {fileID: 4107680075368379875}
   m_NodeColorSO: {fileID: 11400000, guid: 2f776168475df475aa0bf14a7b49ae79, type: 2}
   m_starToken: {fileID: 5659876102791545761}
   m_movableCursorToken: {fileID: 2015534312466817915}
-  m_selectedCursorToken: {fileID: 4107680075368379875}
   m_MoralityThresholdDisplay: {fileID: 5780161510327612113}
   m_dialogueToken: {fileID: 4991098055703731398}
 --- !u!1 &4107680075368379875 stripped
