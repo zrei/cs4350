@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 7912907045908124471}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.2, y: 0.1, z: 0}
+  m_LocalPosition: {x: -0.12, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 8158811207286885119}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.2, y: 0.1, z: 0}
+  m_LocalPosition: {x: 0.12, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -129,6 +129,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7631280318830135118, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 7631280318830135118, guid: c9071d1592e7143be9c500ec030495ce,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 500
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -208,10 +218,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_MeshRenderer: {fileID: 7740498688442905005}
+  m_selectedCursorToken: {fileID: 6674097145157236394}
   m_NodeColorSO: {fileID: 11400000, guid: 2f776168475df475aa0bf14a7b49ae79, type: 2}
   m_starToken: {fileID: 3104569941532033256}
   m_movableCursorToken: {fileID: 9108199819590082610}
-  m_selectedCursorToken: {fileID: 6674097145157236394}
   m_MoralityThresholdDisplay: {fileID: 3866636019159134616}
   m_CharacterToken: {fileID: 1802428700362467649, guid: c05adc74789f540718de2b54d4066ca5,
     type: 3}

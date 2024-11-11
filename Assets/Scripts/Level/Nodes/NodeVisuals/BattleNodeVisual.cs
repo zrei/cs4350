@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 /// Class for handling visuals for Battle Nodes
 /// </summary>
 [RequireComponent(typeof(BattleNode))]
-public class BattleNodeVisual : NodeVisual
+public class BattleNodeVisual : LevelNodeVisual
 {
     [Header("Tokens")]
     [SerializeField] EnemyToken m_CharacterToken;
@@ -15,7 +15,9 @@ public class BattleNodeVisual : NodeVisual
     
     private const float ENTRY_ANIM_TIME = 0.3f;
     private const float CLEAR_ANIM_TIME = 0.3f;
-    
+
+    public override float NodeRadiusOffset => 0.3f;
+
     private BattleNode m_BattleNode;
     private EnemyToken m_EnemyUnitToken;
     

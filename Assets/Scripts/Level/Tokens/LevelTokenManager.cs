@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Level;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Splines;
 
 /// <summary>
 /// Manages the tokens of the player and enemy units in the level
@@ -13,13 +15,16 @@ public class LevelTokenManager : MonoBehaviour
     
     // Animation time to move to a node
     private const float MOVE_TO_NODE_TIME = 0.8f;
+    private const float NODE_EXIT_TIME = 0.3f;
+    private const float NODE_ENTRY_TIME = 0.3f;
+    private const float MOVE_SPEED = 3.0f;
     
     private PlayerToken m_PlayerUnitToken;
-    private NodeVisual m_CurrentNodeVisual;
+    private LevelNodeVisual m_CurrentNodeVisual;
 
     #region Initialisation
 
-    public void Initialise(PlayerCharacterBattleData characterBattleData, NodeVisual currNodeVisual)
+    public void Initialise(PlayerCharacterBattleData characterBattleData, LevelNodeVisual currNodeVisual)
     {
         m_PlayerUnitToken = Instantiate(m_PlayerToken);
         m_PlayerUnitToken.Initialise(characterBattleData);
@@ -37,7 +42,7 @@ public class LevelTokenManager : MonoBehaviour
     {
         if (victor == UnitAllegiance.PLAYER)
         {
-            NodeVisual battleNodeVisual = battleNode.GetComponent<NodeVisual>();
+            LevelNodeVisual battleNodeVisual = battleNode.GetComponent<LevelNodeVisual>();
             if (battleNodeVisual && battleNodeVisual.HasClearAnimation())
             {
                 battleNodeVisual.PlayClearAnimation(m_PlayerUnitToken, null);
@@ -55,7 +60,7 @@ public class LevelTokenManager : MonoBehaviour
     /// <param name="origin">Origin node position</param>
     /// <param name="dest">Destination node position</param>
     /// <returns></returns>
-    private Vector3 GetNodeEdgePos(NodeVisual startNode, NodeVisual destNode)
+    private Vector3 GetNodeEdgePos(LevelNodeVisual startNode, LevelNodeVisual destNode)
     {
         Vector3 origin = startNode.transform.position;
         Vector3 dest = destNode.GetPlayerTargetPosition();
@@ -79,7 +84,7 @@ public class LevelTokenManager : MonoBehaviour
     /// </summary>
     /// <param name="destNodeVisual"></param>
     /// <param name="onMoveComplete"></param>
-    public void MovePlayerToNode(NodeVisual destNodeVisual, VoidEvent onMoveComplete)
+    public void MovePlayerToNode(LevelNodeVisual destNodeVisual, VoidEvent onMoveComplete)
     {
         if (destNodeVisual.HasEntryAnimation())
         {
@@ -100,7 +105,43 @@ public class LevelTokenManager : MonoBehaviour
         m_CurrentNodeVisual = destNodeVisual;
     }
     
-    public void PlayClearAnimation(NodeVisual nodeVisual, VoidEvent onComplete)
+    public void MovePlayerToNode(SplineContainer pathSpline, LevelNodeVisual destNodeVisual, VoidEvent onMoveComplete)
+    {
+        var initialDirection = GetInitialSplineForwardDirection(pathSpline);
+        var initialRotation = Quaternion.LookRotation(-initialDirection, m_PlayerToken.transform.up);
+        var pathOffset = Vector3.zero;
+        var finalDirection = GetFinalSplineForwardDirection(pathSpline);
+        var finalRotation = Quaternion.LookRotation(-finalDirection, m_PlayerToken.transform.up);
+        var startOffset = m_CurrentNodeVisual.NodeRadiusOffset;
+        var endOffset = destNodeVisual.NodeRadiusOffset;
+
+        // Exiting the current node
+        var t = startOffset / pathSpline.CalculateLength();
+        var pathStartPos = (Vector3) pathSpline.EvaluatePosition(t);
+        m_PlayerUnitToken.MoveToPosition(pathStartPos, initialRotation, OnMoveToPathStartPos, NODE_EXIT_TIME);
+
+        // Moving along spline
+        void OnMoveToPathStartPos()
+        {
+            m_PlayerUnitToken.MoveAlongSpline( pathSpline, pathOffset, finalRotation, OnMoveToEdgeComplete, startOffset, endOffset, MOVE_SPEED);
+        }
+        
+        // Entering the destination node
+        void OnMoveToEdgeComplete()
+        {
+            if (destNodeVisual.HasEntryAnimation())
+                destNodeVisual.PlayEntryAnimation(m_PlayerUnitToken, onMoveComplete);
+            else
+            {
+                Vector3 destPos = destNodeVisual.GetPlayerTargetPosition();
+                m_PlayerUnitToken.MoveToPosition(destPos, finalRotation, onMoveComplete, NODE_ENTRY_TIME);
+            }
+        }
+        
+        m_CurrentNodeVisual = destNodeVisual;
+    }
+    
+    public void PlayClearAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
     {
         if (nodeVisual.HasClearAnimation())
         {
@@ -112,7 +153,7 @@ public class LevelTokenManager : MonoBehaviour
         }
     }
     
-    public void PlayFailureAnimation(NodeVisual nodeVisual, VoidEvent onComplete)
+    public void PlayFailureAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
     {
         if (nodeVisual.HasFailureAnimation())
         {
@@ -128,6 +169,16 @@ public class LevelTokenManager : MonoBehaviour
     {
         if (m_PlayerUnitToken)
             Destroy(m_PlayerUnitToken.gameObject);
+    }
+
+    private Vector3 GetInitialSplineForwardDirection(SplineContainer splineContainer)
+    {
+        return ((Vector3) (splineContainer.Spline[1].Position - splineContainer.Spline[0].Position)).normalized;
+    }
+
+    private Vector3 GetFinalSplineForwardDirection(SplineContainer splineContainer)
+    {
+        return ((Vector3) (splineContainer.Spline[^1].Position - splineContainer.Spline[^2].Position)).normalized;
     }
 
     #endregion

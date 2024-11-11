@@ -3,12 +3,12 @@ using Level.Nodes.NodeVisuals;
 using UnityEngine;
 
 /// <summary>
-/// Base class that handles the visuals of a node, e.g. highlighting the node
+/// Base class that handles the visuals of a level node, e.g. highlighting the node
 /// </summary>
-public abstract class NodeVisual : BaseNodeVisual
+public abstract class LevelNodeVisual : BaseNodeVisual
 {
     public override Vector3 TokenOffset => new Vector3(0f, 0.1f, 0f);
-    public override float NodeRadiusOffset => 0.3f;
+    public override float NodeRadiusOffset => 0.25f;
 
     // Puck Visuals
     [SerializeField] NodeColorSO m_NodeColorSO;
