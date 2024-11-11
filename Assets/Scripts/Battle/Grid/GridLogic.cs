@@ -421,7 +421,7 @@ public class GridLogic : MonoBehaviour
         return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position;
     }
 
-    public bool IsTileOccupied(CoordPair tile)
+    private bool IsTileOccupied(CoordPair tile)
     {
         return m_TileData[tile.m_Row, tile.m_Col].m_IsOccupied;
     }

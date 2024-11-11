@@ -184,26 +184,6 @@ public class GameSceneManager : Singleton<GameSceneManager>
     #endregion
 
     #region Transition
-    public void PlayTransition(VoidEvent midTransitionAction, VoidEvent postTransitionAction)
-    {
-        StartCoroutine(PlayTransition_Coroutine(midTransitionAction, postTransitionAction));
-    }
-
-    IEnumerator PlayTransition_Coroutine(VoidEvent midTransitionAction, VoidEvent postTransitionAction)
-    {
-        m_Transition.SetTrigger(Start);
-        
-        yield return new WaitForSeconds(m_TransitionTime);
-
-        midTransitionAction?.Invoke();
-
-        m_Transition.SetTrigger(End);
-
-        yield return new WaitForSeconds(m_TransitionTime);
-
-        postTransitionAction?.Invoke();
-    }
-
     IEnumerator UnloadMultipleAdditiveScenesWithTransition(params int[] sceneIndexes)
     {
         int numHandles = sceneIndexes.Count();

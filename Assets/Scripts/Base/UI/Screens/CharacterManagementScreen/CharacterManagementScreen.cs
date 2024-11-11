@@ -22,6 +22,9 @@ namespace Game.UI
         
         [SerializeField]
         private NamedObjectButton m_PartyMemberButtonPrefab;
+
+        [Header("Tooltip")]
+        [SerializeField] private SkillDisplayTooltip m_SkillDisplayTooltip;
         
         private List<NamedObjectButton> m_PartyMemberButtons = new();
         
@@ -53,17 +56,23 @@ namespace Game.UI
         {
             m_ReclassPanel.OnOverviewEvent += () => TabSwitch(Tab.OVERVIEW);
             m_SkillsAndWeaponPanel.OnReclassEvent += () => TabSwitch(Tab.RECLASS);
+
+            HideTooltip();
         }
 
         public override void Initialize()
         {
             base.Initialize();
             GlobalEvents.UI.OpenPartyOverviewEvent += OnOpenPartyOverview;
+            GlobalEvents.CharacterManagement.OnTooltipEvent += ShowTooltip;
+            GlobalEvents.CharacterManagement.OnHideTooltipEvent += HideTooltip;
         }
         
         private void OnDestroy()
         {
             GlobalEvents.UI.OpenPartyOverviewEvent -= OnOpenPartyOverview;
+            GlobalEvents.CharacterManagement.OnTooltipEvent -= ShowTooltip;
+            GlobalEvents.CharacterManagement.OnHideTooltipEvent -= HideTooltip;
         }
 
         protected override void HideDone()
@@ -75,6 +84,8 @@ namespace Game.UI
                 GlobalEvents.UI.OnClosePartyOverviewEvent?.Invoke();
                 SaveManager.Instance.Save();
             }
+
+            HideTooltip();
         }
 
         private void OnOpenPartyOverview(List<PlayerCharacterData> partyMembers, bool inLevel)
@@ -137,5 +148,17 @@ namespace Game.UI
 
             m_CurrTab = tab;
         }
+
+        #region Tooltip
+        private void ShowTooltip(TooltipContents tooltipContents)
+        {
+            m_SkillDisplayTooltip.SetDisplay(tooltipContents);
+        }
+
+        private void HideTooltip()
+        {
+            m_SkillDisplayTooltip.gameObject.SetActive(false);
+        }
+        #endregion
     }
 }

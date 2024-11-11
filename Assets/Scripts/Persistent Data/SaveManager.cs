@@ -90,7 +90,6 @@ public class SessionSave
         PlayerPrefs.Save();
         postSaveEvent?.Invoke();
         GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
-        m_SaveCoroutine = null;
     }
 }
 
@@ -110,7 +109,7 @@ public class SaveManager : Singleton<SaveManager>
     /// <summary>
     /// Initial guaranteed save delay to ensure the save indicator shows up
     /// </summary>
-    private const float SAVE_DELAY = 1.5f;
+    private const float SAVE_DELAY = 3.0f;
 
     private SessionSave m_SessionSave;
 

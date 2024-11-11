@@ -18,22 +18,19 @@ namespace Game.UI
             for (int i = 0; i < minSkillNumber; ++i)
             {
                 m_SkillButtons[i].icon.sprite = m_CurrClass.m_ActiveSkills[startingIndex + i].m_Icon;
-                ToggleCanvasGroup(m_SkillBtnCgs[i], true);
+                m_SkillButtons[i].gameObject.SetActive(true);
             }
 
             for (int i = minSkillNumber; i < m_NumSkillButtons; ++i)
             {
-                ToggleCanvasGroup(m_SkillBtnCgs[i], false);
+                m_SkillButtons[i].gameObject.SetActive(false);
             }
         }
 
         protected override void HoverSkill(int index)
         {
             ActiveSkillSO activeSkill = m_CurrClass.m_ActiveSkills[(m_CurrPage - 1) * m_NumSkillButtons + index];
-            m_SkillTitle.gameObject.SetActive(true);
-            m_SkillTitle?.SetValue(activeSkill.m_SkillName);
-
-            m_SkillDescription?.SetValue(activeSkill.GetDescription(m_CurrCharacter, null));
+            GlobalEvents.CharacterManagement.OnTooltipEvent?.Invoke(new TooltipContents(activeSkill.m_SkillName, activeSkill.GetDescription(m_CurrCharacter, null)));
         }
     }
 }

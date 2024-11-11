@@ -8,7 +8,7 @@ public class WorldMapVisual : BaseNodeVisual
     [SerializeField] private Vector3 m_MinScale = new Vector3(3f, 3f, 3f);
 
     public override float NodeRadiusOffset => 1.0f;
-    public override Vector3 TokenOffset => new Vector3(0f, 1f);
+    public override Vector3 TokenOffset => new Vector3(0f, 1.5f);
 
     public VoidEvent OnSelected;
     public VoidEvent OnDeselected;  

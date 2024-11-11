@@ -14,9 +14,7 @@ public enum AudioChannel
 public enum AudioState
 {
     PLAYING,
-    PAUSED,
-    FADING_IN,
-    FADING_OUT
+    PAUSED
 }
 
 public class PlayingAudio
@@ -38,7 +36,7 @@ public class PlayingAudio
 
     public bool HasFinishedPlaying()
     {
-        return Application.isFocused && m_AudioState == AudioState.PLAYING && !m_AudioSourceInstance.isPlaying;
+        return m_AudioState != AudioState.PAUSED && !m_AudioSourceInstance.isPlaying;
     }
 }
 
@@ -107,7 +105,6 @@ public class SoundManager : Singleton<SoundManager>
     {
         if (!m_PlayingAudio.ContainsKey(id))
             return;
-        m_PlayingAudio[id].m_AudioState = AudioState.FADING_OUT;
         StartCoroutine(FadeAudio(m_PlayingAudio[id], duration, 0f, postFade));
     }
 
@@ -116,14 +113,7 @@ public class SoundManager : Singleton<SoundManager>
         if (!m_PlayingAudio.ContainsKey(id))
             return;
 
-        m_PlayingAudio[id].m_AudioState = AudioState.FADING_IN;
-        StartCoroutine(FadeAudio(m_PlayingAudio[id], duration, m_PlayingAudio[id].m_Volume, PostFade));
-
-        void PostFade()
-        {
-            m_PlayingAudio[id].m_AudioState = AudioState.PLAYING;
-            postFade?.Invoke();
-        }
+        StartCoroutine(FadeAudio(m_PlayingAudio[id], duration, m_PlayingAudio[id].m_Volume, postFade));
     }
 
     private IEnumerator FadeAudio(PlayingAudio playingAudio, float duration, float finalVolume, VoidEvent postFade = null)
@@ -212,7 +202,7 @@ public class SoundManager : Singleton<SoundManager>
         audioSource.Play();
         int cachedTokenNum = m_TokenNum;
         ++m_TokenNum;
-        m_PlayingAudio[cachedTokenNum] = new PlayingAudio(audioDataSO, audioSource, volume, AudioState.FADING_IN);
+        m_PlayingAudio[cachedTokenNum] = new PlayingAudio(audioDataSO, audioSource, volume);
         FadeInAudio(cachedTokenNum, fadeInDuration);
         return cachedTokenNum;
     }

@@ -9,7 +9,14 @@ namespace Game.UI
 
         public void SetDisplay(PathClass pathClass)
         {
-            m_ConditionText.text = pathClass.m_UnlockCondition.GetDescription();
+            if (!pathClass.m_UnlockCondition.HasConditions())
+            {
+                m_ConditionText.text = "NONE";
+            }
+            else
+            {
+                m_ConditionText.text = pathClass.m_UnlockCondition.GetDescription();
+            }
         }
     }
 }

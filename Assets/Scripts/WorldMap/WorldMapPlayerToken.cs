@@ -19,9 +19,9 @@ public class WorldMapPlayerToken : BaseCharacterToken
     #endregion
 
     #region Follow Path
-    public void MoveAlongSpline(float initialDelay, Quaternion initialRotation, SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    public void MoveAlongSpline(float initialDelay, Quaternion initialRotation, SplineContainer splineContainer, Quaternion finalRotation, VoidEvent completeMovementEvent)
     {
-        StartCoroutine(PreRotation(initialDelay, initialRotation, () => PostRotation(splineContainer, pathOffset, finalRotation, completeMovementEvent)));
+        StartCoroutine(PreRotation(initialDelay, initialRotation, () => PostRotation(splineContainer, finalRotation, completeMovementEvent)));
     }
 
     private IEnumerator PreRotation(float initialDelay, Quaternion initialRotation, VoidEvent postRotation)
@@ -30,12 +30,12 @@ public class WorldMapPlayerToken : BaseCharacterToken
          StartCoroutine(Rotate(initialRotation, postRotation, ROTATION_TIME));
     }
 
-    private void PostRotation(SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    private void PostRotation(SplineContainer splineContainer, Quaternion finalRotation, VoidEvent completeMovementEvent)
     {
-        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, pathOffset, MOVE_SPEED, finalRotation, completeMovementEvent));
+        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, MOVE_SPEED, finalRotation, completeMovementEvent));
     }
 
-    private IEnumerator MoveAlongSpline_Coroutine(SplineContainer splineContainer, Vector3 pathOffset, float speed, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    private IEnumerator MoveAlongSpline_Coroutine(SplineContainer splineContainer, float speed, Quaternion finalRotation, VoidEvent completeMovementEvent)
     {
         float progress = 0f;
 
@@ -50,7 +50,7 @@ public class WorldMapPlayerToken : BaseCharacterToken
         {
             yield return null;
             progress += speed * Time.deltaTime / splineLength;
-            Vector3 currPosition = (Vector3) splineContainer.EvaluatePosition(progress) + pathOffset;
+            Vector3 currPosition = splineContainer.EvaluatePosition(progress);
             Vector3 direction = currPosition - previousPosition;
             this.transform.position = currPosition;
             this.transform.rotation = Quaternion.LookRotation(-direction, transform.up);

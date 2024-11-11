@@ -55,12 +55,7 @@ public class PlayerUnitSetup : MonoBehaviour
         {
             selectedTileVisual.ToggleSwapTarget(false);
         }
-
         GlobalEvents.Battle.PreviewUnitEvent(data.m_CurrUnit);
-
-        if (visual.GridType != GridType.PLAYER)
-            return;
-
         selectedTileVisual = visual;
         if (selectedTileVisual != null && m_PlayerSquares.Contains(selectedTileVisual.Coordinates))
         {

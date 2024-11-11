@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class ArmorVisual : MonoBehaviour
 {
-    private EquippingArmor m_EquippingArmor;
-
     #region Animation
     public static readonly int DirXAnimParam = Animator.StringToHash("DirX");
     public static readonly int DirYAnimParam = Animator.StringToHash("DirY");
@@ -46,50 +44,8 @@ public class ArmorVisual : MonoBehaviour
         m_Model.transform.localPosition = Vector3.zero;
         m_Model.transform.rotation = Quaternion.identity;
 
-        m_EquippingArmor = m_Model.GetComponent<EquippingArmor>();
-        m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
-
-        if (Application.isPlaying)
-            ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
-
-        m_WeaponModels.Clear();
-        foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
-        {
-            if (weaponModelPrefab != null)
-            {
-                var weaponModel = Instantiate(weaponModelPrefab);
-                var attachPoint = weaponModel.attachmentType switch
-                {
-                    WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
-                    _ => null,
-                };
-                weaponModel.transform.SetParent(attachPoint, false);
-                m_WeaponModels.Add(weaponModel);
-            }
-        }
-
-        if (!Application.isPlaying)
-            return;
-
-        m_Animator = m_Model.GetComponentInChildren<Animator>();
-        if (m_Animator == null)
-        {
-            Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
-        }
-
-        m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
-        m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
-
-        m_MeshFader = gameObject.AddComponent<MeshFader>();
-        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
-    }
-
-    public void ChangeArmorAndWeapons(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
-    {
-        ResetModel();
-
-        m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
+        EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
+        equipArmor.Initialize(unitModelData.m_AttachItems);
 
         ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
 
@@ -100,8 +56,46 @@ public class ArmorVisual : MonoBehaviour
                 var weaponModel = Instantiate(weaponModelPrefab);
                 var attachPoint = weaponModel.attachmentType switch
                 {
-                    WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
+                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
+                    _ => null,
+                };
+                weaponModel.transform.SetParent(attachPoint, false);
+                m_WeaponModels.Add(weaponModel);
+            }
+        }
+
+        m_Animator = m_Model.GetComponentInChildren<Animator>();
+        if (m_Animator == null)
+        {
+            Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
+        }
+
+        m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
+        m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
+            
+        m_MeshFader = gameObject.AddComponent<MeshFader>();
+        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
+    }
+
+    public void ChangeArmorAndWeapons(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
+    {
+        ResetModel();
+
+        EquippingArmor equipArmor = m_Model.GetComponent<EquippingArmor>();
+        equipArmor.Initialize(unitModelData.m_AttachItems);
+
+        ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
+
+        foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
+        {
+            if (weaponModelPrefab != null)
+            {
+                var weaponModel = Instantiate(weaponModelPrefab);
+                var attachPoint = weaponModel.attachmentType switch
+                {
+                    WeaponModelAttachmentType.RIGHT_HAND => equipArmor.RightArmBone,
+                    WeaponModelAttachmentType.LEFT_HAND => equipArmor.LeftArmBone,
                     _ => null,
                 };
                 weaponModel.transform.SetParent(attachPoint, false);
@@ -112,14 +106,6 @@ public class ArmorVisual : MonoBehaviour
         m_Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
         m_Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
-
-        StartCoroutine(MeshFadeSet());
-    }
-
-    private IEnumerator MeshFadeSet()
-    {
-        yield return null;
-        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
     }
 
     private void ResetModel()
@@ -131,7 +117,7 @@ public class ArmorVisual : MonoBehaviour
 
         m_WeaponModels.Clear();
 
-        SkinnedMeshRenderer[] armorPieces = m_EquippingArmor.BonesParent.GetComponentsInChildren<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer[] armorPieces = m_Model.GetComponentsInChildren<SkinnedMeshRenderer>();
         foreach (SkinnedMeshRenderer skinnedMeshRenderer in armorPieces)
         {
             Destroy(skinnedMeshRenderer.gameObject);

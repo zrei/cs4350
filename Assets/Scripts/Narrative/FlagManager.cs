@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -47,7 +46,6 @@ public class FlagManager : Singleton<FlagManager>
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent += OnEndPreCutscene;
     }
 
     protected override void HandleDestroy()
@@ -56,7 +54,6 @@ public class FlagManager : Singleton<FlagManager>
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent -= OnEndPreCutscene;
     }
 
     private void HandleDependencies()
@@ -77,11 +74,6 @@ public class FlagManager : Singleton<FlagManager>
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
         HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
-    }
-
-    private void OnEndPreCutscene()
-    {
-        HandleLevelResult(true);
     }
 
     private void OnEarlyQuit()
@@ -179,12 +171,11 @@ public class FlagManager : Singleton<FlagManager>
     #region Helper
     private void ClearPersistentFlags()
     {
-        List<string> flags = m_Flags.Keys.ToList();
-        foreach (string flag in flags)
+        foreach (KeyValuePair<string, FlagWrapper> pair in m_Flags)
         {
-            if (m_Flags[flag].m_FlagType == FlagType.PERSISTENT)
+            if (pair.Value.m_FlagType == FlagType.PERSISTENT)
             {
-                m_Flags[flag] = new FlagWrapper(FlagType.PERSISTENT, false);
+                m_Flags[pair.Key] = new FlagWrapper(FlagType.PERSISTENT, false);
             }
         }
     }

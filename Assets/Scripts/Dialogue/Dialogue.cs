@@ -10,8 +10,6 @@ public class Dialogue : MonoBehaviour
     public UnityEvent onEnterState;
     public UnityEvent onExitState;
 
-    public float delayUntilShown = 0f;
-
     public Sprite characterSprite;
     public string characterName;
     public Color characterColor = Color.white;
@@ -50,8 +48,6 @@ public class Dialogue : MonoBehaviour
         public bool changesMorality;
         [Tooltip("How much the morality should change by")]
         public int moralityChange;
-
-        public List<Flag> setFlags;
 
         public bool IsUnlocked => conditions.All(x => x.Evaluate());
     }

@@ -66,7 +66,6 @@ MonoBehaviour:
   characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
   characterName: 
   characterColor: {r: 1, g: 0, b: 0, a: 1}
-  audioCue: {fileID: 0}
   text: We just left the town... What a glutton. (-15<sprite name="Rations" tint>)
   debugTrigger: 0
   options: []
@@ -83,7 +82,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rationChangeAmt: -15
+  timeChangeAmt: -15
   moralityChangeAmt: 0
   flagResults: []
 --- !u!1 &4238048150012490194
@@ -152,7 +151,6 @@ MonoBehaviour:
   characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
   characterName: 
   characterColor: {r: 1, g: 0, b: 0, a: 1}
-  audioCue: {fileID: 0}
   text: You rob the village of their supplies... (+15<sprite name="Rations" tint>)
     (-15<sprite name="Morality" tint>)
   debugTrigger: 0
@@ -170,7 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rationChangeAmt: 15
+  timeChangeAmt: 15
   moralityChangeAmt: 0
   flagResults:
   - flagName: VillagePillaged
@@ -224,27 +222,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onEnterState:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 9110225073319402266, guid: fac2600fc64bd4d628a454998a31a6e3,
-          type: 3}
-        m_TargetAssemblyTypeName: Cutscene, Assembly-CSharp
-        m_MethodName: LogCheck
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onExitState:
     m_PersistentCalls:
       m_Calls: []
   characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
   characterName: 
   characterColor: {r: 1, g: 1, b: 1, a: 1}
-  audioCue: {fileID: 0}
   text: You come across a village that is nearly abandoned, desvastated by the conflict.
   debugTrigger: 0
   options:
@@ -256,7 +240,6 @@ MonoBehaviour:
     lockedText: 
     changesMorality: 1
     moralityChange: 10
-    setFlags: 
   - text: Search for loot
     nextState: {fileID: 3636274808806051152}
     conditions: []
@@ -264,7 +247,6 @@ MonoBehaviour:
     lockedText: 
     changesMorality: 1
     moralityChange: -10
-    setFlags: 
   - text: Leave the place be.
     nextState: {fileID: 0}
     conditions:
@@ -273,5 +255,4 @@ MonoBehaviour:
     lockedText: '[Requires -<sprite name="Morality" tint>]'
     changesMorality: 0
     moralityChange: 0
-    setFlags: 
   defaultNextState: {fileID: 0}

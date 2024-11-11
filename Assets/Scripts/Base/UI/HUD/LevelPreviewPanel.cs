@@ -34,13 +34,12 @@ namespace Game.UI
         {
             GlobalEvents.WorldMap.OnGoToLevel += OnGoToLevel;
             GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-            ToggleShown(false);
+            ToggleShown(true);
         }
 
         private void OnDestroy()
         {
             GlobalEvents.WorldMap.OnGoToLevel -= OnGoToLevel;
-            InputManager.Instance.CancelInput.OnPressEvent -= OnPartySelectCancel;
         }
         #endregion
         

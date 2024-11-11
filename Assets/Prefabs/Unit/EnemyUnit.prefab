@@ -1,91 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &1280318079713767277
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 4275109526286481243}
-    m_Modifications:
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3066036310198006059, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-        type: 3}
-      propertyPath: m_Name
-      value: ObjectiveMarkerParticle
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e8e1a16a29c62c444b584f0d1865ed4f, type: 3}
---- !u!4 &1254666062834831630 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 48944349670243939, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-    type: 3}
-  m_PrefabInstance: {fileID: 1280318079713767277}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3128377908186629661 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4228494823218063728, guid: e8e1a16a29c62c444b584f0d1865ed4f,
-    type: 3}
-  m_PrefabInstance: {fileID: 1280318079713767277}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04aaacb77a0ce13498b13eb4d4609ff3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &8066070473416736173
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -230,10 +144,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2049863971707318007}
-    - targetCorrespondingSourceObject: {fileID: 5666935979293474733, guid: 1d88b7986259045dfb3ec5ac1e956fb7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1254666062834831630}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 9124460277767311961, guid: 1d88b7986259045dfb3ec5ac1e956fb7,
         type: 3}
@@ -259,8 +169,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ArmorVisual: {fileID: 3441858903853605270}
-  m_ObjectiveMarker: {fileID: 3128377908186629661}
-  m_EnemyTags: 0
 --- !u!114 &3441858903853605270 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -2723889257827604128, guid: 1d88b7986259045dfb3ec5ac1e956fb7,

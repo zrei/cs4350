@@ -21,7 +21,7 @@ public class PlaneCameraController : MonoBehaviour
     private float LookAtNegZLimit => m_BottomLimitTransform.position.z;
     
     // Camera Movement
-    [SerializeField] private float m_CameraMovementSpeed = 5f;
+    [SerializeField] const float CAMERA_MOVEMENT_SPEED = 5f;
     private Vector2 m_CameraMovementDirection;
     private bool m_IsCameraMoving;
 
@@ -72,7 +72,7 @@ public class PlaneCameraController : MonoBehaviour
             while (m_CameraMovementDirection.magnitude > 0.1f)
             {
                 var currPos = m_CameraLookAtTransform.position;
-                var posChange = new Vector3(m_CameraMovementDirection.x, 0, m_CameraMovementDirection.y) * (m_CameraMovementSpeed * Time.deltaTime);
+                var posChange = new Vector3(m_CameraMovementDirection.x, 0, m_CameraMovementDirection.y) * (CAMERA_MOVEMENT_SPEED * Time.deltaTime);
                 m_CameraLookAtTransform.position = new Vector3(
                     Mathf.Clamp(currPos.x + posChange.x, LookAtNegXLimit, LookAtPosXLimit),
                     currPos.y,

@@ -6,7 +6,7 @@ namespace Game.UI
     public class CharacterOverviewDisplay : MonoBehaviour
     {
         #region Component References
-        [SerializeField] private FormattedTextDisplay m_AttributeDisplay;
+        [SerializeField] private FormattedTextDisplay m_PathDisplay;
 
         [SerializeField] private FormattedTextDisplay m_NameDisplay;
 
@@ -40,7 +40,7 @@ namespace Game.UI
         {
             m_PlayerUnit = playerUnit;
             
-            m_AttributeDisplay?.SetValue($"{playerUnit.m_BaseData.m_CharacterMoralityTrait.m_TraitName}");
+            m_PathDisplay?.SetValue($"{playerUnit.m_BaseData.m_PathGroup.m_PathName}");
             m_NameDisplay?.SetValue($"{playerUnit.m_BaseData.m_CharacterName}");
             m_LevelDisplay?.SetValue($"{playerUnit.m_CurrLevel}");
 
@@ -53,7 +53,7 @@ namespace Game.UI
 
             m_CharacterStatDisplay.SetDisplay(playerUnit);
 
-            m_ClassDisplay?.SetValue(playerUnit.m_BaseData.m_PathGroup.m_PathName, playerUnit.CurrClass.m_ClassName);
+            m_ClassDisplay?.SetValue($"{playerUnit.CurrClass.m_ClassName}");
         }
 
         private void OnWeaponChanged()
@@ -74,7 +74,7 @@ namespace Game.UI
         private void OnReclass()
         {
             m_CharacterStatDisplay.SetDisplay(m_PlayerUnit);
-            m_ClassDisplay?.SetValue(m_PlayerUnit.m_BaseData.m_PathGroup.m_PathName, m_PlayerUnit.CurrClass.m_ClassName);
+            m_ClassDisplay?.SetValue($"{m_PlayerUnit.CurrClass.m_ClassName}");
         }
     }
     

@@ -100,7 +100,7 @@ public class BattleNodeVisual : NodeVisual
     public override void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Pointer entered Battle Node");
-        GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_BattleNode);
+        GlobalEvents.Level.BattleNodeHoverStartEvent?.Invoke(m_BattleNode);
     }
 
     public override void OnPointerExit(PointerEventData eventData)
