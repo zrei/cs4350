@@ -1,6 +1,7 @@
 using Game.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum PlayerTurnState
@@ -343,6 +344,10 @@ public class PlayerTurnManager : TurnManager
 
     private bool TryInspect()
     {
+        if (selectedTileData?.m_CurrUnit != null)
+        {
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.InspectScreen, false, selectedTileData?.m_CurrUnit);
+        }
         return false;
     }
     #endregion
@@ -434,7 +439,7 @@ public class PlayerTurnManager : TurnManager
                 if (SelectedSkill == null)
                 {
                     // this should not be possible if unit has no available active skills
-                    SelectedSkill = m_CurrUnit.GetAvailableActiveSkills()[0];
+                    SelectedSkill = m_CurrUnit.GetActiveSkills().ToList()[0];
                 }
                 m_MapLogic.ShowAttackable(GridType.PLAYER, m_CurrUnit, SelectedSkill);
                 m_MapLogic.ShowAttackable(GridType.ENEMY, m_CurrUnit, SelectedSkill);

@@ -493,6 +493,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     #region Skills
+    public abstract IEnumerable<ActiveSkillSO> GetActiveSkills();
+
     public void PerformSkill(ActiveSkillSO attackSO, List<IHealth> targets)
     {
         float dealtDamage = 0f;

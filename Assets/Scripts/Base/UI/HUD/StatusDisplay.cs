@@ -91,6 +91,9 @@ namespace Game.UI
         [SerializeField]
         private LayoutGroup permanentStatusLayout;
 
+        [SerializeField]
+        private GameObject emptyIndicator;
+
         private int permanentStatusCount;
         private int regularStatusCount;
 
@@ -167,9 +170,10 @@ namespace Game.UI
             var regularStatusLayoutActive = regularStatusCount > 0;
             var permanentStatusLayoutActive = permanentStatusCount > 0;
 
-            regularStatusLayout?.gameObject.SetActive(regularStatusLayoutActive);
-            permanentStatusLayout?.gameObject.SetActive(permanentStatusLayoutActive);
-            divider?.gameObject.SetActive(regularStatusLayoutActive && permanentStatusLayoutActive);
+            if (regularStatusLayout != null) regularStatusLayout.gameObject.SetActive(regularStatusLayoutActive);
+            if (permanentStatusLayout != null) permanentStatusLayout.gameObject.SetActive(permanentStatusLayoutActive);
+            if (divider != null) divider.gameObject.SetActive(regularStatusLayoutActive && permanentStatusLayoutActive);
+            if (emptyIndicator != null) emptyIndicator.gameObject.SetActive(!regularStatusLayoutActive && !permanentStatusLayoutActive);
         }
 
         public void Clear()

@@ -48,7 +48,7 @@ namespace Game.UI
         }
         private ActiveSkillSO lockedInSkill;
 
-        private PlayerCharacterData m_PlayerUnit;
+        private ICanAttack m_PlayerUnit;
 
         private void Awake()
         {
@@ -63,21 +63,31 @@ namespace Game.UI
             }
         }
 
+        public void DisplayUnitSkills(Unit unit)
+        {
+            DisplayUnitSkills(unit, unit.GetActiveSkills());
+        }
+
         public void DisplayUnitSkills(PlayerCharacterData playerUnit)
+        {
+            DisplayUnitSkills(playerUnit, playerUnit.CurrClass.m_ActiveSkills);
+        }
+
+        public void DisplayUnitSkills(ICanAttack unit, IEnumerable<ActiveSkillSO> skills)
         {
             // Reset Display
             LockedInSkill = null;
             UpdateSkillDisplay(null);
-            
-            m_PlayerUnit = playerUnit;
-            activeSkills = playerUnit.CurrClass.m_ActiveSkills.ToList();
-            
+
+            m_PlayerUnit = unit;
+            activeSkills = skills.ToList();
+
             for (int i = 0; i < activeSkillButtons.Count; i++)
             {
                 if (i < activeSkills.Count)
                 {
                     var skill = activeSkills[i];
-                        
+
                     activeSkillButtons[i].gameObject.SetActive(true);
                     activeSkillButtons[i].icon.sprite = skill.m_Icon;
                 }
@@ -87,12 +97,13 @@ namespace Game.UI
                 }
             }
 
-            var passiveSkills = playerUnit.CurrClass.m_PassiveEffects;
-            
-            for (int i = 0; i < passiveSkillButtons.Count; i++)
-            {
-                passiveSkillButtons[i].gameObject.SetActive(i < passiveSkills.Count);
-            }
+            // handle passive skills elsewhere
+            //var passiveSkills = playerUnit.CurrClass.m_PassiveEffects;
+
+            //for (int i = 0; i < passiveSkillButtons.Count; i++)
+            //{
+            //    passiveSkillButtons[i].gameObject.SetActive(i < passiveSkills.Count);
+            //}
 
             m_AoESprite.gameObject.SetActive(false);
             m_SelfPositioningSprite.gameObject.SetActive(false);
