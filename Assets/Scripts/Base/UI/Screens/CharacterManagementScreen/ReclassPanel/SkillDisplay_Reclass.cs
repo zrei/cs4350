@@ -1,13 +1,25 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Game.UI
 {
     public abstract class SkillDisplay_Reclass : MonoBehaviour
     {
-        [SerializeField] protected ActionButton m_LeftScrollButton;
-        [SerializeField] protected ActionButton m_RightScrollButton;
-        [SerializeField] protected List<SkillDisplayButton> m_SkillButtons;   
+        [Header("Buttons")]
+        [SerializeField] private ActionButton m_LeftScrollButton;
+        [SerializeField] private ActionButton m_RightScrollButton;
+        [SerializeField] protected List<ActionButton> m_SkillButtons;   
+
+        [Header("Visibility")]
+        [SerializeField] private CanvasGroup m_LeftScrollBtnCg;
+        [SerializeField] private CanvasGroup m_RightScrollBtnCg;
+        [SerializeField] protected List<CanvasGroup> m_SkillBtnCgs;
+
+        [Header("Description")]
+        [SerializeField] protected FormattedTextDisplay m_SkillTitle;
+        [SerializeField] protected FormattedTextDisplay m_SkillDescription;
+        [SerializeField] protected TextMeshProUGUI m_NoneText;
 
         protected int m_NumSkillButtons;
         protected int m_NumPages;
@@ -30,7 +42,6 @@ namespace Game.UI
             {
                 int cachedIndex = i;
                 m_SkillButtons[i].onPointerEnter.AddListener(() => HoverSkill(cachedIndex));
-                m_SkillButtons[i].onPointerExit.AddListener(UnhoverSkill);
             }
         }
 
@@ -38,6 +49,7 @@ namespace Game.UI
         {
             --m_CurrPage;
 
+            ResetDescription();
             UpdateScrollButtons();
             UpdateDisplay();
         }
@@ -46,14 +58,20 @@ namespace Game.UI
         {
             ++m_CurrPage;
 
+            ResetDescription();
             UpdateScrollButtons();
             UpdateDisplay();
         }
 
+        private void ResetDescription()
+        {
+            m_SkillTitle.gameObject.SetActive(false);
+        }
+
         private void UpdateScrollButtons()
         {
-            m_LeftScrollButton.SetActive(m_CurrPage > 1);
-            m_RightScrollButton.SetActive(m_CurrPage < m_NumPages);
+            ToggleCanvasGroup(m_LeftScrollBtnCg, m_CurrPage > 1);
+            ToggleCanvasGroup(m_RightScrollBtnCg, m_CurrPage < m_NumPages);
         }
 
         protected abstract void UpdateDisplay();
@@ -68,15 +86,18 @@ namespace Game.UI
             m_CurrClass = classSO;
             m_CurrCharacter = playerCharacterData;
             InitialisePages(classSO);
+            ResetDescription();
             UpdateScrollButtons();
             UpdateDisplay();
         }
 
         protected abstract void HoverSkill(int index);
 
-        protected void UnhoverSkill()
+        protected void ToggleCanvasGroup(CanvasGroup cg, bool toShow)
         {
-            GlobalEvents.CharacterManagement.OnHideTooltipEvent?.Invoke();
+            cg.alpha = toShow ? 1f : 0f;
+            cg.interactable = toShow;
+            cg.blocksRaycasts = toShow;
         }
     }
 }

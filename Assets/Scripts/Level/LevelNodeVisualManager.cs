@@ -8,7 +8,7 @@ using UnityEngine;
 public class LevelNodeVisualManager : MonoBehaviour
 {
     // Graphics
-    private Dictionary<NodeInternal, NodeVisual> m_NodeVisuals = new();
+    private Dictionary<NodeInternal, LevelNodeVisual> m_NodeVisuals = new();
 
     #region Initialisation
 
@@ -25,7 +25,7 @@ public class LevelNodeVisualManager : MonoBehaviour
     {
         foreach (var levelNode in levelNodes)
         {
-            var nodeVisual = levelNode.GetComponent<NodeVisual>();
+            var nodeVisual = levelNode.GetComponent<LevelNodeVisual>();
             m_NodeVisuals.Add(levelNode, nodeVisual);
             
             nodeVisual.Initialise();
@@ -100,7 +100,7 @@ public class LevelNodeVisualManager : MonoBehaviour
     
     #region Helper
     
-    public NodeVisual GetNodeVisual(NodeInternal nodeInternal)
+    public LevelNodeVisual GetNodeVisual(NodeInternal nodeInternal)
     {
         return m_NodeVisuals[nodeInternal];
     }

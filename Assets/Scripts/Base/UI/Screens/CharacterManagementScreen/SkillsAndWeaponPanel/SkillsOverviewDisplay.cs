@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.UI
 {
@@ -21,7 +22,15 @@ namespace Game.UI
 
         [SerializeField] 
         private FormattedTextDisplay skillDescriptionText;
-        
+
+        [SerializeField]
+        private Image m_AoESprite;
+
+        [SerializeField]
+        private Image m_SelfPositioningSprite;
+
+        [SerializeField]
+        private Image m_TargetPositioningSprite;
         #endregion
 
         private List<ActiveSkillSO> activeSkills;
@@ -39,7 +48,7 @@ namespace Game.UI
         }
         private ActiveSkillSO lockedInSkill;
 
-        private PlayerCharacterData m_PlayerUnit;
+        private ICanAttack m_PlayerUnit;
 
         private void Awake()
         {
@@ -54,21 +63,31 @@ namespace Game.UI
             }
         }
 
+        public void DisplayUnitSkills(Unit unit)
+        {
+            DisplayUnitSkills(unit, unit.GetActiveSkills());
+        }
+
         public void DisplayUnitSkills(PlayerCharacterData playerUnit)
+        {
+            DisplayUnitSkills(playerUnit, playerUnit.CurrClass.m_ActiveSkills);
+        }
+
+        public void DisplayUnitSkills(ICanAttack unit, IEnumerable<ActiveSkillSO> skills)
         {
             // Reset Display
             LockedInSkill = null;
             UpdateSkillDisplay(null);
-            
-            m_PlayerUnit = playerUnit;
-            activeSkills = playerUnit.CurrClass.m_ActiveSkills.ToList();
-            
+
+            m_PlayerUnit = unit;
+            activeSkills = skills.ToList();
+
             for (int i = 0; i < activeSkillButtons.Count; i++)
             {
                 if (i < activeSkills.Count)
                 {
                     var skill = activeSkills[i];
-                        
+
                     activeSkillButtons[i].gameObject.SetActive(true);
                     activeSkillButtons[i].icon.sprite = skill.m_Icon;
                 }
@@ -78,12 +97,17 @@ namespace Game.UI
                 }
             }
 
-            var passiveSkills = playerUnit.CurrClass.m_PassiveEffects;
-            
-            for (int i = 0; i < passiveSkillButtons.Count; i++)
-            {
-                passiveSkillButtons[i].gameObject.SetActive(i < passiveSkills.Count);
-            }
+            // handle passive skills elsewhere
+            //var passiveSkills = playerUnit.CurrClass.m_PassiveEffects;
+
+            //for (int i = 0; i < passiveSkillButtons.Count; i++)
+            //{
+            //    passiveSkillButtons[i].gameObject.SetActive(i < passiveSkills.Count);
+            //}
+
+            m_AoESprite.gameObject.SetActive(false);
+            m_SelfPositioningSprite.gameObject.SetActive(false);
+            m_TargetPositioningSprite.gameObject.SetActive(false);
         }
 
         private void OnSelectSkill(int index)
@@ -102,10 +126,26 @@ namespace Game.UI
             
             skillHeaderText.SetValue(skill.m_SkillName);
             skillDescriptionText.SetValue(skill.GetDescription(m_PlayerUnit, null));
+
+            m_AoESprite.sprite = skill.m_TargetSO.m_TargetRepSprite;
+            m_SelfPositioningSprite.sprite = skill.GetCasterPositioningSprite;
+            var targetPosDisplayInfo = skill.GetTargetPositioningSprite;
+            m_TargetPositioningSprite.sprite = targetPosDisplayInfo.sprite;
+            m_TargetPositioningSprite.gameObject.transform.localEulerAngles = targetPosDisplayInfo.isAlly
+                ? new(0, 0, 180)
+                : Vector3.zero;
+            m_TargetPositioningSprite.color = targetPosDisplayInfo.isAlly
+                ? ColorUtils.AllyColor
+                : ColorUtils.EnemyColor;
+
+            m_AoESprite.gameObject.SetActive(m_AoESprite.sprite != null);
+            m_SelfPositioningSprite.gameObject.SetActive(m_SelfPositioningSprite.sprite != null);
+            m_TargetPositioningSprite.gameObject.SetActive(m_TargetPositioningSprite.sprite != null);
         }
 
         public void Hide()
         {
+            canvasGroup ??= GetComponent<CanvasGroup>();
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0;
@@ -113,6 +153,7 @@ namespace Game.UI
         
         public void Show()
         {
+            canvasGroup ??= GetComponent<CanvasGroup>();
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1;

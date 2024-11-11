@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Level
 {
-    public abstract class LevelCharacterToken : BaseCharacterToken
+    public abstract class LevelCharacterToken : WorldMapPlayerToken
     {
-        public void SetPositionToNode(NodeVisual nodeVisual)
+        public void SetPositionToNode(LevelNodeVisual nodeVisual)
         {
             transform.position = nodeVisual.transform.position + GridYOffset + nodeVisual.TokenOffset;
         }

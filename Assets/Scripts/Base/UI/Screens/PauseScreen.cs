@@ -7,7 +7,7 @@ namespace Game.UI
         [SerializeField] private NamedObjectButton m_MainMenuBtn;
         [SerializeField] private NamedObjectButton m_QuitLevelBtn;
 
-        public override void Show()
+        public override void Show(params object[] args)
         {
             base.Show();
 

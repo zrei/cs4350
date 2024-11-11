@@ -1,162 +1,140 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Game;
+using Game.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Pool;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
-// Temporary UI for node preview, to be integrated with UI_Manager System
 public class UI_NodePreview : MonoBehaviour
 {
-    [Header("General Preview")]
-    [SerializeField] GameObject m_NodePreviewPanel;
+    public float horizontalOffset = 60f;
+    public float verticalOffset = 30f;
+    
     [SerializeField] TextMeshProUGUI m_NodeNameText;
     [SerializeField] TextMeshProUGUI m_DescriptionText;
-    [SerializeField] TextMeshProUGUI m_UnlockConditionHeader;
+    [SerializeField] GameObject m_BattleDataSection;
+    [SerializeField] TextDisplayPooler m_ObjectivesTextDisplay;
+    [SerializeField] TextDisplayPooler m_EnemiesTextDisplay;
+    [SerializeField] GameObject m_UnlockConditionSection;
     [SerializeField] TextMeshProUGUI m_UnlockConditionText;
     
-    [Header("Battle Preview")]
-    [SerializeField] GameObject m_BattlePreviewPanel;
-    [SerializeField] TextMeshProUGUI m_BattleNodeNameText;
-    [SerializeField] TextMeshProUGUI m_BattleDescriptionText;
-    [SerializeField] TextMeshProUGUI m_BattleEnemiesText;
-    
-    // Time to hover before showing the preview panel
-    [SerializeField] float m_TimeToHover = 0.5f;
-    private float m_HoverTimeLeft = 0f;
-    private bool m_IsHovering = false;
-    
-    private GameObject m_CurrentPreviewPanel;
+    private CanvasGroup m_CanvasGroup;
+    private RectTransform m_RectTransform;
+    private Vector3 m_CurrPreviewedNodePosition;
 
     private void Awake()
     {
-        m_NodePreviewPanel.SetActive(false);
-        m_BattlePreviewPanel.SetActive(false);
+        m_CanvasGroup = GetComponent<CanvasGroup>();
+        m_RectTransform = GetComponent<RectTransform>();
+
+        m_CanvasGroup.interactable = false;
+        m_CanvasGroup.blocksRaycasts = false;
+    }
+    
+    public void Show()
+    {
+        m_CanvasGroup.alpha = 1f;
+    }
+    
+    public void Hide()
+    {
+        m_CanvasGroup.alpha = 0f;
         
-        GlobalEvents.Scene.LevelSceneLoadedEvent += OnSceneLoad;
+        StopAllCoroutines();
     }
-
-    private void OnSceneLoad()
+    
+    public void SetUpPreview(NodeInternal node)
     {
-        EnableHover();
-        GlobalEvents.Dialogue.DialogueStartEvent += DisableHover;
-        GlobalEvents.Dialogue.DialogueEndEvent += EnableHover;
-    }
-
-    private void OnDestroy()
-    {
-        DisableHover();
-        GlobalEvents.Dialogue.DialogueStartEvent -= DisableHover;
-        GlobalEvents.Dialogue.DialogueEndEvent -= EnableHover;
-    }
-
-    private void EnableHover()
-    {
-        GlobalEvents.Level.NodeHoverStartEvent += OnHoverStart;
-        GlobalEvents.Level.NodeHoverEndEvent += OnHoverEnd;
-        GlobalEvents.Level.BattleNodeHoverStartEvent += OnBattleHoverStart;
-    }
-
-    private void DisableHover()
-    {
-        GlobalEvents.Level.NodeHoverStartEvent -= OnHoverStart;
-        GlobalEvents.Level.NodeHoverEndEvent -= OnHoverEnd;
-        GlobalEvents.Level.BattleNodeHoverStartEvent -= OnBattleHoverStart;
-    }
-
-    private void Update()
-    {
-        if (!m_IsHovering)
-            return;
+        var previewData = node.GetNodePreviewData();
         
-        m_HoverTimeLeft -= Time.deltaTime;
-        if (m_HoverTimeLeft <= 0f)
+        m_NodeNameText.text = previewData.NodeName;
+        m_DescriptionText.text = previewData.NodeDescription;
+
+        if (previewData is BattleNodePreviewData battleNodePreviewData)
         {
-            m_IsHovering = false;
-            Show();
-        }
-    }
-
-    private void OnHoverStart(NodeInternal node)
-    {
-        SetUpGeneralPreviewPanel(node);
-        
-        // Start hover timer
-        m_HoverTimeLeft = m_TimeToHover;
-        m_IsHovering = true;
-    }
-    
-    private void OnBattleHoverStart(BattleNode node)
-    {
-        SetUpBattlePreviewPanel(node);
-        
-        // Start hover timer
-        m_HoverTimeLeft = m_TimeToHover;
-        m_IsHovering = true;
-    }
-    
-    private void OnHoverEnd()
-    {
-        m_IsHovering = false;
-        Hide();
-    }
-
-    private void Show()
-    {
-        m_CurrentPreviewPanel.SetActive(true);
-    }
-    
-    private void Hide()
-    {
-        m_CurrentPreviewPanel.SetActive(false);
-    }
-    
-    private void SetUpGeneralPreviewPanel(NodeInternal node)
-    {
-        m_NodeNameText.text = node.NodeInfo.m_NodeName;
-        m_DescriptionText.text = node.NodeInfo.m_NodeDescription;
-
-        if (node.IsMoralityLocked)
-        {
-            int thresholdValue = MoralityManager.Instance.GetMoralityValue(node.MoralityThreshold.m_Threshold);
-            bool isSatisfied = node.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage);
-            
-            m_UnlockConditionHeader.text = "Unlock Condition";
-            m_UnlockConditionText.text = $"Morality<sprite name=\"Morality\" tint>: ";
-            m_UnlockConditionText.text += node.MoralityThreshold.m_GreaterThan ? $">{thresholdValue}" : $"<{thresholdValue}";
-            m_UnlockConditionText.text += isSatisfied ? " (Satisfied)" : " (Not Satisfied)";
-            m_UnlockConditionText.color = isSatisfied ? Color.green : Color.red;
+            SetUpBattleDisplay(battleNodePreviewData);
         }
         else
         {
-            m_UnlockConditionHeader.text = "";
+            m_BattleDataSection.SetActive(false);
+        }
+
+        if (previewData.IsMoralityLocked)
+        {
+            SetUpUnlockConditionsDisplay(previewData);
+        }
+        else
+        {
+            m_UnlockConditionSection.SetActive(false);
             m_UnlockConditionText.text = "";
         }
         
-        m_CurrentPreviewPanel = m_NodePreviewPanel;
-        SetUpPreviewPanelLocation(node.transform.position);
+        m_CurrPreviewedNodePosition = node.transform.position;
+        StartCoroutine(UpdatePosition_Coroutine());
     }
     
-    private void SetUpBattlePreviewPanel(BattleNode node)
+    private void SetUpBattleDisplay(BattleNodePreviewData battleData)
     {
-        m_BattleNodeNameText.text = node.NodeInfo.m_NodeName;
-        m_BattleDescriptionText.text = node.NodeInfo.m_NodeDescription;
-
+        m_BattleDataSection.SetActive(true);
+        
         // Get number of enemies by class
         Dictionary<string, int> enemyClassCount = new Dictionary<string, int>();
-        foreach (var enemy in node.BattleSO.m_EnemyUnitsToSpawn)
+        foreach (var enemy in battleData.EnemyUnits)
         {
             if (!enemyClassCount.TryAdd(enemy.m_EnemyCharacterData.m_EnemyClass.m_ClassName, 1))
                 enemyClassCount[enemy.m_EnemyCharacterData.m_EnemyClass.m_ClassName]++;
         }
         
         // List enemies by their classes
-        m_BattleEnemiesText.text = "Enemies: \n";
+        m_EnemiesTextDisplay.Clear();
+        
         foreach (var enemyClass in enemyClassCount)
         {
-            m_BattleEnemiesText.text += $"{enemyClass.Key}\tx{enemyClass.Value}\n";
+            var enemiesDisplay = m_EnemiesTextDisplay.Get();
+            enemiesDisplay.PrimaryText.SetValue(enemyClass.Key);
+            enemiesDisplay.SecondaryText.SetValue(enemyClass.Value);
         }
         
-        m_CurrentPreviewPanel = m_BattlePreviewPanel;
-        SetUpPreviewPanelLocation(node.transform.position);
+        // List objectives
+        m_ObjectivesTextDisplay.Clear();
+        
+        foreach (var objective in battleData.Objectives)
+        {
+            var objectiveDisplay = m_ObjectivesTextDisplay.Get();
+            objectiveDisplay.PrimaryText.SetValue(objective.ToString());
+            objectiveDisplay.PrimaryText.SetColor(objective.m_Color);
+        }
+    }
+    
+    private void SetUpUnlockConditionsDisplay(NodePreviewData previewData)
+    {
+        int thresholdValue = MoralityManager.Instance.GetMoralityValue(previewData.MoralityThreshold.m_Threshold);
+        bool isSatisfied = previewData.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage);
+
+        m_UnlockConditionSection.SetActive(true);
+        m_UnlockConditionText.text = $"Morality<sprite name=\"Morality\" tint>: ";
+        m_UnlockConditionText.text += previewData.MoralityThreshold.m_GreaterThan ? $">{thresholdValue}" : $"<{thresholdValue}";
+        m_UnlockConditionText.text += isSatisfied ? " (Satisfied)" : " (Not Satisfied)";
+        m_UnlockConditionText.color = isSatisfied ? Color.green : Color.red;
+    }
+    
+    private IEnumerator UpdatePosition_Coroutine()
+    {
+        while (true)
+        {
+            UpdatePosition();
+            yield return null;
+        }
+    }
+
+    private void UpdatePosition()
+    {
+        SetUpPreviewPanelLocation(m_CurrPreviewedNodePosition);
     }
 
     private void SetUpPreviewPanelLocation(Vector3 nodePosition)
@@ -165,11 +143,21 @@ public class UI_NodePreview : MonoBehaviour
         var screenPosition = CameraManager.Instance.MainCamera.WorldToScreenPoint(nodePosition);
         var viewportPosition = CameraManager.Instance.MainCamera.ScreenToViewportPoint(screenPosition);
         
-        var rectTransform = m_CurrentPreviewPanel.GetComponent<RectTransform>();
+        Vector3 offset = Vector3.zero;
         
-        if (viewportPosition.x < 0.8f)
-            rectTransform.anchoredPosition = screenPosition + Vector3.right * 240f;
-        else
-            rectTransform.anchoredPosition = screenPosition + Vector3.left * 240f;
+        offset = viewportPosition.x < 0.8f 
+            ? Vector3.right * (m_RectTransform.rect.width / 2 + horizontalOffset)
+            : Vector3.left * (m_RectTransform.rect.width / 2 + horizontalOffset);
+        
+        if (viewportPosition.y < 0.2f)
+        {
+            offset +=  Vector3.up * (m_RectTransform.rect.height / 2 + verticalOffset);
+        }
+        else if (viewportPosition.y > 0.8f)
+        {
+            offset += Vector3.down * (m_RectTransform.rect.height / 2 + verticalOffset);
+        }
+        
+        m_RectTransform.anchoredPosition = screenPosition + offset;
     }
 }

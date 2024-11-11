@@ -15,7 +15,7 @@ namespace Game.UI
         event UIScreenCallback OnHideDone;
 
         void Initialize();
-        void Show();
+        void Show(params object[] args);
         void Hide();
         void ScreenUpdate();
 
@@ -46,6 +46,7 @@ namespace Game.UI
         public IUIScreen LevelUpResultScreen => LoadScreen("LevelUpResultScreen");
         public IUIScreen LevelResultScreen => LoadScreen("LevelResultScreen");
         public IUIScreen PartySelectScreen => LoadScreen("PartySelectScreen");
+        public IUIScreen InspectScreen => LoadScreen("InspectScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();
@@ -65,7 +66,7 @@ namespace Game.UI
             return screens[name];
         }
 
-        public void OpenScreen(IUIScreen screen, bool clearStack = false)
+        public void OpenScreen(IUIScreen screen, bool clearStack = false, params object[] args)
         {
             if ((CurrentScreen?.IsInTransition).GetValueOrDefault()) return;
 
@@ -77,7 +78,7 @@ namespace Game.UI
             }
 
             activeScreens.Push(screen);
-            screen.Show();
+            screen.Show(args);
             screen.RectTransform.SetParent(root, false);
             screen.RectTransform.SetAsLastSibling();
 

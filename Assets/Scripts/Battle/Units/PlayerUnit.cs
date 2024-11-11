@@ -21,9 +21,9 @@ public class PlayerUnit : Unit
     #endregion
 
     #region Active Skills
-    public List<ActiveSkillSO> GetAvailableActiveSkills()
+    public override IEnumerable<ActiveSkillSO> GetActiveSkills()
     {
-        return ((PlayerClassSO) m_Class).m_ActiveSkills.ToList();
+        return ((PlayerClassSO) m_Class).m_ActiveSkills;
     }
     #endregion
 }

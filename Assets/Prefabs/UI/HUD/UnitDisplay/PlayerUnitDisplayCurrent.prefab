@@ -1122,6 +1122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isCurrentUnitDisplay: 1
+  isSubDisplay: 0
   nameDisplay: {fileID: 5562796974418889123}
   characterArt: {fileID: 6202533662631174458}
   background: {fileID: 2492674012837624440}
@@ -1130,6 +1131,7 @@ MonoBehaviour:
   phyDefDisplay: {fileID: 7396101951595440211}
   mgcDefDisplay: {fileID: 7449210116424130776}
   spdDisplay: {fileID: 5400549327648959791}
+  movDisplay: {fileID: 0}
   hpBar: {fileID: 9122519859638268491}
   mpBar: {fileID: 6161363467813054987}
   statusDisplay: {fileID: 1595867650104182599}
@@ -1225,7 +1227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494b3b58269bff34eb32fc139bff0da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textFormat: '{0:G5} <sprite name="PhysicalAttack">'
+  textFormat: '{0:F0} <sprite name="PhysicalAttack">'
 --- !u!114 &2614929459010374600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1389,7 +1391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494b3b58269bff34eb32fc139bff0da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textFormat: '{0:G5} <sprite name="Speed">'
+  textFormat: '{0:F0} <sprite name="Speed">'
 --- !u!114 &1029838992370427271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2066,7 +2068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494b3b58269bff34eb32fc139bff0da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textFormat: '{0:G5} <sprite name="PhysicalDefence">'
+  textFormat: '{0:F0} <sprite name="PhysicalDefence">'
 --- !u!114 &1771075644267601780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2236,7 +2238,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 088d726ab9dcede4796d5fdc9e441727, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 81db7535e0fe58e42b8d7d3afd07b129, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2305,7 +2307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494b3b58269bff34eb32fc139bff0da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textFormat: '{0:G5} <sprite name="MagicDefence">'
+  textFormat: '{0:F0} <sprite name="MagicDefence">'
 --- !u!114 &7818498895283332328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2544,7 +2546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494b3b58269bff34eb32fc139bff0da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textFormat: '{0:G5} <sprite name="MagicAttack">'
+  textFormat: '{0:F0} <sprite name="MagicAttack">'
 --- !u!114 &8214685085177390764
 MonoBehaviour:
   m_ObjectHideFlags: 0

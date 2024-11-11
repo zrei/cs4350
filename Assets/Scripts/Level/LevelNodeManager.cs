@@ -10,6 +10,8 @@ public class LevelNodeManager : MonoBehaviour
     private List<NodeInternal> m_LevelNodes = new();
     public List<NodeInternal> LevelNodes => m_LevelNodes;
     
+    private List<EdgeInternal> m_LevelEdges = new();
+    
     private NodeInternal m_GoalNode;
     
     // Current State
@@ -46,6 +48,8 @@ public class LevelNodeManager : MonoBehaviour
         {
             levelEdge.NodeInternalA.AddAdjacentNode(levelEdge.NodeInternalB, levelEdge.Cost);
             levelEdge.NodeInternalB.AddAdjacentNode(levelEdge.NodeInternalA, levelEdge.Cost);
+            
+            m_LevelEdges.Add(levelEdge);
         }
     }
 
@@ -99,6 +103,20 @@ public class LevelNodeManager : MonoBehaviour
         node = default;
         
         return false;
+    }
+    
+   public EdgeInternal GetEdgeToNode(NodeInternal destNode)
+    {
+        foreach (var edge in m_LevelEdges)
+        {
+            if (edge.NodeInternalA == m_CurrentNodeInternal && edge.NodeInternalB == destNode ||
+                edge.NodeInternalB == m_CurrentNodeInternal && edge.NodeInternalA == destNode)
+            {
+                return edge;
+            }
+        }
+
+        return null;
     }
     
     /// <summary>

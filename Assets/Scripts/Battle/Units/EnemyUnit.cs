@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Wraps around the EnemyActionSO as a runtime instance for each unit
@@ -109,5 +110,16 @@ public class EnemyUnit : Unit
             GetActionToBePerformed(mapLogic);
         }
         NextAction.PerformAction(this, mapLogic, completeActionEvent);
+    }
+
+    public override IEnumerable<ActiveSkillSO> GetActiveSkills()
+    {
+        var result = new List<ActiveSkillSO>();
+        foreach (var enemyAction in m_OrderedActions)
+        {
+            if (enemyAction.m_Action is not EnemyActiveSkillActionSO activeSkillAction) continue;
+            result.Add(activeSkillAction.m_ActiveSkill);
+        }
+        return result;
     }
 }

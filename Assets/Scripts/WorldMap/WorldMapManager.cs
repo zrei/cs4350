@@ -286,9 +286,12 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void DisableNavigation()
     {
-        InputManager.Instance.NavigateLevelAction.OnChangeEvent -= OnNavigateLevel;
-        InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent -= OnFocusCurrentLevel;
-        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= TogglePartyManagement;
+        if (InputManager.IsReady)
+        {
+            InputManager.Instance.NavigateLevelAction.OnChangeEvent -= OnNavigateLevel;
+            InputManager.Instance.ReturnToCurrLevelAction.OnPressEvent -= OnFocusCurrentLevel;
+            InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= TogglePartyManagement;
+        }
     }
 
     private void OnFocusCurrentLevel(IInput input)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Splines;
 
 [System.Serializable]
 public struct InflictedStatusEffect
@@ -174,6 +175,53 @@ public class ActiveSkillSO : ScriptableObject
 
     [Header("Attack Config")]
     public List<SkillTargetRuleSO> m_TargetRules;
+    public Sprite GetCasterPositioningSprite
+    {
+        get
+        {
+            Sprite sprite = GlobalSettings.Instance.DefaultCasterPosSprite;
+            if (HasAttackerLimitations)
+            {
+                var highestPriority = int.MaxValue;
+                foreach (var targetRule in m_TargetRules)
+                {
+                    if (targetRule.m_PositionSprite != null &&
+                        GlobalSettings.SkillCasterPosSpritePriority.TryGetValue(targetRule.GetType(), out var priority) &&
+                        priority < highestPriority)
+                    {
+                        highestPriority = priority;
+                        sprite = targetRule.m_PositionSprite;
+                    }
+                }
+            }
+            return sprite;
+        }
+    }
+
+    
+    public (Sprite sprite, bool isAlly) GetTargetPositioningSprite
+    {
+        get
+        {
+            var isAlly = IsSelfTarget || !IsOpposingSideTarget;
+            Sprite sprite = GlobalSettings.Instance.DefaultTargetPosSprite;
+            if (HasTargetLimitations)
+            {
+                var highestPriority = int.MaxValue;
+                foreach (var targetRule in m_TargetRules)
+                {
+                    if (targetRule.m_PositionSprite != null &&
+                        GlobalSettings.SkillTargetPosSpritePriority.TryGetValue(targetRule.GetType(), out var priority) &&
+                        priority < highestPriority)
+                    {
+                        highestPriority = priority;
+                        sprite = targetRule.m_PositionSprite;
+                    }
+                }
+            }
+            return (sprite, isAlly);
+        }
+    }
 
     [Header("Target")]
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
