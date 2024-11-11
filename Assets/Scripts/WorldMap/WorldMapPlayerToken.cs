@@ -19,9 +19,18 @@ public class WorldMapPlayerToken : BaseCharacterToken
     #endregion
 
     #region Follow Path
-    public void MoveAlongSpline(float initialDelay, Quaternion initialRotation, SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation, VoidEvent completeMovementEvent)
+
+    // Move without initial delay and rotation
+    public void MoveAlongSpline(SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation,
+        VoidEvent completeMovementEvent, float startOffset = 0f, float endOffset = 0f, float moveSpeed = MOVE_SPEED)
     {
-        StartCoroutine(PreRotation(initialDelay, initialRotation, () => PostRotation(splineContainer, pathOffset, finalRotation, completeMovementEvent)));
+        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, pathOffset, moveSpeed, finalRotation,
+            completeMovementEvent, startOffset, endOffset));
+    }
+    
+    public void MoveAlongSpline(float initialDelay, Quaternion initialRotation, SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation, VoidEvent completeMovementEvent, float startOffset = 0f, float endOffset = 0f, float moveSpeed = MOVE_SPEED)
+    {
+        StartCoroutine(PreRotation(initialDelay, initialRotation, () => PostRotation(splineContainer, pathOffset, finalRotation, completeMovementEvent, startOffset, endOffset, moveSpeed)));
     }
 
     private IEnumerator PreRotation(float initialDelay, Quaternion initialRotation, VoidEvent postRotation)
@@ -30,28 +39,30 @@ public class WorldMapPlayerToken : BaseCharacterToken
          StartCoroutine(Rotate(initialRotation, postRotation, ROTATION_TIME));
     }
 
-    private void PostRotation(SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    private void PostRotation(SplineContainer splineContainer, Vector3 pathOffset, Quaternion finalRotation, VoidEvent completeMovementEvent, float startOffset, float endOffset, float moveSpeed)
     {
-        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, pathOffset, MOVE_SPEED, finalRotation, completeMovementEvent));
+        StartCoroutine(MoveAlongSpline_Coroutine(splineContainer, pathOffset, moveSpeed, finalRotation, completeMovementEvent, startOffset, endOffset));
     }
 
-    private IEnumerator MoveAlongSpline_Coroutine(SplineContainer splineContainer, Vector3 pathOffset, float speed, Quaternion finalRotation, VoidEvent completeMovementEvent)
+    private IEnumerator MoveAlongSpline_Coroutine(SplineContainer splineContainer, Vector3 pathOffset, float speed, Quaternion finalRotation, VoidEvent completeMovementEvent, float startOffset, float endOffset)
     {
-        float progress = 0f;
-
         Vector3 previousPosition = this.transform.position;
         float splineLength = splineContainer.CalculateLength();
+        
+        float progress = 0f + startOffset / splineLength;
+        float progressEnd = 1f - endOffset / splineLength;
 
         m_ArmorVisual.SetMoveAnimator(true);
         m_ArmorVisual.SetDirAnim(ArmorVisual.DirXAnimParam, 0f);
         m_ArmorVisual.SetDirAnim(ArmorVisual.DirYAnimParam, 1f);
 
-        while (progress < 1f)
+        while (progress < progressEnd)
         {
             yield return null;
             progress += speed * Time.deltaTime / splineLength;
             Vector3 currPosition = (Vector3) splineContainer.EvaluatePosition(progress) + pathOffset;
-            Vector3 direction = currPosition - previousPosition;
+            // Vector3 direction = currPosition - previousPosition;
+            Vector3 direction = splineContainer.EvaluateTangent(progress);
             this.transform.position = currPosition;
             this.transform.rotation = Quaternion.LookRotation(-direction, transform.up);
         }

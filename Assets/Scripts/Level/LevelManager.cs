@@ -310,9 +310,17 @@ public class LevelManager : MonoBehaviour
             return;
         }
         
+        var pathSpline = m_LevelNodeManager.GetEdgeToNode(destNode).GetPathSplineTo(destNode);
+        
+        if (pathSpline == null)
+        {
+            Debug.LogError("Node Movement: Path Spline is null");
+            return;
+        }
+        
         EndPlayerPhase();
         
-        m_LevelTokenManager.MovePlayerToNode(m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
+        m_LevelTokenManager.MovePlayerToNode(pathSpline, m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
         
         return;
 
@@ -410,7 +418,7 @@ public class LevelManager : MonoBehaviour
 
         Debug.Log("LevelManager: Ending Battle Node");
 
-        NodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
+        LevelNodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
         
         if (victor == UnitAllegiance.PLAYER)
         {
