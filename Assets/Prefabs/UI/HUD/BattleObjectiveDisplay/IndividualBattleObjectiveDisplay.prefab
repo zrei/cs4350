@@ -281,6 +281,7 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 3344241286146801374}
   isWorldSpace: 0
+  deselectOnPointerExit: 0
   onSelect:
     m_PersistentCalls:
       m_Calls: []
@@ -291,6 +292,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onPointerEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onPointerExit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &7887320517385853870

@@ -49,7 +49,7 @@ namespace Game.UI
 
             m_CharacterNameText.text = $"{levelUpSummary.m_CharacterSO.m_CharacterName}";
             
-            m_ResultText.text = $"Level: \t\t\t{levelUpSummary.m_FinalLevel} (+{levelUpSummary.m_LevelGrowth})\n";
+            m_ResultText.text = $"Level: \t\t\t\t{levelUpSummary.m_FinalLevel} (+{levelUpSummary.m_LevelGrowth})\n";
             
             // Iterate for every stat in StatType
             foreach (StatType stat in Enum.GetValues(typeof(StatType)))
@@ -67,15 +67,15 @@ namespace Game.UI
                     case StatType.HEALTH:
                     case StatType.MANA:
                     case StatType.SPEED:
-                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t\t";
+                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t\t\t";
                         break;
                     case StatType.PHYS_ATTACK:
                     case StatType.MAG_ATTACK:
-                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t";
+                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t\t";
                         break;
                     case StatType.PHYS_DEFENCE:
                     case StatType.MAG_DEFENCE:
-                        m_ResultText.text += $"{FormatStatName(stat)}: \t";
+                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t";
                         break;
                 }
                 
