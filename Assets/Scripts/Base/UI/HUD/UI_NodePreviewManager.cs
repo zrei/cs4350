@@ -27,6 +27,7 @@ public class UI_NodePreviewManager : MonoBehaviour
     private void OnDestroy()
     {
         DisablePreview();
+        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnSceneLoad;
         GlobalEvents.Dialogue.DialogueStartEvent -= DisablePreview;
         GlobalEvents.Dialogue.DialogueEndEvent -= EnablePreview;
     }

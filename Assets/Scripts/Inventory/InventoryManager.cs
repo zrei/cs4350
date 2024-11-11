@@ -59,7 +59,7 @@ public class InventoryManager : Singleton<InventoryManager>
         HandleDependencies();
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-        GlobalEvents.UI.OnClosePartyOverviewEvent += SaveWeapons;
+        GlobalEvents.UI.SavePartyChangesEvent += SaveWeapons;
 
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     }
@@ -89,7 +89,7 @@ public class InventoryManager : Singleton<InventoryManager>
         base.HandleDestroy();
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-        GlobalEvents.UI.OnClosePartyOverviewEvent -= SaveWeapons;
+        GlobalEvents.UI.SavePartyChangesEvent -= SaveWeapons;
 
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
     }
