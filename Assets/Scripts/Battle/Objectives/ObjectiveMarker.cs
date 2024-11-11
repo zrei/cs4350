@@ -44,16 +44,24 @@ public class ObjectiveMarker : MonoBehaviour
         SetMarkerType(Type.Default);
 
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+        GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
     }
 
     private void OnDestroy()
     {
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
     }
 
     private void OnBattleEnd(UnitAllegiance _, int numTurns)
     {
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+        SetActive(false);
+    }
+
+    private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+    {
         SetActive(false);
     }
 

@@ -34,8 +34,8 @@ public class UI_BattleResult : MonoBehaviour
     {
         graphicGroup.color = victor switch
         {
-            UnitAllegiance.PLAYER => UIConstants.VictoryColor,
-            UnitAllegiance.ENEMY => UIConstants.DefeatColor,
+            UnitAllegiance.PLAYER => ColorUtils.VictoryColor,
+            UnitAllegiance.ENEMY => ColorUtils.DefeatColor,
             _ => Color.white,
         };
         m_ResultText.text = victor switch

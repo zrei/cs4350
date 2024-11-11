@@ -1,4 +1,5 @@
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game.UI
@@ -9,10 +10,14 @@ namespace Game.UI
         public TextMeshProUGUI nameText;
         public Image glow;
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
-            glow?.CrossFadeAlpha(0, 0, true);
+            base.Awake();
+
+            if (Application.isPlaying)
+            {
+                glow?.CrossFadeAlpha(0, 0, true);
+            }
         }
 
         public void SetGlowActive(bool active)

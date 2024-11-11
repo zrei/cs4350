@@ -12,10 +12,14 @@ namespace Game.UI
         [SerializeField]
         private bool isWorldSpace;
 
+        [SerializeField]
+        private bool deselectOnPointerExit;
+
         public UnityEvent onSelect;
         public UnityEvent onDeselect;
         public UnityEvent onSubmit;
         public UnityEvent onPointerEnter;
+        public UnityEvent onPointerExit;
 
         public override void OnSelect(BaseEventData eventData)
         {
@@ -39,6 +43,17 @@ namespace Game.UI
             onPointerEnter?.Invoke();
 
             Select();
+        }
+
+        public override void OnPointerExit(PointerEventData eventData)
+        {
+            base.OnPointerExit(eventData);
+            onPointerExit?.Invoke();
+
+            if (deselectOnPointerExit)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+            }
         }
 
         public void OnSubmit(BaseEventData eventData)

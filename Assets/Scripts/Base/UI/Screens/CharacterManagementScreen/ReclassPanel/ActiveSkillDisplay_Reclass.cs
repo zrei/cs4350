@@ -15,16 +15,20 @@ namespace Game.UI
         {
             int startingIndex = (m_CurrPage - 1) * m_NumSkillButtons;
             int minSkillNumber = Mathf.Min(m_CurrClass.m_ActiveSkills.Count() - startingIndex, m_NumSkillButtons);
+            var hasSkill = false;
             for (int i = 0; i < minSkillNumber; ++i)
             {
                 m_SkillButtons[i].icon.sprite = m_CurrClass.m_ActiveSkills[startingIndex + i].m_Icon;
                 ToggleCanvasGroup(m_SkillBtnCgs[i], true);
+                hasSkill = true;
             }
 
             for (int i = minSkillNumber; i < m_NumSkillButtons; ++i)
             {
                 ToggleCanvasGroup(m_SkillBtnCgs[i], false);
             }
+
+            m_NoneText?.gameObject.SetActive(!hasSkill);
         }
 
         protected override void HoverSkill(int index)

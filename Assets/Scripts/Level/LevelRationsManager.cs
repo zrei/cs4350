@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelRationsManager : MonoBehaviour
+public class LevelRationsManager : Singleton<LevelRationsManager>
 {
     [Tooltip("List of thresholds that, once rations falls below, will have an effect. Only the lowest fulfilled threshold takes effect.")]
     public List<RationsThreshold> m_LessThanRationsThresholds;
@@ -51,12 +51,14 @@ public class LevelRationsManager : MonoBehaviour
 
     public List<InflictedToken> GetInflictedTokens()
     {
+        // assume sorted in ascending tier, pick highest tier
+        List<InflictedToken> tokens = new();
         foreach (RationsThreshold rationsThreshold in m_LessThanRationsThresholds)
         {
             if (rationsThreshold.IsThresholdMet(m_CurrRations, true))
-                return rationsThreshold.m_Tokens;
+                tokens = rationsThreshold.m_Tokens;
         }
-        return new List<InflictedToken>();
+        return tokens;
     }
 
     #endregion

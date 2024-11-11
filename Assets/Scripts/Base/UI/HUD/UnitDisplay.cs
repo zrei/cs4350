@@ -1,17 +1,21 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
     public class UnitDisplay : MonoBehaviour
     {
-        private static readonly Color PlayerColor = new Color32(0, 64, 106, 102);
-        private static readonly Color EnemyColor = new Color32(106, 0, 0, 102);
+        [SerializeField]
+        private Color playerColor = new Color32(0, 64, 106, 255);
+        [SerializeField]
+        private Color enemyColor = new Color32(106, 0, 0, 255);
 
         [SerializeField]
         private bool isCurrentUnitDisplay = true;
+
+        [SerializeField]
+        private bool isSubDisplay;
 
         #region Component References
         [SerializeField]
@@ -21,7 +25,7 @@ namespace Game.UI
         private Image characterArt;
 
         [SerializeField]
-        private Image background;
+        private Graphic background;
 
         [SerializeField]
         private FormattedTextDisplay phyAtkDisplay;
@@ -39,6 +43,9 @@ namespace Game.UI
         private FormattedTextDisplay spdDisplay;
 
         [SerializeField]
+        private FormattedTextDisplay movDisplay;
+
+        [SerializeField]
         private ProgressBar hpBar;
 
         [SerializeField]
@@ -49,9 +56,10 @@ namespace Game.UI
         #endregion
 
         private Animator animator;
+        private CanvasGroup canvasGroup;
         private bool isHidden;
 
-        private Unit TrackedUnit
+        public Unit TrackedUnit
         {
             get => trackedUnit;
             set
@@ -89,7 +97,7 @@ namespace Game.UI
                         }
                     }
 
-                    statusDisplay.TrackedStatusManager = trackedUnit.StatusManager;
+                    statusDisplay.TrackedUnit = trackedUnit;
                 }
             }
         }
@@ -97,13 +105,19 @@ namespace Game.UI
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
+            if (!isSubDisplay)
+            {
+                animator = GetComponent<Animator>();
+                animator.enabled = false;
 
-            GetComponent<CanvasGroup>().alpha = 0;
-            isHidden = true;
+                canvasGroup = GetComponent<CanvasGroup>();
+                canvasGroup.alpha = 0f;
+                canvasGroup.interactable = false;
+                canvasGroup.blocksRaycasts = false;
+                isHidden = true;
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+                GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+            }
         }
 
         private void OnSceneLoad()
@@ -119,6 +133,7 @@ namespace Game.UI
 
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
         }
 
         private void OnBattleEnd(UnitAllegiance _, int _2)
@@ -131,12 +146,18 @@ namespace Game.UI
             HandleQuit();
         }
 
+        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+        {
+            Hide();
+        }
+
         private void HandleQuit()
         {
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
 
             Hide();
         }
@@ -148,9 +169,10 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
         }
 
-        private void OnPreviewUnit(Unit currentUnit)
+        public void OnPreviewUnit(Unit currentUnit)
         {
             if (currentUnit == null)
             {
@@ -162,10 +184,11 @@ namespace Game.UI
 
             var backgroundColor = currentUnit.UnitAllegiance switch
             {
-                UnitAllegiance.PLAYER => PlayerColor,
-                UnitAllegiance.ENEMY => EnemyColor,
-                _ => PlayerColor
+                UnitAllegiance.PLAYER => playerColor,
+                UnitAllegiance.ENEMY => enemyColor,
+                _ => playerColor
             };
+            backgroundColor.a = background.color.a;
             background.color = backgroundColor;
 
             nameDisplay.SetValue(currentUnit.DisplayName);
@@ -181,6 +204,7 @@ namespace Game.UI
             phyDefDisplay?.SetValue(totalStats.m_PhysicalDefence);
             mgcDefDisplay?.SetValue(totalStats.m_MagicDefence);
             spdDisplay?.SetValue(totalStats.m_Speed);
+            movDisplay?.SetValue(totalStats.m_MovementRange);
 
             TrackedUnit = currentUnit;
         }
@@ -197,6 +221,9 @@ namespace Game.UI
 
         private void Show()
         {
+            if (animator == null) return;
+            if (!isHidden) return;
+
             isHidden = false;
             animator.enabled = true;
             animator.Play(UIConstants.ShowAnimHash);
@@ -204,9 +231,14 @@ namespace Game.UI
 
         private void Hide()
         {
+            if (animator == null) return;
+            if (isHidden) return;
+
             TrackedUnit = null;
 
             isHidden = true;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);
         }
@@ -214,6 +246,9 @@ namespace Game.UI
         private void OnAnimationFinish()
         {
             animator.enabled = false;
+            canvasGroup.alpha = isHidden ? 0 : 1;
+            canvasGroup.interactable = !isHidden;
+            canvasGroup.blocksRaycasts = !isHidden;
         }
     }
 }

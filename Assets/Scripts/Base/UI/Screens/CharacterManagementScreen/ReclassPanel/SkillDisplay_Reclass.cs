@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Game.UI
@@ -18,6 +19,7 @@ namespace Game.UI
         [Header("Description")]
         [SerializeField] protected FormattedTextDisplay m_SkillTitle;
         [SerializeField] protected FormattedTextDisplay m_SkillDescription;
+        [SerializeField] protected TextMeshProUGUI m_NoneText;
 
         protected int m_NumSkillButtons;
         protected int m_NumPages;

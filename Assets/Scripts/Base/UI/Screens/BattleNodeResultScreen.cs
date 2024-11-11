@@ -33,14 +33,14 @@ namespace Game.UI
                 m_TitleText.text = "Victory!";
                 //m_TimeTakenText.text = $"Time taken: {numTurns}";
                 m_ResultText.text = $"Gained {expReward} EXP!";
-                m_GraphicGroup.color = UIConstants.VictoryColor;
+                m_GraphicGroup.color = ColorUtils.VictoryColor;
             }
             else
             {
                 m_TitleText.text = "Defeat...";
                 //m_TimeTakenText.text = $"Time taken: {numTurns}";
                 m_ResultText.text = "";
-                m_GraphicGroup.color = UIConstants.DefeatColor;
+                m_GraphicGroup.color = ColorUtils.DefeatColor;
             }
             
             m_ReturnButton.onSubmit.AddListener(CloseResults);

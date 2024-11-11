@@ -33,8 +33,7 @@ namespace Game.UI
 
         public void ShowDamage(string text, Transform anchor)
         {
-            var display = displayPool.Get();
-            display.Show(text, Color.white, anchor);
+            ShowDamage(text, Color.white, anchor);
         }
 
         public void ShowDamage(string text, Color color, Transform anchor)

@@ -2,11 +2,16 @@ using System.Collections;
 using UnityEngine;
 using Game.UI;
 using TMPro;
+using static GlobalEvents;
 
 public class MoralityDisplay : MonoBehaviour
 {
     [SerializeField]
-    private float displayLength = 485;
+    private float displayLength = 512;
+    [SerializeField]
+    private float displayLengthClamp = 507;
+    [SerializeField]
+    private Gradient colorGradient;
 
     [SerializeField]
     private ProgressBar goodBar;
@@ -16,6 +21,7 @@ public class MoralityDisplay : MonoBehaviour
     private ProgressBar evilBar;
     [SerializeField]
     private GraphicGroup evilGraphicGroup;
+    
     [SerializeField]
     private GraphicGroup marker;
     [SerializeField]
@@ -32,6 +38,7 @@ public class MoralityDisplay : MonoBehaviour
             {
                 var startMorality = morality;
                 var targetMorality = value;
+                var morality01 = morality / 2f + 0.5f;
 
                 var markerPos = marker.transform.localPosition;
                 var t = 0f;
@@ -40,23 +47,25 @@ public class MoralityDisplay : MonoBehaviour
                 {
                     t += Time.deltaTime;
                     morality = Mathf.Lerp(startMorality, targetMorality, t / duration);
+                    morality01 = morality / 2f + 0.5f;
 
                     goodBar.SetValue(Mathf.Max(0, morality), 1f, 0f);
                     evilBar.SetValue(Mathf.Max(0, -morality), 1f, 0f);
-                    markerPos.x = morality * displayLength;
+                    markerPos.x = Mathf.Clamp(morality * displayLength, -displayLengthClamp, displayLengthClamp);
                     marker.transform.localPosition = markerPos;
-                    marker.color = Color.Lerp(evilGraphicGroup.color, goodGraphicGroup.color, morality / 2f + 0.5f);
+                    marker.color = colorGradient.Evaluate(morality01);
                     text.text = $"{Mathf.RoundToInt(morality * 100)}<sprite name=\"Morality\" tint>";
                     yield return null;
                 }
 
                 morality = targetMorality;
+                morality01 = morality / 2f + 0.5f;
 
                 goodBar.SetValue(Mathf.Max(0, morality), 1f, 0f);
                 evilBar.SetValue(Mathf.Max(0, -morality), 1f, 0f);
-                markerPos.x = morality * displayLength;
+                markerPos.x = Mathf.Clamp(morality * displayLength, -displayLengthClamp, displayLengthClamp); ;
                 marker.transform.localPosition = markerPos;
-                marker.color = Color.Lerp(evilGraphicGroup.color, goodGraphicGroup.color, morality / 2f + 0.5f);
+                marker.color = colorGradient.Evaluate(morality01);
                 text.text = $"{Mathf.RoundToInt(morality * 100)}<sprite name=\"Morality\" tint>";
             }
 
@@ -115,10 +124,14 @@ public class MoralityDisplay : MonoBehaviour
     {
         StopAllCoroutines();
         morality = value;
+        var morality01 = morality / 2f + 0.5f;
         goodBar.SetValue(Mathf.Max(0, morality), 1f, 0f);
         evilBar.SetValue(Mathf.Max(0, -morality), 1f, 0f);
-        marker.transform.localPosition = new Vector3(morality * displayLength, marker.transform.localPosition.y, marker.transform.localPosition.z);
-        marker.color = Color.Lerp(evilGraphicGroup.color, goodGraphicGroup.color, morality / 2f + 0.5f);
+        marker.transform.localPosition = new Vector3(
+            Mathf.Clamp(morality * displayLength, -displayLengthClamp, displayLengthClamp),
+            marker.transform.localPosition.y,
+            marker.transform.localPosition.z);
+        marker.color = colorGradient.Evaluate(morality01);
         text.text = $"{Mathf.RoundToInt(morality * 100)}<sprite name=\"Morality\" tint>";
     }
 

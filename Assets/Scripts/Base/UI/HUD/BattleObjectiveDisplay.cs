@@ -36,7 +36,7 @@ namespace Game.UI
             );
 
             GlobalEvents.Battle.BattleInitializedEvent += Initialize;
-            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+            GlobalEvents.Level.ReturnFromLevelEvent += Clear;
 
             animator = GetComponent<Animator>();
             animator.enabled = false;
@@ -51,7 +51,10 @@ namespace Game.UI
         private void OnDestroy()
         {
             GlobalEvents.Battle.BattleInitializedEvent -= Initialize;
+            GlobalEvents.Level.ReturnFromLevelEvent -= Clear;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+            GlobalEvents.Battle.CompleteAttackAnimationEvent -= Show;
         }
 
         private void Initialize()
@@ -66,7 +69,11 @@ namespace Game.UI
             }
 
             Show();
-        }
+
+            GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
+            GlobalEvents.Battle.CompleteAttackAnimationEvent += Show;
+    }
 
         private void Clear()
         {
@@ -74,6 +81,14 @@ namespace Game.UI
         }
 
         private void OnBattleEnd(UnitAllegiance _, int numTurns)
+        {
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
+            GlobalEvents.Battle.CompleteAttackAnimationEvent -= Show;
+            Hide();
+        }
+
+        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
         {
             Hide();
         }
@@ -88,6 +103,8 @@ namespace Game.UI
         private void Hide()
         {
             isHidden = true;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             animator.enabled = true;
             animator.Play(UIConstants.HideAnimHash);
         }
@@ -97,9 +114,6 @@ namespace Game.UI
             animator.enabled = false;
             canvasGroup.interactable = !isHidden;
             canvasGroup.blocksRaycasts = !isHidden;
-
-            if (isHidden)
-                Clear();
         }
     }
 }

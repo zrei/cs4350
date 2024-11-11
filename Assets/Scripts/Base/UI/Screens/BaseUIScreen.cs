@@ -37,7 +37,7 @@ namespace Game.UI
             canvasGroup.blocksRaycasts = false;
         }
 
-        public virtual void Show()
+        public virtual void Show(params object[] args)
         {
             animator.enabled = true;
             animatorCallbackExecuter.RemoveAllListeners();
@@ -100,6 +100,11 @@ namespace Game.UI
         }
 
         public virtual void OnCancel(IInput input)
+        {
+            Close();
+        }
+
+        public void Close()
         {
             UIScreenManager.Instance.CloseScreen();
         }
