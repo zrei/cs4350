@@ -106,6 +106,7 @@ namespace Game.UI
 
         public void Hide()
         {
+            canvasGroup ??= GetComponent<CanvasGroup>();
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0;
@@ -113,6 +114,7 @@ namespace Game.UI
         
         public void Show()
         {
+            canvasGroup ??= GetComponent<CanvasGroup>();
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1;

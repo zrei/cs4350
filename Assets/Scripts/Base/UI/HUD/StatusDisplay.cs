@@ -27,17 +27,10 @@ namespace Game.UI
             {
                 if (value == trackedUnit) return;
 
-                if (activeDisplays.Count > 0)
-                {
-                    var displays = new List<IndividualStatusDisplay>(activeDisplays.Values);
-                    activeDisplays.Clear();
-                    displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
-                }
+                Clear();
 
                 trackedUnit = value;
 
-                permanentStatusCount = 0;
-                regularStatusCount = 0;
                 TrackedStatusManager = trackedUnit.StatusManager;
 
                 foreach (var token in trackedUnit.PermanentTokens)
@@ -171,9 +164,42 @@ namespace Game.UI
             var regularStatusLayoutActive = regularStatusCount > 0;
             var permanentStatusLayoutActive = permanentStatusCount > 0;
 
-            regularStatusLayout.gameObject.SetActive(regularStatusLayoutActive);
-            permanentStatusLayout.gameObject.SetActive(permanentStatusLayoutActive);
-            divider.gameObject.SetActive(regularStatusLayoutActive && permanentStatusLayoutActive);
+            regularStatusLayout?.gameObject.SetActive(regularStatusLayoutActive);
+            permanentStatusLayout?.gameObject.SetActive(permanentStatusLayoutActive);
+            divider?.gameObject.SetActive(regularStatusLayoutActive && permanentStatusLayoutActive);
+        }
+
+        public void Clear()
+        {
+            if (activeDisplays.Count > 0)
+            {
+                var displays = new List<IndividualStatusDisplay>(activeDisplays.Values);
+                activeDisplays.Clear();
+                displays.ForEach(x => { x.TrackedStatus = null; displayPool.Release(x); });
+            }
+
+            permanentStatusCount = 0;
+            regularStatusCount = 0;
+        }
+
+        /// <summary>
+        /// Set the statuses to display directly, in case Unit or Status Manager is unavailable.
+        /// </summary>
+        public void SetStatuses(IEnumerable<IStatus> regularStatuses, IEnumerable<IStatus> permanentStatuses)
+        {
+            Clear();
+
+            foreach (var regularStatus in regularStatuses)
+            {
+                Get(false).TrackedStatus = regularStatus;
+            }
+
+            foreach (var permanentStatus in permanentStatuses)
+            {
+                Get(true).TrackedStatus = permanentStatus;
+            }
+
+            UpdateActiveLayoutGroups();
         }
     }
 }

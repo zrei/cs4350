@@ -46,8 +46,6 @@ namespace Game.UI
             var width = root.rect.width;
             var height = root.rect.height;
             Vector2 localPosNorm = new(localPos.x / width + 0.5f, localPos.y / height + 0.5f);
-            Debug.Log(localPosNorm);
-            Debug.Log(GetClosestCorner(localPosNorm));
 
             display.Show(
                 localPos,

@@ -8,14 +8,24 @@ namespace Game.UI
         private enum Tab 
         {
             OVERVIEW,
-            RECLASS
+            RECLASS,
+            WEAPON,
         }
 
         [Header("Panel")]
         [SerializeField] private CharacterOverviewDisplay m_CharacterOverviewDisplay;
         [SerializeField] private ReclassPanel m_ReclassPanel;
-        [SerializeField] private SkillsAndWeaponPanel m_SkillsAndWeaponPanel;
-        
+        [SerializeField] private WeaponsOverviewDisplay m_WeaponsOverviewDisplay;
+        [SerializeField] private SkillsAndStatusPanel m_SkillsAndStatusPanel;
+
+        [Header("Buttons")]
+        [SerializeField]
+        private NamedObjectButton m_WeaponsOverviewButton;
+        [SerializeField]
+        private Sprite m_WeaponsOverviewOpenSprite;
+        [SerializeField]
+        private Sprite m_WeaponsOverviewCloseSprite;
+
         [Header("Party List")]
         [SerializeField]
         private Transform m_PartyMemberButtonContainer;
@@ -52,7 +62,11 @@ namespace Game.UI
         private void Awake()
         {
             m_ReclassPanel.OnOverviewEvent += () => TabSwitch(Tab.OVERVIEW);
-            m_SkillsAndWeaponPanel.OnReclassEvent += () => TabSwitch(Tab.RECLASS);
+            m_WeaponsOverviewDisplay.OnOverviewEvent += () => TabSwitch(Tab.OVERVIEW);
+
+            m_SkillsAndStatusPanel.OnReclassEvent += () => TabSwitch(Tab.RECLASS);
+
+            m_WeaponsOverviewButton.onSubmit.AddListener(() => TabSwitch(m_CurrTab != Tab.WEAPON ? Tab.WEAPON : Tab.OVERVIEW));
         }
 
         public override void Initialize()
@@ -102,8 +116,8 @@ namespace Game.UI
                 m_PartyMemberButtons.Add(partyMemberButton);
                 continue;
             }
-            
-            B_DisplayPartyMemnber(m_PartyMemberButtons[0], partyMembers[0]);
+
+            CoroutineManager.Instance.ExecuteAfterFrames(() => B_DisplayPartyMemnber(m_PartyMemberButtons[0], partyMembers[0]), 1);
             
             // Temporary way to pass party members
             //m_CharacterOverviewDisplay.SetPartyMembers(partyMembers);
@@ -118,7 +132,8 @@ namespace Game.UI
             SelectedPartyMemberButton = partyMemberButton;
             m_CharacterOverviewDisplay.ViewUnit(playerCharacterData);
             m_ReclassPanel.SetDisplay(playerCharacterData);
-            m_SkillsAndWeaponPanel.ViewUnit(playerCharacterData);
+            m_WeaponsOverviewDisplay.DisplayUnitWeapons(playerCharacterData);
+            m_SkillsAndStatusPanel.ViewUnit(playerCharacterData);
             UpdateDisplay(Tab.OVERVIEW);
         }
 
@@ -133,9 +148,20 @@ namespace Game.UI
         private void UpdateDisplay(Tab tab)
         {
             m_ReclassPanel.gameObject.SetActive(tab == Tab.RECLASS);
-            m_SkillsAndWeaponPanel.gameObject.SetActive(tab == Tab.OVERVIEW);
+            m_WeaponsOverviewDisplay.gameObject.SetActive(tab == Tab.WEAPON);
+            if (tab == Tab.WEAPON)
+            {
+                m_WeaponsOverviewDisplay.Show();
+            }
+            else
+            {
+                m_WeaponsOverviewDisplay.Hide();
+            }
+            m_SkillsAndStatusPanel.gameObject.SetActive(tab == Tab.OVERVIEW);
 
             m_CurrTab = tab;
+            m_WeaponsOverviewButton.SetGlowActive(m_CurrTab == Tab.WEAPON);
+            m_WeaponsOverviewButton.icon.sprite = m_CurrTab == Tab.WEAPON ? m_WeaponsOverviewCloseSprite : m_WeaponsOverviewOpenSprite;
         }
     }
 }

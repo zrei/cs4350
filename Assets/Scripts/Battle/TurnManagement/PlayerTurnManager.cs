@@ -423,8 +423,8 @@ public class PlayerTurnManager : TurnManager
         {
             case PlayerTurnState.SELECTING_ACTION:
             case PlayerTurnState.INSPECT:
-                m_MapLogic.ShowInspectable(GridType.PLAYER);
-                m_MapLogic.ShowInspectable(GridType.ENEMY);
+                m_MapLogic.ShowInspectable(GridType.PLAYER, true);
+                m_MapLogic.ShowInspectable(GridType.ENEMY, true);
                 break;
             case PlayerTurnState.SELECTING_TELEPORT_TARGET:
                 m_MapLogic.ShowTeleportable(GridType.PLAYER, m_CurrUnit, SelectedSkill, m_CachedTargetTile);

@@ -125,6 +125,12 @@ namespace Game.UI
                         TokenStackDisplay display = null;
                         if (!activeDisplays.TryGetValue(tier, out display) && tierCount > 0)
                         {
+                            // not sure why null error was triggered here
+                            if (displayPool == null)
+                            {
+                                Awake();
+                            }
+
                             display = displayPool.Get();
                             activeDisplays.Add(tier, display);
                             display.graphicGroup.color = trackedStatus.Color;
@@ -167,6 +173,8 @@ namespace Game.UI
 
         private void Awake()
         {
+            if (displayPool != null) return;
+
             displayPool = new(
                 createFunc: () => Instantiate(tokenStackDisplayPrefab, tokenStackLayout.transform),
                 actionOnGet: display => { display.gameObject.SetActive(true); display.transform.SetAsFirstSibling(); },

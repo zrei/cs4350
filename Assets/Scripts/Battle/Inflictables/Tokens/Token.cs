@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 [System.Serializable]
-public class InflictedToken
+public class InflictedToken : IStatus
 {
     public TokenTierSO m_TokenTierData;
     [Tooltip("Which tier should be inflicted")]
@@ -11,6 +13,17 @@ public class InflictedToken
 
     public int Id => m_TokenTierData.m_Id;
     public TokenType TokenType => m_TokenTierData.TokenType;
+
+    #region IStatus
+    public Sprite Icon => m_TokenTierData.m_Icon;
+    public Color Color => m_TokenTierData.m_Color;
+    public string DisplayTier => TokenUtil.NumToRomanNumeral(m_Tier);
+    public string DisplayStacks => $"<size=50%>x</size>{m_Number}<sprite name=\"Stack\">";
+    public string Name => m_TokenTierData.m_TokenName;
+    public string Description => m_TokenTierData.m_Description;
+    public List<int> NumStacksPerTier => null;
+    public int CurrentHighestTier => m_Tier;
+    #endregion
 
     public override string ToString()
     {

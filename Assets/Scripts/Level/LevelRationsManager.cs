@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelRationsManager : MonoBehaviour
+public class LevelRationsManager : Singleton<LevelRationsManager>
 {
     [Tooltip("List of thresholds that, once rations falls below, will have an effect. Only the lowest fulfilled threshold takes effect.")]
     public List<RationsThreshold> m_LessThanRationsThresholds;

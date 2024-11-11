@@ -3,19 +3,19 @@ using UnityEngine.Events;
 
 namespace Game.UI
 {
-    public class SkillsAndWeaponPanel : MonoBehaviour
+    public class SkillsAndStatusPanel : MonoBehaviour
     {
         private enum Tab
         {
             SKILL,
-            WEAPON
+            STATUS
         }
 
         [SerializeField] private NamedObjectButton m_SkillsTabButton;
-        [SerializeField] private NamedObjectButton m_WeaponsTabButton;
+        [SerializeField] private NamedObjectButton m_StatusTabButton;
 
         [SerializeField] private SkillsOverviewDisplay m_SkillsOverviewDisplay;
-        [SerializeField] private WeaponsOverviewDisplay m_WeaponsOverviewDisplay;
+        [SerializeField] private StatusOverviewDisplay m_StatusOverviewDisplay;
 
         [Header("Tab")]
         [SerializeField] private NamedObjectButton m_ReclassButton;
@@ -28,14 +28,14 @@ namespace Game.UI
         private void Awake()
         {
             m_SkillsTabButton.onSubmit.AddListener(() => TabSwitch(Tab.SKILL));
-            m_WeaponsTabButton.onSubmit.AddListener(() => TabSwitch(Tab.WEAPON));
+            m_StatusTabButton.onSubmit.AddListener(() => TabSwitch(Tab.STATUS));
             m_ReclassButton.onSubmit.AddListener(OnReclassEvent);
         }
 
         public void ViewUnit(PlayerCharacterData playerCharacterData)
         {
             m_SkillsOverviewDisplay.DisplayUnitSkills(playerCharacterData);
-            m_WeaponsOverviewDisplay.DisplayUnitWeapons(playerCharacterData);
+            m_StatusOverviewDisplay.DisplayUnitStatuses(playerCharacterData);
 
             UpdateTabDisplay(Tab.SKILL);
         }
@@ -53,16 +53,16 @@ namespace Game.UI
             if (tab == Tab.SKILL)
             {
                 m_SkillsOverviewDisplay.Show();
-                m_WeaponsOverviewDisplay.Hide();
+                m_StatusOverviewDisplay.Hide();
             }
             else
             {
                 m_SkillsOverviewDisplay.Hide();
-                m_WeaponsOverviewDisplay.Show();
+                m_StatusOverviewDisplay.Show();
             }
             
             m_SkillsTabButton.SetGlowActive(tab == Tab.SKILL);
-            m_WeaponsTabButton.SetGlowActive(tab == Tab.WEAPON);
+            m_StatusTabButton.SetGlowActive(tab == Tab.STATUS);
 
             m_CurrTab = tab;
         }

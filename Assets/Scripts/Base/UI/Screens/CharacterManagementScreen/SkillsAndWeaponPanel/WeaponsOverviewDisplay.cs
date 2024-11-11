@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Game.UI
 {
@@ -8,11 +9,17 @@ namespace Game.UI
     {
         #region Component References
         private CanvasGroup canvasGroup;
-        
+
+        [SerializeField]
+        private NamedObjectButton closeButton;
+
         [SerializeField]
         private List<NamedObjectButton> weaponButtons = new();
 
-        [SerializeField] 
+        [SerializeField]
+        private FormattedTextDisplay equippedWeaponText;
+
+        [SerializeField]
         private FormattedTextDisplay weaponHeaderText;
 
         [SerializeField] 
@@ -61,6 +68,9 @@ namespace Game.UI
         }
         private NamedObjectButton m_SelectedWeaponButton;
 
+        [HideInInspector]
+        public event UnityAction OnOverviewEvent;
+
         private void Awake()
         {
             canvasGroup = GetComponent<CanvasGroup>();
@@ -74,6 +84,8 @@ namespace Game.UI
             }
             
             equipButton.onSubmit.AddListener(ToggleWeaponEquip);
+
+            closeButton.onSubmit.AddListener(OnOverviewEvent);
         }
 
         public void DisplayUnitWeapons(PlayerCharacterData playerUnit)
@@ -172,7 +184,7 @@ namespace Game.UI
 
             weaponHeaderText.SetValue(weapon.m_WeaponInstanceSO.m_WeaponName);
             var builder = new System.Text.StringBuilder();
-            builder.AppendLine($"Weapon Type: {weapon.m_WeaponInstanceSO.m_WeaponType.ToString()}");
+            builder.AppendLine($"Weapon Type: {weapon.m_WeaponInstanceSO.m_WeaponType}");
             builder.AppendLine($"Base Attack Modifier: {weapon.m_WeaponInstanceSO.m_BaseAttackModifier}");
             builder.AppendLine($"Base Heal Modifier: {weapon.m_WeaponInstanceSO.m_BaseHealModifier}");
             weaponDescriptionText.SetValue(builder.ToString());
@@ -181,25 +193,26 @@ namespace Game.UI
             equipButtonText.text = m_PlayerUnit.m_CurrEquippedWeaponId == weapon.m_InstanceId ? "Unequip" : "Equip";
         }
 
-        // Temp method to add equipped tag to weapon buttons
         private void UpdateEquippedWeaponButtonText()
         {
             for (int i = 0; i < m_AvailableWeapons.Count; i++)
             {
                 if (m_PlayerUnit.m_CurrEquippedWeaponId == m_AvailableWeapons[i].m_InstanceId)
                 {
-                    weaponButtons[i]
-                        .SetObjectName(m_AvailableWeapons[i].m_WeaponInstanceSO.m_WeaponName + " <Equipped>");
+                    weaponButtons[i].icon.gameObject.SetActive(true);
                 }
                 else
                 {
-                    weaponButtons[i].SetObjectName(m_AvailableWeapons[i].m_WeaponInstanceSO.m_WeaponName);
+                    weaponButtons[i].icon.gameObject.SetActive(false);
                 }
             }
+
+            equippedWeaponText.SetValue(m_PlayerUnit.GetWeaponInstanceSO().m_WeaponName);
         }
 
         public void Hide()
         {
+            canvasGroup ??= GetComponent<CanvasGroup>();
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0;
@@ -207,6 +220,7 @@ namespace Game.UI
         
         public void Show()
         {
+            canvasGroup ??= GetComponent<CanvasGroup>();
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1;

@@ -31,20 +31,19 @@ public class UI_NodePreview : MonoBehaviour
     {
         m_CanvasGroup = GetComponent<CanvasGroup>();
         m_RectTransform = GetComponent<RectTransform>();
+
+        m_CanvasGroup.interactable = false;
+        m_CanvasGroup.blocksRaycasts = false;
     }
     
     public void Show()
     {
         m_CanvasGroup.alpha = 1f;
-        m_CanvasGroup.interactable = true;
-        m_CanvasGroup.blocksRaycasts = true;
     }
     
     public void Hide()
     {
         m_CanvasGroup.alpha = 0f;
-        m_CanvasGroup.interactable = false;
-        m_CanvasGroup.blocksRaycasts = false;
         
         StopAllCoroutines();
     }
