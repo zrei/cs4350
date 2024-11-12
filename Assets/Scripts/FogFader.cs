@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class FogFader : MonoBehaviour
 {
-    private static readonly int TintPropertyHash = Shader.PropertyToID("_Tint");
+    private static readonly int ColorPropertyHash = Shader.PropertyToID("_BaseColor");
 
     private Color m_BaseColor;
     private List<Renderer> m_Renderers = new();
@@ -20,7 +21,7 @@ public class FogFader : MonoBehaviour
             value = Mathf.Clamp01(value);
 
             m_Opacity = value;
-            m_PropBlock.SetColor(TintPropertyHash, new Color(m_BaseColor.r, m_BaseColor.g, m_BaseColor.b, m_Opacity * m_BaseColor.a));
+            m_PropBlock.SetColor(ColorPropertyHash, new Color(m_BaseColor.r, m_BaseColor.g, m_BaseColor.b, m_Opacity * m_BaseColor.a));
             m_Renderers.ForEach(x =>
             {
                 x.SetPropertyBlock(m_PropBlock);
@@ -59,9 +60,10 @@ public class FogFader : MonoBehaviour
     private void Awake()
     {
         m_PropBlock = new MaterialPropertyBlock();
-        m_BaseColor = m_PropBlock.GetColor(TintPropertyHash);
+        m_BaseColor = gameObject.GetComponent<Renderer>().material.color;
+        SetRenderers(gameObject.GetComponents<Renderer>());
     }
-
+    
     public void SetRenderers(IEnumerable<Renderer> renderers)
     {
         foreach (var renderer in renderers) AddRenderer(renderer);
@@ -97,3 +99,25 @@ public class FogFader : MonoBehaviour
         Opacity = targetOpacity;
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(FogFader))]
+public class FogFaderEditor : Editor {
+    private FogFader m_FogFader;
+
+    private void OnEnable() {
+        m_FogFader = (FogFader)target;
+    }
+
+    public override void OnInspectorGUI() {
+        base.OnInspectorGUI();
+
+        GUILayout.Space(10f);
+
+        if (GUILayout.Button("Fade")) {
+            m_FogFader.Fade(0, 1);
+            Logger.LogEditor(this.GetType().Name, "Successfully Faded " + target.name, LogLevel.LOG);
+        }
+    }
+}
+#endif
