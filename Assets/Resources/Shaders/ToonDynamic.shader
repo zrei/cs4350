@@ -11,10 +11,10 @@
         [HDR] _RimColor("Rim Color", Color) = (1, 1, 1, 1)
         _RimAmount("Rim Amount", Range(0, 1)) = 0.716
         _RimThreshold("Rim Threshold", Range(0, 1)) = 0.1
-        // _OutlineColor ("Outline Color", Color) = (0,0,0,1)
-        // _OutlineThreshold ("Outline Threshold", Range(0, 1)) = 0.1
-        // _DepthSensitivity ("Depth Sensitivity", Range(0, 1)) = 0.1
-        // _NormalSensitivity ("Normal Sensitivity", Range(0, 1)) = 0.1
+        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        _OutlineThreshold ("Outline Threshold", Range(0, 1)) = 0.1
+        _DepthSensitivity ("Depth Sensitivity", Range(0, 1)) = 0.1
+        _NormalSensitivity ("Normal Sensitivity", Range(0, 1)) = 0.1
     }
     
     SubShader
@@ -76,10 +76,10 @@
                 half4 _RimColor;
                 float _RimAmount;
                 float _RimThreshold;
-                // half4 _OutlineColor;
-                // float _OutlineThreshold;
-                // float _DepthSensitivity;
-                // float _NormalSensitivity;
+                half4 _OutlineColor;
+                float _OutlineThreshold;
+                float _DepthSensitivity;
+                float _NormalSensitivity;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -127,6 +127,67 @@
                 { 1.0, 0.498, 0.875, 0.373, 0.969, 0.467, 0.843, 0.341, 0.992, 0.490, 0.867, 0.365, 0.961, 0.459, 0.835, 0.333 }
             };
 
+            float GetDepthEdges(float2 screenUV, float2 texelSize) 
+            {
+                // Sample depth in 8 directions for better edge detection
+                float depth = SampleSceneDepth(screenUV);
+                float depthN = SampleSceneDepth(screenUV + float2(0, 1) * texelSize);
+                float depthE = SampleSceneDepth(screenUV + float2(1, 0) * texelSize);
+                float depthS = SampleSceneDepth(screenUV + float2(0, -1) * texelSize);
+                float depthW = SampleSceneDepth(screenUV + float2(-1, 0) * texelSize);
+                float depthNE = SampleSceneDepth(screenUV + float2(1, 1) * texelSize);
+                float depthSE = SampleSceneDepth(screenUV + float2(1, -1) * texelSize);
+                float depthSW = SampleSceneDepth(screenUV + float2(-1, -1) * texelSize);
+                float depthNW = SampleSceneDepth(screenUV + float2(-1, 1) * texelSize);
+    
+                // Sobel filter for depth
+                float depthSobelH = depthE * 3 + depthNE * 1 + depthSE * 1 - depthW * 3 - depthNW * 1 - depthSW * 1;
+                float depthSobelV = depthN * 3 + depthNE * 1 + depthNW * 1 - depthS * 3 - depthSE * 1 - depthSW * 1;
+    
+                return sqrt(depthSobelH * depthSobelH + depthSobelV * depthSobelV);
+            }
+
+            float3 GetNormalEdges(float2 screenUV, float2 texelSize)
+            {
+                // Sample normals in 8 directions
+                float3 normalC = SampleSceneNormals(screenUV);
+                float3 normalN = SampleSceneNormals(screenUV + float2(0, 1) * texelSize);
+                float3 normalE = SampleSceneNormals(screenUV + float2(1, 0) * texelSize);
+                float3 normalS = SampleSceneNormals(screenUV + float2(0, -1) * texelSize);
+                float3 normalW = SampleSceneNormals(screenUV + float2(-1, 0) * texelSize);
+                float3 normalNE = SampleSceneNormals(screenUV + float2(1, 1) * texelSize);
+                float3 normalSE = SampleSceneNormals(screenUV + float2(1, -1) * texelSize);
+                float3 normalSW = SampleSceneNormals(screenUV + float2(-1, -1) * texelSize);
+                float3 normalNW = SampleSceneNormals(screenUV + float2(-1, 1) * texelSize);
+    
+                // Sobel filter for normals
+                float3 normalSobelH = normalE * 3 + normalNE * 1 + normalSE * 1 - normalW * 3 - normalNW * 1 - normalSW * 1;
+                float3 normalSobelV = normalN * 3 + normalNE * 1 + normalNW * 1 - normalS * 3 - normalSE * 1 - normalSW * 1;
+    
+                return sqrt(dot(normalSobelH, normalSobelH) + dot(normalSobelV, normalSobelV));
+            }
+
+            float GetOutlineWeight(float2 screenUV, float2 texelSize, float depthThreshold, float normalThreshold)
+            {
+                // Calculate edges using depth and normals
+                float depthEdge = GetDepthEdges(screenUV, texelSize);
+                float normalEdge = length(GetNormalEdges(screenUV, texelSize));
+    
+                // Apply thresholds with smoothstep for softer edges
+                float depthWeight = smoothstep(0, depthThreshold, depthEdge);
+                float normalWeight = smoothstep(0, normalThreshold, normalEdge);
+    
+                // Combine edges with distance fade
+                float edge = max(depthWeight, normalWeight);
+    
+                // Apply distance fade (optional)
+                float depth = SampleSceneDepth(screenUV);
+                float distanceFade = 1 - saturate(depth * _ProjectionParams.w); // w contains 1/far plane
+                edge *= distanceFade;
+    
+                return edge;
+            }
+
             half4 frag(Varyings IN) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
@@ -143,25 +204,16 @@
                 float shadowStepped = smoothstep(0.5, 0.51, mainLight.shadowAttenuation);
                 float NdotLShadowed = NdotL * shadowStepped;
                 float lightIntensity = 
-                    //smoothstep(0.0, 0.01, NdotLShadowed);
-                    //0.333 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    //+ smoothstep(0.333, 0.343, NdotLShadowed)
-                    //+ smoothstep(0.667, 0.677, NdotLShadowed));
-                    //0.25 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    //+ smoothstep(0.25, 0.26, NdotLShadowed)
-                    //+ smoothstep(0.5, 0.51, NdotLShadowed)
-                    //+ smoothstep(0.75, 0.76, NdotLShadowed));
-                    //0.2 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    //+ smoothstep(0.2, 0.21, NdotLShadowed)
-                    //+ smoothstep(0.4, 0.41, NdotLShadowed)
-                    //+ smoothstep(0.6, 0.61, NdotLShadowed)
-                    //+ smoothstep(0.8, 0.81, NdotLShadowed));
-                    0.167 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    + smoothstep(0.167, 0.177, NdotLShadowed)
-                    + smoothstep(0.333, 0.343, NdotLShadowed)
+                    0.1 * (smoothstep(0.0, 0.01, NdotLShadowed)
+                    + smoothstep(0.1, 0.11, NdotLShadowed)
+                    + smoothstep(0.2, 0.21, NdotLShadowed)
+                    + smoothstep(0.3, 0.31, NdotLShadowed)
+                    + smoothstep(0.4, 0.41, NdotLShadowed)
                     + smoothstep(0.5, 0.51, NdotLShadowed)
-                    + smoothstep(0.667, 0.677, NdotLShadowed)
-                    + smoothstep(0.833, 0.843, NdotLShadowed));
+                    + smoothstep(0.6, 0.61, NdotLShadowed)
+                    + smoothstep(0.7, 0.71, NdotLShadowed)
+                    + smoothstep(0.8, 0.81, NdotLShadowed)
+                    + smoothstep(0.9, 0.91, NdotLShadowed));
                 half3 lightColor = mainLight.color * lightIntensity;
 
                 // Specular reflection
@@ -169,17 +221,16 @@
                 float NdotH = dot(normalWS, halfVector);
                 float specularIntensity = pow(NdotH * lightIntensity, _Glossiness * _Glossiness);
                 float specularIntensitySmooth =
-                    //smoothstep(0.005, 0.01, specularIntensity);
-                    //0.25 * (smoothstep(0.0, 0.01, specularIntensity)
-                    //+ smoothstep(0.25, 0.26, specularIntensity)
-                    //+ smoothstep(0.5, 0.51, specularIntensity)
-                    //+ smoothstep(0.75, 0.76, specularIntensity));
-                    0.167 * (smoothstep(0.0, 0.01, specularIntensity)
-                    + smoothstep(0.167, 0.177, specularIntensity)
-                    + smoothstep(0.333, 0.343, specularIntensity)
+                    0.1 * (smoothstep(0.0, 0.01, specularIntensity)
+                    + smoothstep(0.1, 0.11, specularIntensity)
+                    + smoothstep(0.2, 0.21, specularIntensity)
+                    + smoothstep(0.3, 0.31, specularIntensity)
+                    + smoothstep(0.4, 0.41, specularIntensity)
                     + smoothstep(0.5, 0.51, specularIntensity)
-                    + smoothstep(0.667, 0.677, specularIntensity)
-                    + smoothstep(0.833, 0.843, specularIntensity));
+                    + smoothstep(0.6, 0.61, specularIntensity)
+                    + smoothstep(0.7, 0.71, specularIntensity)
+                    + smoothstep(0.8, 0.81, specularIntensity)
+                    + smoothstep(0.9, 0.91, specularIntensity));
                 half3 specular = specularIntensitySmooth * _SpecularColor.rgb;
 
                 // Rim lighting
@@ -190,26 +241,43 @@
 
                 // Final color
                 half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
-                half3 finalColor = _Color.rgb * baseMap.rgb * (_AmbientColor.rgb + lightColor + specular + rim);
+                half3 finalColor = _Color.rgb * baseMap.rgb * (_AmbientColor.rgb * 0.4 + lightColor + specular + rim);
 
                 // Sample depth and normals
                 float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+                float2 texelSize = _ScreenParams.zw - 1.0;
+
                 /*
+                // Simple outline
                 float depth = SampleSceneDepth(screenUV);
                 float3 normals = SampleSceneNormals(screenUV);
 
-                // Calculate depth and normal differences
                 float2 texelSize = 1.0 / _ScreenParams.xy;
                 float depthDiff = abs(depth - SampleSceneDepth(screenUV + float2(1,1) * texelSize));
                 float3 normalDiff = abs(normals - SampleSceneNormals(screenUV + float2(1,1) * texelSize));
 
-                // Detect edges
                 float edgeDepth = depthDiff > _DepthSensitivity;
                 float edgeNormal = length(normalDiff) > _NormalSensitivity;
                 float edge = max(edgeDepth, edgeNormal);
                 finalColor = lerp(finalColor, _OutlineColor, edge * _OutlineThreshold);
                 */
 
+                /*
+                // Outline with anti-aliasing
+                float outlineWeight = 0;
+                for(int i = -1; i <= 1; i++)
+                {
+                    for(int j = -1; j <= 1; j++)
+                    {
+                        float2 offset = float2(i, j) * texelSize;
+                        outlineWeight += GetOutlineWeight(screenUV + offset, texelSize, _DepthSensitivity, _NormalSensitivity) / 9.0;
+                    }
+                }
+
+                finalColor = lerp(finalColor, _OutlineColor.rgb, outlineWeight * _OutlineThreshold);
+                */
+
+                // Dither fade
                 int xRemap = screenUV.x * 1024 % 16;
                 int yRemap = screenUV.y * 1024 % 16;
                 float threshold = threshold_map[xRemap][yRemap];

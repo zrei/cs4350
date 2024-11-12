@@ -139,28 +139,19 @@
                 // Main light
                 Light mainLight = GetMainLight(shadowCoord);
                 float NdotL = dot(normalWS, mainLight.direction);
-                float shadowStepped = smoothstep(0.5, 0.51, mainLight.shadowAttenuation);
+                float shadowStepped = smoothstep(0.5, 0.51, mainLight.shadowAttenuation);;
                 float NdotLShadowed = NdotL * shadowStepped;
                 float lightIntensity = 
-                    //smoothstep(0.0, 0.01, NdotLShadowed);
-                    //0.333 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    //+ smoothstep(0.333, 0.343, NdotLShadowed)
-                    //+ smoothstep(0.667, 0.677, NdotLShadowed));
-                    //0.25 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    //+ smoothstep(0.25, 0.26, NdotLShadowed)
-                    //+ smoothstep(0.5, 0.51, NdotLShadowed)
-                    //+ smoothstep(0.75, 0.76, NdotLShadowed));
-                    //0.2 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    //+ smoothstep(0.2, 0.21, NdotLShadowed)
-                    //+ smoothstep(0.4, 0.41, NdotLShadowed)
-                    //+ smoothstep(0.6, 0.61, NdotLShadowed)
-                    //+ smoothstep(0.8, 0.81, NdotLShadowed));
-                    0.167 * (smoothstep(0.0, 0.01, NdotLShadowed)
-                    + smoothstep(0.167, 0.177, NdotLShadowed)
-                    + smoothstep(0.333, 0.343, NdotLShadowed)
+                    0.1 * (smoothstep(0.0, 0.01, NdotLShadowed)
+                    + smoothstep(0.1, 0.11, NdotLShadowed)
+                    + smoothstep(0.2, 0.21, NdotLShadowed)
+                    + smoothstep(0.3, 0.31, NdotLShadowed)
+                    + smoothstep(0.4, 0.41, NdotLShadowed)
                     + smoothstep(0.5, 0.51, NdotLShadowed)
-                    + smoothstep(0.667, 0.677, NdotLShadowed)
-                    + smoothstep(0.833, 0.843, NdotLShadowed));
+                    + smoothstep(0.6, 0.61, NdotLShadowed)
+                    + smoothstep(0.7, 0.71, NdotLShadowed)
+                    + smoothstep(0.8, 0.81, NdotLShadowed)
+                    + smoothstep(0.9, 0.91, NdotLShadowed));
                 half3 lightColor = mainLight.color * lightIntensity;
 
                 // Specular reflection
@@ -168,17 +159,16 @@
                 float NdotH = dot(normalWS, halfVector);
                 float specularIntensity = pow(NdotH * lightIntensity, _Glossiness * _Glossiness);
                 float specularIntensitySmooth =
-                    //smoothstep(0.005, 0.01, specularIntensity);
-                    //0.25 * (smoothstep(0.0, 0.01, specularIntensity)
-                    //+ smoothstep(0.25, 0.26, specularIntensity)
-                    //+ smoothstep(0.5, 0.51, specularIntensity)
-                    //+ smoothstep(0.75, 0.76, specularIntensity));
-                    0.167 * (smoothstep(0.0, 0.01, specularIntensity)
-                    + smoothstep(0.167, 0.177, specularIntensity)
-                    + smoothstep(0.333, 0.343, specularIntensity)
+                    0.1 * (smoothstep(0.0, 0.01, specularIntensity)
+                    + smoothstep(0.1, 0.11, specularIntensity)
+                    + smoothstep(0.2, 0.21, specularIntensity)
+                    + smoothstep(0.3, 0.31, specularIntensity)
+                    + smoothstep(0.4, 0.41, specularIntensity)
                     + smoothstep(0.5, 0.51, specularIntensity)
-                    + smoothstep(0.667, 0.677, specularIntensity)
-                    + smoothstep(0.833, 0.843, specularIntensity));
+                    + smoothstep(0.6, 0.61, specularIntensity)
+                    + smoothstep(0.7, 0.71, specularIntensity)
+                    + smoothstep(0.8, 0.81, specularIntensity)
+                    + smoothstep(0.9, 0.91, specularIntensity));
                 half3 specular = specularIntensitySmooth * _SpecularColor.rgb;
 
                 // Rim lighting
@@ -189,30 +179,7 @@
 
                 // Final color
                 half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
-                half3 finalColor = _Color.rgb * baseMap.rgb * (_AmbientColor.rgb + lightColor + specular + rim);
-
-                // Sample depth and normals
-                // float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
-                /*
-                float depth = SampleSceneDepth(screenUV);
-                float3 normals = SampleSceneNormals(screenUV);
-
-                // Calculate depth and normal differences
-                float2 texelSize = 1.0 / _ScreenParams.xy;
-                float depthDiff = abs(depth - SampleSceneDepth(screenUV + float2(1,1) * texelSize));
-                float3 normalDiff = abs(normals - SampleSceneNormals(screenUV + float2(1,1) * texelSize));
-
-                // Detect edges
-                float edgeDepth = depthDiff > _DepthSensitivity;
-                float edgeNormal = length(normalDiff) > _NormalSensitivity;
-                float edge = max(edgeDepth, edgeNormal);
-                finalColor = lerp(finalColor, _OutlineColor, edge * _OutlineThreshold);
-                */
-
-                // int xRemap = (uint)(screenUV.x * 10000) % 16;
-                // int yRemap = (uint)(screenUV.y * 10000) % 16;
-                // float threshold = threshold_map[xRemap][yRemap];
-                // clip(_Opacity - threshold);
+                half3 finalColor = _Color.rgb * baseMap.rgb * (_AmbientColor.rgb * 0.4 + lightColor + specular + rim);
 
                 return half4(finalColor, 1);
             }
