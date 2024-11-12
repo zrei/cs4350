@@ -1,16 +1,14 @@
-using System;
 using System.Collections.Generic;
 using Game.Input;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Game.UI
 {
     public class LevelUpResultScreen : BaseUIScreen
     {
         [SerializeField] TextMeshProUGUI m_CharacterNameText;
-        [SerializeField] TextMeshProUGUI m_ResultText;
+        [SerializeField] LevelUpStatDisplay m_LevelUpStatDisplay;
         [SerializeField] SelectableBase m_ReturnButton;
         
         // Temporary List of level up summaries
@@ -44,6 +42,12 @@ namespace Game.UI
                 return;
             }
             
+            var levelUpSummary = m_LevelUpSummaries[0];
+            m_CharacterNameText.text = $"{levelUpSummary.m_CharacterSO.m_CharacterName}";
+            m_LevelUpStatDisplay.DisplayLevelUp(levelUpSummary);
+            m_LevelUpSummaries.RemoveAt(0);
+            
+            /*
             var levelUpSummary = m_LevelUpSummaries[0];
             m_LevelUpSummaries.RemoveAt(0);
 
@@ -82,7 +86,7 @@ namespace Game.UI
                 m_ResultText.text += (statGrowth == 0)
                     ? $"{finalStat}\n"
                     : $"{finalStat} (+{statGrowth})\n";
-            }
+                */
         }
 
         private string FormatStatName(StatType stat)
