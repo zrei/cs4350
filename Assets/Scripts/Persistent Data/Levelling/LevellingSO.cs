@@ -11,6 +11,8 @@ public class LevellingSO : ScriptableObject
 
     public int GetRequiredExpAmount(int level)
     {
+        if (level > MAX_LEVEL)
+            return 0;
         return m_RequiredExpAmounts[level];
     }
 }

@@ -5,6 +5,8 @@ public class LevellingManager : Singleton<LevellingManager>
 {
     [SerializeField] LevellingSO m_LevellingSO;
 
+    public int MaxLevel => m_LevellingSO.MAX_LEVEL;
+
     public void LevelCharacter(PlayerCharacterData characterData, int expGained, out bool hasLevelledUp, out Dictionary<StatType, int> totalStatGrowths)
     {
         hasLevelledUp = false;
@@ -88,6 +90,11 @@ public class LevellingManager : Singleton<LevellingManager>
         
         return m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1) 
                - m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel);
+    }
+
+    public int GetExpToNextLevel(int level)
+    {
+        return m_LevellingSO.GetRequiredExpAmount(level);
     }
     
     /// <summary>
