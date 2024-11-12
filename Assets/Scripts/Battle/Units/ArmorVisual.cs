@@ -44,7 +44,7 @@ public class ArmorVisual : MonoBehaviour
     {
         m_Model = Instantiate(unitModelData.m_Model, transform);
         m_Model.transform.localPosition = Vector3.zero;
-        m_Model.transform.rotation = Quaternion.identity;
+        m_Model.transform.localRotation = Quaternion.identity;
 
         m_EquippingArmor = m_Model.GetComponent<EquippingArmor>();
         m_EquippingArmor.Initialize(unitModelData.m_AttachItems);

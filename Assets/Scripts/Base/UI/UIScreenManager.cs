@@ -47,6 +47,7 @@ namespace Game.UI
         public IUIScreen LevelResultScreen => LoadScreen("LevelResultScreen");
         public IUIScreen PartySelectScreen => LoadScreen("PartySelectScreen");
         public IUIScreen InspectScreen => LoadScreen("InspectScreen");
+        public IUIScreen ExpScreen => LoadScreen("ExpScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();

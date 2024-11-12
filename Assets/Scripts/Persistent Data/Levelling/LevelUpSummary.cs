@@ -23,3 +23,21 @@ public readonly struct LevelUpSummary
         m_FinalStats = characterData.m_CurrStats;
     }
 }
+
+public readonly struct ExpGainSummary
+{
+    public readonly PlayerCharacterSO m_CharacterSO;
+    public readonly int m_InitialLevel;
+    public readonly int m_FinalLevel;
+    public readonly int m_FinalExp;
+    public readonly int m_ExpGrowth;
+
+    public ExpGainSummary(PlayerCharacterData characterData, int initialLevel, int expGrowth)
+    {
+        m_CharacterSO = characterData.m_BaseData;
+        m_InitialLevel = initialLevel;
+        m_FinalLevel = characterData.m_CurrLevel;
+        m_FinalExp = characterData.m_CurrExp;
+        m_ExpGrowth = expGrowth;
+    }
+}

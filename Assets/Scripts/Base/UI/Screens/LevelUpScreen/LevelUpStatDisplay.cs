@@ -44,14 +44,14 @@ namespace Game.UI
 
         private IEnumerator BeginLevelUpAnimation(LevelUpSummary levelUpSummary)
         {
-            yield return null;
-            m_LevelDisplay?.SetValue($"{levelUpSummary.m_FinalLevel} <color=blue>+({levelUpSummary.m_LevelGrowth})</color>");
+            yield return new WaitForSeconds(DELAY);
+            m_LevelDisplay?.SetValue($"{levelUpSummary.m_FinalLevel} <color=blue>(+{levelUpSummary.m_LevelGrowth})</color>");
             yield return new WaitForSeconds(DELAY);
             foreach (StatType statType in Enum.GetValues(typeof(StatType)))
             {
                 if (levelUpSummary.m_TotalStatGrowths.ContainsKey(statType) && levelUpSummary.m_TotalStatGrowths[statType] > 0)
                 {
-                    GetFormattedTextDisplay(statType)?.SetValue($"{levelUpSummary.m_FinalStats.GetStat(statType)} <color=blue>+{levelUpSummary.m_TotalStatGrowths[statType]}</color>");
+                    GetFormattedTextDisplay(statType)?.SetValue($"{levelUpSummary.m_FinalStats.GetStat(statType)} <color=blue>(+{levelUpSummary.m_TotalStatGrowths[statType]})</color>");
                     yield return new WaitForSeconds(DELAY);
                 }
             }

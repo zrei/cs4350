@@ -50,6 +50,7 @@ public class LevelManager : MonoBehaviour
     IUIScreen m_RewardNodeResultScreen;
     IUIScreen m_LevelUpResultScreen;
     IUIScreen m_LevelResultScreen;
+    IUIScreen m_ExpScreen;
 
     public delegate void LevelManagerEvent(LevelManager levelManager);
     public static LevelManagerEvent OnReady;
@@ -134,6 +135,7 @@ public class LevelManager : MonoBehaviour
         m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
         m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
         m_LevelResultScreen = UIScreenManager.Instance.LevelResultScreen;
+        m_ExpScreen = UIScreenManager.Instance.ExpScreen;
         
         CameraManager.Instance.SetUpLevelCamera();
         
@@ -494,6 +496,7 @@ public class LevelManager : MonoBehaviour
     
     private void OnCloseLevellingScreen()
     {
+        GlobalEvents.Level.CompleteExpGainEvent -= OnCloseLevellingScreen;
         GlobalEvents.Level.CloseLevellingScreenEvent -= OnCloseLevellingScreen;
         
         StartPlayerPhase();
@@ -565,17 +568,31 @@ public class LevelManager : MonoBehaviour
         
         if (m_PendingRewards.ContainsKey(RewardType.EXP))
         {
-            AddCharacterExp(m_PendingRewards[RewardType.EXP], out var levelledUpCharacters);
+            hasEvent = true;
+
+            AddCharacterExp(m_PendingRewards[RewardType.EXP], out var expGainSummaries, out var levelledUpCharacters);
             
             m_PendingRewards[RewardType.EXP] = 0;
             
             if (levelledUpCharacters.Count > 0)
             {
+                GlobalEvents.Level.CompleteExpGainEvent += ShowLevelUpScreen;
+            }
+            else
+            {
+                GlobalEvents.Level.CompleteExpGainEvent += OnCloseLevellingScreen;
+            }
+
+            void ShowLevelUpScreen()
+            {
+                GlobalEvents.Level.CompleteExpGainEvent -= ShowLevelUpScreen;
                 GlobalEvents.Level.MassLevellingEvent?.Invoke(levelledUpCharacters);
                 UIScreenManager.Instance.OpenScreen(m_LevelUpResultScreen);
                 GlobalEvents.Level.CloseLevellingScreenEvent += OnCloseLevellingScreen;
-                hasEvent = true;
             }
+
+            GlobalEvents.Level.ExpGainEvent?.Invoke(expGainSummaries);
+            UIScreenManager.Instance.OpenScreen(m_ExpScreen);
         }
 
         if (m_PendingWeaponRewards.Count > 0)
@@ -589,9 +606,10 @@ public class LevelManager : MonoBehaviour
         }
     }
     
-    private void AddCharacterExp(int expAmount, out List<LevelUpSummary> levelledUpCharacters)
+    private void AddCharacterExp(int expAmount, out List<ExpGainSummary> expGainSummaries, out List<LevelUpSummary> levelledUpCharacters)
     {
         levelledUpCharacters = new List<LevelUpSummary>();
+        expGainSummaries = new List<ExpGainSummary>();
             
         // Add exp points to each character
         foreach (var characterData in m_CurrParty)
@@ -601,6 +619,7 @@ public class LevelManager : MonoBehaviour
             LevellingManager.Instance.LevelCharacter(characterData, expAmount,
                 out var levelledUp, out var totalStatGrowth);
                 
+            expGainSummaries.Add(new ExpGainSummary(characterData, initialLevel, expAmount));
             if (levelledUp)
             {
                 levelledUpCharacters.Add(new LevelUpSummary(characterData, initialLevel, totalStatGrowth));
