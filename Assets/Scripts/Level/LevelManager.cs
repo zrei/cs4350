@@ -57,6 +57,7 @@ public class LevelManager : MonoBehaviour
     #region Current State
     
     private List<PlayerCharacterData> m_CurrParty;
+    public List<PlayerCharacterData> CurrParty => m_CurrParty;
     
     private NodeInternal m_CurrSelectedNode;
     private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
@@ -159,6 +160,7 @@ public class LevelManager : MonoBehaviour
         {
             DisplayMovableNodes();
             EnableLevelGraphInput();
+            GlobalEvents.Level.StartPlayerPhaseEvent?.Invoke();
         }
     }
 
@@ -168,6 +170,8 @@ public class LevelManager : MonoBehaviour
         DeselectNode();
         m_LevelNodeVisualManager.ClearMovableNodes();
         m_LevelCameraController.RecenterCamera();
+        
+        GlobalEvents.Level.EndPlayerPhaseEvent?.Invoke();
     }
     
     public void DisplayMovableNodes()

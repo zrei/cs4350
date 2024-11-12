@@ -15,8 +15,8 @@ public class LevelTokenManager : MonoBehaviour
     
     // Animation time to move to a node
     private const float MOVE_TO_NODE_TIME = 0.8f;
-    private const float NODE_EXIT_TIME = 0.3f;
-    private const float NODE_ENTRY_TIME = 0.3f;
+    private const float NODE_EXIT_TIME = 0.15f;
+    private const float NODE_ENTRY_TIME = 0.15f;
     private const float MOVE_SPEED = 3.0f;
     
     private PlayerToken m_PlayerUnitToken;

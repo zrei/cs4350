@@ -9,14 +9,14 @@ public class LevellingManager : Singleton<LevellingManager>
     {
         hasLevelledUp = false;
         totalStatGrowths = new();
-        if (characterData.m_CurrLevel == LevellingSO.MAX_LEVEL)
+        if (characterData.m_CurrLevel == m_LevellingSO.MAX_LEVEL)
         {
             return;
         }
 
-        int finalExp = Mathf.Min(characterData.m_CurrExp + expGained, m_LevellingSO.GetRequiredExpAmount(LevellingSO.MAX_LEVEL));
+        int finalExp = Mathf.Min(characterData.m_CurrExp + expGained, m_LevellingSO.GetRequiredExpAmount(m_LevellingSO.MAX_LEVEL));
         
-        while (characterData.m_CurrLevel < LevellingSO.MAX_LEVEL)
+        while (characterData.m_CurrLevel < m_LevellingSO.MAX_LEVEL)
         {
             if (finalExp >= m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1))
             {
@@ -37,6 +37,8 @@ public class LevellingManager : Singleton<LevellingManager>
                 break;
             }
         }
+        
+        characterData.m_CurrExp = finalExp;
     }
 
     // level up a character from its current level to the given level
@@ -46,7 +48,7 @@ public class LevellingManager : Singleton<LevellingManager>
         if (characterData.m_CurrLevel >= level)
             return;
 
-        if (characterData.m_CurrLevel == LevellingSO.MAX_LEVEL)
+        if (characterData.m_CurrLevel == m_LevellingSO.MAX_LEVEL)
         {
             return;
         }
@@ -67,5 +69,36 @@ public class LevellingManager : Singleton<LevellingManager>
         Dictionary<StatType, int> statGrowthDict = new();
         statGrowths.ForEach(x => statGrowthDict.Add(x.Item1, x.Item2));
         return currStats.LevelUpStats(statGrowthDict);
+    }
+    
+    public float GetProgressToNextLevel(PlayerCharacterData characterData)
+    {
+        if (characterData.m_CurrLevel == m_LevellingSO.MAX_LEVEL) return 1;
+        
+        var requiredExpToNextLevel = m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1) 
+                                     - m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel);
+        var currentExpInLevel = characterData.m_CurrExp - m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel);
+        
+        return (float)currentExpInLevel / requiredExpToNextLevel;
+    }
+    
+    public int GetExpToNextLevel(PlayerCharacterData characterData)
+    {
+        if (characterData.m_CurrLevel == m_LevellingSO.MAX_LEVEL) return 0;
+        
+        return m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel + 1) 
+               - m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel);
+    }
+    
+    /// <summary>
+    /// Get the current exp in the current level
+    /// </summary>
+    /// <param name="characterData"></param>
+    /// <returns></returns>
+    public int GetCurrentExpInLevel(PlayerCharacterData characterData)
+    {
+        if (characterData.m_CurrLevel == m_LevellingSO.MAX_LEVEL) return 0;
+        
+        return characterData.m_CurrExp - m_LevellingSO.GetRequiredExpAmount(characterData.m_CurrLevel);
     }
 }

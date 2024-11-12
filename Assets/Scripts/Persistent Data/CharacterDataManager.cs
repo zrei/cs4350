@@ -26,7 +26,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
-        GlobalEvents.UI.OnClosePartyOverviewEvent += SaveCharacterData;
+        GlobalEvents.UI.SavePartyChangesEvent += SaveCharacterData;
 
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     
@@ -72,7 +72,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
-        GlobalEvents.UI.OnClosePartyOverviewEvent -= SaveCharacterData;
+        GlobalEvents.UI.SavePartyChangesEvent -= SaveCharacterData;
 
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
     }
