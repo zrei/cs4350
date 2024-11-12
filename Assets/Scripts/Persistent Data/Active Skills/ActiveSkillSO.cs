@@ -18,101 +18,6 @@ public struct InflictedStatusEffect
     }
 }
 
-[System.Serializable]
-public struct VFXAudio
-{
-    public AudioDataSO m_AudioDataSO;
-    public float m_AudioDelay;
-}
-
-[System.Serializable]
-public class SkillFX
-{
-    public enum AttachmentType
-    {
-        WeaponModel,
-        Caster,
-        Target,
-    }
-
-    public AttachmentType m_AttachmentType;
-
-    public int m_WeaponModelIndex;
-    public int m_AttachPointIndex;
-    // todo: refactor this to feedback system
-    public ParticleSystem m_FeedbackSystemPrefab;
-
-    [Tooltip("Additional audio to play independent of the audio already played by the VFX")]
-    public List<VFXAudio> m_AudioToPlay;
-
-    public void Play(Unit caster, List<Unit> targets)
-    {
-        if (m_FeedbackSystemPrefab == null) return;
-
-        Transform attachPoint = null;
-        switch (m_AttachmentType)
-        {
-            case AttachmentType.WeaponModel:
-                var weaponModels = caster.WeaponModels;
-                var weaponModelIndex = Mathf.Clamp(m_WeaponModelIndex, 0, weaponModels.Count);
-                if (weaponModelIndex < 0 || weaponModelIndex >= weaponModels.Count) return;
-                var weaponModel = weaponModels[weaponModelIndex];
-
-                var attachPoints = weaponModel.fxAttachPoints;
-                var attachPointIndex = Mathf.Clamp(m_AttachPointIndex, 0, attachPoints.Count);
-                if (attachPointIndex < 0 || attachPointIndex >= attachPoints.Count) return;
-                attachPoint = attachPoints[attachPointIndex];
-                break;
-            case AttachmentType.Caster:
-                // target is caster for self-target i.e. no need separate handling
-            case AttachmentType.Target:
-                break;
-        }
-
-        foreach (VFXAudio vFXAudio in m_AudioToPlay)
-        {
-            SoundManager.Instance.Play(vFXAudio.m_AudioDataSO, vFXAudio.m_AudioDelay);
-        }
-
-        if (m_AttachmentType == AttachmentType.Target || m_AttachmentType == AttachmentType.Caster)
-        {
-            if (targets == null) return;
-
-            var fxs = new List<ParticleSystem>();
-            foreach (var target in targets)
-            {
-                if (target == null) continue;
-                fxs.Add(Object.Instantiate(m_FeedbackSystemPrefab, target.transform));
-            }
-            IEnumerator PlayMultipleAndDispose()
-            {
-                fxs.ForEach(x => x.Play());
-                while (fxs.Any(x => x.isPlaying))
-                {
-                    yield return null;
-                }
-                fxs.ForEach(x => Object.Destroy(x.gameObject));
-            }
-            CoroutineManager.Instance.StartCoroutine(PlayMultipleAndDispose());
-            return;
-        }
-
-        if (attachPoint == null) return;
-
-        var fx = Object.Instantiate(m_FeedbackSystemPrefab, attachPoint);
-        IEnumerator PlayAndDispose()
-        {
-            fx.Play();
-            while (fx.isPlaying)
-            {
-                yield return null;
-            }
-            Object.Destroy(fx.gameObject);
-        }
-        CoroutineManager.Instance.StartCoroutine(PlayAndDispose());
-    }
-}
-
 [CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkills/ActiveSkillSO")]
 public class ActiveSkillSO : ScriptableObject
 {
@@ -228,7 +133,7 @@ public class ActiveSkillSO : ScriptableObject
     public TargetSO m_TargetSO;
 
     [Header("FX")]
-    public List<SkillFX> m_SkillFXs;
+    public List<SkillVFXSO> m_SkillFXs;
 
     #region Helpers
     public bool IsAoe => m_TargetSO.IsAoe;
@@ -462,25 +367,25 @@ public struct Adds
     public Stats m_StatAugments;
 }
 
-#if UNITY_EDITOR
-[CustomEditor(typeof(ActiveSkillSO))]
-public class ActiveSkillSOCustomEditor : Editor
-{
-    ActiveSkillSO m_ActiveSkill;
+//#if UNITY_EDITOR
+//[CustomEditor(typeof(ActiveSkillSO))]
+//public class ActiveSkillSOCustomEditor : Editor
+//{
+//    ActiveSkillSO m_ActiveSkill;
 
-    void OnEnable()
-    {
-        m_ActiveSkill = (ActiveSkillSO) target;
-    }
+//    void OnEnable()
+//    {
+//        m_ActiveSkill = (ActiveSkillSO) target;
+//    }
 
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
+//    public override void OnInspectorGUI()
+//    {
+//        base.OnInspectorGUI();
 
-        GUILayout.Space(30f);
+//        GUILayout.Space(30f);
 
-        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
-        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
-    }
-}
-#endif
+//        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
+//        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
+//    }
+//}
+//#endif

@@ -6,15 +6,17 @@ public class EquippingArmor : MonoBehaviour
 {
     [Header("Bones")]
     [SerializeField] private List<Transform> m_UnitBonesArray;
+    [SerializeField] private Transform m_BonesParent;
     [SerializeField] private Transform m_RootBone;
     [SerializeField] private Transform m_RightArmBone;
-    [SerializeField] private Transform m_LeftArmBone;    
-    [SerializeField] private Transform m_BonesParent;
+    [SerializeField] private Transform m_LeftArmBone;
+    [SerializeField] private Transform m_BodyCenter;
 
     public Transform BonesParent => m_BonesParent; 
     public Transform RightArmBone => m_RightArmBone;
     public Transform LeftArmBone => m_LeftArmBone;
-    
+    public Transform BodyCenter => m_BodyCenter;
+
     private Dictionary<string, Transform> m_PlayerBonesDict;
 
     public void Initialize(SkinnedMeshRenderer[] itemMeshes)

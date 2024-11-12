@@ -32,6 +32,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 {
     [SerializeField] private ArmorVisual m_ArmorVisual;
     public AnimationEventHandler AnimationEventHandler => m_ArmorVisual.AnimationEventHandler;
+    public Transform BodyCenter => m_ArmorVisual.BodyCenter;
 
     [SerializeField] private ObjectiveMarker m_ObjectiveMarker;
     public ObjectiveMarker ObjectiveMarker => m_ObjectiveMarker;
