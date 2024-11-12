@@ -32,8 +32,6 @@ namespace Game.UI
             foreach (ExpGainSummary expGainSummary in expSummaries)
             {
                 ExpDisplay expDisplay = Instantiate(m_ExpDisplayPrefab, m_ExpDisplayParent);
-                Debug.Log($"Initial level: {expGainSummary.m_InitialLevel}, Final level: {expGainSummary.m_FinalLevel}");
-                Debug.Log($"Final exp: {expGainSummary.m_FinalExp}, Exp growth: {expGainSummary.m_ExpGrowth}");
                 expDisplay.SetDisplay(expGainSummary, CompleteAnimation);
             }
         
@@ -55,7 +53,7 @@ namespace Game.UI
             int childCount = m_ExpDisplayParent.childCount;
             for (int i = 0; i < childCount; ++i)
             {
-                Destroy(m_ExpDisplayParent.GetChild(0).gameObject);
+                Destroy(m_ExpDisplayParent.GetChild(i).gameObject);
             }
         }
 

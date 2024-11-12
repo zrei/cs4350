@@ -36,6 +36,8 @@ namespace Game.UI
         
         private void DisplayLevelUp()
         {
+            m_ReturnButton.interactable = false;
+
             if (m_LevelUpSummaries.Count == 0)
             {
                 CloseResults();
@@ -44,56 +46,15 @@ namespace Game.UI
             
             var levelUpSummary = m_LevelUpSummaries[0];
             m_CharacterNameText.text = $"{levelUpSummary.m_CharacterSO.m_CharacterName}";
-            m_LevelUpStatDisplay.DisplayLevelUp(levelUpSummary);
+            m_LevelUpStatDisplay.DisplayLevelUp(levelUpSummary, CompleteLevelUpAnimation);
             m_LevelUpSummaries.RemoveAt(0);
             
-            /*
-            var levelUpSummary = m_LevelUpSummaries[0];
-            m_LevelUpSummaries.RemoveAt(0);
-
-            m_CharacterNameText.text = $"{levelUpSummary.m_CharacterSO.m_CharacterName}";
-            
-            m_ResultText.text = $"Level: \t\t\t\t{levelUpSummary.m_FinalLevel} (+{levelUpSummary.m_LevelGrowth})\n";
-            
-            // Iterate for every stat in StatType
-            foreach (StatType stat in Enum.GetValues(typeof(StatType)))
+            void CompleteLevelUpAnimation()
             {
-                // Skip movement range
-                if (stat == StatType.MOVEMENT_RANGE)
-                    continue;
-                
-                var statGrowth = levelUpSummary.m_TotalStatGrowths.GetValueOrDefault(stat, 0);
-                var finalStat = levelUpSummary.m_FinalStats.GetStat(stat);
-
-                // Hacky way to format the text temporarily
-                switch (stat)
-                {
-                    case StatType.HEALTH:
-                    case StatType.MANA:
-                    case StatType.SPEED:
-                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t\t\t";
-                        break;
-                    case StatType.PHYS_ATTACK:
-                    case StatType.MAG_ATTACK:
-                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t\t";
-                        break;
-                    case StatType.PHYS_DEFENCE:
-                    case StatType.MAG_DEFENCE:
-                        m_ResultText.text += $"{FormatStatName(stat)}: \t\t";
-                        break;
-                }
-                
-                m_ResultText.text += (statGrowth == 0)
-                    ? $"{finalStat}\n"
-                    : $"{finalStat} (+{statGrowth})\n";
-                */
+                m_ReturnButton.interactable = true;
+            }
         }
 
-        private string FormatStatName(StatType stat)
-        {
-            return stat.ToString().Replace("_", " ");
-        }
-    
         private void CloseResults()
         {
             if (m_LevelUpSummaries.Count > 0)

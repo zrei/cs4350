@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEngine.UI;
 using UnityEngine;
 
 namespace Game.UI
@@ -7,11 +8,13 @@ namespace Game.UI
     {
         [SerializeField] FormattedTextDisplay m_CharacterName;
         [SerializeField] ProgressBar m_ProgressBar;
+        [SerializeField] Image m_LevelUpArrow;
 
         private const float TRANSITION_TIME = 1.0f;
 
         public void SetDisplay(ExpGainSummary expGainInfo, VoidEvent onCompleteAnimation = null)
         {
+            m_LevelUpArrow.gameObject.SetActive(false);
             m_CharacterName?.SetValue(expGainInfo.m_CharacterSO.m_CharacterName);
             
             if (expGainInfo.m_InitialLevel == LevellingManager.Instance.MaxLevel)
@@ -42,6 +45,9 @@ namespace Game.UI
                 m_ProgressBar.SetValue(targetExp, totalExp, indivTransitionTime);
                 Debug.Log(targetExp / totalExp);
                 yield return new WaitForSeconds(indivTransitionTime);
+
+                if (i >= 1)
+                    m_LevelUpArrow.gameObject.SetActive(true);
 
                 ++currLevel;
                 initialExp = 0;

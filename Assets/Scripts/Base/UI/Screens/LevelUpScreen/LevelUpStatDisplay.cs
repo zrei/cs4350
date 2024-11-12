@@ -24,37 +24,35 @@ namespace Game.UI
 
         [SerializeField] private FormattedTextDisplay m_MoveDisplay;
 
-        private const float DELAY = 0.2f;
+        private const float DELAY = 0.4f;
 
-        public void DisplayLevelUp(LevelUpSummary levelUpSummary)
+        public void DisplayLevelUp(LevelUpSummary levelUpSummary, VoidEvent completeAnimationEvent = null)
         {
             StopAllCoroutines();
             m_LevelDisplay?.SetValue(levelUpSummary.m_FinalLevel - levelUpSummary.m_LevelGrowth);
-            foreach (StatType statType in levelUpSummary.m_TotalStatGrowths.Keys)
-            {
-                Debug.Log($"{statType}: {levelUpSummary.m_TotalStatGrowths[statType]}");
-            }
+
             foreach (StatType statType in Enum.GetValues(typeof(StatType)))
             {
                 GetFormattedTextDisplay(statType)?.SetValue(GetPreviousStatValue(statType, levelUpSummary.m_FinalStats, levelUpSummary.m_TotalStatGrowths));
             }
 
-            StartCoroutine(BeginLevelUpAnimation(levelUpSummary));
+            StartCoroutine(BeginLevelUpAnimation(levelUpSummary, completeAnimationEvent));
         }
 
-        private IEnumerator BeginLevelUpAnimation(LevelUpSummary levelUpSummary)
+        private IEnumerator BeginLevelUpAnimation(LevelUpSummary levelUpSummary, VoidEvent completeAnimationEvent = null)
         {
             yield return new WaitForSeconds(DELAY);
-            m_LevelDisplay?.SetValue($"{levelUpSummary.m_FinalLevel} <color=blue>(+{levelUpSummary.m_LevelGrowth})</color>");
+            m_LevelDisplay?.SetValue($"{levelUpSummary.m_FinalLevel} <color=#C7B258>(+{levelUpSummary.m_LevelGrowth})</color>");
             yield return new WaitForSeconds(DELAY);
             foreach (StatType statType in Enum.GetValues(typeof(StatType)))
             {
                 if (levelUpSummary.m_TotalStatGrowths.ContainsKey(statType) && levelUpSummary.m_TotalStatGrowths[statType] > 0)
                 {
-                    GetFormattedTextDisplay(statType)?.SetValue($"{levelUpSummary.m_FinalStats.GetStat(statType)} <color=blue>(+{levelUpSummary.m_TotalStatGrowths[statType]})</color>");
+                    GetFormattedTextDisplay(statType)?.SetValue($"{levelUpSummary.m_FinalStats.GetStat(statType)} <color=#C7B258>(+{levelUpSummary.m_TotalStatGrowths[statType]})</color>");
                     yield return new WaitForSeconds(DELAY);
                 }
             }
+            completeAnimationEvent?.Invoke();
         }
 
         private FormattedTextDisplay GetFormattedTextDisplay(StatType statType)
