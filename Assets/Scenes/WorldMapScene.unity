@@ -5055,7 +5055,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StartingCutscene
       value: 
-      objectReference: {fileID: 1055109562564963675, guid: e1500d6519507d4479ab0fa2f9e0a06d,
+      objectReference: {fileID: 1055109562564963675, guid: 1ec285d61cc39d246a8511e11506a611,
         type: 3}
     - target: {fileID: 7896543248334254049, guid: dbd73cfc3bc0f44be85b5557399b78f6,
         type: 3}
@@ -8838,7 +8838,7 @@ PrefabInstance:
     - target: {fileID: 6136615996857911331, guid: dfd62eb1658294e4da2a40e5dc0bdb5a,
         type: 3}
       propertyPath: m_StartingCharacters.Array.size
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6136615996857911331, guid: dfd62eb1658294e4da2a40e5dc0bdb5a,
         type: 3}
@@ -8869,6 +8869,18 @@ PrefabInstance:
       propertyPath: m_StartingCharacters.Array.data[4]
       value: 
       objectReference: {fileID: 11400000, guid: fd194f8c0f7a24a79ad5372cd50b88b8,
+        type: 2}
+    - target: {fileID: 6136615996857911331, guid: dfd62eb1658294e4da2a40e5dc0bdb5a,
+        type: 3}
+      propertyPath: m_StartingCharacters.Array.data[0].m_PlayerCharacter
+      value: 
+      objectReference: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5,
+        type: 2}
+    - target: {fileID: 6136615996857911331, guid: dfd62eb1658294e4da2a40e5dc0bdb5a,
+        type: 3}
+      propertyPath: m_StartingCharacters.Array.data[1].m_PlayerCharacter
+      value: 
+      objectReference: {fileID: 11400000, guid: 2541a19dc80e4469fb97bcf9977abc8c,
         type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
