@@ -84,9 +84,11 @@ namespace Game.UI
         {
             base.HideDone();
 
+            GlobalEvents.UI.OnClosePartyOverviewEvent?.Invoke();
+            
             if (!m_IsInLevel)
             {
-                GlobalEvents.UI.OnClosePartyOverviewEvent?.Invoke();
+                GlobalEvents.UI.SavePartyChangesEvent?.Invoke();
                 SaveManager.Instance.Save();
             }
         }

@@ -11,6 +11,9 @@ namespace Game.UI
         [SerializeField] private FormattedTextDisplay m_NameDisplay;
 
         [SerializeField] private FormattedTextDisplay m_LevelDisplay;
+        
+        [SerializeField] private ProgressBar m_ExpBar;
+        
         [SerializeField] private FormattedTextDisplay m_ClassDisplay;
 
         [SerializeField] private Image m_CharacterArt;
@@ -43,6 +46,9 @@ namespace Game.UI
             m_AttributeDisplay?.SetValue($"{playerUnit.m_BaseData.m_CharacterMoralityTrait.m_TraitName}");
             m_NameDisplay?.SetValue($"{playerUnit.m_BaseData.m_CharacterName}");
             m_LevelDisplay?.SetValue($"{playerUnit.m_CurrLevel}");
+
+            if (m_ExpBar != null)
+                m_ExpBar.SetValue(LevellingManager.Instance.GetProgressToNextLevel(playerUnit), 1f, 0f);
 
             m_CharacterArt.sprite = playerUnit.m_BaseData.m_CharacterSprite;
             var color = m_CharacterArt.color;

@@ -14,6 +14,7 @@ public static class GlobalEvents {
         public delegate void PartyEvent(List<PlayerCharacterData> _, bool inLevel);
         public static PartyEvent OpenPartyOverviewEvent;
         public static VoidEvent OnClosePartyOverviewEvent;
+        public static VoidEvent SavePartyChangesEvent;
     }
 
     public static class Battle {
@@ -73,6 +74,8 @@ public static class GlobalEvents {
         public static VoidEvent ReturnFromLevelEvent;
         public static NodeEvent NodeHoverStartEvent;
         public static VoidEvent NodeHoverEndEvent;
+        public static VoidEvent StartPlayerPhaseEvent;
+        public static VoidEvent EndPlayerPhaseEvent;
     }
 
     public static class Scene
@@ -116,6 +119,7 @@ public static class GlobalEvents {
         public static VoidEvent OnBeginLoadLevelEvent;
         public static LevelSOEvent OnPartySelectEvent;
         public static VoidEvent OnEndPreCutsceneEvent;
+        public static VoidEvent OpenPartyManagementEvent;
     }
 
     public static class MainMenu
