@@ -266,7 +266,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #region Unlock Level
     private void UnlockLevel()
     {
-        if (m_CurrUnlockedLevel == m_WorldMapRegions.Count)
+        if ((GlobalSettings.IsDemo && GlobalSettings.FinalDemoLevel == m_CurrUnlockedLevel) || m_CurrUnlockedLevel == m_WorldMapRegions.Count)
         {
             SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
             SaveManager.Instance.Save(PostSave);
