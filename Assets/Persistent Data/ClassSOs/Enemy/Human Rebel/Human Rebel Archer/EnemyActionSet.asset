@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b94d6327e84484bb62ecb427a46e7e, type: 3}
+  m_Name: EnemyActionSet
+  m_EditorClassIdentifier: 
+  m_EnemyActions:
+  - m_EnemyAction: {fileID: 11400000, guid: 139954ed06891c040ae523ce44561319, type: 2}
+    m_Conditions: []
+    m_BasePriority: 3
+  - m_EnemyAction: {fileID: 11400000, guid: e5a7833004f10fc4c97ef13ed482ebc6, type: 2}
+    m_Conditions: []
+    m_BasePriority: 2
+  - m_EnemyAction: {fileID: 11400000, guid: 2b3548653c3b0c440a549927f002369d, type: 2}
+    m_Conditions: []
+    m_BasePriority: 2
+  - m_EnemyAction: {fileID: 11400000, guid: 15ac809de6e672846aff0901c7be6128, type: 2}
+    m_Conditions: []
+    m_BasePriority: 1
+  - m_EnemyAction: {fileID: 11400000, guid: 55de20d28c7e4e84bb5b13b34969ac59, type: 2}
+    m_Conditions: []
+    m_BasePriority: 0
