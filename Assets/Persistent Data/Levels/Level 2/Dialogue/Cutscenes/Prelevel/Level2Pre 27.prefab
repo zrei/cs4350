@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3636274808806051152}
   - component: {fileID: 5627881665134760556}
   m_Layer: 7
-  m_Name: Survivors
+  m_Name: Glutton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -64,13 +64,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   delayUntilShown: 0
-  characterSprite: {fileID: 21300000, guid: 50551403b1362b345aba08107b784a64, type: 3}
+  characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
   characterName: 
   characterColor: {r: 1, g: 0, b: 0, a: 1}
   audioCue: {fileID: 0}
-  text: You find survivors hiding in one of the houses, hiding in fear. You give
-    them some rations and direct them towards safety. (-5<sprite name="Rations" tint>)
-    (+5<sprite name="Morality" tint>)
+  text: We just left the town... What a glutton. (-15<sprite name="Rations" tint>)
   debugTrigger: 0
   options: []
   defaultNextState: {fileID: 0}
@@ -86,12 +84,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rationChangeAmt: -5
-  moralityChangeAmt: 5
-  flagResults:
-  - flagName: Level1FindSurvivors
-    flagType: 0
-    flagValue: 1
+  rationChangeAmt: -15
+  moralityChangeAmt: 0
+  flagResults: []
 --- !u!1 &4238048150012490194
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,7 +99,7 @@ GameObject:
   - component: {fileID: 994132547348094530}
   - component: {fileID: 2445815926888123963}
   m_Layer: 7
-  m_Name: Loot
+  m_Name: Pillage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -156,14 +151,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   delayUntilShown: 0
-  characterSprite: {fileID: 21300000, guid: 50551403b1362b345aba08107b784a64, type: 3}
+  characterSprite: {fileID: 21300000, guid: ac6f31ed3537fe84b8810b34b42929a4, type: 3}
   characterName: 
   characterColor: {r: 1, g: 0, b: 0, a: 1}
   audioCue: {fileID: 0}
-  text: You ransack the place for whatever is left. Oeyn shakes his head in disagreement.
-    You can tell Aeris is uncomfortable with what you are doing, but does not say
-    anything in protest. (+10<sprite name="Rations" tint>) (-8<sprite name="Morality"
-    tint>)
+  text: You rob the village of their supplies... (+15<sprite name="Rations" tint>)
+    (-15<sprite name="Morality" tint>)
   debugTrigger: 0
   options: []
   defaultNextState: {fileID: 0}
@@ -179,10 +172,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rationChangeAmt: 10
-  moralityChangeAmt: -8
+  rationChangeAmt: 15
+  moralityChangeAmt: 0
   flagResults:
-  - flagName: Level1VillageLooted
+  - flagName: VillagePillaged
     flagType: 0
     flagValue: 1
 --- !u!1 &5324863533857733401
@@ -196,7 +189,7 @@ GameObject:
   - component: {fileID: 4286239811993333608}
   - component: {fileID: 2578122031409413761}
   m_Layer: 7
-  m_Name: Level1Dialogue2
+  m_Name: Level2Pre 27
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -233,54 +226,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onEnterState:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 9110225073319402266, guid: fac2600fc64bd4d628a454998a31a6e3,
-          type: 3}
-        m_TargetAssemblyTypeName: Cutscene, Assembly-CSharp
-        m_MethodName: LogCheck
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onExitState:
     m_PersistentCalls:
       m_Calls: []
   delayUntilShown: 0
-  characterSprite: {fileID: 21300000, guid: 50551403b1362b345aba08107b784a64, type: 3}
-  characterName: 
+  characterSprite: {fileID: 0}
+  characterName: Arrogant Councillor
   characterColor: {r: 1, g: 1, b: 1, a: 1}
   audioCue: {fileID: 0}
-  text: 'You come across a village that is nearly abandoned. It seems like the Orc
-    raiders just left. '
+  text: "(Turning to Lord Alphonso)\n\nSurely you can't believe this heresy? You,
+    of all people, understand the importance of preserving our people\u2019s faith."
   debugTrigger: 0
-  options:
-  - text: Attempt to find any survivors
-    nextState: {fileID: 3636274808806051152}
-    conditions: []
-    hideIfConditionsUnmet: 0
-    lockedText: 
-    changesMorality: 1
-    moralityChange: 0
-    setFlags: 
-  - text: Search for loot
-    nextState: {fileID: 994132547348094530}
-    conditions: []
-    hideIfConditionsUnmet: 0
-    lockedText: 
-    changesMorality: 1
-    moralityChange: 0
-    setFlags: 
-  - text: Leave the place be.
-    nextState: {fileID: 0}
-    conditions: []
-    hideIfConditionsUnmet: 0
-    lockedText: 
-    changesMorality: 0
-    moralityChange: 0
-    setFlags: 
-  defaultNextState: {fileID: 0}
+  options: []
+  defaultNextState: {fileID: 2578122031409413761, guid: 667f3d649b6595243add447de2b6949a,
+    type: 3}
