@@ -75,7 +75,7 @@ namespace Game.UI
             UIScreenManager.Instance.CloseScreen();
             GlobalEvents.WorldMap.OnBeginLoadLevelEvent?.Invoke();
             IEnumerable<int> selectedIds = m_SelectedData.Where(x => x != -1);
-            GameSceneManager.Instance.LoadLevelScene(m_LevelId, CharacterDataManager.Instance.RetrieveCharacterData(selectedIds));
+            SaveManager.Instance.Save(() => GameSceneManager.Instance.LoadLevelScene(m_LevelId, CharacterDataManager.Instance.RetrieveCharacterData(selectedIds)));
         }
         #endregion
 
