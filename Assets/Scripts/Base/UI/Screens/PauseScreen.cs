@@ -7,11 +7,15 @@ namespace Game.UI
         [SerializeField] private NamedObjectButton m_MainMenuBtn;
         [SerializeField] private NamedObjectButton m_QuitLevelBtn;
 
+        private const string SAVE_AND_QUIT_TEXT = "Save and Return to Main Menu";
+        private const string QUIT_TEXT = "Return to Main Menu";
+
         public override void Show(params object[] args)
         {
             base.Show();
 
             m_QuitLevelBtn.gameObject.SetActive(GameSceneManager.Instance.CurrScene == SceneEnum.LEVEL || GameSceneManager.Instance.CurrScene == SceneEnum.BATTLE);
+            m_MainMenuBtn.nameText.text = GameSceneManager.Instance.CurrScene == SceneEnum.WORLD_MAP ? SAVE_AND_QUIT_TEXT : QUIT_TEXT;
         }
 
         protected override void ShowDone()
@@ -38,7 +42,15 @@ namespace Game.UI
         {
             RemoveListeners();
             GlobalEvents.MainMenu.OnReturnToMainMenu?.Invoke();
-            GameSceneManager.Instance.LoadMainMenuScene();
+            UIScreenManager.Instance.CloseScreen();
+            if (GameSceneManager.Instance.CurrScene == SceneEnum.WORLD_MAP)
+            {
+                SaveManager.Instance.Save(GameSceneManager.Instance.LoadMainMenuScene);
+            }
+            else
+            {
+                GameSceneManager.Instance.LoadMainMenuScene();
+            }
         }
 
         private void B_QuitLevel()
