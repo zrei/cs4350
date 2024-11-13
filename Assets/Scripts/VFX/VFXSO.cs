@@ -56,7 +56,7 @@ public class VFXSO : ScriptableObject
                 vfx.transform.localEulerAngles = Vector3.zero;
             },
             actionOnDestroy: vfx => { },
-            collectionCheck: true,
+            collectionCheck: false,
             defaultCapacity: 10,
             maxSize: 10000
         );
@@ -82,24 +82,14 @@ public class VFXSO : ScriptableObject
             SoundManager.Instance.Play(vFXAudio.m_AudioDataSO, vFXAudio.m_AudioDelay);
         }
 
-        VFXSystem vfx;
-        Vector3 startPos;
 
         switch (m_Type)
         {
             case Type.StationaryAttachPrimary:
-                vfx = Get();
-                if (vfx == null) return;
-                Initialize(vfx, color);
-                vfx.transform.SetParent(primaryAttachPoint, false);
-                vfx.Play(duration, unscaledTime);
+                HandleStationaryAttachPrimary(primaryAttachPoint, secondaryAttachPoints, color, duration, unscaledTime);
                 break;
             case Type.StationaryAttachSecondaryFirst:
-                vfx = Get();
-                if (vfx == null) return;
-                Initialize(vfx, color);
-                vfx.transform.SetParent(secondaryAttachPoints[0], false);
-                vfx.Play(duration, unscaledTime);
+                HandleStationaryAttachSecondaryFirst(primaryAttachPoint, secondaryAttachPoints, color, duration, unscaledTime);
                 break;
             case Type.StationaryAttachSecondaryAll:
                 HandleStationaryAttachSecondaryAll(primaryAttachPoint, secondaryAttachPoints, color, duration, unscaledTime);
@@ -128,6 +118,34 @@ public class VFXSO : ScriptableObject
         {
             vfx.SetStartColor(startColorOverride.Value);
         }
+    }
+
+    private void HandleStationaryAttachPrimary(
+        Transform primaryAttachPoint,
+        List<Transform> secondaryAttachPoints = null,
+        Color? color = null,
+        float? duration = null,
+        bool unscaledTime = false)
+    {
+        var vfx = Get();
+        if (vfx == null) return;
+        Initialize(vfx, color);
+        vfx.transform.SetParent(primaryAttachPoint, false);
+        vfx.Play(duration, unscaledTime);
+    }
+
+    private void HandleStationaryAttachSecondaryFirst(
+        Transform primaryAttachPoint,
+        List<Transform> secondaryAttachPoints = null,
+        Color? color = null,
+        float? duration = null,
+        bool unscaledTime = false)
+    {
+        var vfx = Get();
+        if (vfx == null) return;
+        Initialize(vfx, color);
+        vfx.transform.SetParent(secondaryAttachPoints[0], false);
+        vfx.Play(duration, unscaledTime);
     }
 
     private void HandleStationaryAttachSecondaryAll(

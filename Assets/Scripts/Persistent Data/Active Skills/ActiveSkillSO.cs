@@ -133,6 +133,7 @@ public class ActiveSkillSO : ScriptableObject
     public TargetSO m_TargetSO;
 
     [Header("FX")]
+    public bool m_IsRangedAttack;
     public List<SkillVFXSO> m_SkillFXs;
 
     #region Helpers

@@ -60,8 +60,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
         type: 3}
+      propertyPath: looping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
+        type: 3}
       propertyPath: ShapeModule.type
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
+        type: 3}
+      propertyPath: NoiseModule.enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
         type: 3}
@@ -71,12 +81,17 @@ PrefabInstance:
     - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
         type: 3}
       propertyPath: ShapeModule.radius.value
-      value: 0.5
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
+        type: 3}
+      propertyPath: NoiseModule.strength.scalar
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8344455129565465848, guid: f26f5ccbce78f5743b44bd820af16f2a,
         type: 3}
       propertyPath: ShapeModule.radiusThickness
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8805101007397631789, guid: f26f5ccbce78f5743b44bd820af16f2a,
         type: 3}
