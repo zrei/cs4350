@@ -1,0 +1,286 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1736667241390655843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4132462743296238948}
+  - component: {fileID: 3636274808806051152}
+  - component: {fileID: 5627881665134760556}
+  m_Layer: 7
+  m_Name: Survivors
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4132462743296238948
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736667241390655843}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4286239811993333608}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3636274808806051152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736667241390655843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ae88b964d30854f855f5f0ea4a82a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onEnterState:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5627881665134760556}
+        m_TargetAssemblyTypeName: Level.DialogueResult, Assembly-CSharp
+        m_MethodName: ApplyResults
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onExitState:
+    m_PersistentCalls:
+      m_Calls: []
+  delayUntilShown: 0
+  characterSprite: {fileID: 21300000, guid: 50551403b1362b345aba08107b784a64, type: 3}
+  characterName: 
+  characterColor: {r: 1, g: 0, b: 0, a: 1}
+  audioCue: {fileID: 0}
+  text: You find survivors hiding in one of the houses, hiding in fear. You give
+    them some rations and direct them towards safety. (-5<sprite name="Rations" tint>)
+    (+5<sprite name="Morality" tint>)
+  debugTrigger: 0
+  options: []
+  defaultNextState: {fileID: 0}
+--- !u!114 &5627881665134760556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736667241390655843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rationChangeAmt: -5
+  moralityChangeAmt: 5
+  flagResults:
+  - flagName: Level1FindSurvivors
+    flagType: 0
+    flagValue: 1
+--- !u!1 &4238048150012490194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 294267782474217562}
+  - component: {fileID: 994132547348094530}
+  - component: {fileID: 2445815926888123963}
+  m_Layer: 7
+  m_Name: Loot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &294267782474217562
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4238048150012490194}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4286239811993333608}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &994132547348094530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4238048150012490194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ae88b964d30854f855f5f0ea4a82a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onEnterState:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2445815926888123963}
+        m_TargetAssemblyTypeName: Level.DialogueResult, Assembly-CSharp
+        m_MethodName: ApplyResults
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onExitState:
+    m_PersistentCalls:
+      m_Calls: []
+  delayUntilShown: 0
+  characterSprite: {fileID: 21300000, guid: 50551403b1362b345aba08107b784a64, type: 3}
+  characterName: 
+  characterColor: {r: 1, g: 0, b: 0, a: 1}
+  audioCue: {fileID: 0}
+  text: You ransack the place for whatever is left. Oeyn shakes his head in disagreement.
+    You can tell Aeris is uncomfortable with what you are doing, but does not say
+    anything in protest. (+10<sprite name="Rations" tint>) (-8<sprite name="Morality"
+    tint>)
+  debugTrigger: 0
+  options: []
+  defaultNextState: {fileID: 0}
+--- !u!114 &2445815926888123963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4238048150012490194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38f1900b0559488083d2d0677c2a4b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rationChangeAmt: 10
+  moralityChangeAmt: -8
+  flagResults:
+  - flagName: Level1VillageLooted
+    flagType: 0
+    flagValue: 1
+--- !u!1 &5324863533857733401
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4286239811993333608}
+  - component: {fileID: 2578122031409413761}
+  m_Layer: 7
+  m_Name: Level1Dialogue2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4286239811993333608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5324863533857733401}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 2.246}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4132462743296238948}
+  - {fileID: 294267782474217562}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2578122031409413761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5324863533857733401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ae88b964d30854f855f5f0ea4a82a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onEnterState:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 9110225073319402266, guid: fac2600fc64bd4d628a454998a31a6e3,
+          type: 3}
+        m_TargetAssemblyTypeName: Cutscene, Assembly-CSharp
+        m_MethodName: LogCheck
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onExitState:
+    m_PersistentCalls:
+      m_Calls: []
+  delayUntilShown: 0
+  characterSprite: {fileID: 21300000, guid: 50551403b1362b345aba08107b784a64, type: 3}
+  characterName: 
+  characterColor: {r: 1, g: 1, b: 1, a: 1}
+  audioCue: {fileID: 0}
+  text: 'You come across a village that is nearly abandoned. It seems like the Orc
+    raiders just left. '
+  debugTrigger: 0
+  options:
+  - text: Attempt to find any survivors
+    nextState: {fileID: 3636274808806051152}
+    conditions: []
+    hideIfConditionsUnmet: 0
+    lockedText: 
+    changesMorality: 1
+    moralityChange: 5
+    setFlags: 
+  - text: Search for loot
+    nextState: {fileID: 994132547348094530}
+    conditions: []
+    hideIfConditionsUnmet: 0
+    lockedText: 
+    changesMorality: 1
+    moralityChange: -8
+    setFlags: 
+  - text: Leave the place be.
+    nextState: {fileID: 0}
+    conditions: []
+    hideIfConditionsUnmet: 0
+    lockedText: 
+    changesMorality: 0
+    moralityChange: 0
+    setFlags: 
+  defaultNextState: {fileID: 0}

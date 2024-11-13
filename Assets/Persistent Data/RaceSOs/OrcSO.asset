@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b4c41cc7a05437ea9ebcd79a797f8d, type: 3}
+  m_Name: OrcSO
+  m_EditorClassIdentifier: 
+  m_RaceName: Human
+  m_MaleItems:
+    m_BaseModel: {fileID: 2300789127036414716, guid: fbae0fa6ec19d7e439bf3b381a041f55,
+      type: 3}
+    m_GridYOffset: 0
+    m_MageMeshes:
+    - {fileID: 2074584476760554808, guid: 01c3bddb1a85f074d8c03dca6a86dc6b, type: 3}
+    - {fileID: -4253321536509839193, guid: 01c3bddb1a85f074d8c03dca6a86dc6b, type: 3}
+    - {fileID: 703946172356890930, guid: 01c3bddb1a85f074d8c03dca6a86dc6b, type: 3}
+    - {fileID: 8173982544879710345, guid: 01c3bddb1a85f074d8c03dca6a86dc6b, type: 3}
+    - {fileID: 448031548015228244, guid: 01c3bddb1a85f074d8c03dca6a86dc6b, type: 3}
+    - {fileID: 8749617820559582521, guid: 01c3bddb1a85f074d8c03dca6a86dc6b, type: 3}
+    m_HoodedMeshes:
+    - {fileID: 2457215142499444459, guid: 2205cece49cb9494daca7e4e7bf66657, type: 3}
+    - {fileID: -8561724039512658154, guid: 2205cece49cb9494daca7e4e7bf66657, type: 3}
+    - {fileID: 1668240398772796145, guid: 2205cece49cb9494daca7e4e7bf66657, type: 3}
+    - {fileID: -2342033397556264062, guid: 2205cece49cb9494daca7e4e7bf66657, type: 3}
+    - {fileID: -6387239972780573291, guid: 2205cece49cb9494daca7e4e7bf66657, type: 3}
+    - {fileID: -5181717890023543277, guid: 2205cece49cb9494daca7e4e7bf66657, type: 3}
+    m_ArmorMeshes:
+    - {fileID: -5778947371319142618, guid: 7b2ba7dd6a2fb9e4a842e33f57e8cea5, type: 3}
+    - {fileID: -8299226164191775741, guid: 7b2ba7dd6a2fb9e4a842e33f57e8cea5, type: 3}
+    - {fileID: 2977085336350359580, guid: 7b2ba7dd6a2fb9e4a842e33f57e8cea5, type: 3}
+    - {fileID: 3126072714074005196, guid: 7b2ba7dd6a2fb9e4a842e33f57e8cea5, type: 3}
+    - {fileID: 6439490320263206253, guid: 7b2ba7dd6a2fb9e4a842e33f57e8cea5, type: 3}
+    - {fileID: 6833300905667296479, guid: 7b2ba7dd6a2fb9e4a842e33f57e8cea5, type: 3}
+  m_FemaleItems:
+    m_BaseModel: {fileID: 0}
+    m_GridYOffset: 0
+    m_MageMeshes: []
+    m_HoodedMeshes: []
+    m_ArmorMeshes: []
+  m_HurtSound: {fileID: 11400000, guid: 25c32ef2208f64afe8f4455fd4093a85, type: 2}
+  m_DeathSound: {fileID: 11400000, guid: 824f221d2c1634f809ef3c38ebdbd93c, type: 2}
+  m_MaleArmorFolder: Assets/Models/Armors/Orc_Male
+  m_MaleMagePrefix: OM_Mage
+  m_MaleHoodedPrefix: OM_Rogue
+  m_MaleArmorPrefix: OM_Heavy
+  m_FemaleArmorFolder: 
+  m_FemaleMagePrefix: 
+  m_FemaleHoodedPrefix: 
+  m_FemaleArmorPrefix: 

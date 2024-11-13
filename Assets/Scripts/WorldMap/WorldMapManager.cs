@@ -28,6 +28,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
 
+    [Header("FadingFog")]
+    [SerializeField] private float m_FadeDuration = 1.0f;
+
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
 
@@ -264,7 +267,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
 
         FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
-        nextNodeFog.gameObject.SetActive(false);
+        nextNodeFog.Fade(0, m_FadeDuration);
+        //nextNodeFog.gameObject.SetActive(false);
 
         LevelSO levelSO = currNode.LevelSO;
 
