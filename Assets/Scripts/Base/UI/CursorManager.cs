@@ -9,12 +9,13 @@ public class CursorManager : MonoBehaviour
 
     private void Start()
     {
-        Cursor.visible = false;
         m_RectT = transform as RectTransform;
     }
 
     private void Update()
     {
+        Cursor.visible = false;
+
         m_RectT.anchoredPosition = Input.mousePosition;
 
         if (Input.GetMouseButtonDown(0))
