@@ -31,6 +31,8 @@ public class ArmorVisual : MonoBehaviour
     private GameObject m_Model;
     private List<WeaponModel> m_WeaponModels = new();
     public List<WeaponModel> WeaponModels => m_WeaponModels;
+
+    public Transform BodyCenter => m_EquippingArmor.BodyCenter;
     #endregion
 
     private MeshFader m_MeshFader;

@@ -24,6 +24,7 @@ MonoBehaviour:
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
+  m_TeleportSelf: 0
   m_TeleportTargetRules: []
   m_TargetWillPlayHurtAnimation: 1
   m_OverrideWeaponAnimationType: 0
@@ -34,9 +35,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bafa5c363338c0849bc028b7798a2cd0, type: 2}
   - {fileID: 11400000, guid: 3532326be7568d1419b024ef2dccee87, type: 2}
   m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
-  m_TargetSquares: []
+  m_IsRangedAttack: 0
   m_SkillFXs:
-  - m_WeaponModelIndex: 0
-    m_AttachPointIndex: 0
-    m_FeedbackSystemPrefab: {fileID: 655196134911875015, guid: f26f5ccbce78f5743b44bd820af16f2a,
-      type: 3}
+  - {fileID: 11400000, guid: 5ba47f59eb7e27f48ba8dc2072210cac, type: 2}
