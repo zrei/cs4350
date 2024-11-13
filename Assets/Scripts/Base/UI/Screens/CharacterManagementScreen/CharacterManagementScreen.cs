@@ -89,7 +89,6 @@ namespace Game.UI
             if (!m_IsInLevel)
             {
                 GlobalEvents.UI.SavePartyChangesEvent?.Invoke();
-                SaveManager.Instance.Save();
             }
         }
 
