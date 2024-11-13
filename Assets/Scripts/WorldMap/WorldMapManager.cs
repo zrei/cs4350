@@ -37,6 +37,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private int m_CurrUnlockedLevel;
     private int m_CurrSelectedLevel;
 
+    private IUIScreen m_DemoEndScreen;
+
     private const float TOKEN_MOVE_DELAY = 0.3f;
 
     #region Initialisation
@@ -90,6 +92,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
             m_CurrUnlockedLevel = m_StartingLevel;
         }
         m_CurrSelectedLevel = m_CurrUnlockedLevel;
+
+        m_DemoEndScreen = UIScreenManager.Instance.DemoEndScreen;
 
         // check which level to initialise up to - if the post cutscene of the previous level
         // has not been registered as seen, we only want to initialise up to the previous level
@@ -262,21 +266,35 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #region Unlock Level
     private void UnlockLevel()
     {
-        WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
-        // TODO: need to handle final level case
-        WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
+        if (m_CurrUnlockedLevel == m_WorldMapRegions.Count)
+        {
+            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
+            SaveManager.Instance.Save(PostSave);
+            
+            void PostSave()
+            {
+                UIScreenManager.Instance.OpenScreen(m_DemoEndScreen);
+            }            
+        }
+        else
+        {
+            WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
+            // TODO: need to handle final level case
+            WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
 
-        FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
-        nextNodeFog.Fade(0, m_FadeDuration);
-        //nextNodeFog.gameObject.SetActive(false);
+            FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
+            nextNodeFog.Fade(0, m_FadeDuration);
+            //nextNodeFog.gameObject.SetActive(false);
 
-        LevelSO levelSO = currNode.LevelSO;
+            LevelSO levelSO = currNode.LevelSO;
 
-        m_CurrUnlockedLevel += 1;
-        m_CurrSelectedLevel = m_CurrUnlockedLevel;
+            m_CurrUnlockedLevel += 1;
+            m_CurrSelectedLevel = m_CurrUnlockedLevel;
 
-        SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
-        SaveManager.Instance.Save(() => PostUnlockLevelSave(currNode, nextNode));
+            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
+            SaveManager.Instance.Save(() => PostUnlockLevelSave(currNode, nextNode));
+        }
+        
     }
 
     void PostUnlockLevelSave(WorldMapNode currNode, WorldMapNode nextNode)
