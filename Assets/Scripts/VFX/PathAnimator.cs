@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Cinemachine.Editor.CinemachineScreenComposerGuides;
+using static UnityEditor.PlayerSettings;
 
 public static class PathAnimator
 {
@@ -9,6 +11,7 @@ public static class PathAnimator
         Vector3Producer middle,
         Vector3Producer end,
         Vector3Event posSetter,
+        Vector3Event rotSetter,
         float duration = 0.25f,
         bool unscaledTime = false,
         VoidEvent onComplete = null)
@@ -29,8 +32,11 @@ public static class PathAnimator
             {
                 t += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                 progress = t / duration;
-                pos = Vector3.Lerp(Vector3.Lerp(start(), middle(), progress), Vector3.Lerp(middle(), end(), progress), progress);
+                var nextPos = Vector3.Lerp(Vector3.Lerp(start(), middle(), progress), Vector3.Lerp(middle(), end(), progress), progress);
+                var delta = nextPos - pos;
+                pos = nextPos;
                 posSetter?.Invoke(pos);
+                rotSetter?.Invoke(Quaternion.LookRotation(delta).eulerAngles);
                 yield return null;
             }
 
@@ -44,6 +50,7 @@ public static class PathAnimator
     public static Coroutine PassThroughPointsAnimate(
         List<Vector3Producer> points,
         Vector3Event posSetter,
+        Vector3Event rotSetter,
         float duration = 0.25f,
         bool unscaledTime = false,
         VoidEvent onComplete = null)
@@ -57,11 +64,16 @@ public static class PathAnimator
                 var next = points[i + 1];
                 var t = 0f;
                 var progress = 0f;
+                var pos = curr();
                 while (t < durationPerPoint)
                 {
                     t += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                     progress = t / durationPerPoint;
-                    posSetter?.Invoke(Vector3.Lerp(curr(), next(), progress));
+                    var nextPos = Vector3.Lerp(curr(), next(), progress);
+                    var delta = nextPos - pos;
+                    pos = nextPos;
+                    posSetter?.Invoke(pos);
+                    rotSetter?.Invoke(Quaternion.LookRotation(delta).eulerAngles);
                     yield return null;
                 }
             }

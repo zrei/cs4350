@@ -189,6 +189,7 @@ public class VFXSO : ScriptableObject
             },
             () => secondaryAttachPoints[0].position,
             pos => vfx.transform.position = pos,
+            rot => vfx.transform.eulerAngles = rot,
             m_MoveDuration
         );
     }
@@ -221,6 +222,7 @@ public class VFXSO : ScriptableObject
                 },
                 () => secondary.position,
                 pos => vfx.transform.position = pos,
+                rot => vfx.transform.eulerAngles = rot,
                 m_MoveDuration
             );
         }
@@ -245,6 +247,7 @@ public class VFXSO : ScriptableObject
         PathAnimator.PassThroughPointsAnimate(
             points,
             pos => vfx.transform.position = pos,
+            rot => vfx.transform.eulerAngles = rot,
             m_MoveDuration
         );
     }

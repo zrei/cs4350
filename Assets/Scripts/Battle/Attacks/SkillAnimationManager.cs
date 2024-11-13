@@ -108,6 +108,8 @@ public class SkillAnimationManager : MonoBehaviour
             var lookAtPos = Vector3.zero;
             targets.ForEach(x => lookAtPos += x.transform.position);
             lookAt.position = lookAtPos / targets.Count;
+
+            follow.rotation = Quaternion.LookRotation(lookAt.position - follow.position);
         }
         else
         {
@@ -132,6 +134,8 @@ public class SkillAnimationManager : MonoBehaviour
             avgXY /= targets.Count;
             follow.position = new Vector3(avgXY.x, avgXY.y, closestZ);
             lookAt.position = lookAtPos / targets.Count;
+
+            follow.rotation = Quaternion.LookRotation(lookAt.position - follow.position);
         }
 
         if (attacker.UnitAllegiance == UnitAllegiance.PLAYER)
