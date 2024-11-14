@@ -7,6 +7,12 @@ public class GlobalSettings : Singleton<GlobalSettings>
     [SerializeField] private bool m_DoDebug = false;
     public static bool DoDebug => Instance.m_DoDebug;
 
+    [Header("Demo")]
+    [SerializeField] private bool m_IsDemo = true;
+    public static bool IsDemo => Instance.m_IsDemo;
+    [SerializeField] private int m_FinalDemoLevel = 2;
+    public static int FinalDemoLevel => Instance.m_FinalDemoLevel;
+ 
     [Header("Movement Config")]
     [SerializeField] private bool m_AllowCrossingOverOccupiedSquares = false;
     public static bool AllowCrossingOverOccupiedSquares => Instance.m_AllowCrossingOverOccupiedSquares;
