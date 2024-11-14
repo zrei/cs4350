@@ -279,7 +279,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostCutscene()
         {
-            if (levelNum + 1 >= m_WorldMapRegions.Count || GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel)
+            if (levelNum + 1 >= m_WorldMapRegions.Count || (GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel))
             {
                 GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
                 SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(m_DemoEndScreen));
