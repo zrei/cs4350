@@ -168,9 +168,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     #endregion
 
     #region Retrievers
-    public List<PlayerCharacterData> RetrieveAllCharacterData(bool excludeLord = false)
+    public List<PlayerCharacterData> RetrieveAllCharacterData(IEnumerable<int> additionalExcludedCharacterIds, bool excludeLord = false)
     {
-        return m_CharacterData.Values.Where(x => !excludeLord || !x.IsLord).ToList();
+        return m_CharacterData.Values.Where(x => !excludeLord || !x.IsLord).Where(x => !additionalExcludedCharacterIds.Contains(x.Id)).ToList();
     }
 
     public bool TryRetrieveCharacterData(int id, out PlayerCharacterData characterData)

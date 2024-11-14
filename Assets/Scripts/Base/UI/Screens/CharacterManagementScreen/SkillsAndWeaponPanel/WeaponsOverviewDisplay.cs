@@ -144,7 +144,7 @@ namespace Game.UI
                 // Unequip selected weapon from previous unit
                 if (m_SelectedWeapon.m_IsEquipped)
                 {
-                    foreach (var partyMember in CharacterDataManager.Instance.RetrieveAllCharacterData())
+                    foreach (var partyMember in CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()))
                     {
                         if (partyMember.m_CurrEquippedWeaponId == m_SelectedWeapon.m_InstanceId)
                         {
