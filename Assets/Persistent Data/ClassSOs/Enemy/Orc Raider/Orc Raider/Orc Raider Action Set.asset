@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b94d6327e84484bb62ecb427a46e7e, type: 3}
+  m_Name: Orc Raider Action Set
+  m_EditorClassIdentifier: 
+  m_EnemyActions:
+  - m_EnemyAction: {fileID: 11400000, guid: 9cd2f5145f72992409da98766bb09b8b, type: 2}
+    m_Conditions:
+    - m_Condition: {fileID: 11400000, guid: 7897b8d9e4da79b40a4d7f6072af24fa, type: 2}
+      m_Priority: 0
+    m_BasePriority: 3
+  - m_EnemyAction: {fileID: 11400000, guid: 4beaa95b0c396f84ba403319491dd297, type: 2}
+    m_Conditions: []
+    m_BasePriority: 2
+  - m_EnemyAction: {fileID: 11400000, guid: f85e81b56e7d57e48bbc3844503f09f5, type: 2}
+    m_Conditions: []
+    m_BasePriority: 1
+  - m_EnemyAction: {fileID: 11400000, guid: d0ddda27f40fe7f49b82ec6dd404a77c, type: 2}
+    m_Conditions: []
+    m_BasePriority: 0
