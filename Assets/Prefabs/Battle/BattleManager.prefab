@@ -86,9 +86,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: {x: 0.1, y: 0.5, z: 0.3}
-  ShoulderOffset: {x: -2.5, y: 2, z: -1}
+  ShoulderOffset: {x: 1.25, y: 1.5, z: -1}
   VerticalArmLength: 0.5
-  CameraSide: 0
+  CameraSide: 1
   CameraDistance: 1.2
   CameraCollisionFilter:
     serializedVersion: 2
@@ -466,7 +466,7 @@ MonoBehaviour:
     m_SensorSize: {x: 1, y: 1}
   m_Transitions:
     m_BlendHint: 0
-    m_InheritPosition: 0
+    m_InheritPosition: 1
     m_OnCameraLive:
       m_PersistentCalls:
         m_Calls: []
@@ -538,7 +538,7 @@ MonoBehaviour:
     m_SensorSize: {x: 1, y: 1}
   m_Transitions:
     m_BlendHint: 0
-    m_InheritPosition: 0
+    m_InheritPosition: 1
     m_OnCameraLive:
       m_PersistentCalls:
         m_Calls: []
