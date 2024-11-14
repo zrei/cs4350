@@ -69,7 +69,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 4096
+    maxTextureSize: 16384
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -320,7 +320,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Lunge
+      name: RighteousCharge
       rect:
         serializedVersion: 2
         x: 0
@@ -341,7 +341,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sweep
+      name: Cleave
       rect:
         serializedVersion: 2
         x: 544
@@ -1705,6 +1705,111 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MagicMissile
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 7072
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 71196b8695be84441958255348d759d7
+      internalID: -1282824421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Berserk
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 7072
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 126011ff054493441af930780f7c81c2
+      internalID: 1799206120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: QuickShot
+      rect:
+        serializedVersion: 2
+        x: 1088
+        y: 7072
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c289d560706ec0843a907b37243ca426
+      internalID: 1175480942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Inspire
+      rect:
+        serializedVersion: 2
+        x: 2176
+        y: 6528
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 321b58b71127e544bbdf318cf36a849e
+      internalID: -399646690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Warcry
+      rect:
+        serializedVersion: 2
+        x: 2720
+        y: 6528
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82629654c1e7aa14d9f73ea90983b0f8
+      internalID: 875926485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1716,10 +1821,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      AllSameColTarget: 338801712
+      AllSameRowTarget: -159178348
       ArcaneFlow: 1069948953
       AttackDown: -927014203
       AttackIntent: -97088158288067470
       AttackUp: 611204021
+      Berserk: 1799206120
       Bleed: -5188099564364658938
       BlessingOfProtection: -1438751909
       BlessingOfStrength: 527395116
@@ -1729,6 +1837,7 @@ TextureImporter:
       BowShot: -5573393650252216343
       Burn: -8583560586463384379
       Channel: 1984867441382777600
+      Cleave: 4745216710218349964
       Close: -2013610860
       Critical: -27030761
       DefenceDown: -1113224844
@@ -1749,15 +1858,15 @@ TextureImporter:
       HolyProtection: 422313916
       HolyRay: -1046245022
       Hunger: -8828248864853810611
-      Icons_1: -1484437962
       Inspect: -6432770400480951439
+      Inspire: -399646690
       Jab: -7653575836030749839
       Judgement: -657713584
       Lifesteal: 1645497426
       Lord: -439517190
-      Lunge: -1657715152261080285
       MagicAttack: -3115923524977524279
       MagicDefence: -8681509706564008044
+      MagicMissile: -1282824421
       Mana: -1531901422
       MarkTarget: 2613184551013223596
       Morality: -806908879
@@ -1769,12 +1878,15 @@ TextureImporter:
       PhysicalDefence: 912004121006356890
       Poison: -2942882565480004972
       Protection: -6060736179994706473
+      QuickShot: 1175480942
       Rally: 1644151247965553156
       Rapture: 1279413806
       Rations: -322793296
       Reckoning: 1106212051
       Recovery: -2519354409239675539
       Reposition: -6913803671930707150
+      RighteousCharge: -1657715152261080285
+      SingleTarget: -646323077
       Slash: 8685408783168630167
       Smite: 1862073294395254989
       Speed: 6823316075010515700
@@ -1783,7 +1895,6 @@ TextureImporter:
       Stun: -308852018
       SuppressiveFire: -1920872749
       SwapIntent: 6947849505947395973
-      Sweep: 4745216710218349964
       TacticalRetreat: -1929982818213864919
       TakeAim: 1875583235
       Taunt: 889621954
@@ -1793,6 +1904,7 @@ TextureImporter:
       TimeToAct: 5713308170288447385
       Turn: -3932851293694860304
       Volley: 9039833529719069562
+      Warcry: 875926485
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
