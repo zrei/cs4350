@@ -55,19 +55,22 @@ public class ArmorVisual : MonoBehaviour
             ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
 
         m_WeaponModels.Clear();
-        foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
+        if (weaponSO != null)
         {
-            if (weaponModelPrefab != null)
+            foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
             {
-                var weaponModel = Instantiate(weaponModelPrefab);
-                var attachPoint = weaponModel.attachmentType switch
+                if (weaponModelPrefab != null)
                 {
-                    WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
-                    WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
-                    _ => null,
-                };
-                weaponModel.transform.SetParent(attachPoint, false);
-                m_WeaponModels.Add(weaponModel);
+                    var weaponModel = Instantiate(weaponModelPrefab);
+                    var attachPoint = weaponModel.attachmentType switch
+                    {
+                        WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
+                        WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
+                        _ => null,
+                    };
+                    weaponModel.transform.SetParent(attachPoint, false);
+                    m_WeaponModels.Add(weaponModel);
+                }
             }
         }
 
@@ -81,7 +84,55 @@ public class ArmorVisual : MonoBehaviour
         }
 
         m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
-        m_Animator.SetInteger(PoseIDAnimParam, (int)classSO.WeaponAnimationType);
+        m_Animator.SetInteger(PoseIDAnimParam, weaponSO == null ? 0 : (int)classSO.WeaponAnimationType);
+
+        m_MeshFader = gameObject.AddComponent<MeshFader>();
+        m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
+    }
+
+    public void InstantiateModel(UnitModelData unitModelData, Color armorPlateColor, Color armorTrimColor, Color underArmorColor, WeaponInstanceSO weaponSO = null, WeaponAnimationType weaponAnimationType = WeaponAnimationType.SWORD)
+    {
+        m_Model = Instantiate(unitModelData.m_Model, transform);
+        m_Model.transform.localPosition = Vector3.zero;
+        m_Model.transform.localRotation = Quaternion.identity;
+
+        m_EquippingArmor = m_Model.GetComponent<EquippingArmor>();
+        m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
+
+        if (Application.isPlaying)
+            ChangeArmorMaterial(armorPlateColor, armorTrimColor, underArmorColor);
+
+        m_WeaponModels.Clear();
+        if (weaponSO != null)
+        {
+            foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
+            {
+                if (weaponModelPrefab != null)
+                {
+                    var weaponModel = Instantiate(weaponModelPrefab);
+                    var attachPoint = weaponModel.attachmentType switch
+                    {
+                        WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
+                        WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
+                        _ => null,
+                    };
+                    weaponModel.transform.SetParent(attachPoint, false);
+                    m_WeaponModels.Add(weaponModel);
+                }
+            }
+        }
+
+        if (!Application.isPlaying)
+            return;
+
+        m_Animator = m_Model.GetComponentInChildren<Animator>();
+        if (m_Animator == null)
+        {
+            Logger.Log(this.GetType().Name, this.name, "No animator found!", this.gameObject, LogLevel.WARNING);
+        }
+
+        m_AnimationEventHandler = m_Animator.GetComponent<AnimationEventHandler>();
+        m_Animator.SetInteger(PoseIDAnimParam, weaponSO == null ? 0 : (int) weaponAnimationType);
 
         m_MeshFader = gameObject.AddComponent<MeshFader>();
         m_MeshFader.SetRenderers(GetComponentsInChildren<Renderer>());
