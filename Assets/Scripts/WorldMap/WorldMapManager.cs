@@ -92,15 +92,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
             m_CurrUnlockedLevel = m_StartingLevel;
         }
 
-        // set the selected level to the final known level
-        if (m_CurrUnlockedLevel >= m_WorldMapRegions.Count || GlobalSettings.IsDemo && m_CurrUnlockedLevel >= GlobalSettings.FinalDemoLevel)
-        {
-            m_CurrSelectedLevel = m_CurrUnlockedLevel - 1;
-        }
-        else
-        {
-            m_CurrSelectedLevel = m_CurrUnlockedLevel;
-        }
+        m_CurrSelectedLevel = GetFinalUnlockedLevel();
 
         m_DemoEndScreen = UIScreenManager.Instance.DemoEndScreen;
 
@@ -239,7 +231,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         }
         else
         {
-            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(GetWorldMapNode(m_CurrUnlockedLevel).LevelSO, false));
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(GetWorldMapNode(m_CurrSelectedLevel).LevelSO, false));
             EnableAllControls();
         }
 
@@ -264,37 +256,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
             FlagManager.Instance.SetFlagValue(node.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
             additionalCallback?.Invoke();
         }
-
-        /*
-        if ((GlobalSettings.IsDemo && GlobalSettings.FinalDemoLevel == m_CurrUnlockedLevel) || m_CurrUnlockedLevel == m_WorldMapRegions.Count)
-        {
-            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
-            SaveManager.Instance.Save(PostSave);
-            
-            void PostSave()
-            {
-                UIScreenManager.Instance.OpenScreen(m_DemoEndScreen);
-            }            
-        }
-        else
-        {
-            WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
-            // TODO: need to handle final level case
-            WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
-
-            FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
-            nextNodeFog.Fade(0, m_FadeDuration);
-            //nextNodeFog.gameObject.SetActive(false);
-
-            LevelSO levelSO = currNode.LevelSO;
-
-            m_CurrUnlockedLevel += 1;
-            m_CurrSelectedLevel = m_CurrUnlockedLevel;
-
-            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
-            SaveManager.Instance.Save(() => PostUnlockLevelSave(currNode, nextNode));
-        }
-        */
     }
 
     private void PreLevelCutscene(int levelNum)
@@ -318,7 +279,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostCutscene()
         {
-            if (levelNum + 1 >= m_WorldMapRegions.Count || GlobalSettings.IsDemo && levelNum + 1 >= GlobalSettings.FinalDemoLevel)
+            if (levelNum + 1 >= m_WorldMapRegions.Count || GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel)
             {
                 GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
                 SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(m_DemoEndScreen));
@@ -372,7 +333,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         WorldMapNode node = GetWorldMapNode(levelNum);
         node.ToggleCurrLevel(true);
         EnableAllControls();
-        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(node.LevelSO, false));
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(node.LevelSO, levelNum < m_CurrUnlockedLevel));
     }
     #endregion
 
@@ -396,9 +357,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void OnFocusCurrentLevel(IInput input)
     {
-        if (m_CurrSelectedLevel != m_CurrUnlockedLevel)
+        if (m_CurrSelectedLevel != GetFinalUnlockedLevel())
         {
-            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrUnlockedLevel)));
+            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(GetFinalUnlockedLevel())));
         }
         else
         {
@@ -426,7 +387,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void NavigateToNext()
     {
-        if (m_CurrSelectedLevel >= m_CurrUnlockedLevel)
+        if (m_CurrSelectedLevel >= GetFinalUnlockedLevel())
             return;
 
         StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel + 1)));
@@ -516,6 +477,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private FogFader GetWorldMapFog(int levelNumber)
     {
         return m_WorldMapRegions[levelNumber - 1].m_FogFade;
+    }
+
+    private int GetFinalUnlockedLevel()
+    {
+        return Mathf.Min(m_CurrUnlockedLevel, GlobalSettings.IsDemo ? GlobalSettings.FinalDemoLevel : m_WorldMapRegions.Count);
     }
     #endregion
 
