@@ -279,6 +279,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostCutscene()
         {
+            Debug.Log(levelNum + 1);
+            Debug.Log(GlobalSettings.IsDemo);
+            Debug.Log(GlobalSettings.FinalDemoLevel);
             if (levelNum + 1 >= m_WorldMapRegions.Count || (GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel))
             {
                 GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
@@ -322,7 +325,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostMovement()
         {
-            nextLevel.ToggleCurrLevel(true);
             PreLevelCutscene(levelNum + 1);
         }
     }
