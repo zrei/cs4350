@@ -8,6 +8,12 @@ public class WorldMapCutsceneManager : MonoBehaviour
 
     public void ShowCutscene(CutsceneSpawner cutscene, VoidEvent postCutscene)
     {
+        if (cutscene == null)
+        {
+            postCutscene?.Invoke();
+            return;
+        }
+
         m_CurrCutscene = cutscene;
         m_CurrCutscene.BeginCutscene(() => PostCutscene(postCutscene));
 
