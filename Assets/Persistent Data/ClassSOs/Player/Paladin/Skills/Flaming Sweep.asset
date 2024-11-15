@@ -13,30 +13,24 @@ MonoBehaviour:
   m_Name: Flaming Sweep
   m_EditorClassIdentifier: 
   m_SkillName: Flaming Sweep
-  m_Description: 'Deals damage in to an enemy in the front 3 rows and the enemies
-    on their left and right.
-
-    Applies 3 Burn to all targets hit.
-
-    Can only
-    be used from the front 3 rows.'
+  m_Description: 
   m_Icon: {fileID: 1516343400, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 1
-  m_ConsumedMana: 8
+  m_ConsumedMana: 2
   m_SkillTypes: 0000000001000000
   m_InflictedTokens: []
   m_InflictedStatusEffects:
   - m_StatusEffect: {fileID: 11400000, guid: 3d259974e2d581d48b8bc8e5897abdf3, type: 2}
     m_Stack: 3
-  m_DamageModifier: 0.5
+  m_DamageModifier: 0.9
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
   m_TeleportSelf: 0
   m_TeleportTargetRules: []
   m_TargetWillPlayHurtAnimation: 1
-  m_OverrideWeaponAnimationType: 0
-  m_OverriddenWeaponAnimationType: 0
+  m_OverrideWeaponAnimationType: 1
+  m_OverriddenWeaponAnimationType: 200
   m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}

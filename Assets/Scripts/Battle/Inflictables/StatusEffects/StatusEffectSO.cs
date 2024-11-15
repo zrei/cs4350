@@ -17,6 +17,6 @@ public abstract class StatusEffectSO : ScriptableObject
 
     public override string ToString()
     {
-        return m_Sprite != null ? $"<sprite name=\"{m_Sprite.name}\" tint>" : m_StatusEffectName;
+        return m_Sprite != null ? $"{m_StatusEffectName} <sprite name=\"{m_Sprite.name}\" tint>" : m_StatusEffectName;
     }
 }

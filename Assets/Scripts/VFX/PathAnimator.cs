@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Cinemachine.Editor.CinemachineScreenComposerGuides;
-using static UnityEditor.PlayerSettings;
 
 public static class PathAnimator
 {

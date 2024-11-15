@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: E_AS_BowShot
+  m_EditorClassIdentifier: 
+  m_SkillName: Bow Shot
+  m_Description: 
+  m_Icon: {fileID: -5573393650252216343, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillType: 1
+  m_ConsumedMana: 0
+  m_SkillTypes: 00000000
+  m_InflictedTokens: []
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 1
+  m_HealProportion: 1
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportSelf: 0
+  m_TeleportTargetRules: []
+  m_TargetWillPlayHurtAnimation: 1
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 2
+  m_TargetRules:
+  - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
+  - {fileID: 11400000, guid: 9cceed499ff45954c93f9eff929550ab, type: 2}
+  - {fileID: 11400000, guid: 8f8423bc60ccc4a4a95c3efc1f66ed53, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
+  m_IsRangedAttack: 1
+  m_SkillFXs:
+  - {fileID: 11400000, guid: 1ae6e8615aa1e1245b10ec5b6bfa648c, type: 2}
