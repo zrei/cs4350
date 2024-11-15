@@ -39,7 +39,7 @@ public class StatusEffect :
 
     public void AddStack(int amt)
     {
-        m_StackRemaining = Mathf.Max(m_StackRemaining + amt, m_StatusEffectSO.m_MaxStack);
+        m_StackRemaining = Mathf.Min(m_StackRemaining + amt, m_StatusEffectSO.m_MaxStack);
     }
 
     public void ReduceStack(int amt)
