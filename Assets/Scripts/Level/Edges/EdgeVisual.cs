@@ -7,8 +7,8 @@ public class EdgeVisual : MonoBehaviour
 {
     [SerializeField] EdgeInternal m_EdgeInternal;
     
-    [SerializeField] private LineRenderer m_LineRenderer;
-    [SerializeField] private TextMeshPro m_CostText;
+    [SerializeField] public LineRenderer m_LineRenderer;
+    [SerializeField] public TextMeshPro m_CostText;
     
     [Header("Edge Renderer Settings")]
     public float width;
@@ -73,6 +73,12 @@ public class EdgeVisualEditor : Editor
         if (GUILayout.Button("Draw Edge"))
         {
             m_Target.DrawEdge();
+            
+            Undo.RecordObject(m_Target.m_LineRenderer, "Updated LineRenderer");
+            PrefabUtility.RecordPrefabInstancePropertyModifications(m_Target.m_LineRenderer);
+            
+            Undo.RecordObject(m_Target.m_CostText, "Updated CostText");
+            PrefabUtility.RecordPrefabInstancePropertyModifications(m_Target.m_CostText);
         }
     }
 }

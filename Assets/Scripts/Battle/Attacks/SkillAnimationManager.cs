@@ -119,7 +119,7 @@ public class SkillAnimationManager : MonoBehaviour
             var lookAtPos = Vector3.zero;
             foreach (var target in targets)
             {
-                if (Mathf.Abs(target.transform.localPosition.z) < Mathf.Abs(closestZ))
+                if (Mathf.Abs(target.transform.localPosition.z) < Mathf.Abs(closestLocalZ))
                 {
                     closestLocalZ = target.transform.localPosition.z;
                     closestZ = target.transform.position.z;
@@ -136,15 +136,6 @@ public class SkillAnimationManager : MonoBehaviour
             lookAt.position = lookAtPos / targets.Count;
 
             follow.rotation = Quaternion.LookRotation(lookAt.position - follow.position);
-        }
-
-        if (attacker.UnitAllegiance == UnitAllegiance.PLAYER)
-        {
-            follow.localEulerAngles = Vector3.zero;
-        }
-        else
-        {
-            follow.localEulerAngles = new Vector3(0, 180, 0);
         }
 
         m_SkillAnimVCam.enabled = true;

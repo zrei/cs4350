@@ -48,7 +48,7 @@ public abstract class TokenTierSO : ScriptableObject
 
     public override string ToString()
     {
-        return m_Icon != null ? $"<sprite name=\"{m_Icon.name}\" tint>" : m_TokenName;
+        return m_Icon != null ? $"{m_TokenName} <sprite name=\"{m_Icon.name}\" tint>" : m_TokenName;
     }
 
 #if UNITY_EDITOR

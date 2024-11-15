@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: TacticalRetreat
   m_EditorClassIdentifier: 
   m_SkillName: Tactical Retreat
-  m_Description: "Move self by 2. \nGet a Speed Up I and Crit I token.\nCan only
-    be used from the front 3 rows."
+  m_Description: Move self by 2 <sprite name="Steps" tint>
   m_Icon: {fileID: -1929982818213864919, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
-  m_ConsumedMana: 8
+  m_ConsumedMana: 2
   m_SkillTypes: 0100000005000000
   m_InflictedTokens:
   - m_TokenTierData: {fileID: 11400000, guid: 83a815389a0744034b7b6743cdd08642, type: 2}
@@ -25,9 +24,6 @@ MonoBehaviour:
     m_Number: 1
   - m_TokenTierData: {fileID: 11400000, guid: e978f3b5d68364245bad675bf3841823, type: 2}
     m_Tier: 1
-    m_Number: 1
-  - m_TokenTierData: {fileID: 11400000, guid: 86099e809049cd94f8cd2a1d3fdf018d, type: 2}
-    m_Tier: 2
     m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
