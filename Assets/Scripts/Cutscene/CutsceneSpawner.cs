@@ -27,7 +27,7 @@ public class CutsceneSpawner : MonoBehaviour
         m_PostCutsceneAction = null;
     }
 
-    private void SwitchToCutscene(Cutscene cutscene)
+    public void SwitchToCutscene(Cutscene cutscene)
     {
         GameSceneManager.Instance.PlayTransition(MidTransictionAction, null);
 

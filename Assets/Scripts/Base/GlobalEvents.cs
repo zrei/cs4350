@@ -151,5 +151,6 @@ public static class GlobalEvents {
     {
         public delegate void CutsceneEvent(Cutscene _);
         public static CutsceneEvent StartCutsceneEvent;
+        public static StringEvent CutsceneTriggerEvent;
     }
 }
