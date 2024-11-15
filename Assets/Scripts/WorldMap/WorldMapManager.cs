@@ -91,7 +91,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
         {
             m_CurrUnlockedLevel = m_StartingLevel;
         }
-        m_CurrSelectedLevel = m_CurrUnlockedLevel;
+
+        m_CurrSelectedLevel = GetFinalUnlockedLevel();
 
         m_DemoEndScreen = UIScreenManager.Instance.DemoEndScreen;
 
@@ -144,38 +145,16 @@ public class WorldMapManager : Singleton<WorldMapManager>
         
         if (playPostCutsceneOfPrevLevel)
         {
-            // play the post cutscene of the previous level before running the usual level unlock animation
-            PostUnlockLevelSave(GetWorldMapNode(levelToInitialiseUpTo), GetWorldMapNode(m_CurrSelectedLevel));
+            CutsceneSequence(levelToInitialiseUpTo);
         }
         else if (!FlagManager.Instance.GetFlagValue(currNode.LevelSO.PreDialogueFlag))
         {
-            // play the pre cutscene of the current level
-            if (currNode.HasPreCutscene)
-                m_CutsceneManager.ShowCutscene(currNode.PreCutscene, PostPreCutscene);
-            else
-                PostPreCutscene();
+            PreLevelCutscene(m_CurrSelectedLevel);
         }
         else
         {
-            // normal operations
-            PostSave();
+            SelectLevel(m_CurrSelectedLevel);
         }
-
-        void PostPreCutscene()
-        {
-            FlagManager.Instance.SetFlagValue(currNode.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
-            GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
-            SaveManager.Instance.Save(PostSave);
-        }
-
-        void PostSave()
-        {
-            EnableAllControls();
-
-            // initialise the UI
-            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(currNode.LevelSO, false));
-        }
-        
     }
     #endregion
 
@@ -246,11 +225,13 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         if (FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
         {
-            UnlockLevel();
+            m_CurrUnlockedLevel += 1;
+            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
+            SaveManager.Instance.Save(() => CutsceneSequence(m_CurrSelectedLevel));
         }
         else
         {
-            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(GetWorldMapNode(m_CurrUnlockedLevel).LevelSO, false));
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(GetWorldMapNode(m_CurrSelectedLevel).LevelSO, false));
             EnableAllControls();
         }
 
@@ -264,99 +245,97 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #endregion
 
     #region Unlock Level
-    private void UnlockLevel()
+    private void PostLevelCutscene(int levelNum, VoidEvent additionalCallback = null)
     {
-        if ((GlobalSettings.IsDemo && GlobalSettings.FinalDemoLevel == m_CurrUnlockedLevel) || m_CurrUnlockedLevel == m_WorldMapRegions.Count)
+        WorldMapNode node = GetWorldMapNode(levelNum);
+
+        m_CutsceneManager.ShowCutscene(node.PostCutscene, PostCutscene);
+
+        void PostCutscene()
         {
-            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
-            SaveManager.Instance.Save(PostSave);
-            
-            void PostSave()
+            FlagManager.Instance.SetFlagValue(node.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
+            additionalCallback?.Invoke();
+        }
+    }
+
+    private void PreLevelCutscene(int levelNum)
+    {
+        WorldMapNode node = GetWorldMapNode(levelNum);
+
+        m_CutsceneManager.ShowCutscene(node.PreCutscene, PostCutscene);
+
+        void PostCutscene()
+        {
+            // saving always occurs after pre-cutscene is played
+            FlagManager.Instance.SetFlagValue(node.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
+            GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
+            SaveManager.Instance.Save(() => SelectLevel(levelNum));
+        }
+    }
+
+    private void CutsceneSequence(int levelNum)
+    {
+        PostLevelCutscene(levelNum, PostCutscene);
+
+        void PostCutscene()
+        {
+            Debug.Log(levelNum + 1);
+            Debug.Log(GlobalSettings.IsDemo);
+            Debug.Log(GlobalSettings.FinalDemoLevel);
+            if (levelNum + 1 >= m_WorldMapRegions.Count || (GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel))
             {
-                UIScreenManager.Instance.OpenScreen(m_DemoEndScreen);
-            }            
-        }
-        else
-        {
-            WorldMapNode currNode = GetWorldMapNode(m_CurrUnlockedLevel);
-            // TODO: need to handle final level case
-            WorldMapNode nextNode = GetWorldMapNode(m_CurrUnlockedLevel + 1);
-
-            FogFader nextNodeFog = GetWorldMapFog(m_CurrUnlockedLevel + 1);
-            nextNodeFog.Fade(0, m_FadeDuration);
-            //nextNodeFog.gameObject.SetActive(false);
-
-            LevelSO levelSO = currNode.LevelSO;
-
-            m_CurrUnlockedLevel += 1;
-            m_CurrSelectedLevel = m_CurrUnlockedLevel;
-
-            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
-            SaveManager.Instance.Save(() => PostUnlockLevelSave(currNode, nextNode));
-        }
-        
-    }
-
-    void PostUnlockLevelSave(WorldMapNode currNode, WorldMapNode nextNode)
-    {
-        if (currNode.HasPostCutscene)
-        {
-            m_CutsceneManager.ShowCutscene(currNode.PostCutscene, () => PostLevelEndCutscene(currNode, nextNode, m_WorldMapRegions[m_CurrSelectedLevel - 1].m_FogFade));
-        }
-        else
-        {
-            PostLevelEndCutscene(currNode, nextNode, m_WorldMapRegions[m_CurrSelectedLevel - 1].m_FogFade);
+                GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
+                SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(m_DemoEndScreen));
+            }
+            else
+            {
+                UnlockLevelAnimation(levelNum);
+            }
         }
     }
 
-    private void PostLevelEndCutscene(WorldMapNode currNode, WorldMapNode nextNode, FogFader nextRegionFog)
+    /// <summary>
+    /// Pre level cutscene of next level always plays after unlock level animation
+    /// </summary>
+    /// <param name="levelNum"></param>
+    /// <param name="additionalCallback"></param>
+    private void UnlockLevelAnimation(int levelNum)
     {
-        FlagManager.Instance.SetFlagValue(currNode.LevelSO.PostDialogueFlag, true, FlagType.PERSISTENT);
+        WorldMapNode currLevel = GetWorldMapNode(levelNum);
+        WorldMapNode nextLevel = GetWorldMapNode(levelNum + 1);
+        FogFader nextRegionFog = GetWorldMapFog(levelNum + 1);
 
         if (nextRegionFog != null)
             nextRegionFog.gameObject.SetActive(false);
 
-        currNode.ToggleCurrLevel(false);
+        currLevel.ToggleCurrLevel(false);
 
         // start path animation
-        currNode.UnlockPath(PostUnlockPath);
+        currLevel.UnlockPath(PostUnlockPath);
 
         // start moving unit
-        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currNode.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currNode.Spline, currNode.PositioningOffset, Quaternion.LookRotation(currNode.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
+        m_PlayerTokenInstance.MoveAlongSpline(TOKEN_MOVE_DELAY, Quaternion.LookRotation(-currLevel.InitialSplineForwardDirection, m_PlayerTokenInstance.transform.up), currLevel.Spline, currLevel.PositioningOffset, Quaternion.LookRotation(currLevel.transform.forward, m_PlayerTokenInstance.transform.up), PostMovement);
 
         // have the next node pop up
         void PostUnlockPath()
         {
-            nextNode.gameObject.SetActive(true);
-            nextNode.UnlockNode();
+            nextLevel.gameObject.SetActive(true);
+            nextLevel.UnlockNode();
         }
 
-        // re-enable world map controls
         void PostMovement()
         {
-            if (nextNode.HasPreCutscene)
-            {
-                m_CutsceneManager.ShowCutscene(nextNode.PreCutscene, () => PostLevelBeginCutscene(nextNode));
-            }
-            else
-            {
-                PostLevelBeginCutscene(nextNode);
-            }
+            PreLevelCutscene(levelNum + 1);
         }
     }
 
-    private void PostLevelBeginCutscene(WorldMapNode nextNode)
+    private void SelectLevel(int levelNum)
     {
-        FlagManager.Instance.SetFlagValue(nextNode.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
-        nextNode.ToggleCurrLevel(true);
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
-        SaveManager.Instance.Save(PostSave);
-
-        void PostSave()
-        {
-            EnableAllControls();
-            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(nextNode.LevelSO, false));
-        }
+        m_CurrSelectedLevel = levelNum;
+        WorldMapNode node = GetWorldMapNode(levelNum);
+        node.ToggleCurrLevel(true);
+        EnableAllControls();
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(node.LevelSO, levelNum < m_CurrUnlockedLevel));
     }
     #endregion
 
@@ -380,9 +359,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void OnFocusCurrentLevel(IInput input)
     {
-        if (m_CurrSelectedLevel != m_CurrUnlockedLevel)
+        if (m_CurrSelectedLevel != GetFinalUnlockedLevel())
         {
-            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrUnlockedLevel)));
+            StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(GetFinalUnlockedLevel())));
         }
         else
         {
@@ -410,7 +389,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void NavigateToNext()
     {
-        if (m_CurrSelectedLevel >= m_CurrUnlockedLevel)
+        if (m_CurrSelectedLevel >= GetFinalUnlockedLevel())
             return;
 
         StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel + 1)));
@@ -500,6 +479,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private FogFader GetWorldMapFog(int levelNumber)
     {
         return m_WorldMapRegions[levelNumber - 1].m_FogFade;
+    }
+
+    private int GetFinalUnlockedLevel()
+    {
+        return Mathf.Min(m_CurrUnlockedLevel, GlobalSettings.IsDemo ? GlobalSettings.FinalDemoLevel : m_WorldMapRegions.Count);
     }
     #endregion
 
