@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Game.UI;
 
 public class PartyOverviewWorldButton : OpenPartyOverviewButton
@@ -31,7 +32,7 @@ public class PartyOverviewWorldButton : OpenPartyOverviewButton
     {
         if (UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen)) return;
         
-        GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(), false);
+        GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false);
 
         UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen);
     }
