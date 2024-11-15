@@ -169,6 +169,41 @@ public class ArmorVisual : MonoBehaviour
         StartCoroutine(MeshFadeSet());
     }
 
+    public void ChangeWeapons(WeaponInstanceSO weaponInstance, WeaponAnimationType weaponAnimationType = WeaponAnimationType.SWORD)
+    {
+        foreach (WeaponModel weaponModel in m_WeaponModels)
+        {
+            Destroy(weaponModel.gameObject);
+        }
+
+        m_WeaponModels.Clear();
+
+        if (weaponInstance != null)
+        {
+            foreach (var weaponModelPrefab in weaponInstance.m_WeaponModels)
+            {
+                if (weaponModelPrefab != null)
+                {
+                    var weaponModel = Instantiate(weaponModelPrefab);
+                    var attachPoint = weaponModel.attachmentType switch
+                    {
+                        WeaponModelAttachmentType.RIGHT_HAND => m_EquippingArmor.RightArmBone,
+                        WeaponModelAttachmentType.LEFT_HAND => m_EquippingArmor.LeftArmBone,
+                        _ => null,
+                    };
+                    weaponModel.transform.SetParent(attachPoint, false);
+                    m_WeaponModels.Add(weaponModel);
+                }
+            }
+        }
+
+        m_Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        m_Animator.SetInteger(PoseIDAnimParam, weaponInstance == null ? 0 : (int)weaponAnimationType);
+        m_Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+
+        StartCoroutine(MeshFadeSet());
+    }
+
     private IEnumerator MeshFadeSet()
     {
         yield return null;

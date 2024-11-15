@@ -6,8 +6,9 @@ using System.Collections.Generic;
 
 public enum CutsceneTriggerEnum
 {
-    PRE_1_EXAMPLE,
-    POST_1_HELLO,
+    // follow the format: {PRE/POST}_LEVELNUM_NAME
+    PRE_1_START,
+    PRE_1_ATTACK
 }
 
 public class CutsceneTrigger : TriggerBase
@@ -23,14 +24,6 @@ public abstract class TriggerBase : MonoBehaviour
     [SerializeField] protected CutsceneTriggerEnum m_CutsceneTrigger;
 
 #if UNITY_EDITOR
-    [Header("Editor")]
-    [Tooltip("Is this for the pre or post cutscene")]
-    [SerializeField] private bool m_IsPre;
-    [SerializeField] private int m_LevelNum = 1;
-
-    public bool IsPre => m_IsPre;
-    public int LevelNum => m_LevelNum;
-    
     public void SetCutsceneTrigger(CutsceneTriggerEnum cutsceneTrigger)
     {
         m_CutsceneTrigger = cutsceneTrigger;
@@ -44,6 +37,9 @@ public abstract class TriggerBase : MonoBehaviour
 public class TriggerBaseEditor : Editor
 {
     private TriggerBase m_TriggerBase;
+    private bool m_PreCutsceneTrigger = true;
+    private int m_LevelNum = 1;
+    private int m_CutsceneTriggerIndex = 0;
 
     private void OnEnable()
     {
@@ -54,8 +50,10 @@ public class TriggerBaseEditor : Editor
     {
         base.OnInspectorGUI();
 
-        bool isPre = m_TriggerBase.IsPre;
-        int levelNum = m_TriggerBase.LevelNum;
+        GUILayout.Space(30);
+        GUILayout.Label("Editor");
+        m_PreCutsceneTrigger = EditorGUILayout.Toggle("Pre-Cutscene Trigger", m_PreCutsceneTrigger);
+        m_LevelNum = EditorGUILayout.IntField("Level number", m_LevelNum);
 
         IEnumerable<CutsceneTriggerEnum> cutsceneTriggerEnums = Enum.GetValues(typeof(CutsceneTriggerEnum)).OfType<CutsceneTriggerEnum>().Where(x => Filter(x));
         string[] options = cutsceneTriggerEnums.Select(x => x.ToString()).ToArray();
@@ -66,11 +64,11 @@ public class TriggerBaseEditor : Editor
         }
         else
         {
-            int index = EditorGUILayout.Popup(0, options);
+            m_CutsceneTriggerIndex = EditorGUILayout.Popup(m_CutsceneTriggerIndex, options);
 
             if (GUILayout.Button("Set cutscene trigger"))
             {
-                m_TriggerBase.SetCutsceneTrigger(cutsceneTriggerEnums.ElementAt(index));
+                m_TriggerBase.SetCutsceneTrigger(cutsceneTriggerEnums.ElementAt(m_CutsceneTriggerIndex));
             }
         }
 
@@ -80,10 +78,10 @@ public class TriggerBaseEditor : Editor
             if (components.Count() < 2)
                 return false;
 
-            if (!components[0].ToUpper().Equals(isPre ? "PRE" : "POST"))
+            if (!components[0].ToUpper().Equals(m_PreCutsceneTrigger ? "PRE" : "POST"))
                 return false;
 
-            if (!components[1].Equals(levelNum.ToString()))
+            if (!components[1].Equals(m_LevelNum.ToString()))
                 return false;
 
             return true;

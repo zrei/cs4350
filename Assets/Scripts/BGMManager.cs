@@ -2,30 +2,38 @@ using UnityEngine;
 
 public class BGMManager : MonoBehaviour
 {
-    [SerializeField] protected AudioDataSO m_BGM;
+    [SerializeField] protected AudioDataSO m_DefaultBGM;
 
-    protected int m_CurrentlyPlayingAudio;
+    protected int m_CurrentlyPlayingAudioToken;
+    protected bool m_CurrentlyPlayingDefaultBgm = false;
 
     protected virtual void Awake()
     {
-        StartPlayingBGM();
+        StartPlayingDefaultBGM();
     }
 
-    protected virtual void StartPlayingBGM()
+    protected virtual void StartPlayingDefaultBGM()
     {
         if (!SoundManager.IsReady)
         {
-            SoundManager.OnReady += StartPlayingBGM;
+            SoundManager.OnReady += StartPlayingDefaultBGM;
             return;
         }
 
-        SoundManager.OnReady -= StartPlayingBGM;
+        SoundManager.OnReady -= StartPlayingDefaultBGM;
 
-        m_CurrentlyPlayingAudio = SoundManager.Instance.PlayWithFadeIn(m_BGM);
+        m_CurrentlyPlayingAudioToken = SoundManager.Instance.PlayWithFadeIn(m_DefaultBGM);
+        m_CurrentlyPlayingDefaultBgm = true;
     }
 
-    public void FadeOutBgm()
+    public void FadeOutCurrBgm(VoidEvent postFade = null)
     {
-        SoundManager.Instance.FadeOutAndStop(m_CurrentlyPlayingAudio);
+        SoundManager.Instance.FadeOutAndStop(m_CurrentlyPlayingAudioToken, 2f, postFade);
+    }
+
+    public void PlayOtherBgm(AudioDataSO audio)
+    {
+        m_CurrentlyPlayingAudioToken = SoundManager.Instance.PlayWithFadeIn(audio);
+        m_CurrentlyPlayingDefaultBgm = false;
     }
 }

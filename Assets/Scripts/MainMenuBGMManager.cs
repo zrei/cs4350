@@ -2,6 +2,8 @@ public class MainMenuBGMManager : BGMManager
 {
     protected override void Awake()
     {
+        base.Awake();
+
         GlobalEvents.MainMenu.OnBeginLoadWorldMap += OnBeginLoadWorldMap;
     }
 
@@ -12,6 +14,6 @@ public class MainMenuBGMManager : BGMManager
 
     private void OnBeginLoadWorldMap()
     {
-        SoundManager.Instance.FadeOutAndStop(m_CurrentlyPlayingAudio);
+        FadeOutCurrBgm();
     }
 }

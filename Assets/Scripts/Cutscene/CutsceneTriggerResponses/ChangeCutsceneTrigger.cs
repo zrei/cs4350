@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CutsceneSpawner))]
+[AddComponentMenu("CutsceneTriggerResponses/ChangeCutsceneTrigger")]
 public class ChangeCutsceneTrigger : CutsceneTriggerResponse
 {
     [SerializeField] Cutscene m_Cutscene;
