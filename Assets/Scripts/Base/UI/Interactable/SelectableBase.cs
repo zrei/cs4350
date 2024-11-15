@@ -15,6 +15,18 @@ namespace Game.UI
         [SerializeField]
         private bool deselectOnPointerExit;
 
+        [SerializeField]
+        [Tooltip("Leave empty for no sound")]
+        private AudioDataSO hoverAudio;
+
+        [SerializeField]
+        [Tooltip("Leave empty for no sound")]
+        private AudioDataSO selectAudio;
+
+        [SerializeField]
+        [Tooltip("Leave empty for no sound")]
+        private AudioDataSO submitAudio;
+
         public UnityEvent onSelect;
         public UnityEvent onDeselect;
         public UnityEvent onSubmit;
@@ -26,6 +38,8 @@ namespace Game.UI
             if (!IsInteractable()) return;
 
             base.OnSelect(eventData);
+            if (selectAudio != null)
+                SoundManager.Instance.Play(selectAudio);
             onSelect?.Invoke();
         }
 
@@ -40,6 +54,8 @@ namespace Game.UI
             if (!IsInteractable()) return;
 
             base.OnPointerEnter(eventData);
+            if (hoverAudio != null)
+                SoundManager.Instance.Play(hoverAudio);
             onPointerEnter?.Invoke();
 
             Select();
@@ -60,12 +76,18 @@ namespace Game.UI
         {
             if (!IsInteractable()) return;
 
+            if (submitAudio != null)
+                SoundManager.Instance.Play(submitAudio);
+
             onSubmit?.Invoke();
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
             if (!IsInteractable()) return;
+
+            if (submitAudio != null)
+                SoundManager.Instance.Play(submitAudio);
 
             onSubmit?.Invoke();
         }

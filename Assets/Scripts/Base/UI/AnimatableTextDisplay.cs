@@ -7,6 +7,10 @@ namespace Game.UI
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class AnimatableTextDisplay : MonoBehaviour
     {
+        #region SFX
+        [Tooltip("Leave empty for no sound")]
+        public AudioDataSO m_AnimationAudio = null;
+        #endregion
         public float DelayBetweenChars = 0.01f;
 
         private TextMeshProUGUI TextComponent;
@@ -19,6 +23,8 @@ namespace Game.UI
         private float timer;
 
         public event Action onTextComplete;
+
+        private int? m_SFXToken = null;
 
         private void Awake()
         {
@@ -63,8 +69,14 @@ namespace Game.UI
             {
                 if (TextComponent.textInfo.characterCount > 0)
                 {
+                    
                     DelayBetweenChars = time / TextComponent.textInfo.characterCount;
                 }
+            }
+
+            if (m_AnimationAudio != null)
+            {
+                m_SFXToken = SoundManager.Instance.Play(m_AnimationAudio);
             }
         }
 
@@ -128,6 +140,12 @@ namespace Game.UI
             if (!IsAnimating)
             {
                 onTextComplete?.Invoke();
+
+                if (m_SFXToken.HasValue)
+                {
+                    SoundManager.Instance.Stop(m_SFXToken.Value);
+                    m_SFXToken = null;
+                }
             }
         }
 
