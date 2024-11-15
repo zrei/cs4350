@@ -69,6 +69,14 @@ public class StatusManager :
             m_ConsumableTokenStacks[tokenData.m_Id] = new TauntTokenStack(forceTarget, tokenData, number);
         }
     }
+
+    public void TryClearTauntToken(Unit deadUnit)
+    {
+        if (TryGetTauntedUnit(out Unit tauntedUnit) && tauntedUnit.Equals(deadUnit))
+        {
+            ConsumeTokens(TokenType.TAUNT);
+        }
+    }
     #endregion
 
     #region Reduce Stack
@@ -240,6 +248,25 @@ public class StatusManager :
                 if (forceTarget == null || forceTarget.IsDead)
                     return false;
                 Logger.Log(this.GetType().Name, $"Is being taunted by {forceTarget.name}", LogLevel.LOG);
+                return true;
+            }
+        }
+        forceTarget = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Disregards if unit is dead
+    /// </summary>
+    /// <param name="forceTarget"></param>
+    /// <returns></returns>
+    private bool TryGetTauntedUnit(out Unit forceTarget)
+    {
+        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
+        {
+            if (tokenStack.TokenType == TokenType.TAUNT)
+            {
+                forceTarget = ((TauntTokenStack)tokenStack).TauntedUnit;
                 return true;
             }
         }
