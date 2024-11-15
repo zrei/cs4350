@@ -1,40 +1,38 @@
-using UnityEngine;
-
-public class WorldMapBGMManager : MonoBehaviour
+public class WorldMapBGMManager : BGMManager
 {
-    [SerializeField] AudioDataSO m_WorldMapBGM;
+    private bool m_CurrentlyPlayingSceneBgm = false;
 
-    private int m_CurrentlyPlayingAudio;
-
-    private void Awake()
+    protected override void Awake()
     {
-        StartPlayingWorldMapBGM();
-
         GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-        GlobalEvents.Level.ReturnFromLevelEvent += StartPlayingWorldMapBGM;
-    }
-
-    private void StartPlayingWorldMapBGM()
-    {
-        if (!SoundManager.IsReady)
-        {
-            SoundManager.OnReady += StartPlayingWorldMapBGM;
-            return;
-        }
-
-        SoundManager.OnReady -= StartPlayingWorldMapBGM;
-
-        m_CurrentlyPlayingAudio = SoundManager.Instance.PlayWithFadeIn(m_WorldMapBGM);
+        GlobalEvents.Level.ReturnFromLevelEvent += StartPlayingBGM;
+        GlobalEvents.Dialogue.DialogueEndEvent += OnCutsceneEnd;
     }
 
     private void OnDestroy()
     {
         GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
-        GlobalEvents.Level.ReturnFromLevelEvent -= StartPlayingWorldMapBGM;
+        GlobalEvents.Level.ReturnFromLevelEvent -= StartPlayingBGM;
+        GlobalEvents.Dialogue.DialogueEndEvent -= OnCutsceneEnd;
     }
 
     private void OnBeginLoadLevel()
     {
-        SoundManager.Instance.FadeOutAndStop(m_CurrentlyPlayingAudio);
+        FadeOutBgm();
+    }
+
+    protected override void StartPlayingBGM()
+    {
+        base.StartPlayingBGM();
+
+        m_CurrentlyPlayingSceneBgm = true;
+    }
+
+    private void OnCutsceneEnd()
+    {
+        if (!m_CurrentlyPlayingSceneBgm)
+        {
+            m_CurrentlyPlayingAudio = SoundManager.Instance.PlayWithFadeIn(m_BGM);
+        }
     }
 }

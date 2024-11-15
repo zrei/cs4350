@@ -1,9 +1,5 @@
-using UnityEngine;
-
-public abstract class CutsceneTriggerResponse : MonoBehaviour
+public abstract class CutsceneTriggerResponse : TriggerBase
 {
-    [SerializeField] CutsceneTriggerEnum m_CutsceneTrigger;
-
     private void Awake()
     {
         GlobalEvents.CutsceneEvents.CutsceneTriggerEvent += OnTrigger;
@@ -14,9 +10,9 @@ public abstract class CutsceneTriggerResponse : MonoBehaviour
         GlobalEvents.CutsceneEvents.CutsceneTriggerEvent -= OnTrigger;
     }
 
-    private void OnTrigger(string trigger)
+    private void OnTrigger(CutsceneTriggerEnum trigger)
     {
-        if (!m_CutsceneTrigger.ToString().Equals(trigger))
+        if (m_CutsceneTrigger != trigger)
             return;
 
         PerformTrigger();
