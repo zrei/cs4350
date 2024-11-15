@@ -447,7 +447,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         if (!UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(), false);
+            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false);
             UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen);
         }
         else if (UIScreenManager.Instance.IsScreenActive(UIScreenManager.Instance.CharacterManagementScreen))

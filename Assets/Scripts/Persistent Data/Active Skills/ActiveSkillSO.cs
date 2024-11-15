@@ -166,8 +166,8 @@ public class ActiveSkillSO : ScriptableObject
         {
             var dmgSpriteTag = m_SkillType switch
             {
-                SkillType.PHYSICAL => "<sprite name=\"PhysicalAttack\" tint>",
-                SkillType.MAGIC => "<sprite name=\"MagicAttack\" tint>",
+                SkillType.PHYSICAL => "Physical <sprite name=\"PhysicalAttack\" tint>",
+                SkillType.MAGIC => "Magic <sprite name=\"MagicAttack\" tint>",
                 _ => string.Empty,
             };
             var dmgText = $"{(target != null ? DamageCalc.CalculateDamage(caster, target, this) : DamageCalc.CalculateDamage(caster, this)):F1}";
@@ -204,8 +204,17 @@ public class ActiveSkillSO : ScriptableObject
                 builder.Append(status.ToString());
                 builder.Append(", ");
             }
+            builder.Length--;
             builder[builder.Length - 1] = '\n';
-            builder[builder.Length - 2] = ' ';
+        }
+        if (HasAttackerLimitations)
+        {
+            builder.AppendLine($"Requires Self: {GetAttackerRange()}");
+        }
+        builder.AppendLine($"Targets: {GetTargetRange()}");
+        if (m_TargetSO.IsAoe)
+        {
+            builder.AppendLine($"Area of Effect: {m_TargetSO.m_Description}");
         }
 
         if (!string.IsNullOrEmpty(m_Description))
@@ -220,21 +229,21 @@ public class ActiveSkillSO : ScriptableObject
         if (!HasTargetLimitations)
         {
             if (IsOpposingSideTarget)
-                return "All Enemies";
+                return "Enemies";
             else if (IsSelfTarget)
                 return "Self";
             else
-                return "All Allies";
+                return "Allies";
         }
         else
         {
             StringBuilder stringBuilder = new();
             if (IsOpposingSideTarget)
-                stringBuilder.Append("Enemies in ");
+                stringBuilder.Append("Enemies, ");
             else if (IsSelfTarget)
-                stringBuilder.Append("Self in ");
+                stringBuilder.Append("Self, ");
             else
-                stringBuilder.Append("Allies in ");
+                stringBuilder.Append("Allies, ");
 
             List<SkillTargetRuleSO> targetLocationRules = m_TargetRules.Where(x => x is TargetLocationRuleSO).ToList();
             int numRules = targetLocationRules.Count();
@@ -368,25 +377,25 @@ public struct Adds
     public Stats m_StatAugments;
 }
 
-//#if UNITY_EDITOR
-//[CustomEditor(typeof(ActiveSkillSO))]
-//public class ActiveSkillSOCustomEditor : Editor
-//{
-//    ActiveSkillSO m_ActiveSkill;
+#if UNITY_EDITOR
+[CustomEditor(typeof(ActiveSkillSO))]
+public class ActiveSkillSOCustomEditor : Editor
+{
+    ActiveSkillSO m_ActiveSkill;
 
-//    void OnEnable()
-//    {
-//        m_ActiveSkill = (ActiveSkillSO) target;
-//    }
+    void OnEnable()
+    {
+        m_ActiveSkill = (ActiveSkillSO)target;
+    }
 
-//    public override void OnInspectorGUI()
-//    {
-//        base.OnInspectorGUI();
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
 
-//        GUILayout.Space(30f);
+        GUILayout.Space(30f);
 
-//        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
-//        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
-//    }
-//}
-//#endif
+        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
+        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
+    }
+}
+#endif

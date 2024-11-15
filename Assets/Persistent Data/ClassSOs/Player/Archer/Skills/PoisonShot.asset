@@ -13,21 +13,16 @@ MonoBehaviour:
   m_Name: PoisonShot
   m_EditorClassIdentifier: 
   m_SkillName: Poison Shot
-  m_Description: 'Deal damage to a target.
-
-    Apply 3 Poison on them.
-
-    Can
-    only be used from the back 3 rows.'
+  m_Description: 
   m_Icon: {fileID: -2942882565480004972, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
-  m_SkillType: 0
+  m_SkillType: 1
   m_ConsumedMana: 5
   m_SkillTypes: 0000000001000000
   m_InflictedTokens: []
   m_InflictedStatusEffects:
   - m_StatusEffect: {fileID: 11400000, guid: 1c78879aa98354c4d948d640dfd7cd4a, type: 2}
     m_Stack: 3
-  m_DamageModifier: 0.5
+  m_DamageModifier: 0.7
   m_HealProportion: 1
   m_ManaAlterProportion: 0
   m_Summons: []
