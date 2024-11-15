@@ -90,6 +90,23 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public List<WeaponModel> WeaponModels => m_ArmorVisual.WeaponModels;
 
     #region Initialisation
+    private void Awake()
+    {
+        GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
+    }
+
+    private void OnUnitDeath(Unit defeatedUnit)
+    {
+        if (defeatedUnit.Equals(this))
+            return;
+        m_StatusManager.TryClearTauntToken(defeatedUnit);
+    }
+
     protected void Initialise(Stats stats, RaceSO raceSO, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
         m_ArmorVisual.InstantiateModel(unitModelData, weaponInstanceSO, classSo);
@@ -579,6 +596,19 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
                 if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
                     ConsumeTokens(TokenConsumptionType.CONSUME_ON_MANA_ALTER);
+
+                if (attackSO.IsSelfTarget)
+                {
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_SELF_TARGET);
+                }
+                else if (attackSO.IsOpposingSideTarget)
+                {
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_OPPOSING_TARGET);
+                }
+                else
+                {
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_ALLY_TARGET);
+                }
             }
         }
 
