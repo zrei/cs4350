@@ -7,6 +7,18 @@ public class WorldMapPlayerToken : BaseCharacterToken
     private const float MOVE_SPEED = 6.0f;
 
     #region Initialisation
+    private void Awake()
+    {
+        GlobalEvents.CutsceneEvents.StartCutsceneEvent += OnStartCutscene;
+        GlobalEvents.CutsceneEvents.EndCutsceneEvent += OnEndCutscene;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.CutsceneEvents.StartCutsceneEvent -= OnStartCutscene;
+        GlobalEvents.CutsceneEvents.EndCutsceneEvent -= OnEndCutscene;
+    }
+
     public void Initialise(PlayerCharacterSO lordCharacter, ClassSO lordClass, WeaponInstanceSO lordEquippedWeapon)
     {
         Initialise(lordCharacter.GetUnitModelData(lordClass.m_OutfitType), lordEquippedWeapon, lordClass);
@@ -81,6 +93,32 @@ public class WorldMapPlayerToken : BaseCharacterToken
     public void FadeMesh(float targetOpacity, float duration)
     {
         m_ArmorVisual.FadeMesh(targetOpacity, duration);
+    }
+    #endregion
+
+    #region Cutscene
+    private void OnStartCutscene()
+    {
+        ChangeLayers(LayerConstants.WorldMapLayer);
+    }
+
+    private void OnEndCutscene()
+    {
+        ChangeLayers(LayerConstants.ObjectsLayer);
+    }
+
+    private void ChangeLayers(int layer)
+    {
+        ChangeLayer(transform, layer); 
+    }
+
+    private void ChangeLayer(Transform transform, int layer)
+    {
+        transform.gameObject.layer = layer;
+        foreach (Transform child in transform)
+        {
+            ChangeLayer(child, layer);
+        }
     }
     #endregion
 }

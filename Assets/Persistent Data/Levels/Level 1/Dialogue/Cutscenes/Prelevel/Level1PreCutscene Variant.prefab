@@ -1159,10 +1159,11 @@ MonoBehaviour:
   - {fileID: 825531702886027201}
   - {fileID: 8576684899352706591}
   - {fileID: 1315713325314273565}
+  m_BonesParent: {fileID: 160260711805040503}
   m_RootBone: {fileID: 1474487258744479535}
   m_RightArmBone: {fileID: 532249691757919792}
   m_LeftArmBone: {fileID: 2838217442414362262}
-  m_BonesParent: {fileID: 160260711805040503}
+  m_BodyCenter: {fileID: 0}
 --- !u!1 &857504895319527429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1283,7 +1284,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3981169087243533188}
-  - component: {fileID: 1055109562564963675}
   m_Layer: 0
   m_Name: Level1PreCutscene Variant
   m_TagString: Untagged
@@ -1311,18 +1311,6 @@ Transform:
   - {fileID: 6368114911254222152}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1055109562564963675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 957691526435811057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6f85d1ce4593420e998fc970782f771, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1076905673566980680
 GameObject:
   m_ObjectHideFlags: 0
@@ -4171,10 +4159,11 @@ MonoBehaviour:
   - {fileID: 3346354167104827343}
   - {fileID: 3738655233302056580}
   - {fileID: 8425682612238221894}
+  m_BonesParent: {fileID: 5747110360637615879}
   m_RootBone: {fileID: 810752752890836141}
   m_RightArmBone: {fileID: 1514200233620165791}
   m_LeftArmBone: {fileID: 2308180860063258577}
-  m_BonesParent: {fileID: 5747110360637615879}
+  m_BodyCenter: {fileID: 0}
 --- !u!1 &3837424072151254129
 GameObject:
   m_ObjectHideFlags: 0
@@ -4291,10 +4280,11 @@ MonoBehaviour:
   - {fileID: 7018506799440304087}
   - {fileID: 2611084833081370541}
   - {fileID: 4964607530681374656}
+  m_BonesParent: {fileID: 2854292781171129389}
   m_RootBone: {fileID: 9088447079161017930}
   m_RightArmBone: {fileID: 3730252002746596966}
   m_LeftArmBone: {fileID: 2900623906627031735}
-  m_BonesParent: {fileID: 2854292781171129389}
+  m_BodyCenter: {fileID: 0}
 --- !u!1 &3992704482114516564
 GameObject:
   m_ObjectHideFlags: 0
@@ -4507,6 +4497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ArmorVisual: {fileID: 722181143527651526}
+  m_SpawnWeapon: 0
   m_BaseData: {fileID: 11400000, guid: 75bb8482b596e473296f970cfa2cbbef, type: 2}
 --- !u!1 &4605530429199718792
 GameObject:
@@ -7190,6 +7181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ArmorVisual: {fileID: 7652922415940275941}
+  m_SpawnWeapon: 0
   m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
 --- !u!1 &7322825121466847510
 GameObject:
@@ -8199,6 +8191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ArmorVisual: {fileID: 8490698167478180927}
+  m_SpawnWeapon: 0
   m_BaseData: {fileID: 11400000, guid: 2541a19dc80e4469fb97bcf9977abc8c, type: 2}
 --- !u!1 &8582904622497999009
 GameObject:

@@ -3,17 +3,16 @@ using UnityEngine;
 
 public class CutsceneSpawner : MonoBehaviour
 {
-    [SerializeField] private Cutscene m_StartingCutscene;
+    [SerializeField] private GameObject m_StartingCutscene;
     [SerializeField] private Dialogue m_Dialogue;
 
-    private Cutscene m_CurrCutsceneInstance = null;
+    private GameObject m_CurrCutsceneInstance = null;
 
     private VoidEvent m_PostCutsceneAction = null;
     public void BeginCutscene(VoidEvent postCutsceneAction = null)
     {
         m_PostCutsceneAction = postCutsceneAction;
         GlobalEvents.Dialogue.DialogueEndEvent += EndCutscene;
-        GlobalEvents.CutsceneEvents.StartCutsceneEvent += SwitchToCutscene;
         CreateCutscene(m_StartingCutscene);
         DialogueDisplay.Instance.StartDialogue(m_Dialogue);
     }
@@ -21,13 +20,13 @@ public class CutsceneSpawner : MonoBehaviour
     private void EndCutscene()
     {
         GlobalEvents.Dialogue.DialogueEndEvent -= EndCutscene;
-        GlobalEvents.CutsceneEvents.StartCutsceneEvent -= SwitchToCutscene;
         DestroyCurrCutscene();
+        GlobalEvents.CutsceneEvents.EndCutsceneEvent?.Invoke();
         m_PostCutsceneAction?.Invoke();
         m_PostCutsceneAction = null;
     }
 
-    public void SwitchToCutscene(Cutscene cutscene)
+    public void SwitchToCutscene(GameObject cutscene)
     {
         GameSceneManager.Instance.PlayTransition(MidTransictionAction, null);
 
@@ -38,14 +37,14 @@ public class CutsceneSpawner : MonoBehaviour
         }
     }
 
-    private void CreateCutscene(Cutscene cutscene)
+    private void CreateCutscene(GameObject cutscene)
     {
         m_CurrCutsceneInstance = Instantiate(cutscene, this.transform);
     }
 
     private void DestroyCurrCutscene()
     {
-        Destroy(m_CurrCutsceneInstance.gameObject);
+        Destroy(m_CurrCutsceneInstance);
         m_CurrCutsceneInstance = null;
     }
 }
