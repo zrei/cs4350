@@ -6,8 +6,8 @@ public enum SkillEffectType
     HEAL,
     SUMMON,
     ALTER_MANA,
-    // KIV
-    TELEPORT
+    TELEPORT,
+    CLEANSE
 }
 
 public enum SkillType

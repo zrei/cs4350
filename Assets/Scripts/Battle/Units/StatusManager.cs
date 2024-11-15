@@ -164,6 +164,52 @@ public class StatusManager :
         tokens.ForEach(x => OnRemove?.Invoke(x));
     }
 
+    public void CleanseStatusTypes(List<StatusType> statusTypes)
+    {
+        foreach (StatusType statusType in statusTypes)
+            CleanseStatusType(statusType);
+    }
+
+    private void CleanseStatusType(StatusType statusType)
+    {
+        switch (statusType)
+        {
+            case StatusType.STATUS_EFFECT:
+                ClearStatusEffects();
+                break;
+            case StatusType.BUFF_TOKEN:
+                ClearTokens(true);
+                break;
+            case StatusType.DEBUFF_TOKEN:
+                ClearTokens(false);
+                break;
+        }
+    }
+
+    private void ClearStatusEffects()
+    {
+        foreach (StatusEffect statusEffect in m_StatusEffects.Values)
+        {
+            OnRemove?.Invoke(statusEffect);
+        }
+
+        m_StatusEffects.Clear();
+    }
+
+    private void ClearTokens(bool isBuff)
+    {
+        IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();
+
+        foreach (TokenStack tokenStack in tokenStacks)
+        {
+            if (tokenStack.IsBuff == isBuff)
+            {
+                m_ConsumableTokenStacks.Remove(tokenStack.Id);
+                OnRemove?.Invoke(tokenStack);
+            }
+        }
+    }
+
     public void ConsumeTokens(TokenConsumptionType consumeType)
     {
         IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();

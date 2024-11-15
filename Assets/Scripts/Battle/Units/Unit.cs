@@ -411,6 +411,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         return HasToken(TokenType.EVADE);
     }
+
+    private void Cleanse(List<StatusType> statusTypes)
+    {
+        m_StatusManager.CleanseStatusTypes(statusTypes);
+    }
     #endregion
 
     #region Token
@@ -559,6 +564,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                 {
                     target.InflictStatus(inflictedStatusEffects);
                     target.InflictTokens(inflictedTokens, this);
+                }
+
+                if (attackSO.ContainsSkillType(SkillEffectType.CLEANSE))
+                {
+                    target.Cleanse(attackSO.m_CleansedStatusTypes);
                 }
             }
 
