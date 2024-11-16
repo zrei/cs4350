@@ -7,6 +7,8 @@ public class RaceSO : ScriptableObject
 {
     [Header("Descriptions")]
     public string m_RaceName;
+    public Material m_DefaultSkinMat;
+    public Material m_DefaultEyeMat;
 
     [Header("Gender differences")]
     public GenderItems m_MaleItems;
@@ -16,9 +18,9 @@ public class RaceSO : ScriptableObject
     public AudioDataSO m_HurtSound;
     public AudioDataSO m_DeathSound;
    
-    public UnitModelData GetUnitModelData(Gender gender, OutfitType outfitType)
+    public UnitModelData GetUnitModelData(Gender gender, Color newSkinColor, Color newEyeColor, OutfitType outfitType)
     {
-        return new UnitModelData(GetBaseModel(gender), GetAttachItems(gender, outfitType), GetYOffset(gender));
+        return new UnitModelData(GetBaseModel(gender), GetBaseMaterials(newSkinColor,newEyeColor), GetAttachItems(gender, outfitType), GetYOffset(gender));
     }
 
     private GameObject GetBaseModel(Gender gender)
@@ -50,6 +52,23 @@ public class RaceSO : ScriptableObject
             OutfitType.ARMOR => genderItems.m_ArmorMeshes,
             _ => new SkinnedMeshRenderer[] {}
         };
+    }
+
+    private Material[] GetBaseMaterials(Color newSkinColor, Color newEyeColor) {
+        Material skinMaterial = Instantiate(m_DefaultSkinMat);
+        Material eyeMaterial = Instantiate(m_DefaultEyeMat);
+
+        if (newSkinColor != Color.clear) {
+            skinMaterial.color = newSkinColor;
+        }
+
+        if (newEyeColor != Color.clear) {
+            eyeMaterial.color = newEyeColor;
+        }
+
+        Material[] baseModelMaterial = {skinMaterial, eyeMaterial};
+
+        return baseModelMaterial;
     }
 
 #if UNITY_EDITOR
