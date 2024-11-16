@@ -5,8 +5,7 @@ using UnityEngine.AddressableAssets;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public class TurnDisplay : Singleton<TurnDisplay>
     {
         [SerializeField]
@@ -22,10 +21,7 @@ namespace Game.UI
         private Dictionary<Unit, TurnDisplayUnit> mapping = new();
         private TurnDisplayUnit prefab;
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         private TurnDisplayUnit HighlightedDisplay
         {
@@ -44,14 +40,7 @@ namespace Game.UI
         protected override void HandleAwake()
         {
             base.HandleAwake();
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.alpha = 0;
-            isHidden = true;
+            uiAnimator = GetComponent<UIAnimator>();
 
             unitName.gameObject.SetActive(false);
             timeToAct.gameObject.SetActive(false);
@@ -161,23 +150,12 @@ namespace Game.UI
 
         private void Show()
         {
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
         }
 
         private void Hide()
         {
-            isHidden = true;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
-        }
-
-        private void OnAnimationFinish()
-        {
-            animator.enabled = false;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
+            uiAnimator.Hide();
         }
     }
 }

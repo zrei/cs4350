@@ -23,7 +23,7 @@ public class PlayerCharacterSO : CharacterSO
 
     public UnitModelData GetUnitModelData(OutfitType outfitType)
     {
-        return m_Race.GetUnitModelData(m_Gender, outfitType);
+        return m_Race.GetUnitModelData(m_Gender, m_SkinColor, m_EyeColor, outfitType);
     }
 
     /// <summary>

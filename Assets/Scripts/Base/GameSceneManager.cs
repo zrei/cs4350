@@ -127,13 +127,13 @@ public class GameSceneManager : Singleton<GameSceneManager>
         StartCoroutine(LoadAdditiveSceneWithTransition(sceneIndex));
         return;
         
-        void OnLevelManagerReady(LevelManager levelManager)
+        void OnLevelManagerReady()
         {
             LevelManager.OnReady -= OnLevelManagerReady;
             m_CurrScene = SceneEnum.LEVEL;
         
             Debug.Log("Level scene loaded. Initialising level.");
-            levelManager.Initialise(partyMembers);
+            LevelManager.Instance.Initialise(partyMembers);
         }
     }
     

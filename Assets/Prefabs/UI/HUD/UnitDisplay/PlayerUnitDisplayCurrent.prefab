@@ -1080,6 +1080,7 @@ GameObject:
   - component: {fileID: 7962895349753308203}
   - component: {fileID: 2450121569767007407}
   - component: {fileID: 2370243741224773801}
+  - component: {fileID: 7496627211751502311}
   m_Layer: 0
   m_Name: PlayerUnitDisplayCurrent
   m_TagString: Untagged
@@ -1121,6 +1122,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 111692b03dad4254fa604cc888677fe6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerColor: {r: 0, g: 0.2509804, b: 0.41568628, a: 1}
+  enemyColor: {r: 0.41568628, g: 0, b: 0, a: 1}
   isCurrentUnitDisplay: 1
   isSubDisplay: 0
   nameDisplay: {fileID: 5562796974418889123}
@@ -1168,6 +1171,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7496627211751502311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4755588163952984351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0
 --- !u!1 &5783297198110052453
 GameObject:
   m_ObjectHideFlags: 0

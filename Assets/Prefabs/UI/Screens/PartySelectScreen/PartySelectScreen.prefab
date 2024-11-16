@@ -933,6 +933,7 @@ GameObject:
   - component: {fileID: 6931607040456069691}
   - component: {fileID: 5814203787845287207}
   - component: {fileID: 1959708511472552875}
+  - component: {fileID: 8414077045928614285}
   m_Layer: 5
   m_Name: PartySelectScreen
   m_TagString: Untagged
@@ -972,7 +973,7 @@ Animator:
   m_GameObject: {fileID: 5500301566912371976}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 624ae5ebcc3de4343a88e8ee62976876, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9b97e147ef709f143879d238521ab680, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1022,6 +1023,22 @@ MonoBehaviour:
   m_CharacterButtonParent: {fileID: 2665697457414007123}
   m_PartyText: {fileID: 1765595835258622346}
   m_BeginLevelButton: {fileID: 3215767486269324118}
+--- !u!114 &8414077045928614285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5500301566912371976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0
 --- !u!1 &5623512391202672509
 GameObject:
   m_ObjectHideFlags: 0

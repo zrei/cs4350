@@ -21,6 +21,11 @@ namespace Game.UI
             GlobalEvents.Level.ExpGainEvent -= OnExpGain;
         }
 
+        protected override void ShowDone()
+        {
+            base.ShowDone();
+        }
+
         private void OnExpGain(List<ExpGainSummary> expSummaries)
         {
             m_ReturnButton.interactable = false;

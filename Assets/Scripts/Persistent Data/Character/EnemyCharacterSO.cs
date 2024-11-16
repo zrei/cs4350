@@ -11,7 +11,7 @@ public class EnemyCharacterSO : CharacterSO
 
     public UnitModelData GetUnitModelData()
     {
-        return m_Race.GetUnitModelData(m_Gender, m_EnemyClass.m_OutfitType);
+        return m_Race.GetUnitModelData(m_Gender, m_SkinColor, m_EyeColor, m_EnemyClass.m_OutfitType);
     }
 
     public EnemyActionSetSO EnemyActionSetSO => m_EnemyClass.m_EnemyActionSet;

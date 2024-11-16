@@ -2286,6 +2286,7 @@ GameObject:
   - component: {fileID: 1079592971018918425}
   - component: {fileID: 393200372459993114}
   - component: {fileID: 6597441353947191074}
+  - component: {fileID: 5278441431940338010}
   m_Layer: 0
   m_Name: ActionMenu
   m_TagString: Untagged
@@ -2372,6 +2373,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5278441431940338010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6790699315464320894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_CompletionBuffer: 0.1
 --- !u!1 &7389980225670677924
 GameObject:
   m_ObjectHideFlags: 0

@@ -305,7 +305,7 @@ public class ActiveSkillSO : ScriptableObject
     /// <returns></returns>
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
-        if (unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
+        if (IsOpposingSideTarget && unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
             return false;
         return m_TargetRules.Where(x => x is ITargetRule).All(x => ((ITargetRule) x).IsValidTargetTile(targetTile, unit, targetGridType));
     }

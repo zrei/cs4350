@@ -4,46 +4,24 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public class HUDRoot : Singleton<HUDRoot>
     {
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-
-        private bool isHidden;
+        private UIAnimator m_UIAnimator;
 
         protected override void HandleAwake()
         {
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
+            m_UIAnimator = GetComponent<UIAnimator>();
         }
 
         public void Show()
         {
-            if (!isHidden) return;
-
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            m_UIAnimator.Show();
         }
 
         public void Hide()
         {
-            if (isHidden) return;
-
-            isHidden = true;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
-        }
-
-        private void OnAnimationFinish()
-        {
-            animator.enabled = false;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
+            m_UIAnimator.Hide();
         }
     }
 }

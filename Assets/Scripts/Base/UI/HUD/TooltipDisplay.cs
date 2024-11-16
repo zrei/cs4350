@@ -28,7 +28,7 @@ namespace Game.UI
         private void Awake()
         {
             m_CanvasGroup = GetComponent<CanvasGroup>();
-            m_UIFader = new(m_CanvasGroup);
+            m_UIFader = new(m_CanvasGroup, isInteractable: false, blocksRaycast: false);
         }
 
         public void Show(Vector2 pos, string header, string text, Color color, Vector2 pivot)

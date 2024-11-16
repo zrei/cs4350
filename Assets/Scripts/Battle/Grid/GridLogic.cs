@@ -637,11 +637,16 @@ public class GridLogic : MonoBehaviour
                     unit.PlayDeathSound(volumeModifier);
                     unit.Die();
                 }
-                else
+                
+                if (!activeSkill.m_TeleportSelf && !target.IsDead)
                 {
                     OnTeleportUnit?.Invoke(activeSkill.TeleportTargetGrid(attacker), activeSkill.TeleportStartTile(attacker, targetTile), teleportTile);
                 }
-                    
+            }
+
+            if (activeSkill.m_TeleportSelf)
+            {
+                OnTeleportUnit?.Invoke(activeSkill.TeleportTargetGrid(attacker), activeSkill.TeleportStartTile(attacker, targetTile), teleportTile);
             }
 
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory

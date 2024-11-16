@@ -15,12 +15,14 @@ public enum UnitAllegiance
 public struct UnitModelData
 {
     public GameObject m_Model;
+    public Material[] m_BaseMaterial;
     public float m_GridYOffset;
     public SkinnedMeshRenderer[] m_AttachItems;
 
-    public UnitModelData(GameObject model, SkinnedMeshRenderer[] attachItems, float gridYOffset)
+    public UnitModelData(GameObject model, Material[] BaseMaterial, SkinnedMeshRenderer[] attachItems, float gridYOffset)
     {
         m_Model = model;
+        m_BaseMaterial = BaseMaterial;
         m_AttachItems = attachItems;
         m_GridYOffset = gridYOffset;
     }
@@ -90,6 +92,23 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public List<WeaponModel> WeaponModels => m_ArmorVisual.WeaponModels;
 
     #region Initialisation
+    private void Awake()
+    {
+        GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
+    }
+
+    private void OnUnitDeath(Unit defeatedUnit)
+    {
+        if (defeatedUnit.Equals(this))
+            return;
+        m_StatusManager.TryClearTauntToken(defeatedUnit);
+    }
+
     protected void Initialise(Stats stats, RaceSO raceSO, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
         m_ArmorVisual.InstantiateModel(unitModelData, weaponInstanceSO, classSo);
@@ -579,6 +598,19 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
                 if (attackSO.ContainsSkillType(SkillEffectType.ALTER_MANA))
                     ConsumeTokens(TokenConsumptionType.CONSUME_ON_MANA_ALTER);
+
+                if (attackSO.IsSelfTarget)
+                {
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_SELF_TARGET);
+                }
+                else if (attackSO.IsOpposingSideTarget)
+                {
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_OPPOSING_TARGET);
+                }
+                else
+                {
+                    ConsumeTokens(TokenConsumptionType.CONSUME_ON_ALLY_TARGET);
+                }
             }
         }
 
