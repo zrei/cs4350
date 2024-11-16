@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [System.Serializable]
 public struct CharacterSaveData
@@ -88,9 +87,9 @@ public class SessionSave
         }
         yield return new WaitForSeconds(initialSaveTime);
         PlayerPrefs.Save();
-        postSaveEvent?.Invoke();
-        GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
         m_SaveCoroutine = null;
+        GlobalEvents.Save.OnCompleteSaveEvent?.Invoke();
+        postSaveEvent?.Invoke();
     }
 }
 
