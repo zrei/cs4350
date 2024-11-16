@@ -9,6 +9,14 @@ namespace Game.UI
         [SerializeField]
         private bool applyBackgroundBlur;
 
+        [SerializeField]
+        [Tooltip("Leave empty for no sound")]
+        private AudioDataSO m_OpenSound;
+
+        [SerializeField]
+        [Tooltip("Leave empty for no sound")]
+        private AudioDataSO m_CloseSound;
+
         private UIAnimator uiAnimator;
         private RectTransform rectTransform;
         private BackgroundBlur backgroundBlur;
@@ -49,11 +57,21 @@ namespace Game.UI
                 }
                 backgroundBlur.ApplyBlur();
             }
+
+            if (m_OpenSound != null)
+            {
+                SoundManager.Instance.Play(m_OpenSound);
+            }
         }
 
         public virtual void Hide()
         {
             uiAnimator.Hide();
+
+            if (m_CloseSound != null)
+            {
+                SoundManager.Instance.Play(m_CloseSound);
+            }
         }
 
         private void OnAnimationFinish(bool isHidden)
