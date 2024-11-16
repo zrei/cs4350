@@ -9,10 +9,6 @@ public abstract class ClassSO : ScriptableObject
     [TextArea]
     public string m_ClassDescription;
 
-    [Header("Base Model Colour")]
-    public Color m_SkinColor;
-    public Color m_EyeColor;
-
     [Header("Armor Colour")]
     public Color m_ArmorPlate;
     public Color m_ArmorTrim;
