@@ -1,3 +1,4 @@
+using Game.Input;
 using UnityEngine;
 
 namespace Game.UI
@@ -31,6 +32,11 @@ namespace Game.UI
             RemoveListeners();
             GlobalEvents.MainMenu.OnReturnToMainMenu?.Invoke();
             GameSceneManager.Instance.LoadMainMenuScene();
+        }
+
+        public override void OnCancel(IInput input)
+        {
+            ReturnToMainMenu();
         }
     }
 }

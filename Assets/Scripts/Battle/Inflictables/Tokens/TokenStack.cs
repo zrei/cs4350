@@ -80,6 +80,8 @@ public class TokenStack :
 
     public void ConsumeToken()
     {
+        if (IsEmpty)
+            return;
         m_NumTokensOfEachTier[GetMaxTier() - 1]--;
     }
 
@@ -206,7 +208,7 @@ public class TokenStack :
 public class TauntTokenStack : TokenStack
 {
     public Unit TauntedUnit {get; private set;}
-    public override bool IsEmpty => base.IsEmpty && (TauntedUnit == null || TauntedUnit.IsDead);
+    public override bool IsEmpty => base.IsEmpty || TauntedUnit == null || TauntedUnit.IsDead;
 
     public TauntTokenStack(Unit targetedUnit, TokenTierSO tokenTierSO, int initialNumber = 1) : base(tokenTierSO, 1, initialNumber)
     {
