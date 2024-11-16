@@ -15,12 +15,14 @@ public enum UnitAllegiance
 public struct UnitModelData
 {
     public GameObject m_Model;
+    public Material[] m_DefaultBaseMaterial;
     public float m_GridYOffset;
     public SkinnedMeshRenderer[] m_AttachItems;
 
-    public UnitModelData(GameObject model, SkinnedMeshRenderer[] attachItems, float gridYOffset)
+    public UnitModelData(GameObject model, Material[] defaultBaseMaterial, SkinnedMeshRenderer[] attachItems, float gridYOffset)
     {
         m_Model = model;
+        m_DefaultBaseMaterial = defaultBaseMaterial;
         m_AttachItems = attachItems;
         m_GridYOffset = gridYOffset;
     }

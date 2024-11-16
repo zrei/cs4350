@@ -7,6 +7,8 @@ public class RaceSO : ScriptableObject
 {
     [Header("Descriptions")]
     public string m_RaceName;
+    public Material m_DefaultSkinMat;
+    public Material m_DefaultEyeMat;
 
     [Header("Gender differences")]
     public GenderItems m_MaleItems;
@@ -18,7 +20,8 @@ public class RaceSO : ScriptableObject
    
     public UnitModelData GetUnitModelData(Gender gender, OutfitType outfitType)
     {
-        return new UnitModelData(GetBaseModel(gender), GetAttachItems(gender, outfitType), GetYOffset(gender));
+        Material[] baseModelMaterial = {m_DefaultSkinMat, m_DefaultEyeMat};
+        return new UnitModelData(GetBaseModel(gender), baseModelMaterial, GetAttachItems(gender, outfitType), GetYOffset(gender));
     }
 
     private GameObject GetBaseModel(Gender gender)

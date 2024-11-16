@@ -5,6 +5,7 @@ using UnityEngine;
 public class ArmorVisual : MonoBehaviour
 {
     private EquippingArmor m_EquippingArmor;
+    private Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
     #region Animation
     public static readonly int DirXAnimParam = Animator.StringToHash("DirX");
@@ -48,11 +49,13 @@ public class ArmorVisual : MonoBehaviour
         m_Model.transform.localPosition = Vector3.zero;
         m_Model.transform.localRotation = Quaternion.identity;
 
+        m_Model.GetComponentInChildren<SkinnedMeshRenderer>().materials = unitModelData.m_DefaultBaseMaterial;
+
         m_EquippingArmor = m_Model.GetComponent<EquippingArmor>();
         m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
 
         if (Application.isPlaying)
-            ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
+            ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor, classSO.m_SkinColor, classSO.m_EyeColor);
 
         m_WeaponModels.Clear();
         foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
@@ -93,7 +96,7 @@ public class ArmorVisual : MonoBehaviour
 
         m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
 
-        ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor);
+        ChangeArmorMaterial(classSO.m_ArmorPlate, classSO.m_ArmorTrim, classSO.m_UnderArmor, classSO.m_SkinColor, classSO.m_EyeColor);
 
         foreach (var weaponModelPrefab in weaponSO.m_WeaponModels)
         {
@@ -140,7 +143,7 @@ public class ArmorVisual : MonoBehaviour
         }
     }
 
-    private void ChangeArmorMaterial(Color armorPlate, Color armorTrim, Color underArmor)
+    private void ChangeArmorMaterial(Color armorPlate, Color armorTrim, Color underArmor, Color skin, Color eyes)
     {
         SkinnedMeshRenderer[] armorPieces = m_Model.GetComponentsInChildren<SkinnedMeshRenderer>();
         for (int i = 0; i < armorPieces.Length; i++) {
@@ -152,6 +155,10 @@ public class ArmorVisual : MonoBehaviour
                     newArmorMats[j].color = armorTrim;
                 } else if (newArmorMats[j].name == "UnderArmor (Instance)") {
                     newArmorMats[j].color = underArmor;
+                } else if (newArmorMats[j].name.Contains("Skin (Instance)") & skin != DEFAULT_COLOR) {
+                    newArmorMats[j].color = skin;
+                } else if (newArmorMats[j].name == "Eyes (Instance)" & skin != DEFAULT_COLOR) {
+                    newArmorMats[j].color = eyes;
                 }
             }
             armorPieces[i].materials = newArmorMats;
