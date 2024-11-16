@@ -89,6 +89,8 @@ public class EdgeInternal : MonoBehaviour
                 Position = m_SplineContainer.transform.InverseTransformPoint(NodeInternalB.transform.position)
             };
         }
+        
+        m_SplineContainer.Spline.SetTangentMode(TangentMode.AutoSmooth);
     }
     
     public void UpdateReverseSpline()
@@ -102,6 +104,8 @@ public class EdgeInternal : MonoBehaviour
             m_ReverseSplineContainer.Spline = new Spline(m_SplineContainer.Spline);
         
         m_ReverseSplineContainer.ReverseFlow(0);
+        
+        m_ReverseSplineContainer.Spline.SetTangentMode(TangentMode.AutoSmooth);
     }
     
 #endif
