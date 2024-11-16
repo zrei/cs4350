@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    public class WorldHUDManager : Singleton<WorldHUDManager>
+    public class WorldSpaceHUDManager : Singleton<WorldSpaceHUDManager>
     {
         [SerializeField]
         private RectTransform root;
@@ -31,9 +31,21 @@ namespace Game.UI
 
         private void Update()
         {
+            var toRemove = new List<Transform>();
             foreach (var kvp in huds.ToList())
             {
-                kvp.Key.localPosition = kvp.Value();
+                var transform = kvp.Key;
+                var posProducer = kvp.Value;
+                if (transform == null || !transform || posProducer == null)
+                {
+                    toRemove.Add(transform);
+                    continue;
+                }
+                transform.localPosition = kvp.Value();
+            }
+            foreach (var hud in toRemove)
+            {
+                RemoveHUD(hud);
             }
         }
 

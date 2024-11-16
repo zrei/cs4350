@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace Game.UI
 {
+    [RequireComponent(typeof(UIAnimator))]
     public class BattleObjectiveDisplay : MonoBehaviour
     {
         private const int MaxDisplays = 5;
@@ -19,9 +20,7 @@ namespace Game.UI
         [SerializeField]
         private LayoutGroup layout;
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         private void Awake()
         {
@@ -38,14 +37,7 @@ namespace Game.UI
             GlobalEvents.Battle.BattleInitializedEvent += Initialize;
             GlobalEvents.Level.ReturnFromLevelEvent += Clear;
 
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.alpha = 0;
-            isHidden = true;
+            uiAnimator = GetComponent<UIAnimator>();
         }
 
         private void OnDestroy()
@@ -95,25 +87,12 @@ namespace Game.UI
 
         private void Show()
         {
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
         }
 
         private void Hide()
         {
-            isHidden = true;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
-        }
-
-        private void OnAnimationFinish()
-        {
-            animator.enabled = false;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
+            uiAnimator.Hide();
         }
     }
 }

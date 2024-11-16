@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.UI
@@ -10,58 +9,57 @@ namespace Game.UI
 
         CanvasGroup m_CanvasGroup;
         bool m_IsHidden;
+        bool m_IsInteractable;
+        bool m_BlocksRaycast;
+        Coroutine m_AnimateCo;
 
-        public UIFader(CanvasGroup canvasGroup)
+        public UIFader(CanvasGroup canvasGroup, bool hideOnAwake = true, bool isInteractable = true, bool blocksRaycast = true)
         {
             m_CanvasGroup = canvasGroup;
-            m_CanvasGroup.alpha = 0;
-            m_CanvasGroup.interactable = false;
-            m_CanvasGroup.blocksRaycasts = false;
-            m_IsHidden = true;
+            m_IsHidden = hideOnAwake;
+            m_IsInteractable = isInteractable;
+            m_BlocksRaycast = blocksRaycast;
+            m_CanvasGroup.alpha = m_IsHidden ? 0f : 1f;
+            m_CanvasGroup.interactable = m_IsInteractable && !m_IsHidden;
+            m_CanvasGroup.blocksRaycasts = m_BlocksRaycast && !m_IsHidden;
         }
 
-        Coroutine ShowHideCo
-        {
-            set
-            {
-                if (value == m_ShowHideCo) return;
-
-                if (m_ShowHideCo != null)
-                {
-                    CoroutineManager.Instance.StopCoroutine(m_ShowHideCo);
-                }
-
-                m_ShowHideCo = value;
-            }
-        }
-        Coroutine m_ShowHideCo;
-
-        public void Show(float duration = 0.1f, bool unscaledTime = true, VoidEvent onComplete = null, bool autoSetInteractable = false)
+        public void Show(float duration = 0.1f, bool unscaledTime = true, VoidEvent onComplete = null)
         {
             if (!m_IsHidden) return;
 
             m_IsHidden = false;
-            ShowHideCo = CoroutineManager.Instance.StartCoroutine(ShowHideAnimate(true, duration, unscaledTime, onComplete, autoSetInteractable));
+            if (m_AnimateCo != null)
+            {
+                CoroutineManager.Instance.StopCoroutine(m_AnimateCo);
+                m_AnimateCo = null;
+            }
+            m_AnimateCo = CoroutineManager.Instance.StartCoroutine(Animate(m_IsHidden, duration, unscaledTime, onComplete));
         }
 
-        public void Hide(float duration = 0.1f, bool unscaledTime = true, VoidEvent onComplete = null, bool autoSetInteractable = false)
+        public void Hide(float duration = 0.1f, bool unscaledTime = true, VoidEvent onComplete = null)
         {
             if (m_IsHidden) return;
 
             m_IsHidden = true;
-            ShowHideCo = CoroutineManager.Instance.StartCoroutine(ShowHideAnimate(false, duration, unscaledTime, onComplete, autoSetInteractable));
+            if (m_AnimateCo != null)
+            {
+                CoroutineManager.Instance.StopCoroutine(m_AnimateCo);
+                m_AnimateCo = null;
+            }
+            m_AnimateCo = CoroutineManager.Instance.StartCoroutine(Animate(m_IsHidden, duration, unscaledTime, onComplete));
         }
 
-        IEnumerator ShowHideAnimate(bool active, float duration, bool unscaledTime, VoidEvent onComplete, bool setInteractable)
+        IEnumerator Animate(bool isHidden, float duration, bool unscaledTime, VoidEvent onComplete)
         {
-            if (!active && setInteractable)
+            if (isHidden)
             {
                 m_CanvasGroup.interactable = false;
                 m_CanvasGroup.blocksRaycasts = false;
             }
 
             var startAlpha = m_CanvasGroup.alpha;
-            var endAlpha = active ? 1f : 0f;
+            var endAlpha = isHidden ? 0f : 1f;
 
             var t = 0f;
             while (t < duration)
@@ -72,10 +70,10 @@ namespace Game.UI
             }
 
             m_CanvasGroup.alpha = endAlpha;
-            if (active && setInteractable)
+            if (!isHidden)
             {
-                m_CanvasGroup.interactable = true;
-                m_CanvasGroup.blocksRaycasts = true;
+                m_CanvasGroup.interactable = m_IsInteractable;
+                m_CanvasGroup.blocksRaycasts = m_BlocksRaycast;
             }
 
             onComplete?.Invoke();

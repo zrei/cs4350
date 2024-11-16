@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7675681574170691674}
   - component: {fileID: 3651506114204494337}
   - component: {fileID: 4744883154501141305}
+  - component: {fileID: 6928543667248519613}
   m_Layer: 0
   m_Name: TurnDisplay
   m_TagString: Untagged
@@ -91,6 +92,22 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &6928543667248519613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681784416603007389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0
 --- !u!1 &1959595945507915170
 GameObject:
   m_ObjectHideFlags: 0

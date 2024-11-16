@@ -26,7 +26,7 @@ public enum RewardType
 /// <summary>
 /// Main driver class of the level, manages the overall level and player interactions
 /// </summary>
-public class LevelManager : MonoBehaviour
+public class LevelManager : Singleton<LevelManager>
 {
     [Header("Manager References")]
     // Graph Information
@@ -52,9 +52,6 @@ public class LevelManager : MonoBehaviour
     IUIScreen m_LevelResultScreen;
     IUIScreen m_ExpScreen;
 
-    public delegate void LevelManagerEvent(LevelManager levelManager);
-    public static LevelManagerEvent OnReady;
-
     #region Current State
     
     private List<PlayerCharacterData> m_CurrParty;
@@ -78,10 +75,12 @@ public class LevelManager : MonoBehaviour
     #region BGM
     private int? m_LevelBGM = null;
     #endregion
-    
+
     #region Initialisation
-    private void Awake()
+    protected override void HandleAwake()
     {
+        base.HandleAwake();
+
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
         GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
@@ -94,8 +93,6 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        OnReady?.Invoke(this);
-
         m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
     }
 

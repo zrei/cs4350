@@ -9,8 +9,7 @@ using UnityEngine.UI;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public class DialogueDisplay : Singleton<DialogueDisplay>
     {
         private const int MaxOptions = 5;
@@ -45,10 +44,7 @@ namespace Game.UI
         private LayoutGroup buttonsLayout;
         #endregion
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         private Dialogue CurrentDialogue
         {
@@ -58,15 +54,16 @@ namespace Game.UI
 
                 if (currentDialogue != null)
                 {
-                    text.SetText(currentDialogue.text);
-
-                    graphicGroup.CrossFadeColor(currentDialogue.characterColor, 0.25f, false, false);
-
                     characterSprite.sprite = currentDialogue.characterSprite;
                     characterSpriteContainer.SetActive(currentDialogue.characterSprite != null);
 
                     characterName.text = currentDialogue.characterName;
                     characterNameContainer.SetActive(!string.IsNullOrEmpty(currentDialogue.characterName));
+
+                    graphicGroup.CrossFadeColor(currentDialogue.characterColor, 0.25f, false, false);
+
+                    text.SetText(string.Empty);
+                    CoroutineManager.Instance.ExecuteAfterFrames(() => text.SetText(currentDialogue.text), 1);
                 }
             }
         }
@@ -78,14 +75,7 @@ namespace Game.UI
 
         protected override void HandleAwake()
         {
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.alpha = 0;
-            isHidden = true;
+            uiAnimator = GetComponent<UIAnimator>();
 
             text.onTextComplete += OnTextComplete;
 
@@ -231,29 +221,14 @@ namespace Game.UI
 
         private void Show()
         {
-            if (!isHidden) return;
-
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
             HUDRoot.Instance.Hide();
         }
 
         private void Hide()
         {
-            if (isHidden) return;
-
-            isHidden = true;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
+            uiAnimator.Hide();
             HUDRoot.Instance.Show();
-        }
-
-        private void OnAnimationFinish()
-        {
-            animator.enabled = false;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Game.UI
                 {
                     var display = Instantiate(damageDisplayPrefab);
                     display.onAnimationFinishEvent += () => displayPool.Release(display);
-                    WorldHUDManager.Instance.AddHUD(display.transform, () => display.GetAnchorPosition());
+                    WorldSpaceHUDManager.Instance.AddHUD(display.transform, () => display.GetAnchorPosition());
                     return display;
                 },
                 actionOnGet: display => { display.gameObject.SetActive(true); display.transform.SetAsFirstSibling(); },

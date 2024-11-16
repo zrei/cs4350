@@ -3,16 +3,13 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public abstract class BaseUIScreen : MonoBehaviour, IUIScreen
     {
         [SerializeField]
         private bool applyBackgroundBlur;
 
-        private Animator animator;
-        private AnimatorCallbackExecuter animatorCallbackExecuter;
-        private CanvasGroup canvasGroup;
+        private UIAnimator uiAnimator;
         private RectTransform rectTransform;
         private BackgroundBlur backgroundBlur;
 
@@ -20,29 +17,20 @@ namespace Game.UI
         public event UIScreenCallback OnHideDone;
 
         public RectTransform RectTransform => rectTransform;
-        public bool IsInTransition => animator.enabled;
+        public bool IsInTransition => uiAnimator.IsInTransition;
 
         public virtual void Initialize()
         {
-            animator = GetComponentInChildren<Animator>();
-            animator.enabled = false;
+            uiAnimator = GetComponent<UIAnimator>();
+            uiAnimator.onAnimationEnd += OnAnimationFinish;
 
-            animatorCallbackExecuter = animator.GetBehaviour<AnimatorCallbackExecuter>();
-            canvasGroup = GetComponent<CanvasGroup>();
             rectTransform = transform as RectTransform;
             backgroundBlur = GetComponentInChildren<BackgroundBlur>();
-
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
         }
 
         public virtual void Show(params object[] args)
         {
-            animator.enabled = true;
-            animatorCallbackExecuter.RemoveAllListeners();
-            animatorCallbackExecuter.AddListener(ShowDone);
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
 
             if (applyBackgroundBlur)
             {
@@ -63,34 +51,27 @@ namespace Game.UI
             }
         }
 
-        protected virtual void ShowDone()
-        {
-            animator.enabled = false;
-            OnShowDone?.Invoke(this);
-
-            canvasGroup.alpha = 1;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-        }
-
         public virtual void Hide()
         {
-            animator.enabled = true;
-            animatorCallbackExecuter.RemoveAllListeners();
-            animatorCallbackExecuter.AddListener(HideDone);
-            animator.Play(UIConstants.HideAnimHash);
+            uiAnimator.Hide();
+        }
+
+        private void OnAnimationFinish(bool isHidden)
+        {
+            if (!isHidden) ShowDone();
+            else HideDone();
+        }
+
+        protected virtual void ShowDone()
+        {
+            OnShowDone?.Invoke(this);
         }
 
         protected virtual void HideDone()
         {
             if ((backgroundBlur?.IsActive).GetValueOrDefault()) backgroundBlur.RemoveBlur();
 
-            animator.enabled = false;
             OnHideDone?.Invoke(this);
-
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
         }
 
         public abstract void ScreenUpdate();
