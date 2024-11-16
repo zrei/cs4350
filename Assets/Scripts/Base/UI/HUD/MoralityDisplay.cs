@@ -2,8 +2,8 @@ using System.Collections;
 using UnityEngine;
 using Game.UI;
 using TMPro;
-using static GlobalEvents;
 
+[RequireComponent(typeof(UIAnimator))]
 public class MoralityDisplay : MonoBehaviour
 {
     [SerializeField]
@@ -77,20 +77,11 @@ public class MoralityDisplay : MonoBehaviour
     [SerializeProperty("Morality")]
     private float morality;
 
-    private Animator animator;
-    private CanvasGroup canvasGroup;
-    private bool isHidden;
+    private UIAnimator uiAnimator;
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
-        animator.enabled = false;
-
-        canvasGroup = GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-        isHidden = true;
+        uiAnimator = GetComponent<UIAnimator>();
 
         GlobalEvents.Morality.MoralityChangeEvent += OnMoralityChange;
         GlobalEvents.Morality.MoralitySetEvent += OnMoralitySet;
@@ -142,24 +133,11 @@ public class MoralityDisplay : MonoBehaviour
 
     private void Show()
     {
-        if (!isHidden) return;
-
-        isHidden = false;
-        animator.enabled = true;
-        animator.Play(UIConstants.ShowAnimHash);
+        uiAnimator.Show();
     }
 
     private void Hide()
     {
-        if (isHidden) return;
-
-        isHidden = true;
-        animator.enabled = true;
-        animator.Play(UIConstants.HideAnimHash);
-    }
-
-    private void OnAnimationFinish()
-    {
-        animator.enabled = false;
+        uiAnimator.Hide();
     }
 }

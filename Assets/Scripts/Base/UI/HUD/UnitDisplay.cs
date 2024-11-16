@@ -55,9 +55,7 @@ namespace Game.UI
         private StatusDisplay statusDisplay;
         #endregion
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         public Unit TrackedUnit
         {
@@ -73,6 +71,8 @@ namespace Game.UI
                 }
 
                 trackedUnit = value;
+                statusDisplay.TrackedUnit = value;
+
                 if (trackedUnit != null)
                 {
                     trackedUnit.OnHealthChange += OnHealthChange;
@@ -96,8 +96,6 @@ namespace Game.UI
                             mpBar.SetValue(trackedUnit.CurrentMana, maxMana, 0);
                         }
                     }
-
-                    statusDisplay.TrackedUnit = trackedUnit;
                 }
             }
         }
@@ -107,14 +105,7 @@ namespace Game.UI
         {
             if (!isSubDisplay)
             {
-                animator = GetComponent<Animator>();
-                animator.enabled = false;
-
-                canvasGroup = GetComponent<CanvasGroup>();
-                canvasGroup.alpha = 0f;
-                canvasGroup.interactable = false;
-                canvasGroup.blocksRaycasts = false;
-                isHidden = true;
+                uiAnimator = GetComponent<UIAnimator>();
 
                 GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
             }
@@ -176,11 +167,11 @@ namespace Game.UI
         {
             if (currentUnit == null)
             {
-                if (!isHidden) Hide();
+                Hide();
                 return;
             }
 
-            if (isHidden) Show();
+            Show();
 
             var backgroundColor = currentUnit.UnitAllegiance switch
             {
@@ -221,34 +212,18 @@ namespace Game.UI
 
         private void Show()
         {
-            if (animator == null) return;
-            if (!isHidden) return;
+            if (uiAnimator == null) return;
 
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
         }
 
         private void Hide()
         {
-            if (animator == null) return;
-            if (isHidden) return;
+            if (uiAnimator == null) return;
 
             TrackedUnit = null;
 
-            isHidden = true;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
-        }
-
-        private void OnAnimationFinish()
-        {
-            animator.enabled = false;
-            canvasGroup.alpha = isHidden ? 0 : 1;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
+            uiAnimator.Hide();
         }
     }
 }

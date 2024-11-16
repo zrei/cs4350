@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9213216273352202110}
   - component: {fileID: 7645751132266847589}
   - component: {fileID: 8298001928441876536}
+  - component: {fileID: 7840908567312979391}
   m_Layer: 5
   m_Name: RewardNodeResultScreen
   m_TagString: Untagged
@@ -49,7 +50,7 @@ Animator:
   m_GameObject: {fileID: 576579204999736238}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: a1e6c8ac37bce4c0299064f449651a51, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9b97e147ef709f143879d238521ab680, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -87,6 +88,22 @@ MonoBehaviour:
   applyBackgroundBlur: 0
   m_ResultText: {fileID: 8255119014306627628}
   m_ReturnButton: {fileID: 6893089227977485895}
+--- !u!114 &7840908567312979391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576579204999736238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0
 --- !u!1 &1309392325033814478
 GameObject:
   m_ObjectHideFlags: 0

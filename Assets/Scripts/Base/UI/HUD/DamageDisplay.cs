@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Game.UI
 {
-
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public class DamageDisplay : MonoBehaviour
     {
         [SerializeField]

@@ -2066,6 +2066,7 @@ GameObject:
   - component: {fileID: 4024713427417137670}
   - component: {fileID: 4255813889535037806}
   - component: {fileID: 7421646751541560505}
+  - component: {fileID: 2403361519670323799}
   m_Layer: 0
   m_Name: DialogueDisplay
   m_TagString: Untagged
@@ -2186,3 +2187,19 @@ MonoBehaviour:
     colorMult: {r: 1, g: 1, b: 1, a: 0.2509804}
   - graphic: {fileID: 9095639414055325835}
     colorMult: {r: 0.1254902, g: 0.1254902, b: 0.1254902, a: 0.89411765}
+--- !u!114 &2403361519670323799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8429758253238697154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0

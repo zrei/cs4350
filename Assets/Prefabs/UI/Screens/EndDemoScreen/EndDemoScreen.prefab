@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 387448049268107040}
   - component: {fileID: 6486473643262098872}
   - component: {fileID: 7033306867770186337}
+  - component: {fileID: 947713294931315363}
   m_Layer: 5
   m_Name: EndDemoScreen
   m_TagString: Untagged
@@ -225,7 +226,7 @@ Animator:
   m_GameObject: {fileID: 5005285282358199792}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 81e3cfe373ed34116b1b8fcedba91f55, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9b97e147ef709f143879d238521ab680, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -262,6 +263,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyBackgroundBlur: 0
   m_ReturnToMainMenuButton: {fileID: 6030457972819071384}
+--- !u!114 &947713294931315363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005285282358199792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0
 --- !u!1001 &3623736767966168149
 PrefabInstance:
   m_ObjectHideFlags: 0

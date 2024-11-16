@@ -3,28 +3,18 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public class UnitSetupMenu : MonoBehaviour
     {
         [SerializeField]
         private SelectableBase button;
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.alpha = 0;
-            isHidden = true;
+            uiAnimator = GetComponent<UIAnimator>();
+            uiAnimator.onAnimationEnd += OnAnimationFinish;
 
             button.onSubmit.RemoveAllListeners();
             button.onSubmit.AddListener(EndSetup);
@@ -84,24 +74,16 @@ namespace Game.UI
 
         private void Show()
         {
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
         }
 
         private void Hide()
         {
-            isHidden = true;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
+            uiAnimator.Hide();
         }
 
-        private void OnAnimationFinish()
+        private void OnAnimationFinish(bool isHidden)
         {
-            animator.enabled = false;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
-
             if (!isHidden)
             {
                 button.Select();

@@ -701,6 +701,7 @@ GameObject:
   - component: {fileID: 5603226291314966048}
   - component: {fileID: 6724015084252021274}
   - component: {fileID: 1801532141940358977}
+  - component: {fileID: 486413603655847413}
   m_Layer: 5
   m_Name: HUD
   m_TagString: Untagged
@@ -746,7 +747,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4296357444496641568}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48cce38b936373f4996741945759339e, type: 3}
+  m_Script: {fileID: 11500000, guid: a8512594f96c4cf42a149c84ea97f88c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!225 &6724015084252021274
@@ -782,6 +783,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &486413603655847413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4296357444496641568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 0
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_CompletionBuffer: 0.1
 --- !u!1 &5330406224980587231
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,14 +1,12 @@
 using Game.Input;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TMPro;
 using UnityEngine;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public class ActionMenu : MonoBehaviour
     {
         #region Component References
@@ -82,7 +80,7 @@ namespace Game.UI
                     if (startIndex + i < availableSkills.Count)
                     {
                         var skill = availableSkills[startIndex + i];
-                        
+
                         button.SetActive(true);
                         button.icon.sprite = skill.m_Icon;
                     }
@@ -139,21 +137,12 @@ namespace Game.UI
         }
         private ActionButton lockedInActionButton;
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.alpha = 0;
-            isHidden = true;
+            uiAnimator = GetComponent<UIAnimator>();
+            uiAnimator.onAnimationEnd += OnAnimationFinish;
 
             GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
 
@@ -182,7 +171,7 @@ namespace Game.UI
         {
             HandleQuit();
         }
-        
+
         private void OnBattleEnd(UnitAllegiance unitAllegiance, int numTurns)
         {
             HandleQuit();
@@ -216,7 +205,7 @@ namespace Game.UI
             currentUnit = unit;
             AvailableSkills = playerUnit.GetActiveSkills().ToList();
 
-            if (canvasGroup.interactable)
+            if (uiAnimator.CanvasGroup.interactable)
             {
                 inspectButton.Select();
             }
@@ -303,7 +292,7 @@ namespace Game.UI
         private void OnSelectMove()
         {
             if (lockedInActionButton != null) return;
-            
+
             ShowMoveDescription();
         }
 
@@ -465,32 +454,19 @@ namespace Game.UI
         #region Animations
         private void Show()
         {
-            if (!isHidden) return;
-
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
         }
 
         private void Hide()
         {
-            if (isHidden) return;
-
-            isHidden = true;
-            animator.enabled = true;
-            animator.Play(UIConstants.HideAnimHash);
+            uiAnimator.Hide();
 
             LockedInActionButton = null;
             LockedInSkill = null;
         }
 
-        private void OnAnimationFinish()
+        private void OnAnimationFinish(bool isHidden)
         {
-            animator.enabled = false;
-            canvasGroup.alpha = isHidden ? 0: 1;
-            canvasGroup.interactable = !isHidden;
-            canvasGroup.blocksRaycasts = !isHidden;
-
             if (!isHidden)
             {
                 inspectButton.Select();
