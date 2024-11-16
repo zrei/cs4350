@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game.UI
 {
     [RequireComponent(typeof(UIAnimator))]
-    public class HUDManager : Singleton<HUDManager>
+    public class HUDRoot : Singleton<HUDRoot>
     {
         private UIAnimator m_UIAnimator;
 

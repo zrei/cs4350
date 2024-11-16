@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    public class WorldHUDManager : Singleton<WorldHUDManager>
+    public class WorldSpaceHUDManager : Singleton<WorldSpaceHUDManager>
     {
         [SerializeField]
         private RectTransform root;

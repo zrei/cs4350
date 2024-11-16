@@ -222,13 +222,13 @@ namespace Game.UI
         private void Show()
         {
             uiAnimator.Show();
-            HUDManager.Instance.Hide();
+            HUDRoot.Instance.Hide();
         }
 
         private void Hide()
         {
             uiAnimator.Hide();
-            HUDManager.Instance.Show();
+            HUDRoot.Instance.Show();
         }
     }
 }

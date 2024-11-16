@@ -83,7 +83,7 @@ namespace Game.UI
             screen.RectTransform.SetParent(root, false);
             screen.RectTransform.SetAsLastSibling();
 
-            HUDManager.Instance.Hide();
+            HUDRoot.Instance.Hide();
         }
 
         public void CloseScreen()
@@ -100,7 +100,7 @@ namespace Game.UI
                 screen.OnHideDone += OnHideDone;
                 screen.Hide();
 
-                HUDManager.Instance.Show();
+                HUDRoot.Instance.Show();
             }
         }
 
