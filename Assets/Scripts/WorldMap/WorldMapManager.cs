@@ -28,8 +28,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
 
-    [Header("FadingFog")]
-    [SerializeField] private float m_FadeDuration = 1.0f;
+    //[Header("FadingFog")]
+    //[SerializeField] private float m_FadeDuration = 1.0f;
 
     private WorldMapPlayerToken m_PlayerTokenInstance = null;
     private WorldMapNode m_CurrTargetNode = null;
