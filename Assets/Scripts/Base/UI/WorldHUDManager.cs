@@ -33,7 +33,10 @@ namespace Game.UI
         {
             foreach (var kvp in huds.ToList())
             {
-                kvp.Key.localPosition = kvp.Value();
+                var transform = kvp.Key;
+                var posProducer = kvp.Value;
+                if (transform == null || !transform || posProducer == null) continue;
+                transform.localPosition = kvp.Value();
             }
         }
 
