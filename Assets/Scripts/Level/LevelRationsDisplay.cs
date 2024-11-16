@@ -80,6 +80,8 @@ public class LevelRationsDisplay : MonoBehaviour
 
     private void OnSceneLoad()
     {
+        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnSceneLoad;
+        
         m_LevelRationsManager = FindObjectOfType<LevelRationsManager>();
 
         if (m_LevelRationsManager == null)
