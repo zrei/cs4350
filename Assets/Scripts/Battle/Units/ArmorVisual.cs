@@ -48,6 +48,8 @@ public class ArmorVisual : MonoBehaviour
         m_Model.transform.localPosition = Vector3.zero;
         m_Model.transform.localRotation = Quaternion.identity;
 
+        m_Model.GetComponentInChildren<SkinnedMeshRenderer>().materials = unitModelData.m_BaseMaterial;
+
         m_EquippingArmor = m_Model.GetComponent<EquippingArmor>();
         m_EquippingArmor.Initialize(unitModelData.m_AttachItems);
 

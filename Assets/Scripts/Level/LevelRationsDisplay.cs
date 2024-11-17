@@ -5,8 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(CanvasGroup))]
+[RequireComponent(typeof(UIAnimator))]
 public class LevelRationsDisplay : MonoBehaviour
 {
     private const float DisplayMaxRations = 100;
@@ -57,24 +56,13 @@ public class LevelRationsDisplay : MonoBehaviour
         }
     }
 
-    private Animator m_Animator;
-    private CanvasGroup m_CanvasGroup;
-
-    private bool isHidden;
+    private UIAnimator m_UIAnimator;
 
     #region Initialisation
 
     private void Awake()
     {
-        m_Animator = GetComponent<Animator>();
-        m_Animator.enabled = false;
-
-        m_CanvasGroup = GetComponent<CanvasGroup>();
-        m_CanvasGroup.interactable = false;
-        m_CanvasGroup.blocksRaycasts = false;
-        m_CanvasGroup.alpha = 0;
-
-        isHidden = true;
+        m_UIAnimator = GetComponent<UIAnimator>();
 
         GlobalEvents.Scene.LevelSceneLoadedEvent += OnSceneLoad;
     }
@@ -106,9 +94,18 @@ public class LevelRationsDisplay : MonoBehaviour
         GlobalEvents.Rations.RationsChangeEvent += OnRationsChange;
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent += Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
 
         Show();
+    }
+
+    private void OnReturnFromLevel()
+    {
+        GlobalEvents.Rations.RationsSetEvent -= OnRationsSet;
+        GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
+        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
+        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
     }
 
     private void OnDestroy()
@@ -118,7 +115,7 @@ public class LevelRationsDisplay : MonoBehaviour
         GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
     }
 
     private void OnRationsSet(float newRations)
@@ -170,25 +167,13 @@ public class LevelRationsDisplay : MonoBehaviour
 
     private void Hide()
     {
-        isHidden = true;
-        m_Animator.enabled = true;
-        m_Animator.Play(UIConstants.HideAnimHash);
+        m_UIAnimator.Hide();
     }
 
     private void Show()
     {
-        isHidden = false;
-        m_Animator.enabled = true;
-        m_Animator.Play(UIConstants.ShowAnimHash);
+        m_UIAnimator.Show();
     }
-
-    private void OnAnimationFinish()
-    {
-        m_Animator.enabled = false;
-        m_CanvasGroup.interactable = !isHidden;
-        m_CanvasGroup.blocksRaycasts = !isHidden;
-    }
-
     #endregion
 }
 

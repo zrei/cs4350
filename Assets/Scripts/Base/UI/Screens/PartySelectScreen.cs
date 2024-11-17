@@ -18,9 +18,6 @@ namespace Game.UI
         [SerializeField] TextMeshProUGUI m_PartyText;
         [SerializeField] NamedObjectButton m_BeginLevelButton;
 
-        private PartySelectionSlotButton m_SelectedSlot = null;
-        private List<int> m_SelectedData;
-
         private int m_LevelId;
         private int m_PartyLimit;
         private int m_NumUnitsSelected = 0;
@@ -50,16 +47,6 @@ namespace Game.UI
             m_BeginLevelButton.onSubmit.RemoveListener(OnBeginLevel);
         }
 
-        protected override void HideDone()
-        {
-            base.HideDone();
-
-            foreach (PartySelectionSlotButton partySelectionSlotButton in m_PartySelectionSlotButtons)
-            {
-                partySelectionSlotButton.SetSelected(false);
-            }
-        }
-
         private void OnDestroy()
         {
             GlobalEvents.WorldMap.OnPartySelectEvent -= OnPartySelect;
@@ -74,7 +61,7 @@ namespace Game.UI
 
             UIScreenManager.Instance.CloseScreen();
             GlobalEvents.WorldMap.OnBeginLoadLevelEvent?.Invoke();
-            IEnumerable<int> selectedIds = m_SelectedData.Where(x => x != -1);
+            IEnumerable<int> selectedIds = GetSelectedCharacterIds();
             SaveManager.Instance.Save(() => GameSceneManager.Instance.LoadLevelScene(m_LevelId, CharacterDataManager.Instance.RetrieveCharacterData(selectedIds)));
         }
         #endregion
@@ -83,47 +70,48 @@ namespace Game.UI
         private void OnPartySelect(LevelSO levelSO)
         {
             ResetButtons();
-            m_SelectedData = new();
             m_PartyLimit = levelSO.m_UnitLimit;
             m_LevelId = levelSO.m_LevelId;
 
-            // exclude the lord because they cannot be swapped out
-            foreach (PlayerCharacterData data in CharacterDataManager.Instance.RetrieveAllCharacterData(excludeLord: true))
+            // exclude the lord and additional locked in characters because they cannot be swapped out
+            foreach (PlayerCharacterData data in CharacterDataManager.Instance.RetrieveAllCharacterData(levelSO.m_LockedInCharacters.Select(x => x.m_Id), excludeLord: true))
             {
                 InstantiateCharacterButton(data);
             }
 
-            PartySelectionSlotButton firstButton = null;
             for (int i = 0; i < m_PartySelectionSlotButtons.Count; ++i)
             {
                 // also instantiate slot
                 PartySelectionSlotButton partySelectionSlotButton = m_PartySelectionSlotButtons[i];
-                partySelectionSlotButton.Initialise(i, () => OnSelectPartySlot(partySelectionSlotButton), () => OnRemovePartySlot(partySelectionSlotButton));
+                partySelectionSlotButton.Initialise(i, () => OnRemovePartySlot(partySelectionSlotButton));
 
                 if (i < m_PartyLimit)
                 {
                     partySelectionSlotButton.SetEmpty();
-                    m_SelectedData.Add(-1);
                 }   
                 else
                     partySelectionSlotButton.SetLocked();
-                
-
-                if (i == 0)
-                    firstButton = partySelectionSlotButton;
             }
 
-            // if there is a lord, always fill the first slot with the lord
-            // and lock interaction as it cannot be removed from the party
+
+            m_NumUnitsSelected = 0;
+            List<PlayerCharacterData> lockedInCharacters = new();
             if (CharacterDataManager.Instance.TryRetrieveLordCharacterData(out PlayerCharacterData lordData))
             {
-                m_SelectedData[0] = lordData.Id;
-                firstButton.SetDisplay(lordData, true);
-                m_NumUnitsSelected = 1;
+                lockedInCharacters.Add(lordData);
             }
-            else
+
+            lockedInCharacters.AddRange(CharacterDataManager.Instance.RetrieveCharacterData(levelSO.m_LockedInCharacters.Select(x => x.m_Id), true));
+            
+            foreach (PlayerCharacterData playerCharacterData in lockedInCharacters)
             {
-                m_NumUnitsSelected = 0;
+                if (!TryGetEmptySlot(out PartySelectionSlotButton partySelectionSlotButton))
+                {
+                    break;
+                }
+                
+                partySelectionSlotButton.SetDisplay(playerCharacterData, true);
+                ++m_NumUnitsSelected;
             }
 
             UpdateState();
@@ -141,51 +129,25 @@ namespace Game.UI
         #region Callback
         private void OnSelectCharacterButton(NamedObjectButton button, PlayerCharacterData playerCharacterData)
         {
-            if (m_SelectedSlot == null)
+            if (!TryGetEmptySlot(out PartySelectionSlotButton partySelectionSlotButton))
+            {
+                ToastNotificationManager.Instance.Show($"No empty slot", Color.red);
                 return;
+            }
 
             Destroy(button.gameObject);
 
-            if (m_SelectedSlot.IsFilled)
-            {
-                InstantiateCharacterButton(CharacterDataManager.Instance.RetrieveCharacterData(m_SelectedSlot.CharacterId));
-            }
-            else
-            {
-                ++m_NumUnitsSelected;
-                UpdateState();
-                m_BeginLevelButton.interactable = m_NumUnitsSelected > 0;
-            }
-
-            m_SelectedSlot.SetDisplay(playerCharacterData, false);
-            m_SelectedData[m_SelectedSlot.Index] = playerCharacterData.m_BaseData.m_Id;
-        }
-
-        private void OnSelectPartySlot(PartySelectionSlotButton selectedSlot)
-        {
-            if (selectedSlot == m_SelectedSlot)
-            {
-                selectedSlot.SetSelected(false);
-                m_SelectedSlot = null;
-                return;
-            }
-
-            if (m_SelectedSlot != null)
-            {
-                m_SelectedSlot.SetSelected(false);
-            }
-
-            m_SelectedSlot = selectedSlot;
-            m_SelectedSlot.SetSelected(true);
+            partySelectionSlotButton.SetDisplay(playerCharacterData, false);
+            ++m_NumUnitsSelected;
+            
+            UpdateState();
         }
 
         private void OnRemovePartySlot(PartySelectionSlotButton partySelectionSlotButton)
         {
-            m_SelectedData[partySelectionSlotButton.Index] = -1;
             InstantiateCharacterButton(CharacterDataManager.Instance.RetrieveCharacterData(partySelectionSlotButton.CharacterId));
             --m_NumUnitsSelected;
             UpdateState();
-            m_BeginLevelButton.interactable = m_NumUnitsSelected > 0;
             partySelectionSlotButton.SetEmpty();
         }
         #endregion
@@ -205,8 +167,33 @@ namespace Game.UI
             {
                 Destroy(child.gameObject);
             }
+        }
 
-            m_SelectedSlot = null;
+        private bool TryGetEmptySlot(out PartySelectionSlotButton partySelectionSlotButton)
+        {
+            foreach (PartySelectionSlotButton slot in m_PartySelectionSlotButtons)
+            {
+                if (slot.IsEmpty)
+                {
+                    partySelectionSlotButton = slot;
+                    return true;
+                }
+            }
+            partySelectionSlotButton = default;
+            return false;
+        }
+
+        private List<int> GetSelectedCharacterIds()
+        {
+            List<int> selectedCharacterIds = new();
+
+            foreach (PartySelectionSlotButton partySelectionSlotButton in m_PartySelectionSlotButtons)
+            {
+                if (partySelectionSlotButton.IsFilled)
+                    selectedCharacterIds.Add(partySelectionSlotButton.CharacterId);
+            }
+
+            return selectedCharacterIds;
         }
         #endregion
 

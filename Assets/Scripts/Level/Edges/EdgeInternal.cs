@@ -89,6 +89,8 @@ public class EdgeInternal : MonoBehaviour
                 Position = m_SplineContainer.transform.InverseTransformPoint(NodeInternalB.transform.position)
             };
         }
+        
+        m_SplineContainer.Spline.SetTangentMode(TangentMode.AutoSmooth);
     }
     
     public void UpdateReverseSpline()
@@ -102,20 +104,32 @@ public class EdgeInternal : MonoBehaviour
             m_ReverseSplineContainer.Spline = new Spline(m_SplineContainer.Spline);
         
         m_ReverseSplineContainer.ReverseFlow(0);
+        
+        m_ReverseSplineContainer.Spline.SetTangentMode(TangentMode.AutoSmooth);
     }
     
 #endif
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(EdgeInternal))]
+[CustomEditor(typeof(EdgeInternal)), CanEditMultipleObjects]
 public class EdgeInternalEditor : Editor
 {
     EdgeInternal m_Target;
+    EdgeInternal[] m_Targets;
 
     private void OnEnable()
     {
-        m_Target = (EdgeInternal) target;
+        if (targets.Length == 1)
+            m_Target = (EdgeInternal) target;
+        else
+        {
+            m_Targets = new EdgeInternal[targets.Length];
+            for (var i = 0; i < targets.Length; i++)
+            {
+                m_Targets[i] = (EdgeInternal)targets[i];
+            }
+        }
     }
 
     public override void OnInspectorGUI()
@@ -124,21 +138,43 @@ public class EdgeInternalEditor : Editor
 
         if (GUILayout.Button("Update Spline"))
         {
-            m_Target.UpdateSpline();
-            
-            Undo.RecordObject(m_Target.SplineContainer, "Updated Spline");
-            
-            PrefabUtility.RecordPrefabInstancePropertyModifications(m_Target.SplineContainer);
+            if (m_Targets == null)
+                UpdateTargetSpline(m_Target);
+            else
+            {
+                foreach (var edgeInternal in m_Targets)
+                    UpdateTargetSpline(edgeInternal);
+            }
         }
         
         if (GUILayout.Button("Update Reverse Spline"))
         {
-            m_Target.UpdateReverseSpline();
-            
-            Undo.RecordObject(m_Target.ReverseSplineContainer, "Updated Reverse Spline");
-            
-            PrefabUtility.RecordPrefabInstancePropertyModifications(m_Target.ReverseSplineContainer);
+            if (m_Targets == null)
+                UpdateTargetReverseSpline(m_Target);
+            else
+            {
+                foreach (var edgeInternal in m_Targets)
+                    UpdateTargetReverseSpline(edgeInternal);
+            }
         }
+    }
+    
+    private void UpdateTargetSpline(EdgeInternal edgeInternal)
+    {
+        edgeInternal.UpdateSpline();
+        
+        Undo.RecordObject(edgeInternal.SplineContainer, "Updated Spline");
+        
+        PrefabUtility.RecordPrefabInstancePropertyModifications(edgeInternal.SplineContainer);
+    }
+
+    private void UpdateTargetReverseSpline(EdgeInternal edgeInternal)
+    {
+        edgeInternal.UpdateReverseSpline();
+
+        Undo.RecordObject(edgeInternal.ReverseSplineContainer, "Updated Reverse Spline");
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(edgeInternal.ReverseSplineContainer);
     }
 }
 #endif

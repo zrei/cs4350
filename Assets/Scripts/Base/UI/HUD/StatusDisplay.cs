@@ -27,19 +27,26 @@ namespace Game.UI
         {
             set
             {
-                if (value == trackedUnit) return;
+                if (trackedUnit == value) return;
 
                 Clear();
 
                 trackedUnit = value;
 
-                TrackedStatusManager = trackedUnit.StatusManager;
-
-                foreach (var token in trackedUnit.PermanentTokens)
+                if (trackedUnit != null)
                 {
-                    var display = Get(true);
-                    display.TrackedStatus = token;
-                    activeDisplays.Add(token, display);
+                    TrackedStatusManager = trackedUnit.StatusManager;
+
+                    foreach (var token in trackedUnit.PermanentTokens)
+                    {
+                        var display = Get(true);
+                        display.TrackedStatus = token;
+                        activeDisplays.Add(token, display);
+                    }
+                }
+                else
+                {
+                    TrackedStatusManager = null;
                 }
 
                 UpdateActiveLayoutGroups();

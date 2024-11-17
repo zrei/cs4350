@@ -18,6 +18,7 @@ public class TokenStack :
     private int m_NumTiers;
     public int Id => m_TokenTierData.m_Id;
     public TokenType TokenType => m_TokenTierData.TokenType;
+    public bool IsBuff => m_TokenTierData.m_IsBuff;
     public bool ContainsConsumptionType(TokenConsumptionType tokenConsumptionType) => m_TokenTierData.ContainsConsumptionType(tokenConsumptionType);
     #endregion
 
@@ -80,6 +81,8 @@ public class TokenStack :
 
     public void ConsumeToken()
     {
+        if (IsEmpty)
+            return;
         m_NumTokensOfEachTier[GetMaxTier() - 1]--;
     }
 
@@ -206,7 +209,7 @@ public class TokenStack :
 public class TauntTokenStack : TokenStack
 {
     public Unit TauntedUnit {get; private set;}
-    public override bool IsEmpty => base.IsEmpty && TauntedUnit != null && !TauntedUnit.IsDead;
+    public override bool IsEmpty => base.IsEmpty || TauntedUnit == null || TauntedUnit.IsDead;
 
     public TauntTokenStack(Unit targetedUnit, TokenTierSO tokenTierSO, int initialNumber = 1) : base(tokenTierSO, 1, initialNumber)
     {

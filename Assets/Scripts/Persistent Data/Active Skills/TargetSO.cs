@@ -7,6 +7,8 @@ public class TargetSO : ScriptableObject
     [Tooltip("These are tiles that will also be targeted, represented as offsets from the target square")]
     public List<CoordPair> m_TargetTiles;
 
+    public string m_Description;
+
     [Tooltip("The sprite to represent the target tiles")]
     public Sprite m_TargetRepSprite;
 

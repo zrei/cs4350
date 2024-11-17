@@ -24,7 +24,7 @@ namespace Game.UI
 
         [SerializeField] private FormattedTextDisplay m_MoveDisplay;
 
-        private const float DELAY = 0.4f;
+        private const float DELAY = 0.2f;
 
         public void DisplayLevelUp(LevelUpSummary levelUpSummary, VoidEvent completeAnimationEvent = null)
         {

@@ -7,8 +7,8 @@ public class EdgeVisual : MonoBehaviour
 {
     [SerializeField] EdgeInternal m_EdgeInternal;
     
-    [SerializeField] private LineRenderer m_LineRenderer;
-    [SerializeField] private TextMeshPro m_CostText;
+    [SerializeField] public LineRenderer m_LineRenderer;
+    [SerializeField] public TextMeshPro m_CostText;
     
     [Header("Edge Renderer Settings")]
     public float width;
@@ -56,14 +56,24 @@ public class EdgeVisual : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(EdgeVisual))]
+[CustomEditor(typeof(EdgeVisual)), CanEditMultipleObjects]
 public class EdgeVisualEditor : Editor
 {
     EdgeVisual m_Target;
+    EdgeVisual[] m_Targets;
 
     private void OnEnable()
     {
-        m_Target = (EdgeVisual) target;
+        if (targets.Length == 1)
+            m_Target = (EdgeVisual) target;
+        else
+        {
+            m_Targets = new EdgeVisual[targets.Length];
+            for (var i = 0; i < targets.Length; i++)
+            {
+                m_Targets[i] = (EdgeVisual) targets[i];
+            }
+        }
     }
 
     public override void OnInspectorGUI()
@@ -72,8 +82,27 @@ public class EdgeVisualEditor : Editor
         
         if (GUILayout.Button("Draw Edge"))
         {
-            m_Target.DrawEdge();
+            if (m_Targets == null)
+                DrawEdgeFromEditor(m_Target);
+            else
+            {
+                foreach (var edgeVisual in m_Targets)
+                {
+                    DrawEdgeFromEditor(edgeVisual);
+                }
+            }
         }
+    }
+
+    private void DrawEdgeFromEditor(EdgeVisual edgeVisual)
+    {
+        edgeVisual.DrawEdge();
+            
+        Undo.RecordObject(edgeVisual.m_LineRenderer, "Updated LineRenderer");
+        PrefabUtility.RecordPrefabInstancePropertyModifications(edgeVisual.m_LineRenderer);
+            
+        Undo.RecordObject(edgeVisual.m_CostText, "Updated CostText");
+        PrefabUtility.RecordPrefabInstancePropertyModifications(edgeVisual.m_CostText);
     }
 }
 #endif

@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 8942927154403848630}
   - component: {fileID: 3461618414484186214}
   - component: {fileID: 8331001338952987720}
+  - component: {fileID: 735398338519124562}
   m_Layer: 0
   m_Name: WorldSpaceUnitDisplay
   m_TagString: Untagged
@@ -158,6 +159,22 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &735398338519124562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1823649542437647182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 0
+  m_BlocksRaycast: 0
+  m_HasIdleAnim: 0
 --- !u!1 &2577101120371226926
 GameObject:
   m_ObjectHideFlags: 0

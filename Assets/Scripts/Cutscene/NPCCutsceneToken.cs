@@ -14,6 +14,8 @@ public class NPCCutsceneToken : CutsceneToken
     [SerializeField] private Color m_ArmorPlateColor;
     [SerializeField] private Color m_ArmorTrimColor;
     [SerializeField] private Color m_UnderArmorColor;
+    [SerializeField] private Color m_SkinColor;
+    [SerializeField] private Color m_EyeColor;
 
     [Header("Weapon")]
     [SerializeField] private WeaponInstanceSO m_WeaponInstance;
@@ -23,6 +25,12 @@ public class NPCCutsceneToken : CutsceneToken
     {
         base.Initialise();
 
-        m_ArmorVisual.InstantiateModel(m_RaceSO.GetUnitModelData(m_Gender, m_OutfitType), m_ArmorPlateColor, m_ArmorTrimColor, m_UnderArmorColor, m_SpawnWeapon ? m_WeaponInstance : null, m_WeaponAnimationType);
+        m_ArmorVisual.InstantiateModel(
+            m_RaceSO.GetUnitModelData(m_Gender, m_SkinColor, m_EyeColor, m_OutfitType),
+            m_ArmorPlateColor,
+            m_ArmorTrimColor,
+            m_UnderArmorColor,
+            m_SpawnWeapon ? m_WeaponInstance : null,
+            m_WeaponAnimationType);
     }
 }

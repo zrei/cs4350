@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Splines;
 
 [System.Serializable]
 public struct InflictedStatusEffect
@@ -16,6 +14,13 @@ public struct InflictedStatusEffect
     {
         return $"{m_Stack}x <color=#{ColorUtility.ToHtmlStringRGB(m_StatusEffect.m_Color)}>{m_StatusEffect}</color>";
     }
+}
+
+public enum StatusType
+{
+    STATUS_EFFECT,
+    BUFF_TOKEN,
+    DEBUFF_TOKEN
 }
 
 [CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkills/ActiveSkillSO")]
@@ -67,6 +72,10 @@ public class ActiveSkillSO : ScriptableObject
     public bool m_TeleportSelf;
     [Tooltip("Rules governing where the target can be teleported to - should generally be location checks for target")]
     public List<TeleportRuleSO> m_TeleportTargetRules;
+
+    [Space]
+    [Tooltip("What this skill will cleanse")]
+    public List<StatusType> m_CleansedStatusTypes;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
@@ -166,8 +175,8 @@ public class ActiveSkillSO : ScriptableObject
         {
             var dmgSpriteTag = m_SkillType switch
             {
-                SkillType.PHYSICAL => "<sprite name=\"PhysicalAttack\" tint>",
-                SkillType.MAGIC => "<sprite name=\"MagicAttack\" tint>",
+                SkillType.PHYSICAL => "Physical <sprite name=\"PhysicalAttack\" tint>",
+                SkillType.MAGIC => "Magic <sprite name=\"MagicAttack\" tint>",
                 _ => string.Empty,
             };
             var dmgText = $"{(target != null ? DamageCalc.CalculateDamage(caster, target, this) : DamageCalc.CalculateDamage(caster, this)):F1}";
@@ -204,8 +213,17 @@ public class ActiveSkillSO : ScriptableObject
                 builder.Append(status.ToString());
                 builder.Append(", ");
             }
+            builder.Length--;
             builder[builder.Length - 1] = '\n';
-            builder[builder.Length - 2] = ' ';
+        }
+        if (HasAttackerLimitations)
+        {
+            builder.AppendLine($"Requires Self: {GetAttackerRange()}");
+        }
+        builder.AppendLine($"Targets: {GetTargetRange()}");
+        if (m_TargetSO.IsAoe)
+        {
+            builder.AppendLine($"Area of Effect: {m_TargetSO.m_Description}");
         }
 
         if (!string.IsNullOrEmpty(m_Description))
@@ -220,21 +238,21 @@ public class ActiveSkillSO : ScriptableObject
         if (!HasTargetLimitations)
         {
             if (IsOpposingSideTarget)
-                return "All Enemies";
+                return "Enemies";
             else if (IsSelfTarget)
                 return "Self";
             else
-                return "All Allies";
+                return "Allies";
         }
         else
         {
             StringBuilder stringBuilder = new();
             if (IsOpposingSideTarget)
-                stringBuilder.Append("Enemies in ");
+                stringBuilder.Append("Enemies, ");
             else if (IsSelfTarget)
-                stringBuilder.Append("Self in ");
+                stringBuilder.Append("Self, ");
             else
-                stringBuilder.Append("Allies in ");
+                stringBuilder.Append("Allies, ");
 
             List<SkillTargetRuleSO> targetLocationRules = m_TargetRules.Where(x => x is TargetLocationRuleSO).ToList();
             int numRules = targetLocationRules.Count();
@@ -296,7 +314,7 @@ public class ActiveSkillSO : ScriptableObject
     /// <returns></returns>
     public bool IsValidTargetTile(CoordPair targetTile, Unit unit, GridType targetGridType)
     {
-        if (unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
+        if (IsOpposingSideTarget && unit.IsTaunted(out Unit forceTarget) && !ConstructAttackTargetTiles(targetTile).Contains(forceTarget.CurrPosition))
             return false;
         return m_TargetRules.Where(x => x is ITargetRule).All(x => ((ITargetRule) x).IsValidTargetTile(targetTile, unit, targetGridType));
     }
@@ -368,25 +386,25 @@ public struct Adds
     public Stats m_StatAugments;
 }
 
-//#if UNITY_EDITOR
-//[CustomEditor(typeof(ActiveSkillSO))]
-//public class ActiveSkillSOCustomEditor : Editor
-//{
-//    ActiveSkillSO m_ActiveSkill;
+#if UNITY_EDITOR
+[CustomEditor(typeof(ActiveSkillSO))]
+public class ActiveSkillSOCustomEditor : Editor
+{
+    ActiveSkillSO m_ActiveSkill;
 
-//    void OnEnable()
-//    {
-//        m_ActiveSkill = (ActiveSkillSO) target;
-//    }
+    void OnEnable()
+    {
+        m_ActiveSkill = (ActiveSkillSO)target;
+    }
 
-//    public override void OnInspectorGUI()
-//    {
-//        base.OnInspectorGUI();
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
 
-//        GUILayout.Space(30f);
+        GUILayout.Space(30f);
 
-//        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
-//        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
-//    }
-//}
-//#endif
+        GUILayout.Label("Current target range text: " + m_ActiveSkill.GetTargetRange());
+        GUILayout.Label("Current attacker range text: " + m_ActiveSkill.GetAttackerRange());
+    }
+}
+#endif

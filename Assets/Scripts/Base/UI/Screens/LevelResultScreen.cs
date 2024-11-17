@@ -15,6 +15,8 @@ namespace Game.UI
 {
     public class LevelResultScreen : BaseUIScreen
     {
+        [SerializeField] GraphicGroup m_GraphicGroup;
+
         [SerializeField] GameObject m_ResultPanel;
         [SerializeField] TextMeshProUGUI m_ResultText;
         [SerializeField] SelectableBase m_ReturnButton;
@@ -38,6 +40,13 @@ namespace Game.UI
         
         private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
         {
+            m_GraphicGroup.color = result switch
+            {
+                LevelResultType.SUCCESS => ColorUtils.VictoryColor,
+                LevelResultType.DEFEAT => ColorUtils.DefeatColor,
+                LevelResultType.OUT_OF_TIME => ColorUtils.DefeatColor,
+                _ => Color.white
+            };
             m_ResultText.text = result switch
             {
                 LevelResultType.SUCCESS => "Level Completed!",

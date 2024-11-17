@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Id: 10
   m_AllowStack: 1
+  m_IsBuff: 0
   m_TokenName: Attack Down
   m_Description: Reduces damage for next attack. (25% per tier)
   m_Icon: {fileID: -927014203, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
@@ -21,5 +22,5 @@ MonoBehaviour:
   m_TieredTokens:
   - {fileID: 11400000, guid: db8b5f90dd715bb49b527f00031a503f, type: 2}
   - {fileID: 11400000, guid: 6b79889cc7c69454e9d51c2eae248b3e, type: 2}
-  m_Consumption: 0300000002000000
+  m_Consumption: 03000000020000000600000007000000
   m_AffectedStats: 0200000003000000

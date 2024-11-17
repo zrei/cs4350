@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(UIAnimator))]
     public class CurrentUnitMarker : MonoBehaviour
     {
         [SerializeField]
@@ -13,23 +12,14 @@ namespace Game.UI
 
         private Unit trackedUnit;
 
-        private Animator animator;
-        private CanvasGroup canvasGroup;
-
-        private bool isHidden;
+        private UIAnimator uiAnimator;
 
         private Coroutine followCoroutine;
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
-            animator.enabled = false;
-
-            canvasGroup = GetComponent<CanvasGroup>();
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.alpha = 0;
-            isHidden = true;
+            uiAnimator = GetComponent<UIAnimator>();
+            uiAnimator.onAnimationEnd += OnAnimationFinish;
 
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
@@ -114,26 +104,16 @@ namespace Game.UI
 
         public void Show()
         {
-            if (!isHidden) return;
-
-            isHidden = false;
-            animator.enabled = true;
-            animator.Play(UIConstants.ShowAnimHash);
+            uiAnimator.Show();
         }
 
         public void Hide()
         {
-            if (isHidden) return;
-
-            isHidden = true;
-            animator.enabled = true;
-            animator.CrossFade(UIConstants.HideAnimHash, 0.1f);
+            uiAnimator.Hide(0.1f);
         }
 
-        private void OnAnimationFinish()
+        private void OnAnimationFinish(bool isHidden)
         {
-            animator.enabled = !isHidden;
-            
             if (trackedUnit != null)
             {
                 BeginFollow();

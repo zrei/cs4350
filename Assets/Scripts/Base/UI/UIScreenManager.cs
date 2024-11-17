@@ -1,7 +1,6 @@
 using Game.Input;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace Game.UI
 {
@@ -48,6 +47,7 @@ namespace Game.UI
         public IUIScreen PartySelectScreen => LoadScreen("PartySelectScreen");
         public IUIScreen InspectScreen => LoadScreen("InspectScreen");
         public IUIScreen ExpScreen => LoadScreen("ExpScreen");
+        public IUIScreen DemoEndScreen => LoadScreen("EndDemoScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();

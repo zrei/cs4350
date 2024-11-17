@@ -14,6 +14,7 @@ public abstract class TokenTierSO : ScriptableObject
     /// Whether or not multiple tokens (regardless of tier) are allowed to be stacked on the same unit
     /// </summary>
     public bool m_AllowStack;
+    public bool m_IsBuff = true;
     public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 
     [Header("Details")]
@@ -48,7 +49,7 @@ public abstract class TokenTierSO : ScriptableObject
 
     public override string ToString()
     {
-        return m_Icon != null ? $"<sprite name=\"{m_Icon.name}\" tint>" : m_TokenName;
+        return m_Icon != null ? $"{m_TokenName} <sprite name=\"{m_Icon.name}\" tint>" : m_TokenName;
     }
 
 #if UNITY_EDITOR

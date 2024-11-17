@@ -8,6 +8,7 @@ public delegate void FloatEvent(float _);
 public delegate void Vector3Event(Vector3 _);
 public delegate Vector3 Vector3Producer();
 public delegate void StringEvent(string _);
+public delegate void BoolEvent(bool _);
 
 public static class GlobalEvents {
 

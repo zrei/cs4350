@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(UIAnimator))]
 public class WorldSpaceUnitDisplay : MonoBehaviour
 {
     #region Asset References
@@ -63,10 +64,7 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
     private void OnHealthChange(float change, float value, float max) { hpBar?.SetValue(value, max); }
     private void OnManaChange(float change, float value, float max) { mpBar?.SetValue(value, max); }
 
-    private Animator animator;
-    private CanvasGroup canvasGroup;
-
-    private bool isHidden;
+    private UIAnimator uiAnimator;
 
     private Coroutine followCoroutine;
 
@@ -74,14 +72,8 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
 
     private void Awake()
     {
-        animator = GetComponent<Animator>();
-        animator.enabled = false;
-
-        canvasGroup = GetComponent<CanvasGroup>();
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0;
-        isHidden = true;
+        uiAnimator = GetComponent<UIAnimator>();
+        uiAnimator.onAnimationEnd += OnAnimationFinish;
 
         GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
         GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
@@ -180,28 +172,16 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
 
     public void Show()
     {
-        if (!isHidden) return;
-
-        isHidden = false;
-        animator.enabled = true;
-        animator.Play(UIConstants.ShowAnimHash);
+        uiAnimator.Show();
     }
 
     public void Hide()
     {
-        if (isHidden) return;
-
-        isHidden = true;
-        animator.enabled = true;
-        animator.CrossFade(UIConstants.HideAnimHash, 0.1f);
+        uiAnimator.Hide();
     }
 
-    private void OnAnimationFinish()
+    private void OnAnimationFinish(bool isHidden)
     {
-        animator.enabled = !isHidden;
-        canvasGroup.interactable = !isHidden;
-        canvasGroup.blocksRaycasts = !isHidden;
-
         onAnimationFinishEvent?.Invoke();
     }
 }

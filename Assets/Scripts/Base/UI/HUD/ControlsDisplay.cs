@@ -5,7 +5,6 @@ namespace Game.UI
 {
     public class ControlsDisplay : MonoBehaviour
     {
-
         [SerializeField] private CanvasGroup m_LevelControls;
         [SerializeField] private CanvasGroup m_BattleControls;
         [SerializeField] private CanvasGroup m_WorldMapControls;

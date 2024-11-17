@@ -739,6 +739,7 @@ GameObject:
   - component: {fileID: 4346371680319182319}
   - component: {fileID: 6374940881543604112}
   - component: {fileID: 1358748529871139041}
+  - component: {fileID: 3788801527384929960}
   m_Layer: 0
   m_Name: UnitSetupMenu
   m_TagString: Untagged
@@ -839,6 +840,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3788801527384929960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7402007286135499272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1a9d97c7f763944af45063986148dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HideOnAwake: 1
+  m_IsInteractable: 1
+  m_BlocksRaycast: 1
+  m_HasIdleAnim: 0
 --- !u!1 &7618665877258492588
 GameObject:
   m_ObjectHideFlags: 0
