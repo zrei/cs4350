@@ -242,4 +242,11 @@ public class SoundManager : Singleton<SoundManager>
         }
     }
     #endregion
+
+    #region Helper
+    public bool IsPlaying(int token)
+    {
+        return m_PlayingAudio.ContainsKey(token) && !m_PlayingAudio[token].HasFinishedPlaying();
+    }
+    #endregion
 }

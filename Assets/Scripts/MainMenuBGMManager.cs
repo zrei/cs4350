@@ -1,29 +1,10 @@
-using UnityEngine;
-
-public class MainMenuBGMManager : MonoBehaviour
+public class MainMenuBGMManager : BGMManager
 {
-    [SerializeField] AudioDataSO m_MainMenuBGM;
-
-    private int m_CurrentlyPlayingAudio;
-
-    private void Awake()
+    protected override void Awake()
     {
-        StartPlayingMainMenuBGM();
+        base.Awake();
 
         GlobalEvents.MainMenu.OnBeginLoadWorldMap += OnBeginLoadWorldMap;
-    }
-
-    private void StartPlayingMainMenuBGM()
-    {
-        if (!SoundManager.IsReady)
-        {
-            SoundManager.OnReady += StartPlayingMainMenuBGM;
-            return;
-        }
-
-        SoundManager.OnReady -= StartPlayingMainMenuBGM;
-
-        m_CurrentlyPlayingAudio = SoundManager.Instance.PlayWithFadeIn(m_MainMenuBGM);
     }
 
     private void OnDestroy()
@@ -33,6 +14,6 @@ public class MainMenuBGMManager : MonoBehaviour
 
     private void OnBeginLoadWorldMap()
     {
-        SoundManager.Instance.FadeOutAndStop(m_CurrentlyPlayingAudio);
+        FadeOutCurrBgm();
     }
 }
