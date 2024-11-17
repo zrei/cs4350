@@ -14,6 +14,7 @@ public class CutsceneSpawner : MonoBehaviour
         m_PostCutsceneAction = postCutsceneAction;
         GlobalEvents.Dialogue.DialogueEndEvent += EndCutscene;
         CreateCutscene(m_StartingCutscene);
+        GlobalEvents.CutsceneEvents.StartCutsceneEvent?.Invoke();
         DialogueDisplay.Instance.StartDialogue(m_Dialogue);
     }
 
