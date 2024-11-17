@@ -14,6 +14,7 @@ public abstract class TokenTierSO : ScriptableObject
     /// Whether or not multiple tokens (regardless of tier) are allowed to be stacked on the same unit
     /// </summary>
     public bool m_AllowStack;
+    public bool m_IsBuff = true;
     public virtual TokenType TokenType => TokenType.INFLICT_STATUS;
 
     [Header("Details")]

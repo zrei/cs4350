@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Splines;
 
 [System.Serializable]
 public struct InflictedStatusEffect
@@ -16,6 +14,13 @@ public struct InflictedStatusEffect
     {
         return $"{m_Stack}x <color=#{ColorUtility.ToHtmlStringRGB(m_StatusEffect.m_Color)}>{m_StatusEffect}</color>";
     }
+}
+
+public enum StatusType
+{
+    STATUS_EFFECT,
+    BUFF_TOKEN,
+    DEBUFF_TOKEN
 }
 
 [CreateAssetMenu(fileName = "ActiveSkillSO", menuName = "ScriptableObject/ActiveSkills/ActiveSkillSO")]
@@ -67,6 +72,10 @@ public class ActiveSkillSO : ScriptableObject
     public bool m_TeleportSelf;
     [Tooltip("Rules governing where the target can be teleported to - should generally be location checks for target")]
     public List<TeleportRuleSO> m_TeleportTargetRules;
+
+    [Space]
+    [Tooltip("What this skill will cleanse")]
+    public List<StatusType> m_CleansedStatusTypes;
     
     [Header("Animations")]
     [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]

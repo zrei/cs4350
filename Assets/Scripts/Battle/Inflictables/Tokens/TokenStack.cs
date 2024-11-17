@@ -18,6 +18,7 @@ public class TokenStack :
     private int m_NumTiers;
     public int Id => m_TokenTierData.m_Id;
     public TokenType TokenType => m_TokenTierData.TokenType;
+    public bool IsBuff => m_TokenTierData.m_IsBuff;
     public bool ContainsConsumptionType(TokenConsumptionType tokenConsumptionType) => m_TokenTierData.ContainsConsumptionType(tokenConsumptionType);
     #endregion
 
