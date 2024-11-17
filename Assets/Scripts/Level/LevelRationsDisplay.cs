@@ -94,9 +94,18 @@ public class LevelRationsDisplay : MonoBehaviour
         GlobalEvents.Rations.RationsChangeEvent += OnRationsChange;
         GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent += Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
 
         Show();
+    }
+
+    private void OnReturnFromLevel()
+    {
+        GlobalEvents.Rations.RationsSetEvent -= OnRationsSet;
+        GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
+        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
+        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
+        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
     }
 
     private void OnDestroy()
@@ -106,7 +115,7 @@ public class LevelRationsDisplay : MonoBehaviour
         GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
         GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
         GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent -= Hide;
+        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
     }
 
     private void OnRationsSet(float newRations)

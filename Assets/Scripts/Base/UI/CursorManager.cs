@@ -15,6 +15,7 @@ public class CursorManager : MonoBehaviour
     private void Update()
     {
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
 
         m_RectT.anchoredPosition = Input.mousePosition;
 

@@ -10,8 +10,10 @@ namespace Game.UI
         private void Start()
         {
             InputManager.Instance.CancelInput.OnPressEvent += OnCancel;
-            GlobalEvents.Dialogue.DialogueStartEvent += OnDialogueStart;
-            GlobalEvents.Dialogue.DialogueEndEvent += OnDialogueEnd;
+            GlobalEvents.Dialogue.DialogueStartEvent += DisablePause;
+            GlobalEvents.Dialogue.DialogueEndEvent += EnablePause;
+            GlobalEvents.Save.OnBeginSaveEvent += DisablePause;
+            GlobalEvents.Save.OnCompleteSaveEvent += EnablePause;
         }
 
         private void OnCancel(IInput input)
@@ -40,16 +42,18 @@ namespace Game.UI
                 InputManager.Instance.CancelInput.OnPressEvent -= OnCancel;
             }
 
-            GlobalEvents.Dialogue.DialogueStartEvent -= OnDialogueStart;
-            GlobalEvents.Dialogue.DialogueEndEvent -= OnDialogueEnd;
+            GlobalEvents.Dialogue.DialogueStartEvent -= DisablePause;
+            GlobalEvents.Dialogue.DialogueEndEvent -= EnablePause;
+            GlobalEvents.Save.OnBeginSaveEvent -= DisablePause;
+            GlobalEvents.Save.OnCompleteSaveEvent -= EnablePause;
         }
 
-        private void OnDialogueStart()
+        private void DisablePause()
         {
             m_PauseAllowed = false;
         }
 
-        private void OnDialogueEnd()
+        private void EnablePause()
         {
             m_PauseAllowed = true;
         }

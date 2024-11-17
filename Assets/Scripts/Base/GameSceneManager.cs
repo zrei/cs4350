@@ -113,7 +113,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
             
             m_Transition.SetTrigger(End);
         }
-        asyncHandle.completed += OnSceneLoadComplete;
+        if (asyncHandle != null)
+        {
+            asyncHandle.completed += OnSceneLoadComplete;
+        }
     }
 
     public void LoadLevelScene(int levelId, List<PlayerCharacterData> partyMembers)
@@ -216,7 +219,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
         foreach (int sceneIndex in sceneIndexes)
         {
             var asyncHandle = SceneManager.UnloadSceneAsync(sceneIndex);
-            asyncHandle.completed += OnSceneLoadComplete;
+            if (asyncHandle != null)
+            {
+                asyncHandle.completed += OnSceneLoadComplete;
+            }
         }
         
         void OnSceneLoadComplete(AsyncOperation handle)
@@ -254,7 +260,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
             
             m_Transition.SetTrigger(End);
         }
-        asyncHandle.completed += OnSceneLoadComplete;
+        if (asyncHandle != null)
+        {
+            asyncHandle.completed += OnSceneLoadComplete;
+        }
     }
     
     IEnumerator UnloadAdditiveSceneWithTransition(int sceneIndex)
@@ -276,7 +285,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
             m_AfterSceneChange?.Invoke();
             m_AfterSceneChange = null;
         }
-        asyncHandle.completed += OnSceneUnloadComplete;
+        if (asyncHandle != null)
+        {
+            asyncHandle.completed += OnSceneUnloadComplete;
+        }
     }
 
     #endregion

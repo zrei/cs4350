@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7575cd51f9c25004b8310a8ef019a81d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_AnimationAudio: {fileID: 0}
   DelayBetweenChars: 0.01
 --- !u!222 &6790008733277492455
 CanvasRenderer:
@@ -339,7 +340,7 @@ MonoBehaviour:
   m_fontSize: 28
   m_fontSizeBase: 28
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 12
   m_fontSizeMax: 28
   m_fontStyle: 0
@@ -674,7 +675,7 @@ MonoBehaviour:
     m_Left: 60
     m_Right: 60
     m_Top: 30
-    m_Bottom: 30
+    m_Bottom: 45
   m_ChildAlignment: 0
   m_Spacing: 15
   m_ChildForceExpandWidth: 0
@@ -2094,7 +2095,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 375}
+  m_SizeDelta: {x: 0, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4536954980808364141
 MonoBehaviour:

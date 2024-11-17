@@ -63,7 +63,13 @@ namespace Game.UI
                     graphicGroup.CrossFadeColor(currentDialogue.characterColor, 0.25f, false, false);
 
                     text.SetText(string.Empty);
-                    CoroutineManager.Instance.ExecuteAfterFrames(() => text.SetText(currentDialogue.text), 1);
+                    CoroutineManager.Instance.ExecuteAfterFrames(() =>
+                    {
+                        if (currentDialogue != null)
+                        {
+                            text.SetText(currentDialogue.text);
+                        }
+                    }, 1);
                 }
             }
         }
