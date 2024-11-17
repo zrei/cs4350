@@ -16,8 +16,8 @@ public class PlayerCharacterCutsceneToken : CutsceneToken
 
         int characterId = m_BaseData.m_Id;
         if (CharacterDataManager.IsReady && CharacterDataManager.Instance.TryRetrieveCharacterData(characterId, out PlayerCharacterData characterData))
-            Initialise(m_BaseData.GetUnitModelData(characterData.CurrClass.m_OutfitType), characterData.GetWeaponInstanceSO(), characterData.CurrClass);
+            Initialise(m_BaseData.GetUnitModelData(characterData.CurrClass.m_OutfitType), m_SpawnWeapon ? characterData.GetWeaponInstanceSO() : null, characterData.CurrClass);
         else
-            Initialise(m_BaseData.GetUnitModelData(m_BaseData.StartingClass.m_OutfitType), m_BaseData.StartingClass.DefaultWeapon, m_BaseData.StartingClass);
+            Initialise(m_BaseData.GetUnitModelData(m_BaseData.StartingClass.m_OutfitType), m_SpawnWeapon ? m_BaseData.StartingClass.DefaultWeapon : null, m_BaseData.StartingClass);
     }
 }

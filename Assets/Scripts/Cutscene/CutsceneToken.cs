@@ -3,6 +3,8 @@ using UnityEngine;
 
 public abstract class CutsceneToken : BaseCharacterToken
 {
+    [SerializeField] protected bool m_SpawnWeapon;
+
     private void Start()
     {
         Initialise();

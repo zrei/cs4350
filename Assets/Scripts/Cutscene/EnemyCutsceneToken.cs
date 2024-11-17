@@ -14,6 +14,6 @@ public class EnemyCutsceneToken : CutsceneToken
             return;
         }
 
-        Initialise(m_EnemyCharacterSO.GetUnitModelData(), m_EnemyCharacterSO.m_EquippedWeapon, m_EnemyCharacterSO.m_EnemyClass);
+        Initialise(m_EnemyCharacterSO.GetUnitModelData(), m_SpawnWeapon ? m_EnemyCharacterSO.m_EquippedWeapon : null, m_EnemyCharacterSO.m_EnemyClass);
     }
 }
