@@ -1,5 +1,3 @@
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 public class ObjectPooler : MonoBehaviour
@@ -26,7 +24,7 @@ public class ObjectPooler : MonoBehaviour
     public GameObject RetrievePooledObject(Transform parent, bool setActive = true)
     {
         Transform pooledTransform = InstantiatePooledObject();
-        pooledTransform.parent = parent;
+        pooledTransform.SetParent(parent, false);
         pooledTransform.localScale = Vector3.one;
         pooledTransform.position = Vector3.zero;
         pooledTransform.rotation = Quaternion.identity;

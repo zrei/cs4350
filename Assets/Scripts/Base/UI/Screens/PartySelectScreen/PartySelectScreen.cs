@@ -11,7 +11,7 @@ namespace Game.UI
         [SerializeField] List<PartySelectionSlotButton> m_PartySelectionSlotButtons;
 
         [Header("Character Buttons")]
-        [SerializeField] NamedObjectButton m_CharacterButton;
+        [SerializeField] private PartySelectCharacterButton m_CharacterButton;
         [SerializeField] Transform m_CharacterButtonParent;
 
         [Space]
@@ -110,7 +110,7 @@ namespace Game.UI
                     break;
                 }
                 
-                partySelectionSlotButton.SetDisplay(playerCharacterData, true);
+                partySelectionSlotButton.SetDisplay(new PartySelectionSlotUIData(playerCharacterData, () => DisplayPreview(playerCharacterData), true));
                 ++m_NumUnitsSelected;
             }
 
@@ -127,7 +127,7 @@ namespace Game.UI
         #endregion
 
         #region Callback
-        private void OnSelectCharacterButton(NamedObjectButton button, PlayerCharacterData playerCharacterData)
+        private void OnSelectCharacterButton(PartySelectCharacterButton button, PlayerCharacterData playerCharacterData)
         {
             if (!TryGetEmptySlot(out PartySelectionSlotButton partySelectionSlotButton))
             {
@@ -137,7 +137,7 @@ namespace Game.UI
 
             Destroy(button.gameObject);
 
-            partySelectionSlotButton.SetDisplay(playerCharacterData, false);
+            partySelectionSlotButton.SetDisplay(new PartySelectionSlotUIData(playerCharacterData, () => DisplayPreview(playerCharacterData), false));
             ++m_NumUnitsSelected;
             
             UpdateState();
@@ -155,10 +155,10 @@ namespace Game.UI
         #region Helper
         private void InstantiateCharacterButton(PlayerCharacterData playerCharacterData)
         {
-            NamedObjectButton characterButton = Instantiate(m_CharacterButton, m_CharacterButtonParent);
-            characterButton.nameText.text = $"{playerCharacterData.m_BaseData.m_CharacterName} / {playerCharacterData.CurrClass.m_ClassName}";
-            characterButton.onSubmit.RemoveAllListeners();
-            characterButton.onSubmit.AddListener(() => OnSelectCharacterButton(characterButton, playerCharacterData));
+            PartySelectCharacterButton characterButton = Instantiate(m_CharacterButton, m_CharacterButtonParent);
+            
+            characterButton.SetCharacter(new PartySelectCharacterButtonUIData(playerCharacterData.m_BaseData.m_CharacterName, playerCharacterData.CurrClass.m_ClassName,
+                () => OnSelectCharacterButton(characterButton, playerCharacterData), () => DisplayPreview(playerCharacterData)));
         }
 
         private void ResetButtons()
@@ -194,6 +194,13 @@ namespace Game.UI
             }
 
             return selectedCharacterIds;
+        }
+        #endregion
+
+        #region Preview
+        private void DisplayPreview(PlayerCharacterData playerCharacterData)
+        {
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PreviewScreen, false, playerCharacterData);
         }
         #endregion
 
