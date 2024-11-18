@@ -200,7 +200,6 @@ namespace Game.UI
         #region Preview
         private void DisplayPreview(PlayerCharacterData playerCharacterData)
         {
-            Debug.Log("!!!!!!");
             UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PreviewScreen, false, playerCharacterData);
         }
         #endregion
