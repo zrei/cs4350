@@ -11,12 +11,28 @@ namespace Game.UI
         LOCKED,
         FILLED
     }
+
+    public struct PartySelectionSlotUIData
+    {
+        public PlayerCharacterData PlayerCharacterData;
+        public UnityAction InfoCallback;
+        public bool IsRequiredCharacter;
+
+        public PartySelectionSlotUIData(PlayerCharacterData playerCharacterData, UnityAction infoCallback, bool isRequiredCharacter)
+        {
+            PlayerCharacterData = playerCharacterData;
+            InfoCallback = infoCallback;
+            IsRequiredCharacter = isRequiredCharacter;
+        }
+    }
+
     public class PartySelectionSlotButton : MonoBehaviour
     {
         [SerializeField] Image m_Glow;
         [SerializeField] GraphicGroup m_GraphicGroup;
         [SerializeField] TextMeshProUGUI m_NameText;
         [SerializeField] NamedObjectButton m_RemoveButton;
+        [SerializeField] NamedObjectButton m_InfoButton;
 
         [SerializeField] Color m_ActiveColor;
         [SerializeField] Color m_DisabledColor;
@@ -54,12 +70,15 @@ namespace Game.UI
             UpdateDisplay(PartySelectSlotState.EMPTY);
         }
 
-        public void SetDisplay(PlayerCharacterData playerCharacterData, bool isRequired)
+        public void SetDisplay(PartySelectionSlotUIData partySelectionSlotUIData)
         {
-            m_RemoveButton.gameObject.SetActive(!isRequired);
-            m_NameText.text = $"{playerCharacterData.m_BaseData.m_CharacterName} / {playerCharacterData.CurrClass.m_ClassName}";
-            CharacterId = playerCharacterData.m_BaseData.m_Id;
+            m_RemoveButton.gameObject.SetActive(!partySelectionSlotUIData.IsRequiredCharacter);
+            m_NameText.text = $"{partySelectionSlotUIData.PlayerCharacterData.m_BaseData.m_CharacterName} / {partySelectionSlotUIData.PlayerCharacterData.CurrClass.m_ClassName}";
+            CharacterId = partySelectionSlotUIData.PlayerCharacterData.m_BaseData.m_Id;
             UpdateDisplay(PartySelectSlotState.FILLED);
+
+            m_InfoButton.onSubmit.RemoveAllListeners();
+            m_InfoButton.onSubmit.AddListener(partySelectionSlotUIData.InfoCallback);
         }
 
         private void SetGlow(bool isSelected)
@@ -72,6 +91,7 @@ namespace Game.UI
             m_SlotState = slotState;
             SetGlow(slotState == PartySelectSlotState.FILLED);
             m_GraphicGroup.CrossFadeColor(slotState == PartySelectSlotState.LOCKED ? m_DisabledColor : m_ActiveColor, 0f, true, true);
+            m_InfoButton.gameObject.SetActive(slotState == PartySelectSlotState.FILLED);
         }
     }
 }

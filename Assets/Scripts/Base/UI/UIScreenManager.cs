@@ -46,6 +46,7 @@ namespace Game.UI
         public IUIScreen LevelResultScreen => LoadScreen("LevelResultScreen");
         public IUIScreen PartySelectScreen => LoadScreen("PartySelectScreen");
         public IUIScreen InspectScreen => LoadScreen("InspectScreen");
+        public IUIScreen PreviewScreen => LoadScreen("PreviewScreen");
         public IUIScreen ExpScreen => LoadScreen("ExpScreen");
         public IUIScreen DemoEndScreen => LoadScreen("EndDemoScreen");
 
