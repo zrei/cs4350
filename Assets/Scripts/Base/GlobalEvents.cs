@@ -150,9 +150,9 @@ public static class GlobalEvents {
 
     public static class CutsceneEvents
     {
-        public delegate void CutsceneEvent(Cutscene _);
         public delegate void CutsceneTriggerEnumEvent(CutsceneTriggerEnum _);
-        public static CutsceneEvent StartCutsceneEvent;
+        public static VoidEvent StartCutsceneEvent;
+        public static VoidEvent EndCutsceneEvent;
         public static CutsceneTriggerEnumEvent CutsceneTriggerEvent;
     }
 }

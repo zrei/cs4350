@@ -4,6 +4,7 @@ using UnityEngine;
 
 public static class LayerConstants
 {
+    public static readonly int WorldMapLayer = LayerMask.NameToLayer("WorldMap");
     public static readonly int DefaultLayer = LayerMask.NameToLayer("Default");
     public static readonly int ObjectsLayer = LayerMask.NameToLayer("Objects");
 }

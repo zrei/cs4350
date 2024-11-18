@@ -4,7 +4,7 @@ using UnityEngine;
 [AddComponentMenu("CutsceneTriggerResponses/ChangeCutsceneTrigger")]
 public class ChangeCutsceneTrigger : CutsceneTriggerResponse
 {
-    [SerializeField] Cutscene m_Cutscene;
+    [SerializeField] GameObject m_Cutscene;
 
     private CutsceneSpawner m_CutsceneSpawner;
 

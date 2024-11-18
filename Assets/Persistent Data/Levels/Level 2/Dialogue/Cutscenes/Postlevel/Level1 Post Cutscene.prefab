@@ -82,10 +82,11 @@ MonoBehaviour:
   - {fileID: 7449042330196545328}
   - {fileID: 1865750764765784428}
   - {fileID: 3456405579868130900}
+  m_BonesParent: {fileID: 4952644492869980605}
   m_RootBone: {fileID: 4780279138491471298}
   m_RightArmBone: {fileID: 5796184451318808646}
   m_LeftArmBone: {fileID: 551646864025566502}
-  m_BonesParent: {fileID: 4952644492869980605}
+  m_BodyCenter: {fileID: 0}
 --- !u!1 &62660404661886140
 GameObject:
   m_ObjectHideFlags: 0
@@ -4367,10 +4368,11 @@ MonoBehaviour:
   - {fileID: 1613395545358547826}
   - {fileID: 5194511666822561293}
   - {fileID: 3248510526582333541}
+  m_BonesParent: {fileID: 809375448841852106}
   m_RootBone: {fileID: 3500988144680096439}
   m_RightArmBone: {fileID: 8538865453974240138}
   m_LeftArmBone: {fileID: 4261753987629236713}
-  m_BonesParent: {fileID: 809375448841852106}
+  m_BodyCenter: {fileID: 0}
 --- !u!1 &4229771245213839851
 GameObject:
   m_ObjectHideFlags: 0
@@ -4858,10 +4860,11 @@ MonoBehaviour:
   - {fileID: 3423587099811780636}
   - {fileID: 1574736872982403208}
   - {fileID: 7045932861416615218}
+  m_BonesParent: {fileID: 6398237240772882797}
   m_RootBone: {fileID: 7169070978927482633}
   m_RightArmBone: {fileID: 1640076795515635425}
   m_LeftArmBone: {fileID: 3841742402090397103}
-  m_BonesParent: {fileID: 6398237240772882797}
+  m_BodyCenter: {fileID: 0}
 --- !u!1 &4859006060503941697
 GameObject:
   m_ObjectHideFlags: 0
@@ -9594,9 +9597,10 @@ PrefabInstance:
     - target: {fileID: 3948126361562024510, guid: 71fa503eecea74a6aaa4d05297dbb847,
         type: 3}
       propertyPath: m_Name
-      value: CutsceneBase Variant
+      value: Level1 Post Cutscene
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3829317326647609748, guid: 71fa503eecea74a6aaa4d05297dbb847, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 918456621786701643, guid: 71fa503eecea74a6aaa4d05297dbb847,
