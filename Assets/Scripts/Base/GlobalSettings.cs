@@ -52,8 +52,10 @@ public class GlobalSettings : Singleton<GlobalSettings>
         DontDestroyOnLoad(gameObject);
     }
 
-    private void OnDestroy()
+    protected override void HandleDestroy()
     {
+        base.HandleDestroy();
+
         GlobalEvents.ClearEvents();
     }
 }

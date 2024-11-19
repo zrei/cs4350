@@ -48,8 +48,10 @@ namespace Game.UI
             GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
         }
 
-        private void OnDestroy()
+        protected override void HandleDestroy()
         {
+            base.HandleDestroy();
+
             GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
             GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;

@@ -23,9 +23,11 @@ public class LevelRationsManager : Singleton<LevelRationsManager>
         GlobalEvents.Rations.RationsSetEvent += SetRations;
         GlobalEvents.Rations.RationsChangeEvent += ChangeRations;
     }
-    
-    private void OnDestroy()
+
+    protected override void HandleDestroy()
     {
+        base.HandleDestroy();
+
         GlobalEvents.Rations.RationsSetEvent -= SetRations;
         GlobalEvents.Rations.RationsChangeEvent -= ChangeRations;
     }
