@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Game.UI;
 using UnityEngine;
 
 [System.Serializable]
@@ -147,7 +148,14 @@ public class SaveManager : Singleton<SaveManager>
     
     public void Save(VoidEvent postSaveEvent = null)
     {
-        m_SessionSave.Save(SAVE_DELAY, postSaveEvent);
+        UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.SaveScreen);
+        m_SessionSave.Save(SAVE_DELAY, PostSave);
+
+        void PostSave()
+        {
+            postSaveEvent?.Invoke();
+            UIScreenManager.Instance.CloseScreen();
+        }
     }
 
     public void ClearSave()
