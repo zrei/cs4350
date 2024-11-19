@@ -163,6 +163,9 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
         targetablePositions = new List<CoordPair>();
         targetablePositionsIgnoreOccupiedAndAdditionalConditions = new List<CoordPair>();
 
+        if (!enemyUnit.CanPerformSkill(m_ActiveSkill))
+            return false;
+
         if (m_ActiveSkill.m_ConsumedMana > enemyUnit.CurrentMana)
             return false;
 

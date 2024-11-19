@@ -49,6 +49,7 @@ public class EnemyUnit : Unit
     {
         m_OrderedConditions = new();
         m_OrderedActions = new();
+        List<ActiveSkillSO> activeSkills = new();
         foreach (EnemyAction enemyAction in enemyActionSetSO.m_EnemyActions)
         {
             EnemyActionWrapper enemyActionWrapper = enemyAction.EnemyActionWrapper;
@@ -57,9 +58,15 @@ public class EnemyUnit : Unit
                 m_OrderedConditions.Add((condition, enemyActionWrapper));
             }
             m_OrderedActions.Add(enemyActionWrapper);
+
+            if (enemyAction.m_EnemyAction is EnemyActiveSkillActionSO)
+            {
+                activeSkills.Add(((EnemyActiveSkillActionSO) enemyAction.m_EnemyAction).m_ActiveSkill);
+            }
         }
         m_OrderedConditions.Sort((x, y) => y.Item1.m_Priority.CompareTo(x.Item1.m_Priority));
         m_OrderedActions.Sort((x, y) => y.m_Priority.CompareTo(x.m_Priority));
+        m_SkillCooldownTracker.SetSkills(activeSkills);
     }
 
     // can cache action

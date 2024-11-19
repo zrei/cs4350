@@ -23,7 +23,7 @@ namespace Game.UI
         private ActionButton leftScrollButton;
 
         [SerializeField]
-        private List<ActionButton> skillButtons = new();
+        private List<SkillButton> skillButtons = new();
 
         [SerializeField]
         private ActionButton rightScrollButton;
@@ -63,7 +63,7 @@ namespace Game.UI
                 if (availableSkills.Count == 0)
                 {
                     currentSkillPageIndex = 0;
-                    skillButtons.ForEach(x => x.SetActive(false));
+                    skillButtons.ForEach(x => x.SetState(SkillButtonState.EMPTY));
                     return;
                 }
 
@@ -80,13 +80,26 @@ namespace Game.UI
                     if (startIndex + i < availableSkills.Count)
                     {
                         var skill = availableSkills[startIndex + i];
+                        button.SkillSprite = skill.m_Icon;
 
-                        button.SetActive(true);
-                        button.icon.sprite = skill.m_Icon;
+                        if (!currentUnit.HasEnoughManaForSkill(skill))
+                        {
+                            button.SetFill(0f);
+                            button.statusText?.SetValue(skill.m_ConsumedMana, "<sprite name=\"Mana\" tint>");
+                            button.SetState(SkillButtonState.LOCKED);
+                        }
+                        else
+                        {
+                            button.SetFill(currentUnit.GetSkillCooldownProportion(skill));
+                            int cooldown = currentUnit.GetSkillCooldown(skill);
+                            button.statusText?.SetValue("<sprite name=\"Turn\" tint>", cooldown);
+                            button.SetState(cooldown > 0 ? SkillButtonState.LOCKED : SkillButtonState.NORMAL);
+                        }
                     }
                     else
                     {
-                        button.SetActive(false);
+                        button.SetFill(1f);
+                        button.SetState(SkillButtonState.EMPTY);
                     }
                 }
             }

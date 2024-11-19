@@ -25,11 +25,5 @@ namespace Game.UI
         {
             glow.CrossFadeAlpha(active ? 1 : 0, 0.2f, false);
         }
-
-        public void SetActive(bool active)
-        {
-            interactable = active;
-            icon.color = active ? Color.red : Color.clear;
-        }
     }
 }

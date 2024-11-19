@@ -12,7 +12,7 @@ namespace Game.UI
         private CanvasGroup canvasGroup;
         
         [SerializeField]
-        private List<ActionButton> activeSkillButtons = new();
+        private List<SkillButton> activeSkillButtons = new();
         
         [SerializeField]
         private List<ActionButton> passiveSkillButtons = new();
@@ -88,8 +88,32 @@ namespace Game.UI
                 {
                     var skill = activeSkills[i];
 
-                    activeSkillButtons[i].gameObject.SetActive(true);
-                    activeSkillButtons[i].icon.sprite = skill.m_Icon;
+                    var button = activeSkillButtons[i];
+                    button.gameObject.SetActive(true);
+                    button.SkillSprite = skill.m_Icon;
+
+                    if (unit is Unit)
+                    {
+                        Unit castUnit = (Unit) unit;
+                        if (!castUnit.HasEnoughManaForSkill(skill))
+                        {
+                            button.SetFill(0f);
+                            button.statusText?.SetValue(skill.m_ConsumedMana, "<sprite name=\"Mana\" tint>");
+                            button.SetState(SkillButtonState.LOCKED);
+                        }
+                        else
+                        {
+                            button.SetFill(castUnit.GetSkillCooldownProportion(skill));
+                            int cooldown = castUnit.GetSkillCooldown(skill);
+                            button.statusText?.SetValue("<sprite name=\"Turn\" tint>", cooldown);
+                            button.SetState(cooldown > 0 ? SkillButtonState.LOCKED : SkillButtonState.NORMAL);
+                        }
+                    }
+                    else
+                    {
+                        button.SetFill(1f);
+                        button.SetState(SkillButtonState.NORMAL);
+                    }
                 }
                 else
                 {

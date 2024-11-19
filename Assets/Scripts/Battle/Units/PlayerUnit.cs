@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 public class PlayerUnit : Unit
 {
@@ -18,6 +17,7 @@ public class PlayerUnit : Unit
         permanentTokens.AddRange(additionalPermanentTokens);
         permanentTokens.AddRange(characterBattleData.GetInflictedTokens(currMoralityPercentage));
         base.Initialise(characterBattleData.m_CurrStats, characterBattleData.m_BaseData.m_Race, characterBattleData.m_ClassSO, characterBattleData.m_BaseData.m_CharacterSprite, characterBattleData.GetUnitModelData(), characterBattleData.m_CurrEquippedWeapon, permanentTokens);
+        m_SkillCooldownTracker.SetSkills(characterBattleData.m_ClassSO.m_ActiveSkills);
     }
     #endregion
 
