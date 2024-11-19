@@ -85,8 +85,10 @@ public class LevelManager : Singleton<LevelManager>
         GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
 
-    private void OnDestroy()
+    protected override void HandleDestroy()
     {
+        base.HandleDestroy();
+
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
         GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
     }
