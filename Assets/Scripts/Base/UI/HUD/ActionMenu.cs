@@ -84,7 +84,7 @@ namespace Game.UI
 
                         if (!currentUnit.HasEnoughManaForSkill(skill))
                         {
-                            button.SetFill(0f);
+                            button.SetFill(1f);
                             button.statusText?.SetValue(skill.m_ConsumedMana, "<sprite name=\"Mana\" tint>");
                             button.SetState(SkillButtonState.LOCKED);
                         }
@@ -92,13 +92,13 @@ namespace Game.UI
                         {
                             button.SetFill(currentUnit.GetSkillCooldownProportion(skill));
                             int cooldown = currentUnit.GetSkillCooldown(skill);
-                            button.statusText?.SetValue("<sprite name=\"Turn\" tint>", cooldown);
+                            button.statusText?.SetValue(cooldown, "<sprite name=\"Turn\" tint>");
                             button.SetState(cooldown > 0 ? SkillButtonState.LOCKED : SkillButtonState.NORMAL);
                         }
                     }
                     else
                     {
-                        button.SetFill(1f);
+                        button.SetFill(0f);
                         button.SetState(SkillButtonState.EMPTY);
                     }
                 }

@@ -51,4 +51,9 @@ public class GlobalSettings : Singleton<GlobalSettings>
         transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
     }
+
+    private void OnDestroy()
+    {
+        GlobalEvents.ClearEvents();
+    }
 }
