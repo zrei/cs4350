@@ -36,6 +36,17 @@ namespace Game.UI
                 if (m_VisibilityTags == value) return;
 
                 m_VisibilityTags = value;
+
+                if (m_VisibilityTags == VisibilityTags.None)
+                {
+                    foreach (var ui in m_ActiveUIs.ToList())
+                    {
+                        ui.Hide();
+                        m_ActiveUIs.Remove(ui);
+                    }
+                    return;
+                }
+
                 var newActiveUIs = m_ToggleableUIs.Where(x => x.VisibilityTags.HasFlag(m_VisibilityTags));
                 foreach (var ui in m_ActiveUIs.ToList())
                 {
@@ -51,7 +62,6 @@ namespace Game.UI
                 }
             }
         }
-        [SerializeProperty("VisibilityTags")]
         [SerializeField]
         private VisibilityTags m_VisibilityTags = VisibilityTags.None;
 
@@ -62,13 +72,22 @@ namespace Game.UI
         public void Add(IToggleableUI ui)
         {
             m_ToggleableUIs.Add(ui);
-            if (ui.VisibilityTags.HasFlag(m_VisibilityTags)) ui.Show();
-            else ui.Hide();
+
+            if (m_VisibilityTags != VisibilityTags.None && ui.VisibilityTags.HasFlag(m_VisibilityTags))
+            {
+                m_ActiveUIs.Add(ui);
+                ui.Show();
+            }
+            else
+            {
+                ui.Hide();
+            }
         }
 
         public void Remove(IToggleableUI ui)
         {
             m_ToggleableUIs.Remove(ui);
+            m_ActiveUIs.Remove(ui);
             ui.Hide();
         }
 
@@ -76,39 +95,27 @@ namespace Game.UI
         {
             base.HandleAwake();
 
-            GlobalEvents.Level.ReturnFromLevelEvent += OnWorldSceneLoaded;
+            GlobalEvents.WorldMap.OnBeginLoadLevelEvent += SetVisiblityNone;
 
-            GlobalEvents.Scene.LevelSceneLoadedEvent += OnLevelSceneLoaded;
-            GlobalEvents.Battle.ReturnFromBattleEvent += OnLevelSceneLoaded;
+            GlobalEvents.Level.ReturnFromLevelEvent += SetVisibilityWorld;
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
+            GlobalEvents.Scene.LevelSceneLoadedEvent += SetVisibilityLevel;
+            GlobalEvents.Battle.ReturnFromBattleEvent += SetVisibilityLevel;
+
+            GlobalEvents.Scene.BattleSceneLoadedEvent += SetVisibilityBattle;
             //GlobalEvents.Battle.PlayerUnitSetupStartEvent += OnBattleSetUpStart;
             //GlobalEvents.Battle.PlayerTurnStartEvent += OnBattlePlayerTurnStart;
             //GlobalEvents.Battle.EnemyTurnStartEvent += OnBattleEnemyTurnStart;
             //GlobalEvents.Battle.AttackAnimationEvent += OnBattleSkillAnimationEvent;
             //GlobalEvents.Battle.BattleEndEvent += OnBattleEndEvent;
 
-            OnWorldSceneLoaded();
+            SetVisibilityWorld();
         }
 
-        private void OnDestroy()
-        {
-            GlobalEvents.Level.ReturnFromLevelEvent -= OnWorldSceneLoaded;
-
-            GlobalEvents.Scene.LevelSceneLoadedEvent -= OnLevelSceneLoaded;
-            GlobalEvents.Battle.ReturnFromBattleEvent -= OnLevelSceneLoaded;
-
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
-            //GlobalEvents.Battle.PlayerUnitSetupStartEvent += OnBattleSetUpStart;
-            //GlobalEvents.Battle.PlayerTurnStartEvent += OnBattlePlayerTurnStart;
-            //GlobalEvents.Battle.EnemyTurnStartEvent += OnBattleEnemyTurnStart;
-            //GlobalEvents.Battle.AttackAnimationEvent += OnBattleSkillAnimationEvent;
-            //GlobalEvents.Battle.BattleEndEvent += OnBattleEndEvent;
-        }
-
-        private void OnWorldSceneLoaded() { VisibilityTags = VisibilityTags.World; }
-        private void OnLevelSceneLoaded() { VisibilityTags = VisibilityTags.Level; }
-        private void OnBattleSceneLoaded() { VisibilityTags = VisibilityTags.Battle; }
+        private void SetVisiblityNone() { VisibilityTags = VisibilityTags.None; }
+        private void SetVisibilityWorld() { VisibilityTags = VisibilityTags.World; }
+        private void SetVisibilityLevel() { VisibilityTags = VisibilityTags.Level; }
+        private void SetVisibilityBattle() { VisibilityTags = VisibilityTags.Battle; }
         //private void OnBattleSetUpStart() { VisibilityTags = VisibilityTags.BattleSetUp; }
         //private void OnBattlePlayerTurnStart() { VisibilityTags = VisibilityTags.BattlePlayerTurn; }
         //private void OnBattleEnemyTurnStart() { VisibilityTags = VisibilityTags.BattleEnemyTurn; }
