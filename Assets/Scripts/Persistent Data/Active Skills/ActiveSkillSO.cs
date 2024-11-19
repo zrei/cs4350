@@ -35,6 +35,8 @@ public class ActiveSkillSO : ScriptableObject
     public SkillType m_SkillType;
     [Tooltip("Amount of mana to consume to utilise this skill. Leave as 0 if this does not consume mana")]
     public float m_ConsumedMana = 0f;
+    [Tooltip("Number of turns that must pass before the skill can be used again - set at 0 for no cooldown")]
+    public int m_CooldownTurns = 0;
 
     [Header("Effects")]
     [Tooltip("Determines what the skill does upon being activated")]
@@ -168,6 +170,11 @@ public class ActiveSkillSO : ScriptableObject
         if (m_ConsumedMana > 0)
         {
             builder.AppendLine($"Mana Cost: {m_ConsumedMana:F1}");
+        }
+
+        if (m_CooldownTurns > 0)
+        {
+            builder.AppendLine($"Cooldown: {m_CooldownTurns} <sprite name=\"Turn\" tint>");
         }
 
         var skillTypesSet = new HashSet<SkillEffectType>(m_SkillTypes);

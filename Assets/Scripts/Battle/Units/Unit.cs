@@ -58,6 +58,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     protected StatusManager m_StatusManager = new StatusManager();
     public IStatusManager StatusManager => m_StatusManager;
+
+    protected SkillCooldownTracker m_SkillCooldownTracker = new();
     #endregion
 
     #region Static Data
@@ -270,6 +272,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void Tick()
     {
         m_StatusManager.Tick(this);
+        m_SkillCooldownTracker.Tick();
     }
     #endregion
 
@@ -539,6 +542,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
         GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
 
+        m_SkillCooldownTracker.UtiliseSkill(attackSO);
+
         AnimationEventHandler.onSkillHit += OnSkillHit;
 
         void OnSkillHit()
@@ -629,6 +634,21 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
             PostSkillEvent?.Invoke();
         }
+    }
+
+    public bool CanPerformSkill(ActiveSkillSO activeSkillSO)
+    {
+        return m_SkillCooldownTracker.CanUtiliseSkill(activeSkillSO);
+    }
+
+    public int GetSkillCooldown(ActiveSkillSO activeSkillSO)
+    {
+        return m_SkillCooldownTracker.GetCooldown(activeSkillSO);
+    }
+
+    public float GetSkillCooldownProportion(ActiveSkillSO activeSkillSO)
+    {
+        return m_SkillCooldownTracker.GetCooldownProportion(activeSkillSO);
     }
 
     public VoidEvent PostSkillEvent;

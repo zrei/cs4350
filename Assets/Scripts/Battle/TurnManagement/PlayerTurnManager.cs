@@ -272,10 +272,20 @@ public class PlayerTurnManager : TurnManager
         return false;
     }
 
+    private bool CheckCooldownRequirement(Unit unit, ActiveSkillSO skill)
+    {
+        if (unit == null || skill == null) return true;
+        if (unit.CanPerformSkill(skill)) return true;
+
+        ToastNotificationManager.Instance.Show($"Remaining cooldown: {unit.GetSkillCooldown(skill)}", Color.red);
+        return false;
+    }
+
     private bool TryPerformSkill()
     {
         if (selectedTileData == null || selectedTileVisual == null) return false;
         if (!CheckSkillManaRequirement(m_CurrUnit, selectedSkill)) return false;
+        if (!CheckCooldownRequirement(m_CurrUnit, selectedSkill)) return false;
 
         if (m_MapLogic.CanPerformSkill(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
         {
@@ -450,7 +460,9 @@ public class PlayerTurnManager : TurnManager
                 }
                 else
                 {
-                    CheckSkillManaRequirement(m_CurrUnit, selectedSkill);
+                    bool manaReq = CheckSkillManaRequirement(m_CurrUnit, selectedSkill);
+                    if (manaReq)
+                        CheckCooldownRequirement(m_CurrUnit, selectedSkill);
                 }
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
