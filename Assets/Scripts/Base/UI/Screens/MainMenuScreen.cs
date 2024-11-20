@@ -11,11 +11,18 @@ public class MainMenuScreen : MonoBehaviour
     [SerializeField] private float m_TextureAnimSpeed = 0.1f;
     [SerializeField] private NamedObjectButton m_NewGameButton;
     [SerializeField] private NamedObjectButton m_ContinueButton;
+    [SerializeField] private NamedObjectButton m_CreditsButton;
+    [SerializeField] private NamedObjectButton m_OptionsButton;
     [SerializeField] private NamedObjectButton m_QuitButton;
+
+    [Header("Screens")]
+    [SerializeField] private BaseUIScreen m_CreditsScreen;
+    [SerializeField] private BaseUIScreen m_OptionsScreen;
 
     private void Awake()
     {
         HandleDependencies();
+        m_CreditsScreen.Initialize();
     }
 
     private void Start()
@@ -23,6 +30,8 @@ public class MainMenuScreen : MonoBehaviour
         m_NewGameButton.onSubmit.AddListener(B_StartNewGame);
         m_ContinueButton.onSubmit.AddListener(B_Continue);
         m_QuitButton.onSubmit.AddListener(B_QuitGame);
+        m_CreditsButton.onSubmit.AddListener(B_Credits);
+        m_OptionsButton.onSubmit.AddListener(B_Options);
     }
 
     private void OnDestroy()
@@ -67,6 +76,16 @@ public class MainMenuScreen : MonoBehaviour
     {
         RemoveListeners();
         Application.Quit();
+    }
+
+    private void B_Credits()
+    {
+        m_CreditsScreen.Show();
+    }
+
+    private void B_Options()
+    {
+        m_OptionsScreen.Show();
     }
 
     private void Update()
