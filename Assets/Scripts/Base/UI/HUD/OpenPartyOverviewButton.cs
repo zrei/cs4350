@@ -30,18 +30,17 @@ public class OpenPartyOverviewButton : MonoBehaviour
 
     protected virtual void OpenPartyOverview()
     {
-        if (UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen)) return;
+        IUIScreen characterManagementScreen = UIScreenManager.Instance.CharacterManagementScreen;
+        if (UIScreenManager.Instance.IsScreenOpen(characterManagementScreen)) return;
 
         if (LevelManager.IsReady)
         {
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(LevelManager.Instance.CurrParty, true);
+            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, new CharacterManagementUIData(LevelManager.Instance.CurrParty, true));
         }
         else if (CharacterDataManager.IsReady)
         {
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false);
+            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, new CharacterManagementUIData(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false));
         }
-
-        UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen);
     }
 
     private void OnOpenPartyOverview(List<PlayerCharacterData> list, bool _)

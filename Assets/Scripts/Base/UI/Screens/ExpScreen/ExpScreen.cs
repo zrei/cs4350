@@ -10,15 +10,14 @@ namespace Game.UI
         [SerializeField] SelectableBase m_ReturnButton;
         [SerializeField] RectTransform m_ExpDisplayParent;
 
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.Level.ExpGainEvent += OnExpGain;
-        }
+            if (args.Length == 0)
+                return;
 
-        private void OnDestroy()
-        {
-            GlobalEvents.Level.ExpGainEvent -= OnExpGain;
+            ShowExpGain((List<ExpGainSummary>) args[0]);
+
+            base.Show();
         }
 
         protected override void ShowDone()
@@ -26,7 +25,7 @@ namespace Game.UI
             base.ShowDone();
         }
 
-        private void OnExpGain(List<ExpGainSummary> expSummaries)
+        private void ShowExpGain(List<ExpGainSummary> expSummaries)
         {
             m_ReturnButton.interactable = false;
             ClearChildren();
@@ -65,7 +64,6 @@ namespace Game.UI
         private void CloseExpScreen()
         {
             UIScreenManager.Instance.CloseScreen();
-            GlobalEvents.Level.CompleteExpGainEvent?.Invoke();
             m_ReturnButton.onSubmit.RemoveListener(CloseExpScreen);
         }
         

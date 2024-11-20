@@ -28,6 +28,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
 
+    [Header("Tutorial")]
+    [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+
     //[Header("FadingFog")]
     //[SerializeField] private float m_FadeDuration = 1.0f;
 
@@ -36,8 +39,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private int m_CurrUnlockedLevel;
     private int m_CurrSelectedLevel;
-
-    private IUIScreen m_DemoEndScreen;
 
     private const float TOKEN_MOVE_DELAY = 0.3f;
 
@@ -94,8 +95,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         m_CurrSelectedLevel = GetFinalUnlockedLevel();
 
-        m_DemoEndScreen = UIScreenManager.Instance.DemoEndScreen;
-
         // check which level to initialise up to - if the post cutscene of the previous level
         // has not been registered as seen, we only want to initialise up to the previous level
         int levelToInitialiseUpTo = m_CurrSelectedLevel;
@@ -142,7 +141,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         // initialise the camera
         m_CameraController.Initialise(m_PlayerTokenInstance.transform);
-        
+ 
         if (playPostCutsceneOfPrevLevel)
         {
             CutsceneSequence(levelToInitialiseUpTo);
@@ -153,7 +152,31 @@ public class WorldMapManager : Singleton<WorldMapManager>
         }
         else
         {
-            SelectLevel(m_CurrSelectedLevel);
+            ShowTutorial(() => SelectLevel(m_CurrSelectedLevel));
+        }
+    }
+    #endregion
+
+    #region Tutorial
+    private void ShowTutorial(VoidEvent postTutorialShown)
+    {
+        if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_WORLD_MAP))
+        {
+            FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_WORLD_MAP, true, FlagType.PERSISTENT);
+            IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
+            tutorialScreen.OnHideDone += PostTutorial;
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_Tutorial);
+        }
+        else
+        {
+            PostTutorial(null);
+        }
+
+        void PostTutorial(IUIScreen tutorialScreen)
+        {
+            if (tutorialScreen != null)
+                tutorialScreen.OnHideDone -= PostTutorial;
+            postTutorialShown?.Invoke();
         }
     }
     #endregion
@@ -268,6 +291,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
         {
             // saving always occurs after pre-cutscene is played
             FlagManager.Instance.SetFlagValue(node.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
+            ShowTutorial(PostTutorial);
+        }
+
+        void PostTutorial()
+        {
             GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
             SaveManager.Instance.Save(() => SelectLevel(levelNum));
         }
@@ -279,13 +307,10 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostCutscene()
         {
-            Debug.Log(levelNum + 1);
-            Debug.Log(GlobalSettings.IsDemo);
-            Debug.Log(GlobalSettings.FinalDemoLevel);
             if (levelNum + 1 >= m_WorldMapRegions.Count || (GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel))
             {
                 GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
-                SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(m_DemoEndScreen));
+                SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.DemoEndScreen));
             }
             else
             {
@@ -447,8 +472,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         if (!UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false);
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen);
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen, false, new CharacterManagementUIData(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false));
         }
         else if (UIScreenManager.Instance.IsScreenActive(UIScreenManager.Instance.CharacterManagementScreen))
         {

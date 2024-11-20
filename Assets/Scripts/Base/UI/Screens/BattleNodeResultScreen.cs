@@ -4,6 +4,20 @@ using UnityEngine;
 
 namespace Game.UI
 {
+    public struct BattleNodeResultUIData
+    {
+        public BattleSO BattleSO;
+        public UnitAllegiance Victor;
+        public int NumTurns;
+
+        public BattleNodeResultUIData(BattleSO battleSO, UnitAllegiance victor, int numTurns)
+        {
+            BattleSO = battleSO;
+            Victor = victor;
+            NumTurns = numTurns;
+        }
+    }
+
     public class BattleNodeResultScreen : BaseUIScreen
     {
         [SerializeField] TextMeshProUGUI m_TitleText;
@@ -12,22 +26,21 @@ namespace Game.UI
         [SerializeField] SelectableBase m_ReturnButton;
         [SerializeField] GraphicGroup m_GraphicGroup;
 
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
+            if (args.Length == 0)
+                return;
+
+            ShowBattleNodeEnd((BattleNodeResultUIData) args[0]);
+
+            base.Show();
         }
 
-        private void OnDestroy()
+        private void ShowBattleNodeEnd(BattleNodeResultUIData battleNodeResultUIData)
         {
-            GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
-        }
-
-        private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
-        {
-            if (victor == UnitAllegiance.PLAYER)
+            if (battleNodeResultUIData.Victor == UnitAllegiance.PLAYER)
             {
-                var expReward = battleNode.BattleSO.m_ExpReward;
+                var expReward = battleNodeResultUIData.BattleSO.m_ExpReward;
                 
                 m_TitleText.text = "Victory!";
                 //m_TimeTakenText.text = $"Time taken: {numTurns}";
@@ -48,7 +61,6 @@ namespace Game.UI
         private void CloseResults()
         {
             UIScreenManager.Instance.CloseScreen();
-            GlobalEvents.Level.CloseRewardScreenEvent?.Invoke();
             m_ReturnButton.onSubmit.RemoveListener(CloseResults);
         }
         
