@@ -32,7 +32,6 @@ namespace Game.UI
         private void Awake()
         {
             GlobalEvents.WorldMap.OnGoToLevel += OnGoToLevel;
-            ToggleShown(false);
         }
 
         private void OnDestroy()
@@ -49,13 +48,6 @@ namespace Game.UI
         #endregion
 
         #region Display
-        private void ToggleShown(bool show)
-        {
-            m_CanvasGroup.alpha = show ? 1f : 0f;
-            m_CanvasGroup.interactable = show;
-            m_CanvasGroup.blocksRaycasts = show;
-        }
-
         private void OnGoToLevel(LevelData levelData)
         {
             m_LevelTitleText.text = string.Format(LEVEL_TITLE_FORMAT, levelData.m_LevelSO.m_LevelNum, levelData.m_LevelSO.m_LevelName);
@@ -76,8 +68,6 @@ namespace Game.UI
                 m_StartLevelButton.interactable = true;
                 m_StartLevelButton.onSubmit.AddListener(() => OpenPartySelect(m_CurrentLevelSO));
             }
-
-            ToggleShown(true);
         }
         #endregion
     }

@@ -199,12 +199,16 @@ public static class GlobalEvents
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
         public static VoidEvent OnEndPreCutsceneEvent;
+        public static VoidEvent OnBeginLevelAnimationEvent;
+        public static VoidEvent OnEndLevelAnimationEvent;
 
         public static void ClearEvents()
         {
             OnGoToLevel = null;
             OnBeginLoadLevelEvent = null;
             OnEndPreCutsceneEvent = null;
+            OnBeginLevelAnimationEvent = null;
+            OnEndLevelAnimationEvent = null;
         }
     }
 

@@ -326,6 +326,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     /// <param name="additionalCallback"></param>
     private void UnlockLevelAnimation(int levelNum)
     {
+        GlobalEvents.WorldMap.OnBeginLevelAnimationEvent?.Invoke();
+
         WorldMapNode currLevel = GetWorldMapNode(levelNum);
         WorldMapNode nextLevel = GetWorldMapNode(levelNum + 1);
         FogFader nextRegionFog = GetWorldMapFog(levelNum + 1);
@@ -350,6 +352,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostMovement()
         {
+            GlobalEvents.WorldMap.OnEndLevelAnimationEvent?.Invoke();
             PreLevelCutscene(levelNum + 1);
         }
     }
