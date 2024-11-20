@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.UI;
 using UnityEngine;
 
 [CreateAssetMenu(fileName="LevelSO", menuName="ScriptableObject/Level/LevelSO")]
@@ -28,6 +29,12 @@ public class LevelSO : ScriptableObject
     [Header("Rewards")]
     public List<PlayerCharacterSO> m_RewardCharacters;
     public List<WeaponInstanceSO> m_RewardWeapons;
+
+    /*
+    [Header("Tutorial")]
+    [Tooltip("Tutorial that will play at the start of the level - leave empty for no tutorial")]
+    public List<TutorialPageUIData> m_Tutorial;
+    */
     
     public string PreDialogueFlag => "PRE_DIALOGUE_" + m_LevelId;
     public string PostDialogueFlag => "POST_DIALOGUE_" + m_LevelId;

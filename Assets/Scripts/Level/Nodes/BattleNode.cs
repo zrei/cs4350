@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,10 +27,9 @@ public class BattleNode : NodeInternal
             Objectives = m_BattleSO.m_Objectives
         };
     }
-    
-    public override void StartNodeEvent()
+
+    protected override void PerformNode(VoidEvent postEvent = null)
     {
-        Debug.Log("Starting Battle Node");
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         GlobalEvents.Battle.ReturnFromBattleEvent += OnReturnFromBattle;
         GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
@@ -56,6 +54,20 @@ public class BattleNode : NodeInternal
     private void OnReturnFromBattle()
     {
         GlobalEvents.Battle.ReturnFromBattleEvent -= OnReturnFromBattle;
+
         GlobalEvents.Level.BattleNodeEndEvent?.Invoke(this, m_Victor, m_NumTurns);
+    }
+
+    public void PostTutorial(VoidEvent postEvent)
+    {
+        if (!m_HasPlayedPostTutorial)
+        {
+            m_HasPlayedPostTutorial = true;
+            PlayTutorial(m_PostTutorial, postEvent);
+        }
+        else
+        {
+            postEvent?.Invoke();
+        }
     }
 }

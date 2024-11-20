@@ -4,9 +4,9 @@ using UnityEngine;
 public class StartNode : NodeInternal
 {
     [SerializeField] private Dialogue m_DefaultDialogue;
-    [SerializeField] private ConditionalDialogue[] m_ConditionalDialogues;
-    
-    public void StartNodeEvent(VoidEvent onEventFinished)
+    [SerializeField] private ConditionalDialogue[] m_ConditionalDialogues;  
+
+    protected override void PerformNode(VoidEvent postEvent = null)
     {
         foreach (var conditionalDialogue in m_ConditionalDialogues)
         {
@@ -25,16 +25,29 @@ public class StartNode : NodeInternal
             return;
         }
         
-        onEventFinished?.Invoke();
+        PostTutorial();
         return;
 
         void onDialogueEnd()
         {
             GlobalEvents.Dialogue.DialogueEndEvent -= onDialogueEnd;
-            onEventFinished?.Invoke();
+            PostTutorial();
+        }
+
+        void PostTutorial()
+        {
+            if (!m_HasPlayedPostTutorial)
+            {
+                m_HasPlayedPostTutorial = true;
+                PlayTutorial(m_PostTutorial, postEvent);
+            }
+            else
+            {
+                postEvent?.Invoke();
+            }
         }
     }
-    
+
     public override void Initialise()
     {
         // Cleared by default

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 namespace Game.UI
 {
@@ -44,6 +45,9 @@ namespace Game.UI
         
         [SerializeField]
         private NamedObjectButton m_PartyMemberButtonPrefab;
+
+        [Header("Tutorial")]
+        [SerializeField] private List<TutorialPageUIData> m_Tutorial;
         
         private List<NamedObjectButton> m_PartyMemberButtons = new();
         
@@ -89,6 +93,23 @@ namespace Game.UI
             ShowPartyOverview((CharacterManagementUIData) args[0]);
 
             base.Show();
+        }
+
+        protected override void ShowDone()
+        {
+            base.ShowDone();
+
+            if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_CHARACTER_MANAGEMENT))
+            {                
+                StartCoroutine(ShowTutorial());
+            }
+        }
+
+        private IEnumerator ShowTutorial()
+        {
+            yield return null;
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_CHARACTER_MANAGEMENT, true, FlagType.PERSISTENT);
         }
 
         protected override void HideDone()

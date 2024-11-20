@@ -61,6 +61,9 @@ public class LevelManager : Singleton<LevelManager>
     
     private NodeInternal m_CurrTargetNode;
     private bool m_HasHitNode;
+
+    // for tutorial purposes
+    private BattleNode m_CurrBattleNode = null;
     
     #endregion
 
@@ -393,6 +396,7 @@ public class LevelManager : Singleton<LevelManager>
 
     private void OnBattleNodeStart(BattleNode battleNode)
     {
+        m_CurrBattleNode = battleNode;
         Debug.Log("LevelManager: Starting Battle Node");
         
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
@@ -480,7 +484,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         screen.OnHideDone -= OnCloseLevellingScreen;
 
-        StartPlayerPhase();
+        m_CurrBattleNode?.PostTutorial(StartPlayerPhase);
     }
     
     private void OnDialogueNodeEnd(DialogueNode dialogueNode)
