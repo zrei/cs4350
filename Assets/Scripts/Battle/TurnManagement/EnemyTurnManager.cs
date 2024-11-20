@@ -7,7 +7,7 @@ public class EnemyTurnManager : TurnManager
         m_CurrUnit = enemyUnit;
         Logger.Log(this.GetType().Name, "Start enemy turn with " + m_CurrUnit.name, LogLevel.LOG);
 
-        m_CurrUnit.Tick();
+        m_CurrUnit.PreTick();
 
         if (m_CurrUnit.IsDead)
         {
@@ -30,6 +30,7 @@ public class EnemyTurnManager : TurnManager
 
     private void CompleteTurn()
     {
+        m_CurrUnit.PostTick();
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
     }
 }

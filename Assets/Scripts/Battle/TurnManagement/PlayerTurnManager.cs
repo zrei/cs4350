@@ -93,7 +93,7 @@ public class PlayerTurnManager : TurnManager
         GlobalEvents.Battle.PlayerTurnStartEvent?.Invoke();
 
         m_CurrUnit = playerUnit;
-        m_CurrUnit.Tick();
+        m_CurrUnit.PreTick();
 
         GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
 
@@ -479,6 +479,8 @@ public class PlayerTurnManager : TurnManager
     public void EndTurn()
     {
         m_IsTurnInProgress = false;
+
+        m_CurrUnit.PostTick();
 
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
 
