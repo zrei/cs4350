@@ -1,4 +1,3 @@
-using Game.Input;
 using TMPro;
 using UnityEngine;
 
@@ -33,59 +32,22 @@ namespace Game.UI
         private void Awake()
         {
             GlobalEvents.WorldMap.OnGoToLevel += OnGoToLevel;
-            GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-            ToggleShown(false);
         }
 
         private void OnDestroy()
         {
             GlobalEvents.WorldMap.OnGoToLevel -= OnGoToLevel;
-            if (InputManager.IsReady)
-            {
-                InputManager.Instance.CancelInput.OnPressEvent -= OnPartySelectCancel;
-            }
         }
         #endregion
         
         #region Transition
         private void OpenPartySelect(LevelSO levelSO)
         {
-            CloseScreen();
-            // TODO: this is a bit messy will refactor once this is made? part of the ui system?
-            InputManager.Instance.CancelInput.OnPressEvent += OnPartySelectCancel;
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PartySelectScreen);
-            GlobalEvents.WorldMap.OnPartySelectEvent?.Invoke(levelSO);
-        }
-
-        private void OnBeginLoadLevel()
-        {
-            InputManager.Instance.CancelInput.OnPressEvent -= OnPartySelectCancel;
-        }
-        #endregion
-
-        #region Helper
-
-        private void OnPartySelectCancel(IInput input)
-        {
-            ToggleShown(true);
-            m_StartLevelButton.onSubmit.AddListener(() => OpenPartySelect(m_CurrentLevelSO));
-        }
-
-        private void CloseScreen()
-        {
-            ToggleShown(false);
-            m_StartLevelButton.onSubmit.RemoveAllListeners();
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PartySelectScreen, false, levelSO);
         }
         #endregion
 
         #region Display
-        private void ToggleShown(bool show)
-        {
-            m_CanvasGroup.alpha = show ? 1f : 0f;
-            m_CanvasGroup.interactable = show;
-            m_CanvasGroup.blocksRaycasts = show;
-        }
-
         private void OnGoToLevel(LevelData levelData)
         {
             m_LevelTitleText.text = string.Format(LEVEL_TITLE_FORMAT, levelData.m_LevelSO.m_LevelNum, levelData.m_LevelSO.m_LevelName);
@@ -106,8 +68,6 @@ namespace Game.UI
                 m_StartLevelButton.interactable = true;
                 m_StartLevelButton.onSubmit.AddListener(() => OpenPartySelect(m_CurrentLevelSO));
             }
-
-            ToggleShown(true);
         }
         #endregion
     }

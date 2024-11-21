@@ -96,6 +96,8 @@ namespace Game.UI
             base.HandleAwake();
 
             GlobalEvents.WorldMap.OnBeginLoadLevelEvent += SetVisiblityNone;
+            GlobalEvents.WorldMap.OnBeginLevelAnimationEvent += SetVisiblityNone;
+            GlobalEvents.WorldMap.OnEndLevelAnimationEvent += SetVisibilityWorld;
 
             GlobalEvents.Level.ReturnFromLevelEvent += SetVisibilityWorld;
 

@@ -79,8 +79,6 @@ public static class GlobalEvents
         public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor, int numTurns);
         public delegate void RewardNodeEvent(RewardNode _);
         public delegate void DialogueNodeEvent(DialogueNode _);
-        public delegate void ExpSummaryEvent(List<ExpGainSummary> _);
-        public delegate void MassLevelUpEvent(List<LevelUpSummary> _);
         public delegate void LevelResultEvent(LevelSO levelSo, LevelResultType _);
         public static NodeEvent NodeEnteredEvent;
         public static NodeEvent NodeClearedEvent;
@@ -91,12 +89,7 @@ public static class GlobalEvents
         public static BattleNodeEvent BattleNodeStartEvent;
         public static BattleNodeResultEvent BattleNodeEndEvent;
         public static RewardNodeEvent RewardNodeStartEvent;
-        public static VoidEvent CloseRewardScreenEvent;
         public static DialogueNodeEvent DialogueNodeEndEvent;
-        public static ExpSummaryEvent ExpGainEvent;
-        public static VoidEvent CompleteExpGainEvent;
-        public static MassLevelUpEvent MassLevellingEvent;
-        public static VoidEvent CloseLevellingScreenEvent;
         /// <summary>
         /// This event is called the moment the level ends
         /// </summary>
@@ -122,12 +115,7 @@ public static class GlobalEvents
             BattleNodeStartEvent = null;
             BattleNodeEndEvent = null;
             RewardNodeStartEvent = null;
-            CloseRewardScreenEvent = null;
             DialogueNodeEndEvent = null;
-            ExpGainEvent = null;
-            CompleteExpGainEvent = null;
-            MassLevellingEvent = null;
-            CloseLevellingScreenEvent = null;
             LevelEndEvent = null;
             LevelResultsEvent = null;
             ReturnFromLevelEvent = null;
@@ -145,6 +133,7 @@ public static class GlobalEvents
         public static VoidEvent WorldMapSceneLoadedEvent;
         public static VoidEvent MainMenuSceneLoadedEvent;
         public static VoidEvent EarlyQuitEvent;
+        public static VoidEvent SaveAndQuitEvent;
 
         public static void ClearEvents()
         {
@@ -153,6 +142,7 @@ public static class GlobalEvents
             WorldMapSceneLoadedEvent = null;
             MainMenuSceneLoadedEvent = null;
             EarlyQuitEvent = null;
+            SaveAndQuitEvent = null;
         }
     }
 
@@ -206,20 +196,19 @@ public static class GlobalEvents
     public static class WorldMap 
     {
         public delegate void LevelEvent(LevelData levelData);
-        public delegate void LevelSOEvent(LevelSO levelSO);
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
-        public static LevelSOEvent OnPartySelectEvent;
         public static VoidEvent OnEndPreCutsceneEvent;
-        public static VoidEvent OpenPartyManagementEvent;
+        public static VoidEvent OnBeginLevelAnimationEvent;
+        public static VoidEvent OnEndLevelAnimationEvent;
 
         public static void ClearEvents()
         {
             OnGoToLevel = null;
             OnBeginLoadLevelEvent = null;
-            OnPartySelectEvent = null;
             OnEndPreCutsceneEvent = null;
-            OpenPartyManagementEvent = null;
+            OnBeginLevelAnimationEvent = null;
+            OnEndLevelAnimationEvent = null;
         }
     }
 

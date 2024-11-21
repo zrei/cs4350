@@ -1,8 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 namespace Game.UI
 {
+    public struct CharacterManagementUIData
+    {
+        public List<PlayerCharacterData> PartyMembers;
+        public bool InLevel;
+
+        public CharacterManagementUIData(List<PlayerCharacterData> partyMemebers, bool inLevel)
+        {
+            PartyMembers = partyMemebers;
+            InLevel = inLevel;
+        }
+    }
+
     public class CharacterManagementScreen : BaseUIScreen
     {
         private enum Tab 
@@ -32,6 +45,9 @@ namespace Game.UI
         
         [SerializeField]
         private NamedObjectButton m_PartyMemberButtonPrefab;
+
+        [Header("Tutorial")]
+        [SerializeField] private List<TutorialPageUIData> m_Tutorial;
         
         private List<NamedObjectButton> m_PartyMemberButtons = new();
         
@@ -69,15 +85,31 @@ namespace Game.UI
             m_WeaponsOverviewButton.onSubmit.AddListener(() => TabSwitch(m_CurrTab != Tab.WEAPON ? Tab.WEAPON : Tab.OVERVIEW));
         }
 
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.UI.OpenPartyOverviewEvent += OnOpenPartyOverview;
+            if (args.Length == 0)
+                return;
+
+            ShowPartyOverview((CharacterManagementUIData) args[0]);
+
+            base.Show();
         }
-        
-        private void OnDestroy()
+
+        protected override void ShowDone()
         {
-            GlobalEvents.UI.OpenPartyOverviewEvent -= OnOpenPartyOverview;
+            base.ShowDone();
+
+            if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_CHARACTER_MANAGEMENT))
+            {                
+                StartCoroutine(ShowTutorial());
+            }
+        }
+
+        private IEnumerator ShowTutorial()
+        {
+            yield return null;
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_CHARACTER_MANAGEMENT, true, FlagType.PERSISTENT);
         }
 
         protected override void HideDone()
@@ -92,9 +124,9 @@ namespace Game.UI
             }
         }
 
-        private void OnOpenPartyOverview(List<PlayerCharacterData> partyMembers, bool inLevel)
+        private void ShowPartyOverview(CharacterManagementUIData characterManagementUIData)
         {
-            m_IsInLevel = inLevel;
+            m_IsInLevel = characterManagementUIData.InLevel;
 
             // Clear existing party members
             foreach (var button in m_PartyMemberButtons)
@@ -103,13 +135,13 @@ namespace Game.UI
             }
             m_PartyMemberButtons.Clear();
             
-            if (partyMembers.Count == 0)
+            if (characterManagementUIData.PartyMembers.Count == 0)
             {
                 m_CharacterOverviewDisplay.gameObject.SetActive(false);
                 return;
             }
             
-            foreach (var playerUnit in partyMembers)
+            foreach (var playerUnit in characterManagementUIData.PartyMembers)
             {
                 var partyMemberButton = Instantiate(m_PartyMemberButtonPrefab, m_PartyMemberButtonContainer);
                 partyMemberButton.SetObjectName(playerUnit.m_BaseData.m_CharacterName);
@@ -118,7 +150,7 @@ namespace Game.UI
                 continue;
             }
 
-            CoroutineManager.Instance.ExecuteAfterFrames(() => B_DisplayPartyMemnber(m_PartyMemberButtons[0], partyMembers[0]), 1);
+            CoroutineManager.Instance.ExecuteAfterFrames(() => B_DisplayPartyMemnber(m_PartyMemberButtons[0], characterManagementUIData.PartyMembers[0]), 1);
             
             // Temporary way to pass party members
             //m_CharacterOverviewDisplay.SetPartyMembers(partyMembers);

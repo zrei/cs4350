@@ -45,6 +45,7 @@ namespace Game.UI
             UIScreenManager.Instance.CloseScreen();
             if (GameSceneManager.Instance.CurrScene == SceneEnum.WORLD_MAP)
             {
+                GlobalEvents.Scene.SaveAndQuitEvent?.Invoke();
                 SaveManager.Instance.Save(GameSceneManager.Instance.LoadMainMenuScene);
             }
             else

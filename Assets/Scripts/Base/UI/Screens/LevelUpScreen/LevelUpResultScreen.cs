@@ -13,19 +13,16 @@ namespace Game.UI
         
         // Temporary List of level up summaries
         private List<LevelUpSummary> m_LevelUpSummaries;
-
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.Level.MassLevellingEvent += OnMassLevelling;
+            if (args.Length == 0)
+                return;
+
+            ShowMassLevelling((List<LevelUpSummary>) args[0]);
+            base.Show();
         }
 
-        private void OnDestroy()
-        {
-            GlobalEvents.Level.MassLevellingEvent -= OnMassLevelling;
-        }
-
-        private void OnMassLevelling(List<LevelUpSummary> levelUpSummaries)
+        private void ShowMassLevelling(List<LevelUpSummary> levelUpSummaries)
         {
             m_LevelUpSummaries = levelUpSummaries;
         
@@ -64,7 +61,6 @@ namespace Game.UI
             }
         
             UIScreenManager.Instance.CloseScreen();
-            GlobalEvents.Level.CloseLevellingScreenEvent?.Invoke();
             m_ReturnButton.onSubmit.RemoveListener(CloseResults);
         }
         

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -14,6 +15,9 @@ namespace Game.UI
         [SerializeField] private PartySelectCharacterButton m_CharacterButton;
         [SerializeField] Transform m_CharacterButtonParent;
 
+        [Header("Tutorial")]
+        [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+
         [Space]
         [SerializeField] TextMeshProUGUI m_PartyText;
         [SerializeField] NamedObjectButton m_BeginLevelButton;
@@ -26,11 +30,13 @@ namespace Game.UI
         private const string PARTY_TEXT_MAX_FORMAT = "Party <color=red>({0}/{1})</color>";
 
         #region Initialise
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.WorldMap.OnPartySelectEvent += OnPartySelect;
-            
+            if (args.Length == 0)
+                return;
+
+            ShowPartySelect((LevelSO) args[0]);
+            base.Show();
         }
 
         protected override void ShowDone()
@@ -38,6 +44,18 @@ namespace Game.UI
             base.ShowDone();
 
             m_BeginLevelButton.onSubmit.AddListener(OnBeginLevel);
+
+            if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_PARTY_SELECT))
+            {                
+                StartCoroutine(ShowTutorial());
+            }
+        }
+
+        private IEnumerator ShowTutorial()
+        {
+            yield return null;
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_PARTY_SELECT, true, FlagType.PERSISTENT);
         }
 
         public override void Hide()
@@ -45,11 +63,6 @@ namespace Game.UI
             base.Hide();
 
             m_BeginLevelButton.onSubmit.RemoveListener(OnBeginLevel);
-        }
-
-        private void OnDestroy()
-        {
-            GlobalEvents.WorldMap.OnPartySelectEvent -= OnPartySelect;
         }
         #endregion
 
@@ -67,7 +80,7 @@ namespace Game.UI
         #endregion
 
         #region Display
-        private void OnPartySelect(LevelSO levelSO)
+        private void ShowPartySelect(LevelSO levelSO)
         {
             ResetButtons();
             m_PartyLimit = levelSO.m_UnitLimit;

@@ -10,7 +10,10 @@ public enum Flag
 {
     WIN_LEVEL_FLAG,
     LOSE_LEVEL_FLAG,
-    QUIT_LEVEL_FLAG
+    QUIT_LEVEL_FLAG,
+    HAS_VISITED_WORLD_MAP,
+    HAS_VISITED_PARTY_SELECT,
+    HAS_VISITED_CHARACTER_MANAGEMENT
 }
 
 public enum FlagType
@@ -48,6 +51,8 @@ public class FlagManager : Singleton<FlagManager>
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
         GlobalEvents.WorldMap.OnEndPreCutsceneEvent += OnEndPreCutscene;
+        GlobalEvents.Scene.SaveAndQuitEvent += OnEndPreCutscene;
+        GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnEndPreCutscene;
     }
 
     protected override void HandleDestroy()
@@ -57,6 +62,8 @@ public class FlagManager : Singleton<FlagManager>
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
         GlobalEvents.WorldMap.OnEndPreCutsceneEvent -= OnEndPreCutscene;
+        GlobalEvents.Scene.SaveAndQuitEvent -= OnEndPreCutscene;
+        GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnEndPreCutscene;
     }
 
     private void HandleDependencies()

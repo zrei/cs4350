@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Game.UI;
 using UnityEngine;
 
 // General Node Information applicable for all types of Nodes
@@ -35,6 +36,14 @@ public abstract class NodeInternal : MonoBehaviour
     
     [SerializeField] private Threshold m_MoralityThreshold;
     public Threshold MoralityThreshold => m_MoralityThreshold;
+
+    [Tooltip("Tutorial to play upon first visiting the node - leave empty for no tutorial")]
+    [SerializeField] private List<TutorialPageUIData> m_PreTutorial;
+    [Tooltip("Tutorial to play upon finishing the node for the first time - leave empty for no tutorial")]
+    [SerializeField] protected List<TutorialPageUIData> m_PostTutorial;
+
+    protected bool m_HasPlayedPreTutorial = false;
+    protected bool m_HasPlayedPostTutorial = false;
     
     // Adjacent nodes and their costs
     private Dictionary<NodeInternal, float> m_AdjacentNodes = new();
@@ -49,7 +58,6 @@ public abstract class NodeInternal : MonoBehaviour
             MoralityThreshold = m_MoralityThreshold
         };
     }
-    
     #endregion
 
     #region Node State Information
@@ -117,9 +125,18 @@ public abstract class NodeInternal : MonoBehaviour
         GlobalEvents.Level.NodeEnteredEvent(this);
     }
 
-    public virtual void StartNodeEvent()
+    public void StartNodeEvent(VoidEvent postEvent = null)
     {
         Debug.Log("Starting Node: " + m_NodeInfo.m_NodeName);
+        if (!m_HasPlayedPreTutorial)
+        {
+            m_HasPlayedPreTutorial = true;
+            PlayTutorial(m_PreTutorial, () => PerformNode(postEvent));
+        }
+        else
+        {
+            PerformNode(postEvent);
+        }
     }
     
     public virtual void ClearNode()
@@ -136,6 +153,30 @@ public abstract class NodeInternal : MonoBehaviour
         GlobalEvents.Level.NodeExitedEvent(this);
     }
 
+    protected abstract void PerformNode(VoidEvent postEvent = null);
+
     #endregion
-    
+
+    #region Tutorial
+    protected void PlayTutorial(List<TutorialPageUIData> tutorial, VoidEvent postEvent)
+    {
+        if (tutorial.Count == 0)
+        {
+            postEvent?.Invoke();
+        } 
+        else
+        {
+            IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
+            tutorialScreen.OnHideDone += PostTutorial;
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, tutorial);
+        }
+
+        void PostTutorial(IUIScreen screen)
+        {
+            screen.OnHideDone -= PostTutorial;
+            postEvent?.Invoke();
+        }
+        
+    }
+    #endregion
 }

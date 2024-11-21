@@ -1,3 +1,4 @@
+using Game.UI;
 using UnityEngine;
 
 public class RewardNode : NodeInternal
@@ -12,9 +13,23 @@ public class RewardNode : NodeInternal
     [SerializeField] private WeaponInstanceSO m_WeaponReward;
     public WeaponInstanceSO WeaponReward => m_WeaponReward;
     
-    public override void StartNodeEvent()
+    protected override void PerformNode(VoidEvent postEvent = null)
     {
         Debug.Log("Starting Reward Node");
+
+        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        rewardNodeResultScreen.OnHideDone += PostResultScreen;
+
         GlobalEvents.Level.RewardNodeStartEvent?.Invoke(this);
+
+        void PostResultScreen(IUIScreen screen)
+        {
+            screen.OnHideDone -= PostResultScreen;
+            if (!m_HasPlayedPostTutorial)
+            {
+                m_HasPlayedPostTutorial = true;
+                PlayTutorial(m_PostTutorial, null);
+            }
+        }
     }
 }

@@ -50,6 +50,7 @@ namespace Game.UI
         public IUIScreen ExpScreen => LoadScreen("ExpScreen");
         public IUIScreen DemoEndScreen => LoadScreen("EndDemoScreen");
         public IUIScreen SaveScreen => LoadScreen("SaveScreen");
+        public IUIScreen TutorialScreen => LoadScreen("TutorialScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();
@@ -71,7 +72,13 @@ namespace Game.UI
 
         public void OpenScreen(IUIScreen screen, bool clearStack = false, params object[] args)
         {
-            if ((CurrentScreen?.IsInTransition).GetValueOrDefault()) return;
+            if ((CurrentScreen?.IsInTransition).GetValueOrDefault())
+            {
+                Debug.Log(CurrentScreen?.GetType().Name);
+                return;
+            }
+
+            Debug.Log("!!" + screen.GetType().Name);
 
             if (IsScreenOpen(screen)) return;
 
