@@ -269,9 +269,19 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     #region Tick
-    public void Tick()
+    /// <summary>
+    /// Tick at the start of the turn
+    /// </summary>
+    public void PreTick()
     {
         m_StatusManager.Tick(this);
+    }
+
+    /// <summary>
+    /// Tick at the end of the turn
+    /// </summary>
+    public void PostTick()
+    {
         m_SkillCooldownTracker.Tick();
     }
     #endregion
