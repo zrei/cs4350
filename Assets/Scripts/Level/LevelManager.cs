@@ -196,7 +196,7 @@ public class LevelManager : Singleton<LevelManager>
         if (!UIScreenManager.Instance.IsScreenOpen(characterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, new CharacterManagementUIData(m_CurrParty, true));
+            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, m_CurrParty);
         }
         else if (UIScreenManager.Instance.IsScreenActive(characterManagementScreen))
         {

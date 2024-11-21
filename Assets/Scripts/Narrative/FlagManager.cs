@@ -50,9 +50,8 @@ public class FlagManager : Singleton<FlagManager>
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent += OnEndPreCutscene;
-        GlobalEvents.Scene.SaveAndQuitEvent += OnEndPreCutscene;
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnEndPreCutscene;
+
+        SaveManager.OnSaveEvent += SavePersistentFlags;
     }
 
     protected override void HandleDestroy()
@@ -61,9 +60,8 @@ public class FlagManager : Singleton<FlagManager>
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent -= OnEndPreCutscene;
-        GlobalEvents.Scene.SaveAndQuitEvent -= OnEndPreCutscene;
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnEndPreCutscene;
+
+        SaveManager.OnSaveEvent -= SavePersistentFlags;
     }
 
     private void HandleDependencies()
@@ -83,30 +81,17 @@ public class FlagManager : Singleton<FlagManager>
     #region Level Result
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
-    }
-
-    private void OnEndPreCutscene()
-    {
-        HandleLevelResult(true);
-    }
-
-    private void OnEarlyQuit()
-    {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
-        {
-            SavePersistentFlags();
-        }
-        else
+        if (levelResultType != LevelResultType.SUCCESS)
         {
             ClearPersistentFlags();
             TryLoadSavedPersistentFlags();
         }
+    }
+
+    private void OnEarlyQuit()
+    {
+        ClearPersistentFlags();
+        TryLoadSavedPersistentFlags();
     }
     #endregion
 
@@ -118,7 +103,6 @@ public class FlagManager : Singleton<FlagManager>
         if (!TryLoadSavedPersistentFlags())
         {
             LoadStartingFlags();
-            SavePersistentFlags();
         }
     }
 
@@ -144,7 +128,7 @@ public class FlagManager : Singleton<FlagManager>
         }
     }
 
-    private void SavePersistentFlags()
+    private void SavePersistentFlags(ISave save)
     {
         List<string> flagsToSave = new();
         foreach (KeyValuePair<string, FlagWrapper> flag in m_Flags)
@@ -154,7 +138,7 @@ public class FlagManager : Singleton<FlagManager>
                 flagsToSave.Add(flag.Key);
             }
         }
-        SaveManager.Instance.SavePersistentFlags(flagsToSave);
+        save.SavePersistentFlags(flagsToSave);
     } 
     #endregion
 

@@ -38,7 +38,6 @@ public class SkillCooldownTracker
         if (m_Cooldowns.ContainsKey(activeSkillSO))
         {
             m_Cooldowns[activeSkillSO] = activeSkillSO.m_CooldownTurns + 1;
-            Debug.Log(activeSkillSO.m_CooldownTurns + 1);
         }
     }
 

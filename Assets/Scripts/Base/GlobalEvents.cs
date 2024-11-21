@@ -12,22 +12,6 @@ public delegate void BoolEvent(bool _);
 
 public static class GlobalEvents
 {
-
-    public static class UI
-    {
-        public delegate void PartyEvent(List<PlayerCharacterData> _, bool inLevel);
-        public static PartyEvent OpenPartyOverviewEvent;
-        public static VoidEvent OnClosePartyOverviewEvent;
-        public static VoidEvent SavePartyChangesEvent;
-
-        public static void ClearEvents()
-        {
-            OpenPartyOverviewEvent = null;
-            OnClosePartyOverviewEvent = null;
-            SavePartyChangesEvent = null;
-        }
-    }
-
     public static class Battle
     {
         public delegate void UnitEvent(Unit _);
@@ -133,7 +117,6 @@ public static class GlobalEvents
         public static VoidEvent WorldMapSceneLoadedEvent;
         public static VoidEvent MainMenuSceneLoadedEvent;
         public static VoidEvent EarlyQuitEvent;
-        public static VoidEvent SaveAndQuitEvent;
 
         public static void ClearEvents()
         {
@@ -142,7 +125,6 @@ public static class GlobalEvents
             WorldMapSceneLoadedEvent = null;
             MainMenuSceneLoadedEvent = null;
             EarlyQuitEvent = null;
-            SaveAndQuitEvent = null;
         }
     }
 
@@ -198,7 +180,6 @@ public static class GlobalEvents
         public delegate void LevelEvent(LevelData levelData);
         public static LevelEvent OnGoToLevel;
         public static VoidEvent OnBeginLoadLevelEvent;
-        public static VoidEvent OnEndPreCutsceneEvent;
         public static VoidEvent OnBeginLevelAnimationEvent;
         public static VoidEvent OnEndLevelAnimationEvent;
 
@@ -206,7 +187,6 @@ public static class GlobalEvents
         {
             OnGoToLevel = null;
             OnBeginLoadLevelEvent = null;
-            OnEndPreCutsceneEvent = null;
             OnBeginLevelAnimationEvent = null;
             OnEndLevelAnimationEvent = null;
         }
@@ -270,7 +250,6 @@ public static class GlobalEvents
 
     public static void ClearEvents()
     {
-        UI.ClearEvents();
         Battle.ClearEvents();
         Level.ClearEvents();
         Scene.ClearEvents();

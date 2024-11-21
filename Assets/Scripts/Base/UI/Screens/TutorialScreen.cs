@@ -47,11 +47,8 @@ namespace Game.UI
 
         public override void Show(params object[] args)
         {
-            Debug.Log("?");
             if (args.Length == 0)
                 return;
-
-            Debug.Log("!");
 
             m_PageData = (List<TutorialPageUIData>) args[0];
             m_PageIndex = 0;

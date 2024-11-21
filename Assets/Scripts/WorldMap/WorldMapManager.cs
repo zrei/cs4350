@@ -296,7 +296,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostTutorial()
         {
-            GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
             SaveManager.Instance.Save(() => SelectLevel(levelNum));
         }
     }
@@ -309,7 +308,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
         {
             if (levelNum + 1 >= m_WorldMapRegions.Count || (GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel))
             {
-                GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
                 SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.DemoEndScreen));
             }
             else
@@ -475,7 +473,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         if (!UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen, false, new CharacterManagementUIData(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false));
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen, false, CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()));
         }
         else if (UIScreenManager.Instance.IsScreenActive(UIScreenManager.Instance.CharacterManagementScreen))
         {

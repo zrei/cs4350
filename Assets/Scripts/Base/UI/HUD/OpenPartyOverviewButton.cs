@@ -24,8 +24,7 @@ public class OpenPartyOverviewButton : MonoBehaviour
 
     protected virtual void HandleDestroy()
     {
-        GlobalEvents.UI.OpenPartyOverviewEvent -= OnOpenPartyOverview;
-        GlobalEvents.UI.OnClosePartyOverviewEvent -= OnPartyOverviewClosed;
+        m_OpenButton.onSubmit.RemoveListener(OpenPartyOverview);
     }
 
     protected virtual void OpenPartyOverview()
@@ -35,33 +34,11 @@ public class OpenPartyOverviewButton : MonoBehaviour
 
         if (LevelManager.IsReady)
         {
-            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, new CharacterManagementUIData(LevelManager.Instance.CurrParty, true));
+            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, LevelManager.Instance.CurrParty);
         }
         else if (CharacterDataManager.IsReady)
         {
-            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, new CharacterManagementUIData(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false));
+            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()));
         }
-    }
-
-    private void OnOpenPartyOverview(List<PlayerCharacterData> list, bool _)
-    {
-        m_OpenButton.onSubmit.RemoveListener(OpenPartyOverview);
-    }
-
-    private void OnPartyOverviewClosed()
-    {
-        m_OpenButton.onSubmit.AddListener(OpenPartyOverview);
-    }
-
-    protected void EnablePartyOverview()
-    {
-        GlobalEvents.UI.OpenPartyOverviewEvent += OnOpenPartyOverview;
-        GlobalEvents.UI.OnClosePartyOverviewEvent += OnPartyOverviewClosed;
-    }
-
-    protected void DisablePartyOverview()
-    {
-        GlobalEvents.UI.OpenPartyOverviewEvent -= OnOpenPartyOverview;
-        GlobalEvents.UI.OnClosePartyOverviewEvent -= OnPartyOverviewClosed;
     }
 }
