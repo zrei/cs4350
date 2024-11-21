@@ -6,8 +6,9 @@ using UnityEngine.Splines;
 /// Class that maintains the internal representation of an edge in the graph
 /// (edge cost and connecting nodes),
 /// </summary>
-public class EdgeInternal : MonoBehaviour
+public class EdgeInternal : BaseEdge
 {
+    [Header("Level Edge")]
     [SerializeField] private NodeInternal nodeInternalA;
     public NodeInternal NodeInternalA => nodeInternalA;
     
@@ -24,6 +25,9 @@ public class EdgeInternal : MonoBehaviour
     [Tooltip("The spline container that holds the reverse path between the two nodes")]
     [SerializeField] private SplineContainer m_ReverseSplineContainer;
     public SplineContainer ReverseSplineContainer => m_ReverseSplineContainer;
+
+    protected override Transform EndPoint => nodeInternalA.transform;
+    protected override Transform StartingPoint => nodeInternalB.transform;
 
     public SplineContainer GetPathSplineTo(NodeInternal destNode)
     {
