@@ -3,8 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 
-public class WorldMapEdge : MonoBehaviour
+public class WorldMapEdge : BaseEdge
 {
+    [Header("World Map Edge")]
     [SerializeField] private Transform m_StartingPoint;
     [SerializeField] private Transform m_EndPoint;
     [SerializeField] private SplineContainer m_SplineContainer;
@@ -14,6 +15,9 @@ public class WorldMapEdge : MonoBehaviour
 
     private const float NODE_INTERVALS = 2f;
     private const float NODE_SPAWN_DELAY = 0.3f;
+
+    protected override Transform EndPoint => m_EndPoint;
+    protected override Transform StartingPoint => m_StartingPoint;
 
     #region Path
     public void InstantiatePath(float offset, bool instant = true, VoidEvent onCompleteInstantiation = null)
@@ -103,14 +107,24 @@ public class WorldMapEdge : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(WorldMapEdge))]
+[CustomEditor(typeof(WorldMapEdge)), CanEditMultipleObjects]
 public class WorldMapEdgeEditor : Editor
 {
     WorldMapEdge m_Target;
+    WorldMapEdge[] m_Targets;
 
     private void OnEnable()
     {
-        m_Target = (WorldMapEdge) target;
+        if (targets.Length == 1)
+            m_Target = (WorldMapEdge) target;
+        else
+        {
+            m_Targets = new WorldMapEdge[targets.Length];
+            for (var i = 0; i < targets.Length; i++)
+            {
+                m_Targets[i] = (WorldMapEdge)targets[i];
+            }
+        }
     }
 
     public override void OnInspectorGUI()
@@ -119,7 +133,13 @@ public class WorldMapEdgeEditor : Editor
 
         if (GUILayout.Button("Update spline"))
         {
-            m_Target.UpdateSpline();
+            if (m_Targets == null)
+                m_Target.UpdateSpline();
+            else
+            {
+                foreach (var worldMapEdge in m_Targets)
+                    worldMapEdge.UpdateSpline();
+            }
         }
     }
 }
