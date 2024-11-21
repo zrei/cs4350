@@ -94,10 +94,19 @@ public class SessionSave
     }
 }
 
+public interface ISave 
+{
+    public void SaveCharacterData(IEnumerable<CharacterSaveData> data);
+    public void SaveInventoryData(IEnumerable<WeaponInstanceSaveData> data);
+    public void SetCurrentLevel(int currLevel);
+    public void SaveMorality(int morality);
+    public void SavePersistentFlags(IEnumerable<string> flags);
+}
+
 /// <summary>
 /// Saves to JSON only
 /// </summary>
-public class SaveManager : Singleton<SaveManager>
+public class SaveManager : Singleton<SaveManager>, ISave
 {
     private const string UNIT_DATA_KEY = "UnitData";
     private const string INVENTORY_DATA_KEY = "InventoryData";
@@ -113,6 +122,10 @@ public class SaveManager : Singleton<SaveManager>
     private const float SAVE_DELAY = 1.5f;
 
     private SessionSave m_SessionSave;
+
+    public delegate void SaveDelegate(ISave _);
+
+    public static SaveDelegate OnSaveEvent;
 
     protected override void HandleAwake()
     {
@@ -149,6 +162,7 @@ public class SaveManager : Singleton<SaveManager>
     public void Save(VoidEvent postSaveEvent = null)
     {
         UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.SaveScreen);
+        OnSaveEvent?.Invoke(this);
         m_SessionSave.Save(SAVE_DELAY, PostSave);
 
         void PostSave()

@@ -26,10 +26,10 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
-        GlobalEvents.UI.SavePartyChangesEvent += SaveCharacterData;
-
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
     
+        SaveManager.OnSaveEvent += SaveCharacterData;
+
         HandleDependencies();
     }
 
@@ -60,7 +60,6 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         if (!TryLoadSaveData())
         {
             LoadStartingCharacters();
-            SaveCharacterData();
         }
     }
 
@@ -72,33 +71,24 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
-        GlobalEvents.UI.SavePartyChangesEvent -= SaveCharacterData;
-
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+
+        SaveManager.OnSaveEvent -= SaveCharacterData;
     }
     #endregion
 
     #region Level Result
     private void OnLevelEnd(LevelSO _, LevelResultType result)
     {
-        HandleLevelResult(result == LevelResultType.SUCCESS);
+        if (result != LevelResultType.SUCCESS)
+        {
+            TryLoadSaveData();
+        }
     }
 
     private void OnEarlyQuit()
     {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
-        {
-            SaveCharacterData();
-        }
-        else
-        {
-            TryLoadSaveData();
-        }
+        TryLoadSaveData();
     }
     #endregion
 
@@ -147,9 +137,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         ReceiveStartingCharacters(m_StartingCharacters);
     }
 
-    private void SaveCharacterData()
+    private void SaveCharacterData(ISave save)
     {
-        SaveManager.Instance.SaveCharacterData(m_CharacterData.Values.Select(x => GetCharacterSaveData(x)));
+        save.SaveCharacterData(m_CharacterData.Values.Select(x => GetCharacterSaveData(x)));
     }
 
     private CharacterSaveData GetCharacterSaveData(PlayerCharacterData playerCharacterData)

@@ -59,9 +59,10 @@ public class InventoryManager : Singleton<InventoryManager>
         HandleDependencies();
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-        GlobalEvents.UI.SavePartyChangesEvent += SaveWeapons;
 
         GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+
+        SaveManager.OnSaveEvent += SaveWeapons;
     }
 
     private void HandleDependencies()
@@ -89,33 +90,25 @@ public class InventoryManager : Singleton<InventoryManager>
         base.HandleDestroy();
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-        GlobalEvents.UI.SavePartyChangesEvent -= SaveWeapons;
 
         GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+
+        SaveManager.OnSaveEvent -= SaveWeapons;
     }
     #endregion
 
     #region Level Result
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
+        if (levelResultType != LevelResultType.SUCCESS)
+        {
+            TryLoadSaveData();
+        }
     }
 
     private void OnEarlyQuit()
     {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
-        {
-            SaveWeapons();
-        }
-        else
-        {
-            TryLoadSaveData();
-        }
+        TryLoadSaveData();
     }
     #endregion
 
@@ -125,9 +118,7 @@ public class InventoryManager : Singleton<InventoryManager>
         if (!TryLoadSaveData())
         {
             LoadStartingInventory();
-            SaveWeapons();
-        }
-            
+        }            
     }
 
     private bool TryLoadSaveData()
@@ -173,9 +164,9 @@ public class InventoryManager : Singleton<InventoryManager>
         m_CurrNextId = m_Inventory.Count;
     }
 
-    private void SaveWeapons()
+    private void SaveWeapons(ISave save)
     {
-        SaveManager.Instance.SaveInventoryData(m_Inventory.Values.Select(x => x.GetSaveData()));
+        save.SaveInventoryData(m_Inventory.Values.Select(x => x.GetSaveData()));
     }
     #endregion
 

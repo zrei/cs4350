@@ -74,11 +74,8 @@ namespace Game.UI
         {
             if ((CurrentScreen?.IsInTransition).GetValueOrDefault())
             {
-                Debug.Log(CurrentScreen?.GetType().Name);
                 return;
             }
-
-            Debug.Log("!!" + screen.GetType().Name);
 
             if (IsScreenOpen(screen)) return;
 

@@ -43,7 +43,6 @@ namespace Game.UI
                 // set initial bar
                 m_ProgressBar.SetValue(initialExp, totalExp, 0f);
                 m_ProgressBar.SetValue(targetExp, totalExp, indivTransitionTime);
-                Debug.Log(targetExp / totalExp);
                 yield return new WaitForSeconds(indivTransitionTime);
 
                 if (i >= 1)
@@ -52,7 +51,6 @@ namespace Game.UI
                 ++currLevel;
                 initialExp = 0;
                 targetExp = i == 1 ? expGainInfo.m_FinalExp - LevellingManager.Instance.GetExpToNextLevel(currLevel) : LevellingManager.Instance.GetExpToNextLevel(currLevel);
-                Debug.Log(targetExp);
             }
 
             onCompleteAnimation?.Invoke();
