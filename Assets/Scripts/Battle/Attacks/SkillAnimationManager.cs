@@ -6,10 +6,15 @@ using UnityEngine;
 
 public class SkillAnimationManager : MonoBehaviour
 {
+    private const float MeleePositionOffset = 2f;
+
     [SerializeField] CinemachineVirtualCamera m_SkillAnimVCam;
 
     private Vector3 m_CachedAttackerPosition;
     private Quaternion m_CachedAttackerRotation;
+
+    private bool m_ResetAttackerPosition;
+    private bool m_ResetAttackerRotation;
 
     private void Awake()
     {
@@ -76,7 +81,7 @@ public class SkillAnimationManager : MonoBehaviour
 
             activeSkill.m_OnHitSkillVFXs.ForEach(x => x.Play(attacker, targets));
 
-            CoroutineManager.Instance.ExecuteAfterFrames(() => TimeManager.Instance.ModifyTime(0.1f, 0.5f), 3);
+            CoroutineManager.Instance.ExecuteAfterDelay(() => TimeManager.Instance.ModifyTime(0.1f, 0.5f), 0.1f);
         }
 
         void OnSkillComplete()
@@ -97,11 +102,11 @@ public class SkillAnimationManager : MonoBehaviour
         var isAttack = activeSkill.IsOpposingSideTarget;
         var isRanged = activeSkill.m_IsRangedAttack;
 
-        // if buff skill, no cam anim
-        // if attack skill
         // vcam always 3rd person follow caster, look at target
         // fade all units, then fade in caster and targets during cam transition
-        // if ranged, don't move caster, rotate caster to face target avg position
+        // treat support skills i.e. not IsOpposingSideTarget like ranged
+        // if ranged, don't move caster
+        // if ranged attack, rotate caster to face target avg position
         // if melee, move caster to just in front of most forward and center pos
 
         yield return HandleCamAnimTransitIn(attacker, targets, isAttack, isRanged);
@@ -117,17 +122,23 @@ public class SkillAnimationManager : MonoBehaviour
 
     IEnumerator HandleCamAnimTransitIn(Unit attacker, List<Unit> targets, bool isAttack, bool isRanged)
     {
-        if (!isAttack) yield break;
-
         var follow = m_SkillAnimVCam.Follow;
         var lookAt = m_SkillAnimVCam.LookAt;
 
-        if (isRanged)
+        if (isRanged || !isAttack)
         {
             follow.position = attacker.transform.position;
             var lookAtPos = Vector3.zero;
-            targets.ForEach(x => lookAtPos += x.transform.position);
-            lookAt.position = lookAtPos / targets.Count;
+            if (targets.Count == 1 && attacker == targets[0])
+            {
+                lookAtPos = attacker.BodyCenter.position + attacker.transform.forward * MeleePositionOffset;
+            }
+            else
+            {
+                targets.ForEach(x => lookAtPos += x.BodyCenter.position);
+                lookAtPos /= targets.Count;
+            }
+            lookAt.position = lookAtPos;
 
             follow.rotation = Quaternion.LookRotation(lookAt.position - follow.position);
         }
@@ -145,14 +156,12 @@ public class SkillAnimationManager : MonoBehaviour
                     closestZ = target.transform.position.z;
                 }
                 avgXY += new Vector2(target.transform.position.x, target.transform.position.y);
-                lookAtPos += target.transform.position;
+                lookAtPos += target.BodyCenter.position;
             }
 
-            closestZ += attacker.UnitAllegiance == UnitAllegiance.PLAYER
-                ? -2f
-                : 2f;
             avgXY /= targets.Count;
             follow.position = new Vector3(avgXY.x, avgXY.y, closestZ);
+            follow.position += attacker.transform.forward * MeleePositionOffset;
             lookAt.position = lookAtPos / targets.Count;
 
             follow.rotation = Quaternion.LookRotation(lookAt.position - follow.position);
@@ -167,11 +176,18 @@ public class SkillAnimationManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         m_CachedAttackerPosition = attacker.transform.position;
-        m_CachedAttackerRotation = attacker.transform.rotation;
         attacker.transform.position = follow.transform.position;
-        var attackerRot = attacker.transform.eulerAngles;
-        attackerRot.y = follow.transform.eulerAngles.y + 180;
-        attacker.transform.eulerAngles = attackerRot;
+        m_ResetAttackerPosition = true;
+
+        if (isAttack)
+        {
+            m_CachedAttackerRotation = attacker.transform.rotation;
+            var attackerRot = attacker.transform.eulerAngles;
+            attackerRot.y = follow.transform.eulerAngles.y + 180;
+            attacker.transform.eulerAngles = attackerRot;
+            m_ResetAttackerRotation = true;
+        }
+
         attacker.FadeMesh(1, 0.25f);
 
         foreach (var target in targets)
@@ -183,16 +199,22 @@ public class SkillAnimationManager : MonoBehaviour
 
     IEnumerator HandleCamAnimTransitOut(Unit attacker, List<Unit> targets, bool isAttack, bool isRanged)
     {
-        if (!isAttack) yield break;
-
         m_SkillAnimVCam.enabled = false;
 
         attacker.FadeMesh(0, 0.25f);
         targets.ForEach(x => x.FadeMesh(0, 0.25f));
         yield return new WaitForSeconds(0.5f);
 
-        attacker.transform.position = m_CachedAttackerPosition;
-        attacker.transform.rotation = m_CachedAttackerRotation;
+        if (m_ResetAttackerPosition)
+        {
+            attacker.transform.position = m_CachedAttackerPosition;
+            m_ResetAttackerPosition = false;
+        }
+        if (m_ResetAttackerRotation)
+        {
+            attacker.transform.rotation = m_CachedAttackerRotation;
+            m_ResetAttackerRotation = false;
+        }
 
         var battleManager = BattleManager.Instance;
         foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(1, 0.25f);
