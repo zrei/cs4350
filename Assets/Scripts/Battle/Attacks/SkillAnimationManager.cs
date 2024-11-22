@@ -6,16 +6,11 @@ using UnityEngine;
 
 public class SkillAnimationManager : MonoBehaviour
 {
-    [SerializeField] Transform m_AttackerPosition;
-    [SerializeField] Transform m_TargetPosition;
     [SerializeField] CinemachineVirtualCamera m_SkillAnimVCam;
 
     private Vector3 m_CachedAttackerPosition;
     private Quaternion m_CachedAttackerRotation;
-    private Vector3 m_CachedTargetPosition;
-    private Quaternion m_CachedTargetRotation;
 
-    private bool m_IsSelfTarget = false;
     private void Awake()
     {
         GlobalEvents.Battle.AttackAnimationEvent += OnSkillAnimation;
@@ -26,12 +21,8 @@ public class SkillAnimationManager : MonoBehaviour
         GlobalEvents.Battle.AttackAnimationEvent -= OnSkillAnimation;
     }
 
-    // perform attack skill
     private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
     {
-        m_IsSelfTarget = activeSkill.IsSelfTarget || (!activeSkill.IsAoe && targets[0].Equals(attacker));
-        Logger.Log(this.GetType().Name, "Is self target: " + m_IsSelfTarget, LogLevel.LOG);
-
         StartCoroutine(PlayAttackAnimation(activeSkill, attacker, targets));
     }
 
