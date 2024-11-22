@@ -15,11 +15,18 @@ public class CoroutineManager : Singleton<CoroutineManager>
         DontDestroyOnLoad(gameObject);
     }
 
-    public Coroutine ExecuteAfterDelay(VoidEvent action, float delay)
+    public Coroutine ExecuteAfterDelay(VoidEvent action, float delay, bool unscaledTime = false)
     {
         IEnumerator Co()
         {
-            yield return new WaitForSeconds(delay);
+            if (unscaledTime)
+            {
+                yield return new WaitForSecondsRealtime(delay);
+            }
+            else
+            {
+                yield return new WaitForSeconds(delay);
+            }
             action?.Invoke();
         }
         return StartCoroutine(Co());
