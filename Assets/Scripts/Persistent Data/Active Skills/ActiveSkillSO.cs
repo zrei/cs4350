@@ -80,7 +80,6 @@ public class ActiveSkillSO : ScriptableObject
     public List<StatusType> m_CleansedStatusTypes;
     
     [Header("Animations")]
-    [Tooltip("The amount of time after the animation for this skill starts that the response animation from targets should start playing")]
     public bool m_TargetWillPlayHurtAnimation = false;
     [Tooltip("Use this to override the weapon animation type instead of taking it from the character's weapon")]
     public bool m_OverrideWeaponAnimationType = false;
@@ -145,7 +144,9 @@ public class ActiveSkillSO : ScriptableObject
 
     [Header("FX")]
     public bool m_IsRangedAttack;
-    public List<SkillVFXSO> m_SkillFXs;
+    public List<SkillVFXSO> m_OnWindUpSkillVFXs;
+    public List<SkillVFXSO> m_OnReleaseSkillVFXs;
+    public List<SkillVFXSO> m_OnHitSkillVFXs;
 
     #region Helpers
     public bool IsAoe => m_TargetSO.IsAoe;

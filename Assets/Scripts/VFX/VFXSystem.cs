@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public delegate void VFXSystemEvent(VFXSystem vfx);
 
 public class VFXSystem : MonoBehaviour
 {
@@ -9,7 +10,8 @@ public class VFXSystem : MonoBehaviour
     private List<ParticleSystem.MainModule> m_MainModules = new();
     private List<ParticleSystem.MinMaxGradient> m_OriginalStartColors = new();
 
-    public event Action<VFXSystem> onStopped;
+    public event VFXSystemEvent onStop; // this is invoked when the Stop method is called
+    public event VFXSystemEvent onParticleSystemStop; // this is invoked only when all the particles in the system die
 
     private Coroutine StopCo
     {
@@ -18,7 +20,7 @@ public class VFXSystem : MonoBehaviour
             if (m_StopCo == value) return;
             if (m_StopCo != null)
             {
-                StopCoroutine(m_StopCo);
+                CoroutineManager.Instance.StopCoroutine(m_StopCo);
                 m_StopCo = null;
             }
             m_StopCo = value;
@@ -45,7 +47,8 @@ public class VFXSystem : MonoBehaviour
 
     private void OnParticleSystemStopped()
     {
-        onStopped?.Invoke(this);
+        StopCo = null;
+        onParticleSystemStop?.Invoke(this);
         RestoreStartColor();
     }
 
@@ -58,31 +61,21 @@ public class VFXSystem : MonoBehaviour
         StopCo = null;
         if (duration != null)
         {
-            m_StopCo = StartCoroutine(StopAfterDelay(duration.Value, unscaledTime));
+            m_StopCo = CoroutineManager.Instance.ExecuteAfterDelay(Stop, duration.Value, unscaledTime);
         }
     }
 
     public void Stop()
     {
+        StopCo = null;
+        onStop?.Invoke(this);
         m_ParticleSystems[0].Stop();
     }
 
-    private IEnumerator StopAfterDelay(float duration, bool unscaledTime)
+    public void SetStartColor(Color? color)
     {
-        if (unscaledTime)
-        {
-            yield return new WaitForSecondsRealtime(duration);
-        }
-        else
-        {
-            yield return new WaitForSeconds(duration);
-        }
-        Stop();
-    }
-
-    public void SetStartColor(Color color)
-    {
-        m_MainModules.ForEach(main => main.startColor = color);
+        if (color == null) return;
+        m_MainModules.ForEach(main => main.startColor = color.Value);
     }
 
     public void RestoreStartColor()
