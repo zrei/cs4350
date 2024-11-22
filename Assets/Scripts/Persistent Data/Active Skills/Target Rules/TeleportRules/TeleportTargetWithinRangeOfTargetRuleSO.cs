@@ -5,8 +5,8 @@ public class TeleportTargetWithinRangeOfTargetRuleSO : TeleportRuleSO
 {
     public RangeDefinition m_AllowedRange;
 
-    public override bool IsValidTeleportTile(CoordPair initialTarget, CoordPair targetTile, Unit attackingUnit)
+    public override bool IsValidTeleportTile(GridType targetGridType, CoordPair initialTarget, CoordPair targetTile, Unit attackingUnit)
     {
-        return m_AllowedRange.IsWithinRange(initialTarget, targetTile);
+        return m_AllowedRange.IsWithinRange(targetGridType, targetGridType, initialTarget, targetTile);
     }
 }

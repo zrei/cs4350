@@ -357,7 +357,7 @@ public class ActiveSkillSO : ScriptableObject
     {
         if (TeleportTargetGrid(unit) != targetGridType)
             return false;
-        return m_TeleportTargetRules.All(x => x.IsValidTeleportTile(TeleportStartTile(unit, initialTarget), targetTile, unit));
+        return m_TeleportTargetRules.All(x => x.IsValidTeleportTile(TeleportTargetGrid(unit), TeleportStartTile(unit, initialTarget), targetTile, unit));
     }
 
     public List<CoordPair> ConstructAttackTargetTiles(CoordPair target) => m_TargetSO.ConstructAttackTargetTiles(target);

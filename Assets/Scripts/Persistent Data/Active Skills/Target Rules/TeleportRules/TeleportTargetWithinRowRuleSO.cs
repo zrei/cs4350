@@ -6,7 +6,7 @@ public class TeleportTargetWithinRowRuleSO : TeleportRuleSO
 {
     public List<int> m_Rows;
 
-    public override bool IsValidTeleportTile(CoordPair initialTarget, CoordPair targetTile, Unit attackingUnit)
+    public override bool IsValidTeleportTile(GridType targetGridType, CoordPair initialTarget, CoordPair targetTile, Unit attackingUnit)
     {
         return m_Rows.Contains(targetTile.m_Row);
     }
