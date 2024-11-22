@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 
 [System.Serializable]
 public struct VFXAudio
@@ -32,40 +31,15 @@ public class VFXSO : ScriptableObject
     public float m_MoveArcHeight = 0.0f;
     public float m_MoveDuration = 0.2f;
 
-    private Transform parent;
-    private ObjectPool<VFXSystem> m_VFXPool;
-
-    private void InitializePool()
-    {
-        if (m_VFXPool != null) return;
-
-        parent = new GameObject(name).transform;
-        DontDestroyOnLoad(parent);
-        m_VFXPool = new(
-            createFunc: () => {
-                var vfx = Instantiate(m_VFXPrefab, parent.transform, false);
-                vfx.gameObject.SetActive(false);
-                vfx.onStopped += x => m_VFXPool.Release(x);
-                return vfx;
-            },
-            actionOnGet: vfx => { vfx.gameObject.SetActive(true); },
-            actionOnRelease: vfx => {
-                vfx.gameObject.SetActive(false);
-                vfx.transform.SetParent(parent, false);
-                vfx.transform.localPosition = Vector3.zero;
-                vfx.transform.localEulerAngles = Vector3.zero;
-            },
-            actionOnDestroy: vfx => { },
-            collectionCheck: false,
-            defaultCapacity: 10,
-            maxSize: 10000
-        );
-    }
 
     private VFXSystem Get()
     {
-        InitializePool();
-        var vfx = m_VFXPool.Get();
+        if (!VFXPoolManager.IsReady)
+        {
+            Debug.LogWarning($"no instance of VFXPoolManager exists");
+            return null;
+        }
+        var vfx = VFXPoolManager.Instance.Get(this);
         if (vfx == null) Debug.LogWarning($"{name} vfx pool max size reached");
         return vfx;
     }
