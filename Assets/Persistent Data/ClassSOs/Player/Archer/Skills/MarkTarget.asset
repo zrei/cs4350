@@ -17,6 +17,7 @@ MonoBehaviour:
   m_Icon: {fileID: 2613184551013223596, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
   m_ConsumedMana: 3
+  m_CooldownTurns: 0
   m_SkillTypes: 01000000
   m_InflictedTokens:
   - m_TokenTierData: {fileID: 11400000, guid: 3bd20286dd9b2c44c9977a2f23463996, type: 2}
@@ -29,6 +30,7 @@ MonoBehaviour:
   m_Summons: []
   m_TeleportSelf: 0
   m_TeleportTargetRules: []
+  m_CleansedStatusTypes: 
   m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0
@@ -38,5 +40,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8f8423bc60ccc4a4a95c3efc1f66ed53, type: 2}
   m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
   m_IsRangedAttack: 1
-  m_SkillFXs:
+  m_OnWindUpSkillVFXs: []
+  m_OnReleaseSkillVFXs:
   - {fileID: 11400000, guid: 458ccfbf0057b8f4fbc4ffb2e7677abb, type: 2}
+  m_OnHitSkillVFXs:
+  - {fileID: 11400000, guid: 5b4f11a5e5891e04a961f046b738fca8, type: 2}
