@@ -26,15 +26,16 @@ public static class PathAnimator
 
             var t = 0f;
             var progress = 0f;
+            Vector3 delta = Vector3.zero;
             while (t < duration)
             {
                 t += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                 progress = t / duration;
                 var nextPos = Vector3.Lerp(Vector3.Lerp(start(), middle(), progress), Vector3.Lerp(middle(), end(), progress), progress);
-                var delta = nextPos - pos;
+                delta = nextPos - pos;
                 pos = nextPos;
                 posSetter?.Invoke(pos);
-                rotSetter?.Invoke(Quaternion.LookRotation(delta).eulerAngles);
+                if (delta.sqrMagnitude > 0.01f) rotSetter?.Invoke(Quaternion.LookRotation(delta).eulerAngles);
                 yield return null;
             }
 
@@ -63,17 +64,20 @@ public static class PathAnimator
                 var t = 0f;
                 var progress = 0f;
                 var pos = curr();
+                Vector3 delta = Vector3.zero;
                 while (t < durationPerPoint)
                 {
                     t += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                     progress = t / durationPerPoint;
                     var nextPos = Vector3.Lerp(curr(), next(), progress);
-                    var delta = nextPos - pos;
+                    delta = nextPos - pos;
                     pos = nextPos;
                     posSetter?.Invoke(pos);
-                    rotSetter?.Invoke(Quaternion.LookRotation(delta).eulerAngles);
+                    if (delta.sqrMagnitude > 0.01f) rotSetter?.Invoke(Quaternion.LookRotation(delta).eulerAngles);
                     yield return null;
                 }
+
+                posSetter?.Invoke(next());
             }
 
             onComplete?.Invoke();
