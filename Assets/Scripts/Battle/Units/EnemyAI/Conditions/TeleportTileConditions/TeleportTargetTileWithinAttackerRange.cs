@@ -5,8 +5,8 @@ public class TeleportTargetTileWithinAttackerRange : EnemyTeleportTileConditionS
 {
     public RangeDefinition m_AllowedRange;
 
-    public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair teleportTargetTile, CoordPair initialTarget)
+    public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, GridType targetGridType, CoordPair teleportTargetTile, CoordPair initialTarget)
     {
-        return m_AllowedRange.IsWithinRange(enemyUnit.CurrPosition, teleportTargetTile);
+        return m_AllowedRange.IsWithinRange(GridHelper.GetSameSide(enemyUnit.UnitAllegiance), targetGridType, enemyUnit.CurrPosition, teleportTargetTile);
     }
 }

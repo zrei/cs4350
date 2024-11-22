@@ -6,7 +6,7 @@ public class TeleportTargetTileWithinCol : EnemyTeleportTileConditionSO
 {
     public List<int> m_Cols;
 
-    public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, CoordPair teleportTargetTile, CoordPair initialTarget)
+    public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic, GridType targetGridType, CoordPair teleportTargetTile, CoordPair initialTarget)
     {
         return m_Cols.Contains(teleportTargetTile.m_Col);
     }

@@ -228,7 +228,7 @@ public class EnemyActiveSkillActionSO : EnemyActionSO
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair teleportTargetTile = new CoordPair(r, c);
-                if (mapLogic.IsValidTeleportTile(m_ActiveSkill, enemyUnit, finalTeleportedTile, teleportTargetTile, targetTeleportGrid) && m_TeleportTileConditions.All(x => x.IsConditionMet(enemyUnit, mapLogic, teleportTargetTile, finalTeleportedTile)))
+                if (mapLogic.IsValidTeleportTile(m_ActiveSkill, enemyUnit, finalTeleportedTile, teleportTargetTile, targetTeleportGrid) && m_TeleportTileConditions.All(x => x.IsConditionMet(enemyUnit, mapLogic, targetTeleportGrid, teleportTargetTile, finalTeleportedTile)))
                 {
                     possibleTeleportTargetTiles = possibleTeleportTargetTiles.Append(teleportTargetTile);
                 }
