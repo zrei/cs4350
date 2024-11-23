@@ -164,6 +164,8 @@ namespace Game.UI
 
         private void OnDestroy()
         {
+            BindInputEvents(false);
+
             GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
