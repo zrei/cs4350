@@ -37,9 +37,9 @@ public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
 
     private void OnDestroy()
     {
-        HandleDestroy();
         if (m_Instance == this)
         {
+            HandleDestroy();
             m_Instance = null;
             Logger.Log(this.GetType().Name, "Singleton has been destroyed", LogLevel.LOG);
         }

@@ -47,9 +47,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     {
         base.HandleAwake();
 
-        GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-        GlobalEvents.Scene.LevelSceneLoadedEvent += OnLevelSceneLoaded;
+        GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
+        GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
 
         HandleDependencies();
     }
@@ -58,9 +58,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     {
         base.HandleDestroy();
 
-        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
-        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnLevelSceneLoaded;
+        GlobalEvents.Scene.OnSceneTransitionEvent -= OnSceneTransition;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnBeginSceneChange;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
         
         DisableAllControls();
     }
@@ -229,19 +229,28 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #endregion
 
     #region Level Loading
-    private void OnLevelSceneLoaded()
+    private void OnSceneTransition(SceneEnum sceneEnum)
     {
+        if (sceneEnum != SceneEnum.LEVEL)
+            return;
+
         m_WorldMap.SetActive(false);
     }
 
-    private void OnBeginLoadLevel()
+    private void OnBeginSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (fromScene != SceneEnum.WORLD_MAP || toScene == SceneEnum.MAIN_MENU)
+            return;
+
         m_CameraController.RecenterCamera();
         DisableAllControls();
     }
 
-    private void OnReturnFromLevel()
+    private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (toScene != SceneEnum.WORLD_MAP || fromScene == SceneEnum.MAIN_MENU)
+            return;
+
         m_WorldMap.SetActive(true);
 
         m_CameraController.RecenterCamera();

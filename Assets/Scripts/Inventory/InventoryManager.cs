@@ -58,9 +58,7 @@ public class InventoryManager : Singleton<InventoryManager>
 
         HandleDependencies();
 
-        GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
         SaveManager.OnSaveEvent += SaveWeapons;
     }
@@ -89,26 +87,20 @@ public class InventoryManager : Singleton<InventoryManager>
     {
         base.HandleDestroy();
 
-        GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
         SaveManager.OnSaveEvent -= SaveWeapons;
     }
     #endregion
 
     #region Level Result
-    private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
-        if (levelResultType != LevelResultType.SUCCESS)
-        {
-            TryLoadSaveData();
-        }
-    }
+        if (toScene != SceneEnum.WORLD_MAP) 
+            return;
 
-    private void OnEarlyQuit()
-    {
-        TryLoadSaveData();
+        if (FlagManager.Instance.GetFlagValue(Flag.QUIT_LEVEL_FLAG) || FlagManager.Instance.GetFlagValue(Flag.LOSE_LEVEL_FLAG))
+            TryLoadSaveData();
     }
     #endregion
 

@@ -49,7 +49,7 @@ public class FlagManager : Singleton<FlagManager>
         HandleDependencies();
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
         SaveManager.OnSaveEvent += SavePersistentFlags;
     }
@@ -59,7 +59,7 @@ public class FlagManager : Singleton<FlagManager>
         base.HandleDestroy();
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
         SaveManager.OnSaveEvent -= SavePersistentFlags;
     }
@@ -88,10 +88,16 @@ public class FlagManager : Singleton<FlagManager>
         }
     }
 
-    private void OnEarlyQuit()
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
-        ClearPersistentFlags();
-        TryLoadSavedPersistentFlags();
+        if (toScene != SceneEnum.WORLD_MAP)
+            return;
+
+        if (GetFlagValue(Flag.QUIT_LEVEL_FLAG) || GetFlagValue(Flag.LOSE_LEVEL_FLAG))
+        {
+            ClearPersistentFlags();
+            TryLoadSavedPersistentFlags();
+        }
     }
     #endregion
 

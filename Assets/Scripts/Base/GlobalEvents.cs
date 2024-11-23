@@ -33,7 +33,6 @@ public static class GlobalEvents
         public static UnitEvent PreviewCurrentUnitEvent;
         public static AttackEvent AttackAnimationEvent; 
         public static VoidEvent CompleteAttackAnimationEvent;
-        public static VoidEvent ReturnFromBattleEvent;
 
         public static void ClearEvents()
         {
@@ -51,7 +50,6 @@ public static class GlobalEvents
             PreviewCurrentUnitEvent = null;
             AttackAnimationEvent = null;
             CompleteAttackAnimationEvent = null;
-            ReturnFromBattleEvent = null;
         }
     }
 
@@ -82,7 +80,6 @@ public static class GlobalEvents
         /// This event is called to pass out the results
         /// </summary>
         public static LevelResultEvent LevelResultsEvent;
-        public static VoidEvent ReturnFromLevelEvent;
         public static NodeEvent NodeHoverStartEvent;
         public static VoidEvent NodeHoverEndEvent;
         public static VoidEvent StartPlayerPhaseEvent;
@@ -102,7 +99,6 @@ public static class GlobalEvents
             DialogueNodeEndEvent = null;
             LevelEndEvent = null;
             LevelResultsEvent = null;
-            ReturnFromLevelEvent = null;
             NodeHoverStartEvent = null;
             NodeHoverEndEvent = null;
             StartPlayerPhaseEvent = null;
@@ -112,19 +108,17 @@ public static class GlobalEvents
 
     public static class Scene
     {
-        public static VoidEvent BattleSceneLoadedEvent;
-        public static VoidEvent LevelSceneLoadedEvent;
-        public static VoidEvent WorldMapSceneLoadedEvent;
-        public static VoidEvent MainMenuSceneLoadedEvent;
-        public static VoidEvent EarlyQuitEvent;
+        public delegate void SceneTransitionEvent(SceneEnum prev, SceneEnum final);
+        public delegate void SceneChangeEvent(SceneEnum _);
+        public static SceneTransitionEvent OnBeginSceneChange;
+        public static SceneChangeEvent OnSceneTransitionEvent;
+        public static SceneTransitionEvent OnSceneTransitionCompleteEvent;
 
         public static void ClearEvents()
         {
-            BattleSceneLoadedEvent = null;
-            LevelSceneLoadedEvent = null;
-            WorldMapSceneLoadedEvent = null;
-            MainMenuSceneLoadedEvent = null;
-            EarlyQuitEvent = null;
+            OnBeginSceneChange = null;
+            OnSceneTransitionEvent = null;
+            OnSceneTransitionCompleteEvent = null;
         }
     }
 
@@ -179,28 +173,14 @@ public static class GlobalEvents
     {
         public delegate void LevelEvent(LevelData levelData);
         public static LevelEvent OnGoToLevel;
-        public static VoidEvent OnBeginLoadLevelEvent;
         public static VoidEvent OnBeginLevelAnimationEvent;
         public static VoidEvent OnEndLevelAnimationEvent;
 
         public static void ClearEvents()
         {
             OnGoToLevel = null;
-            OnBeginLoadLevelEvent = null;
             OnBeginLevelAnimationEvent = null;
             OnEndLevelAnimationEvent = null;
-        }
-    }
-
-    public static class MainMenu
-    {
-        public static VoidEvent OnBeginLoadWorldMap;
-        public static VoidEvent OnReturnToMainMenu;
-
-        public static void ClearEvents()
-        {
-            OnBeginLoadWorldMap = null;
-            OnReturnToMainMenu = null;
         }
     }
 
@@ -258,7 +238,6 @@ public static class GlobalEvents
         Rations.ClearEvents();
         Flags.ClearEvents();
         WorldMap.ClearEvents();
-        MainMenu.ClearEvents();
         Save.ClearEvents();
         CharacterManagement.ClearEvents();
         CutsceneEvents.ClearEvents();

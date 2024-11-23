@@ -4,21 +4,33 @@ public class WorldMapBGMManager : BGMManager
     {
         base.Awake();
 
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-        GlobalEvents.Level.ReturnFromLevelEvent += StartPlayingDefaultBGM;
+        GlobalEvents.Scene.OnBeginSceneChange += OnBeginLoadLevel;
+        GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
         GlobalEvents.Dialogue.DialogueEndEvent += OnCutsceneEnd;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
-        GlobalEvents.Level.ReturnFromLevelEvent -= StartPlayingDefaultBGM;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnBeginLoadLevel;
+        GlobalEvents.Scene.OnSceneTransitionEvent -= OnSceneTransition;
         GlobalEvents.Dialogue.DialogueEndEvent -= OnCutsceneEnd;
     }
 
-    private void OnBeginLoadLevel()
+    private void OnBeginLoadLevel(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (fromScene != SceneEnum.WORLD_MAP)
+            return;
+        
         FadeOutCurrBgm();
+    }
+
+    private void OnSceneTransition(SceneEnum sceneEnum)
+    {
+        if (sceneEnum != SceneEnum.WORLD_MAP)
+            return;
+
+        if (!m_CurrentlyPlayingDefaultBgm)
+            StartPlayingDefaultBGM();
     }
 
     private void OnCutsceneEnd()

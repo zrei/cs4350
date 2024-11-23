@@ -30,7 +30,6 @@ namespace Game.UI
         private void ReturnToMainMenu()
         {
             RemoveListeners();
-            GlobalEvents.MainMenu.OnReturnToMainMenu?.Invoke();
             GameSceneManager.Instance.LoadMainMenuScene();
         }
 

@@ -81,6 +81,7 @@ public class BattleManager : Singleton<BattleManager>
     #region Initialisation
     private bool isBattleInitialised = false;
     
+    /*
     private void Start()
     {
         m_PlayerTurnManager = GetComponent<PlayerTurnManager>();
@@ -95,19 +96,30 @@ public class BattleManager : Singleton<BattleManager>
 
         GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke();
     }
+    */
 
     protected override void HandleAwake()
     {
         base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
+
+        m_PlayerTurnManager = GetComponent<PlayerTurnManager>();
+        m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
+        m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
+
+        InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
+
+        m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
+        m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
+        m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
         if (InputManager.IsReady)
         {
@@ -326,10 +338,13 @@ public class BattleManager : Singleton<BattleManager>
         return m_Objectives.Any(x => x.CompletionStatus == ObjectiveState.Failed && x.ObjectiveTags.HasFlag(ObjectiveTag.LoseOnFail));
     }
 
-    private void OnEarlyQuit()
+    private void OnSceneChange(SceneEnum _, SceneEnum _2)
     {
-        SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
-        m_BattleBGM = null;
+        if (m_BattleBGM.HasValue)
+        {
+            SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
+            m_BattleBGM = null;
+        }
     }
 
     private void CompleteBattle(UnitAllegiance victoriousSide)

@@ -88,12 +88,7 @@ public class MoralityDisplay : MonoBehaviour
         GlobalEvents.Level.LevelEndEvent += Hide;
 
         Show();
-        
-        //GlobalEvents.Scene.LevelSceneLoadedEvent += Show;
-        GlobalEvents.Battle.ReturnFromBattleEvent += Show;
-        GlobalEvents.Scene.BattleSceneLoadedEvent += Hide;
-        GlobalEvents.Level.ReturnFromLevelEvent += Show;        
-
+ 
         Morality = MoralityManager.Instance.CurrMoralityPercentage;
     }
 
@@ -103,12 +98,6 @@ public class MoralityDisplay : MonoBehaviour
         GlobalEvents.Morality.MoralityChangeEvent -= OnMoralityChange;
         GlobalEvents.Morality.MoralitySetEvent -= OnMoralitySet;
         GlobalEvents.Level.LevelEndEvent -= Hide;
-
-        //GlobalEvents.Scene.LevelSceneLoadedEvent -= Show;
-        GlobalEvents.Battle.ReturnFromBattleEvent -= Show;
-        GlobalEvents.Scene.BattleSceneLoadedEvent -= Hide;
-        GlobalEvents.Level.ReturnFromLevelEvent -= Show;
-        
     }
 
     private void OnMoralitySet(int value)

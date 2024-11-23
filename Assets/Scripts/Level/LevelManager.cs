@@ -76,7 +76,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         base.HandleAwake();
 
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
         GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
 
@@ -84,7 +84,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         base.HandleDestroy();
 
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
     }
 
@@ -123,7 +123,7 @@ public class LevelManager : Singleton<LevelManager>
         
         CameraManager.Instance.SetUpLevelCamera();
         
-        GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
+        //GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
         
         m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
@@ -507,7 +507,6 @@ public class LevelManager : Singleton<LevelManager>
         {
             Debug.Log("Receiving Reward Characters");
             CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
-            // CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty); // TODO: Testing if this works first
             
             foreach (var weaponReward in levelSo.m_RewardWeapons)
             {
@@ -523,7 +522,7 @@ public class LevelManager : Singleton<LevelManager>
         GlobalEvents.Level.LevelResultsEvent?.Invoke(levelSo, result);
     }
 
-    private void OnEarlyQuit()
+    private void OnSceneChange(SceneEnum _, SceneEnum _2)
     {
         if (m_LevelBGM.HasValue)
         {

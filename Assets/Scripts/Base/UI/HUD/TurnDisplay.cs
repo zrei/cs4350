@@ -45,26 +45,29 @@ namespace Game.UI
             unitName.gameObject.SetActive(false);
             timeToAct.gameObject.SetActive(false);
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
         }
 
         protected override void HandleDestroy()
         {
             base.HandleDestroy();
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         }
 
-        private void OnSceneLoad()
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
         {
+            if (toScene != SceneEnum.BATTLE)
+                return;
+
             GlobalEvents.Battle.PlayerUnitSetupEndEvent += OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
-            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
         }
 
         private void OnSetupEnd()
@@ -79,7 +82,7 @@ namespace Game.UI
             HandleQuit();
         }
 
-        private void OnEarlyQuit()
+        private void OnSceneChange(SceneEnum _, SceneEnum _2)
         {
             HandleQuit();
         }
@@ -88,7 +91,7 @@ namespace Game.UI
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
             // Clear leftover mapping
             foreach (var display in mapping.Values)

@@ -26,7 +26,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
     
         SaveManager.OnSaveEvent += SaveCharacterData;
 
@@ -71,7 +71,7 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
         SaveManager.OnSaveEvent -= SaveCharacterData;
     }
@@ -86,9 +86,13 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         }
     }
 
-    private void OnEarlyQuit()
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
-        TryLoadSaveData();
+        if (toScene != SceneEnum.WORLD_MAP)
+            return;
+
+        if (FlagManager.Instance.GetFlagValue(Flag.LOSE_LEVEL_FLAG) || FlagManager.Instance.GetFlagValue(Flag.QUIT_LEVEL_FLAG))
+            TryLoadSaveData();
     }
     #endregion
 

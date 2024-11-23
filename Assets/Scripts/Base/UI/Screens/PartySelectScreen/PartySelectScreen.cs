@@ -73,7 +73,6 @@ namespace Game.UI
                 return;
 
             UIScreenManager.Instance.CloseScreen();
-            GlobalEvents.WorldMap.OnBeginLoadLevelEvent?.Invoke();
             IEnumerable<int> selectedIds = GetSelectedCharacterIds();
             SaveManager.Instance.Save(() => GameSceneManager.Instance.LoadLevelScene(m_LevelId, CharacterDataManager.Instance.RetrieveCharacterData(selectedIds)));
         }

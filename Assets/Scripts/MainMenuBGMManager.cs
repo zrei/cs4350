@@ -1,18 +1,20 @@
+using UnityEngine;
+
 public class MainMenuBGMManager : BGMManager
 {
     protected override void Awake()
     {
         base.Awake();
 
-        GlobalEvents.MainMenu.OnBeginLoadWorldMap += OnBeginLoadWorldMap;
+        GlobalEvents.Scene.OnBeginSceneChange += OnBeginLoadWorldMap;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.MainMenu.OnBeginLoadWorldMap -= OnBeginLoadWorldMap;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnBeginLoadWorldMap;
     }
 
-    private void OnBeginLoadWorldMap()
+    private void OnBeginLoadWorldMap(SceneEnum _, SceneEnum _2)
     {
         FadeOutCurrBgm();
     }

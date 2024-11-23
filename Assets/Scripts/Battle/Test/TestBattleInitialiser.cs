@@ -13,15 +13,15 @@ public class TestBattleInitialiser : MonoBehaviour
     private void Awake()
     {
         // If BattleSceneLoadedEvent has any subscribers (from level manager), don't add the test battle initialiser
-        if (GlobalEvents.Scene.BattleSceneLoadedEvent != null) return;
+        if (BattleManager.OnReady != null) return;
         
         Debug.Log("TestBattleInitializer: No subscribers to BattleSceneLoadedEvent. Adding test battle initialiser.");
-        GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
+        BattleManager.OnReady += OnBattleSceneLoaded;
     }
     
     private void OnBattleSceneLoaded()
     {
-        GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
+        BattleManager.OnReady -= OnBattleSceneLoaded;
         
         Debug.Log("TestBattleInitializer: Battle scene loaded. Initialising battle.");
         BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData, new());
