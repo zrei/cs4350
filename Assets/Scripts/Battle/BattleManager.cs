@@ -120,7 +120,7 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnitData"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, GameObject mapBiome, List<InflictedToken> fatigueTokens)
+    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, List<InflictedToken> fatigueTokens)
     {
         m_CurrBattleSO = battleSO;
         m_TurnQueue.Clear();
@@ -132,7 +132,6 @@ public class BattleManager : Singleton<BattleManager>
         m_CurrMoralityPercentage = MoralityManager.Instance.CurrMoralityPercentage;
         m_PermanentFatigueTokens = fatigueTokens;
 
-        InstantiateBiome(mapBiome);
         m_BattleBGM = SoundManager.Instance.PlayWithFadeIn(battleSO.m_BattleBGM);
         StartCoroutine(BattleInitialise(battleSO, playerUnitData));
     }
@@ -219,14 +218,6 @@ public class BattleManager : Singleton<BattleManager>
                 return coordPair;
         }
         return default;
-    }
-
-    private void InstantiateBiome(GameObject biomeObj)
-    {
-        GameObject map = Instantiate(biomeObj, m_MapBiomeParent);
-        map.transform.localPosition = Vector3.zero;
-        map.transform.localRotation = Quaternion.identity;
-        map.transform.localScale = Vector3.one;
     }
 
     /// <summary>

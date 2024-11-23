@@ -400,7 +400,7 @@ public class LevelManager : Singleton<LevelManager>
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
         GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
-            m_LevelSO.m_BiomeObject, m_LevelRationsManager.GetInflictedTokens());
+            m_LevelSO.m_BiomeName, m_LevelRationsManager.GetInflictedTokens());
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)

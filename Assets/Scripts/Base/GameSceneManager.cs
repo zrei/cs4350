@@ -12,6 +12,13 @@ public enum SceneEnum
     LEVEL,
     BATTLE
 }
+
+public enum BattleMapType
+{
+    PLAINS,
+    FOREST,
+    CAVE
+}
 /// <summary>
 /// Singleton class for managing game scenes.
 /// </summary>
@@ -25,13 +32,14 @@ public class GameSceneManager : Singleton<GameSceneManager>
     
     private static readonly int Start = Animator.StringToHash("Start");
     private static readonly int End = Animator.StringToHash("End");
+
+    private const string BATTLE_SCENE_PATH = "BattleScene_{0}";
     
     const int MAIN_MENU_INDEX = 0;
     const int WORLD_MAP_INDEX = 1;
-    const int BATTLE_SCENE_INDEX = 2;
     
     // Respective level scenes indexes will accessed by adding the level id to the level 1 value
-    const int LEVEL_1_SCENE_INDEX = 3;
+    const int LEVEL_1_SCENE_INDEX = 2;
     
     private VoidEvent m_OnSceneChange;
     private VoidEvent m_AfterSceneChange;
@@ -49,6 +57,8 @@ public class GameSceneManager : Singleton<GameSceneManager>
     private SceneEnum m_CurrScene = SceneEnum.MAIN_MENU;
     public SceneEnum CurrScene => m_CurrScene;
     private int m_CurrLevelId;
+
+    private BattleMapType m_CurrBiome;
     #endregion
 
     #region Initialisation
@@ -72,10 +82,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
         switch (m_CurrScene)
         {
             case SceneEnum.BATTLE:
-                StartCoroutine(UnloadMultipleAdditiveScenesWithTransition(new[] {LEVEL_1_SCENE_INDEX + m_CurrLevelId, BATTLE_SCENE_INDEX}));
+                StartCoroutine(UnloadMultipleAdditiveScenesWithTransition(new[] {LEVEL_1_SCENE_INDEX + m_CurrLevelId}, new[] {string.Format(BATTLE_SCENE_PATH, m_CurrBiome)}));
                 break;
             case SceneEnum.LEVEL:
-                StartCoroutine(UnloadMultipleAdditiveScenesWithTransition(new[] {LEVEL_1_SCENE_INDEX + m_CurrLevelId}));
+                StartCoroutine(UnloadMultipleAdditiveScenesWithTransition(new[] {LEVEL_1_SCENE_INDEX + m_CurrLevelId}, new string[] {}));
                 break;
             default:
                 Logger.Log(this.GetType().Name, "Not in a scene that can return to the world map", LogLevel.ERROR);
@@ -139,7 +149,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
             LevelManager.Instance.Initialise(partyMembers);
         }
     }
-    
+
     public void UnloadLevelScene(int levelId)
     {
         m_OnSceneChange = () => m_WorldLight.gameObject.SetActive(true);
@@ -151,8 +161,10 @@ public class GameSceneManager : Singleton<GameSceneManager>
         StartCoroutine(UnloadAdditiveSceneWithTransition(sceneIndex));
     }
 
-    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, GameObject mapBiome, List<InflictedToken> fatigueTokens)
+    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, BattleMapType mapBiome, List<InflictedToken> fatigueTokens)
     {
+        m_CurrBiome = mapBiome;
+
         // Set up the callback to initialize battle parameters for when the battle scene is loaded
         GlobalEvents.Scene.BattleSceneLoadedEvent += OnBattleSceneLoaded;
         
@@ -162,14 +174,14 @@ public class GameSceneManager : Singleton<GameSceneManager>
         m_OnSceneChange += () => m_CurrScene = SceneEnum.BATTLE;
 
         // Load the battle scene
-        StartCoroutine(LoadAdditiveSceneWithTransition(BATTLE_SCENE_INDEX));
+        StartCoroutine(LoadAdditiveSceneWithTransition(string.Format(BATTLE_SCENE_PATH, mapBiome)));
         
         void OnBattleSceneLoaded()
         {
             GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
         
             Debug.Log("Battle scene loaded. Initialising battle.");
-            BattleManager.Instance.InitialiseBattle(battleSo, unitBattleData, mapBiome, fatigueTokens);
+            BattleManager.Instance.InitialiseBattle(battleSo, unitBattleData, fatigueTokens);
         }
     }
     
@@ -181,7 +193,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
         m_AfterSceneChange = () => GlobalEvents.Battle.ReturnFromBattleEvent?.Invoke();
         m_AfterSceneChange += () => m_CurrScene = SceneEnum.LEVEL;
         // Unload the battle scene
-        StartCoroutine(UnloadAdditiveSceneWithTransition(BATTLE_SCENE_INDEX));
+        StartCoroutine(UnloadAdditiveSceneWithTransition(string.Format(BATTLE_SCENE_PATH, m_CurrBiome)));
     }
 
     #endregion
@@ -207,9 +219,9 @@ public class GameSceneManager : Singleton<GameSceneManager>
         postTransitionAction?.Invoke();
     }
 
-    IEnumerator UnloadMultipleAdditiveScenesWithTransition(params int[] sceneIndexes)
+    IEnumerator UnloadMultipleAdditiveScenesWithTransition(int[] sceneIndexes, string[] sceneNames)
     {
-        int numHandles = sceneIndexes.Count();
+        int numHandles = sceneIndexes.Count() + sceneNames.Count();
         int numHandlesLoaded = 0;
 
         m_Transition.SetTrigger(Start);
@@ -219,6 +231,15 @@ public class GameSceneManager : Singleton<GameSceneManager>
         foreach (int sceneIndex in sceneIndexes)
         {
             var asyncHandle = SceneManager.UnloadSceneAsync(sceneIndex);
+            if (asyncHandle != null)
+            {
+                asyncHandle.completed += OnSceneLoadComplete;
+            }
+        }
+
+        foreach (string sceneName in sceneNames)
+        {
+            var asyncHandle = SceneManager.UnloadSceneAsync(sceneName);
             if (asyncHandle != null)
             {
                 asyncHandle.completed += OnSceneLoadComplete;
@@ -265,6 +286,28 @@ public class GameSceneManager : Singleton<GameSceneManager>
             asyncHandle.completed += OnSceneLoadComplete;
         }
     }
+
+    IEnumerator LoadAdditiveSceneWithTransition(string scenePath)
+    {
+        m_Transition.SetTrigger(Start);
+        
+        yield return new WaitForSeconds(m_TransitionTime);
+        
+        var asyncHandle = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
+        void OnSceneLoadComplete(AsyncOperation handle)
+        {
+            asyncHandle.completed -= OnSceneLoadComplete;
+
+            m_OnSceneChange?.Invoke();
+            m_OnSceneChange = null;
+            
+            m_Transition.SetTrigger(End);
+        }
+        if (asyncHandle != null)
+        {
+            asyncHandle.completed += OnSceneLoadComplete;
+        }
+    }
     
     IEnumerator UnloadAdditiveSceneWithTransition(int sceneIndex)
     {
@@ -288,6 +331,28 @@ public class GameSceneManager : Singleton<GameSceneManager>
         if (asyncHandle != null)
         {
             asyncHandle.completed += OnSceneUnloadComplete;
+        }
+    }
+
+    IEnumerator UnloadAdditiveSceneWithTransition(string scenePath)
+    {
+        m_Transition.SetTrigger(Start);
+        
+        yield return new WaitForSeconds(m_TransitionTime);
+        
+        var asyncHandle = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
+        void OnSceneLoadComplete(AsyncOperation handle)
+        {
+            asyncHandle.completed -= OnSceneLoadComplete;
+
+            m_OnSceneChange?.Invoke();
+            m_OnSceneChange = null;
+            
+            m_Transition.SetTrigger(End);
+        }
+        if (asyncHandle != null)
+        {
+            asyncHandle.completed += OnSceneLoadComplete;
         }
     }
 

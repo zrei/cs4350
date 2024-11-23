@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 #if UNITY_EDITOR
 public class SceneLoadTool : EditorWindow
@@ -9,12 +12,13 @@ public class SceneLoadTool : EditorWindow
     private string m_MainMenuPath = "Assets/Scenes/MainMenuScene";
     private string m_WorldMapPath = "Assets/Scenes/WorldMapScene";
     private string m_LevelPath = "Assets/Scenes/Level{0}Scene";
-    private string m_BattlePath = "Assets/Scenes/BattleScene";
+    private string m_BattlePath = "Assets/Scenes/BattleScene_{0}";
 
     private string m_CurrentScenePath; 
     private const string SCENE_PATH_FORMAT = "{0}.unity";
 
     private int m_LevelNumber = 1;
+    private int m_BattleMapBiomeIndex = 0;
 
     [MenuItem("Window/Scene Load Tool")]
     public static void ShowSceneLoadWindow()
@@ -49,9 +53,14 @@ public class SceneLoadTool : EditorWindow
 
         GUILayout.Space(10f);
         m_BattlePath = EditorGUILayout.TextField("Battle Scene Path", m_BattlePath);
-        if (GUILayout.Button("Load Battle Scene"))
+
+        IEnumerable<BattleMapType> battleMapBiomes = Enum.GetValues(typeof(BattleMapType)).OfType<BattleMapType>();
+        string[] options = battleMapBiomes.Select(x => x.ToString()).ToArray();
+        m_BattleMapBiomeIndex = EditorGUILayout.Popup("Battle Map Biome", m_BattleMapBiomeIndex, options);
+        BattleMapType finalBiome = battleMapBiomes.ElementAt(m_BattleMapBiomeIndex);
+        if (GUILayout.Button($"Load {finalBiome} Battle Scene"))
         {
-            LoadScene(string.Format(SCENE_PATH_FORMAT, m_BattlePath));
+            LoadScene(string.Format(SCENE_PATH_FORMAT, string.Format(m_BattlePath, finalBiome)));
         }
 
         GUILayout.Space(30f);

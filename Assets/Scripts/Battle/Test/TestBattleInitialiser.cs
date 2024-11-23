@@ -9,7 +9,6 @@ public class TestBattleInitialiser : MonoBehaviour
 {
     [SerializeField] private List<PlayerCharacterBattleData> m_TestData;
     [SerializeField] private BattleSO m_TestBattle;
-    [SerializeField] private GameObject m_MapBiome;
     
     private void Awake()
     {
@@ -25,6 +24,6 @@ public class TestBattleInitialiser : MonoBehaviour
         GlobalEvents.Scene.BattleSceneLoadedEvent -= OnBattleSceneLoaded;
         
         Debug.Log("TestBattleInitializer: Battle scene loaded. Initialising battle.");
-        BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData, m_MapBiome, new());
+        BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData, new());
     }
 }
