@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game;
 using Game.Input;
 using Game.UI;
-using Level;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
@@ -60,7 +57,6 @@ public class LevelManager : Singleton<LevelManager>
     #region Input and Selected Node
     
     private NodeInternal m_CurrTargetNode;
-    private bool m_HasHitNode;
 
     // for tutorial purposes
     private BattleNode m_CurrBattleNode = null;
@@ -171,12 +167,41 @@ public class LevelManager : Singleton<LevelManager>
     #endregion
 
     #region Inputs
-
-    private void OnPointerPosition(IInput input)
+    
+    private void EnableLevelGraphInput()
     {
-        var inputVector = input.GetValue<Vector2>();
-        Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
-        m_HasHitNode = m_LevelNodeManager.TryRetrieveNode(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetNode);
+        GlobalEvents.Level.NodeHoverStartEvent += OnNodeHoverStart;
+        GlobalEvents.Level.NodeHoverEndEvent += OnNodeHoverEnd;
+        
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
+        
+        m_LevelCameraController.EnableCameraMovement();
+    }
+    
+    private void DisableLevelGraphInput()
+    {
+        GlobalEvents.Level.NodeHoverStartEvent -= OnNodeHoverStart;
+        GlobalEvents.Level.NodeHoverEndEvent -= OnNodeHoverEnd;
+        
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= OnTogglePartyMenu;
+        
+        m_LevelCameraController.DisableCameraMovement();
+    }
+    
+    private void OnNodeHoverStart(NodeInternal node)
+    {
+        m_CurrTargetNode = node;
+        
+        UpdateState();
+    }
+    
+    private void OnNodeHoverEnd()
+    {
+        m_CurrTargetNode = null;
         
         UpdateState();
     }
@@ -202,26 +227,6 @@ public class LevelManager : Singleton<LevelManager>
             UIScreenManager.Instance.CloseScreen();
         }
     }
-    
-    private void EnableLevelGraphInput()
-    {
-        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
-        
-        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
-        
-        m_LevelCameraController.EnableCameraMovement();
-    }
-    
-    private void DisableLevelGraphInput()
-    {
-        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
-        
-        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= OnTogglePartyMenu;
-        
-        m_LevelCameraController.DisableCameraMovement();
-    }
 
     #endregion
 
@@ -229,7 +234,7 @@ public class LevelManager : Singleton<LevelManager>
 
     private void UpdateState()
     {
-        if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
+        if (m_CurrSelectedNode && m_CurrSelectedNode == m_CurrTargetNode)
         {
             m_CurrState = m_CurrSelectedNode != m_LevelNodeManager.CurrentNode 
                 ? PlayerLevelSelectionState.MOVING_NODE
@@ -269,7 +274,7 @@ public class LevelManager : Singleton<LevelManager>
 
     private void TrySelectNode()
     {
-        if (m_HasHitNode)
+        if (m_CurrTargetNode)
         {
             if (m_CurrSelectedNode && m_CurrSelectedNode != m_CurrTargetNode)
             {
