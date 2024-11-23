@@ -422,7 +422,7 @@ public class LevelManager : Singleton<LevelManager>
         }
         else
         {
-            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete);
+            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete, !m_LevelSO.m_FailOnDefeat);
         }
         
         return;
@@ -446,7 +446,14 @@ public class LevelManager : Singleton<LevelManager>
 
         void OnFailureAnimComplete()
         {
-            OnLevelEnd(m_LevelSO, LevelResultType.DEFEAT);
+            if (m_LevelSO.m_FailOnDefeat)
+            {
+                OnLevelEnd(m_LevelSO, LevelResultType.DEFEAT);
+            }
+            else
+            {
+                StartPlayerPhase();
+            }
         }
     }
     

@@ -11,6 +11,8 @@ public class LevelSO : ScriptableObject
     public string m_LevelName;
     [TextArea]
     public string m_LevelDescription;
+    [Tooltip("Whether the level will immediately end when the player fails a battle")]
+    public bool m_FailOnDefeat = true;
 
     [Header("BGM")]
     public AudioDataSO m_LevelBGM;
