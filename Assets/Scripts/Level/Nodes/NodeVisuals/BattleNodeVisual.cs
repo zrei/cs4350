@@ -90,9 +90,9 @@ public class BattleNodeVisual : LevelNodeVisual
         return true;
     }
     
-    public override void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete)
+    public override void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete, bool resetOnComplete = false)
     {
-        playerToken.Defeat(onComplete);
+        playerToken.Defeat(onComplete, resetOnComplete);
     }
 
     #endregion
