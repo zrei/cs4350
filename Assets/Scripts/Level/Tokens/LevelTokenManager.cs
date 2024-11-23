@@ -153,11 +153,11 @@ public class LevelTokenManager : MonoBehaviour
         }
     }
     
-    public void PlayFailureAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
+    public void PlayFailureAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete, bool resetOnComplete = false)
     {
         if (nodeVisual.HasFailureAnimation())
         {
-            nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete);
+            nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete, resetOnComplete);
         }
         else
         {

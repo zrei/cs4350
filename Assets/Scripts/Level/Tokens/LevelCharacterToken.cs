@@ -81,14 +81,15 @@ namespace Level
         {
             m_ArmorVisual.Die(onComplete);
         }
-        
+
         /// <summary>
         /// Defeat animation without fade away
         /// </summary>
         /// <param name="onComplete"></param>
-        public void Defeat(VoidEvent onComplete)
+        /// <param name="resetOnComplete"></param>
+        public void Defeat(VoidEvent onComplete, bool resetOnComplete = false)
         {
-            m_ArmorVisual.Defeat(onComplete);
+            m_ArmorVisual.Defeat(onComplete, resetOnComplete);
         }
     }
 }
