@@ -399,8 +399,9 @@ public class LevelManager : Singleton<LevelManager>
         
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
-            m_LevelSO.m_BiomeName, m_LevelRationsManager.GetInflictedTokens());
+        BattleSO battleSO = battleNode.BattleSO;
+        GameSceneManager.Instance.LoadBattleScene(battleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            battleSO.m_OverrideBattleMap ? battleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, m_LevelRationsManager.GetInflictedTokens());
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
