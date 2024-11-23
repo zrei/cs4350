@@ -2,21 +2,22 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ObjectiveMarker : MonoBehaviour
+public class UnitMarker : MonoBehaviour
 {
-    public enum Type
+    public enum IconType
     {
-        Default,
+        Objective,
         Enemy,
         Boss,
         Lord,
+        TimeToAct,
     }
 
     [SerializeField]
     List<ParticleSystem> m_Particles;
 
     [SerializeField]
-    ParticleSystem m_DefaultIconParticles;
+    ParticleSystem m_ObjectiveIconParticles;
 
     [SerializeField]
     ParticleSystem m_EnemyIconParticles;
@@ -27,13 +28,16 @@ public class ObjectiveMarker : MonoBehaviour
     [SerializeField]
     ParticleSystem m_LordIconParticles;
 
+    [SerializeField]
+    ParticleSystem m_TimeToActIconParticles;
+
     ParticleSystem m_ActiveIconParticles;
 
     bool m_IsActive;
 
     private void Awake()
     {
-        var emission = m_DefaultIconParticles.emission;
+        var emission = m_ObjectiveIconParticles.emission;
         emission.enabled = false;
         emission = m_EnemyIconParticles.emission;
         emission.enabled = false;
@@ -41,7 +45,9 @@ public class ObjectiveMarker : MonoBehaviour
         emission.enabled = false;
         emission = m_LordIconParticles.emission;
         emission.enabled = false;
-        SetMarkerType(Type.Default);
+        emission = m_TimeToActIconParticles.emission;
+        emission.enabled = false;
+        SetMarkerType(IconType.Objective);
 
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
@@ -70,22 +76,25 @@ public class ObjectiveMarker : MonoBehaviour
         m_Particles?.ForEach(x => { var main = x.main; main.startColor = color; });
     }
 
-    public void SetMarkerType(Type type)
+    public void SetMarkerType(IconType type)
     {
         ParticleSystem next = null;
         switch (type)
         {
-            case Type.Default:
-                next = m_DefaultIconParticles;
+            case IconType.Objective:
+                next = m_ObjectiveIconParticles;
                 break;
-            case Type.Enemy:
+            case IconType.Enemy:
                 next = m_EnemyIconParticles;
                 break;
-            case Type.Boss:
+            case IconType.Boss:
                 next = m_BossIconParticles;
                 break;
-            case Type.Lord:
+            case IconType.Lord:
                 next = m_LordIconParticles;
+                break;
+            case IconType.TimeToAct:
+                next = m_TimeToActIconParticles;
                 break;
         }
         if (next == null || next == m_ActiveIconParticles) return;
