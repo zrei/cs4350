@@ -66,8 +66,6 @@ public class SoundManager : Singleton<SoundManager>
 
         transform.SetParent(null);
         DontDestroyOnLoad(this.gameObject);
-
-        GlobalEvents.MainMenu.OnReturnToMainMenu += OnReturnToMainMenu;
     }
 
     private void InitVolumes()
@@ -83,8 +81,6 @@ public class SoundManager : Singleton<SoundManager>
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
-
-        GlobalEvents.MainMenu.OnReturnToMainMenu -= OnReturnToMainMenu;
     }
     #endregion
 
@@ -228,6 +224,7 @@ public class SoundManager : Singleton<SoundManager>
     }
     #endregion
 
+    /*
     #region Event Callbacks
     private void OnReturnToMainMenu()
     {
@@ -242,6 +239,7 @@ public class SoundManager : Singleton<SoundManager>
         }
     }
     #endregion
+    */
 
     #region Helper
     public bool IsPlaying(int token)

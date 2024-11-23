@@ -31,14 +31,12 @@ public class BattleNode : NodeInternal
     protected override void PerformNode(VoidEvent postEvent = null)
     {
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
-        GlobalEvents.Battle.ReturnFromBattleEvent += OnReturnFromBattle;
         GlobalEvents.Level.BattleNodeStartEvent?.Invoke(this);
     }
 
     private void OnDestroy()
     {
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-        GlobalEvents.Battle.ReturnFromBattleEvent -= OnReturnFromBattle;
     }
 
     private void OnBattleEnd(UnitAllegiance victor, int numTurns)
@@ -49,11 +47,16 @@ public class BattleNode : NodeInternal
         
         // Remove the event listener
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
     }
     
-    private void OnReturnFromBattle()
+    private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
     {
-        GlobalEvents.Battle.ReturnFromBattleEvent -= OnReturnFromBattle;
+        if (toScene != SceneEnum.LEVEL)
+            return;
+
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
 
         GlobalEvents.Level.BattleNodeEndEvent?.Invoke(this, m_Victor, m_NumTurns);
     }

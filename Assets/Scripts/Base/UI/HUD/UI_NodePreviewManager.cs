@@ -12,12 +12,15 @@ public class UI_NodePreviewManager : MonoBehaviour
     private void Awake()
     {
         Hide();
-        GlobalEvents.Scene.LevelSceneLoadedEvent += OnSceneLoad;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
     }
 
-    private void OnSceneLoad()
+    private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
     {
-        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnSceneLoad;
+        if (toScene != SceneEnum.LEVEL)
+            return;
+
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
         
         EnablePreview();
         GlobalEvents.Dialogue.DialogueStartEvent += DisablePreview;
@@ -27,7 +30,7 @@ public class UI_NodePreviewManager : MonoBehaviour
     private void OnDestroy()
     {
         DisablePreview();
-        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnSceneLoad;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
         GlobalEvents.Dialogue.DialogueStartEvent -= DisablePreview;
         GlobalEvents.Dialogue.DialogueEndEvent -= EnablePreview;
     }

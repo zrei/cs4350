@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine;
+using Game.Input;
 
 namespace Game.UI
 {
@@ -85,6 +86,11 @@ namespace Game.UI
         private void B_Close()
         {
             UIScreenManager.Instance.CloseScreen();
+        }
+
+        public override void OnCancel(IInput input)
+        {
+            // pass, cannot be closed with on cancel
         }
     }
 }

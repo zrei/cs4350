@@ -41,7 +41,6 @@ namespace Game.UI
         private void B_MainMenu()
         {
             RemoveListeners();
-            GlobalEvents.MainMenu.OnReturnToMainMenu?.Invoke();
             UIScreenManager.Instance.CloseScreen();
             if (GameSceneManager.Instance.CurrScene == SceneEnum.WORLD_MAP)
             {
@@ -56,7 +55,6 @@ namespace Game.UI
         private void B_QuitLevel()
         {
             RemoveListeners();
-            GlobalEvents.Scene.EarlyQuitEvent?.Invoke();
             UIScreenManager.Instance.CloseScreen();
             GameSceneManager.Instance.ReturnToWorldMap();
         }

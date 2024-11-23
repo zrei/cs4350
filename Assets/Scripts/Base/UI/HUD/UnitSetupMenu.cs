@@ -19,11 +19,14 @@ namespace Game.UI
             button.onSubmit.RemoveAllListeners();
             button.onSubmit.AddListener(EndSetup);
             
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
         }
 
-        private void OnSceneLoad()
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
         {
+            if (toScene != SceneEnum.BATTLE)
+                return;
+
             var playerUnitSetup = BattleManager.Instance.PlayerUnitSetup;
             if (playerUnitSetup == null || !playerUnitSetup.IsSetupStarted)
             {
@@ -39,29 +42,29 @@ namespace Game.UI
         {
             GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
 
-            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
             Show();
         }
 
         private void OnDestroy()
         {
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.PlayerUnitSetupStartEvent -= OnSetupStart;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         }
 
         private void EndSetup()
         {
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
             BattleManager.Instance.PlayerUnitSetup.EndSetup();
             Hide();
         }
 
-        private void OnEarlyQuit()
+        private void OnSceneChange(SceneEnum _, SceneEnum _2)
         {
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
             Hide();
         }

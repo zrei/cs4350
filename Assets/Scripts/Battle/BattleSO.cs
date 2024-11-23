@@ -34,4 +34,8 @@ public class BattleSO : ScriptableObject
     public List<TutorialPageUIData> m_SetupPhaseTutorial;
     [Tooltip("Tutorial to play upon entering battle phase - leave empty for no tutorial")]
     public List<TutorialPageUIData> m_BattlePhaseTutorial;
+
+    [Header("Biome")]
+    public bool m_OverrideBattleMap = false;
+    public BattleMapType m_OverriddenBattleMapType;
 }

@@ -59,7 +59,6 @@ public class MainMenuScreen : MonoBehaviour
 
     private void GoToWorldMap()
     {
-        GlobalEvents.MainMenu.OnBeginLoadWorldMap?.Invoke();
         GameSceneManager.Instance.LoadWorldMapScene();
     }
 

@@ -134,18 +134,21 @@ public class SaveManager : Singleton<SaveManager>, ISave
         DontDestroyOnLoad(this.gameObject);
         m_SessionSave = new(this);
 
-        GlobalEvents.MainMenu.OnReturnToMainMenu += OnQuitGame;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
 
-        GlobalEvents.MainMenu.OnReturnToMainMenu -= OnQuitGame;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
     }
 
-    private void OnQuitGame()
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (toScene != SceneEnum.MAIN_MENU)
+            return;
+
         m_SessionSave.Clear();
     }
 
@@ -172,7 +175,7 @@ public class SaveManager : Singleton<SaveManager>, ISave
         }
     }
 
-    public void ClearSave()
+    private void ClearSave()
     {
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
