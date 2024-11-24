@@ -72,6 +72,20 @@ public class LevellingManager : Singleton<LevellingManager>
         statGrowths.ForEach(x => statGrowthDict.Add(x.Item1, x.Item2));
         return currStats.LevelUpStats(statGrowthDict);
     }
+
+    public Stats LevelUpStats(Stats initialStats, StatProgress initialStatProgress, GrowthRate growthRate, int numLevelsGained)
+    {
+        Stats currStats = initialStats;
+        for (int i = 0; i < numLevelsGained; ++i)
+        {
+            initialStatProgress.TryProgressStats(growthRate, out List<(StatType, int)> statGrowths);
+
+            Dictionary<StatType, int> statGrowthDict = new();
+            statGrowths.ForEach(x => statGrowthDict.Add(x.Item1, x.Item2));
+            currStats = currStats.LevelUpStats(statGrowthDict);
+        }
+        return currStats;
+    }
     
     public float GetProgressToNextLevel(PlayerCharacterData characterData)
     {
