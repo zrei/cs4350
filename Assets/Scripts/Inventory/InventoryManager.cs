@@ -56,31 +56,17 @@ public class InventoryManager : Singleton<InventoryManager>
     {
         base.HandleAwake();
 
-        HandleDependencies();
+        LoadWeapons();
 
         GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
         SaveManager.OnSaveEvent += SaveWeapons;
     }
 
-    private void HandleDependencies()
+    protected override void AddDependencies()
     {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!PersistentDataManager.IsReady)
-        {
-            PersistentDataManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-        PersistentDataManager.OnReady -= HandleDependencies;
-
-        LoadWeapons();
+        AddDependency<SaveManager>();
+        AddDependency<PersistentDataManager>();
     }
 
     protected override void HandleDestroy()

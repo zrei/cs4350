@@ -51,7 +51,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
         GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
 
-        HandleDependencies();
+        StartCoroutine(Initialise());
     }
 
     protected override void HandleDestroy()
@@ -65,24 +65,10 @@ public class WorldMapManager : Singleton<WorldMapManager>
         DisableAllControls();
     }
 
-    private void HandleDependencies()
+    protected override void AddDependencies()
     {
-        if (!CharacterDataManager.IsReady)
-        {
-            CharacterDataManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!FlagManager.IsReady)
-        {
-            FlagManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        CharacterDataManager.OnReady -= HandleDependencies;
-        FlagManager.OnReady -= HandleDependencies;
-
-        StartCoroutine(Initialise());
+        AddDependency<CharacterDataManager>();
+        AddDependency<FlagManager>();
     }
 
     private IEnumerator Initialise()

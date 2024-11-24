@@ -30,37 +30,17 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
     
         SaveManager.OnSaveEvent += SaveCharacterData;
 
-        HandleDependencies();
-    }
-
-    private void HandleDependencies()
-    {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!PersistentDataManager.IsReady)
-        {
-            PersistentDataManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!LevellingManager.IsReady)
-        {
-            LevellingManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-        PersistentDataManager.OnReady -= HandleDependencies;
-        LevellingManager.OnReady -= HandleDependencies;
-        
         if (!TryLoadSaveData())
         {
             LoadStartingCharacters();
         }
+    }
+
+    protected override void AddDependencies()
+    {
+        AddDependency<SaveManager>();
+        AddDependency<PersistentDataManager>();
+        AddDependency<LevellingManager>();
     }
 
     protected override void HandleDestroy()
