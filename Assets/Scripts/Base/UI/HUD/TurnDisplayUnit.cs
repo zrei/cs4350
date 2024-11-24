@@ -1,12 +1,20 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Game.UI
 {
-    public class TurnDisplayUnit : MonoBehaviour
+    public class TurnDisplayUnit : MonoBehaviour,
+        IPointerEnterHandler,
+        IPointerExitHandler
     {
-        private Image image;
+        [SerializeField]
+        private RectTransform root;
+
+        [SerializeField]
+        private GraphicGroup graphicGroup;
+
         private RectTransform rectTransform;
 
         private Unit unit;
@@ -18,8 +26,6 @@ namespace Game.UI
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
-            image = GetComponent<Image>();
-            GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDefeated;
         }
 
         private void OnDestroy()
@@ -34,20 +40,19 @@ namespace Game.UI
                 if (animateCoroutine != null) StopCoroutine(animateCoroutine);
                 GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDefeated;
                 TurnDisplay.Instance.RemoveTurnDisplayUnit(unit);
-                Destroy(gameObject);
             }
         }
 
-        public void OnPreviewUnit(Unit unit)
+        private void SetHighlightActive(bool active)
         {
-            if (unit == this.unit)
+            if (active)
             {
                 if (animateCoroutine != null) StopCoroutine(animateCoroutine);
                 animateCoroutine = StartCoroutine(Animate(Vector3.one * 2, Color.yellow));
             }
             else
             {
-                var targetColor = this.unit.UnitAllegiance switch
+                var targetColor = unit.UnitAllegiance switch
                 {
                     UnitAllegiance.PLAYER => Color.cyan,
                     UnitAllegiance.ENEMY => Color.red,
@@ -58,23 +63,28 @@ namespace Game.UI
             }
         }
 
+        public void OnPreviewUnit(Unit unit)
+        {
+            SetHighlightActive(unit == this.unit);
+        }
+
         private IEnumerator Animate(Vector3 targetScale, Color targetColor)
         {
-            var scale = transform.localScale;
-            var color = image.color;
+            var scale = root.localScale;
+            var color = graphicGroup.color;
             var t = 0f;
             var duration = 0.1f;
             var p = t / duration;
             while (t < duration)
             {
-                transform.localScale = Vector3.Lerp(scale, targetScale, p);
-                image.color = Color.Lerp(color, targetColor, p);
+                root.localScale = Vector3.Lerp(scale, targetScale, p);
+                graphicGroup.color = Color.Lerp(color, targetColor, p);
                 t += Time.deltaTime;
                 p = t / duration;
                 yield return null;
             }
-            transform.localScale = targetScale;
-            image.color = targetColor;
+            root.localScale = targetScale;
+            graphicGroup.color = targetColor;
             animateCoroutine = null;
         }
 
@@ -84,12 +94,13 @@ namespace Game.UI
             switch (unit.UnitAllegiance)
             {
                 case UnitAllegiance.PLAYER:
-                    image.color = Color.cyan;
+                    graphicGroup.color = Color.cyan;
                     break;
                 case UnitAllegiance.ENEMY:
-                    image.color = Color.red;
+                    graphicGroup.color = Color.red;
                     break;
             }
+            GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDefeated;
         }
 
         public void UpdateTurnValue(float timeToNext, float max)
@@ -101,6 +112,20 @@ namespace Game.UI
             var rot = rectTransform.localEulerAngles;
             rot.z = ratio * 360;
             rectTransform.localEulerAngles = rot;
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            TurnDisplay.Instance.OnPreviewUnit(unit);
+            unit.UnitMarker.SetColor(Color.yellow);
+            unit.UnitMarker.SetMarkerType(UnitMarker.IconType.TimeToAct);
+            unit.UnitMarker.SetActive(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            TurnDisplay.Instance.OnPreviewUnit(null);
+            unit.UnitMarker.SetActive(false);
         }
     }
 }

@@ -36,8 +36,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public AnimationEventHandler AnimationEventHandler => m_ArmorVisual.AnimationEventHandler;
     public Transform BodyCenter => m_ArmorVisual.BodyCenter;
 
-    [SerializeField] private ObjectiveMarker m_ObjectiveMarker;
-    public ObjectiveMarker ObjectiveMarker => m_ObjectiveMarker;
+    [SerializeField] private UnitMarker m_UnitMarker;
+    public UnitMarker UnitMarker => m_UnitMarker;
 
     #region Current Status
     // current health
@@ -502,7 +502,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         OnDeath?.Invoke();
         m_ArmorVisual.Die(null);
-        m_ObjectiveMarker.SetActive(false);
+        m_UnitMarker.SetActive(false);
         GlobalEvents.Battle.UnitDefeatedEvent?.Invoke(this);
     }
     #endregion
