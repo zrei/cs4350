@@ -27,6 +27,8 @@ public class LevelSO : ScriptableObject
     public int m_UnitLimit = 8;
     [Tooltip("Characters that must take part in this battle - the lord and any characters not owned by the player will be disregarded if it is in this list\nIf the number of characters exceeds the party limit, only the first few will be taken")]
     public List<PlayerCharacterSO> m_LockedInCharacters;
+    [Tooltip("Whether to show the party select screen at all, or directly start the level")]
+    public bool m_ShowCharacterSelectScreen = true;
     
     [Header("Rewards")]
     public List<PlayerCharacterSO> m_RewardCharacters;

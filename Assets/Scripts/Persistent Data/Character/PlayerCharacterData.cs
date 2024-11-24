@@ -184,3 +184,27 @@ public struct PlayerCharacterBattleData
         return m_BaseData.GetUnitModelData(m_ClassSO.m_OutfitType);
     }
 } 
+
+/// <summary>
+/// Meant to serialise character data specifically for tutorial purposes, 
+/// allowing any configuration to be specified while still relying on existing
+/// character data.
+/// </summary>
+[System.Serializable]
+public class TutorialCharacterData
+{
+    public PlayerCharacterSO m_BaseData;
+
+    public int m_CurrCharaLevel = 1;
+    public PlayerClassSO m_ClassSO;
+
+    public WeaponInstanceSO m_CurrEquippedWeapon;
+
+    [Tooltip("Whether this player unit should be tracked in battle. Once this unit dies, the battle is considered lost. This could be due to a variety of reasons, e.g. the unit is a lord etc.")]
+    public bool m_CannotDieWithoutLosingBattle;
+
+    public PlayerCharacterBattleData GetBattleData()
+    {
+        return new PlayerCharacterBattleData(m_BaseData, LevellingManager.Instance.LevelUpStats(m_BaseData.m_StartingStats, new StatProgress(), m_BaseData.m_GrowthRates.FlatAugment(m_ClassSO.m_GrowthRateAugments), m_CurrCharaLevel - 1).FlatAugment(m_ClassSO.m_StatAugments), m_ClassSO, m_CurrEquippedWeapon, m_CannotDieWithoutLosingBattle, m_ClassSO.GetInflictedTokens(m_CurrCharaLevel));
+    }
+} 

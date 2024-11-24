@@ -1,5 +1,7 @@
 using TMPro;
+using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public struct LevelData 
 {
@@ -43,7 +45,16 @@ namespace Game.UI
         #region Transition
         private void OpenPartySelect(LevelSO levelSO)
         {
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PartySelectScreen, false, levelSO);
+            if (levelSO.m_ShowCharacterSelectScreen)
+                UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.PartySelectScreen, false, levelSO);
+            else
+            {
+                List<PlayerCharacterData> characterData = new();
+                if (CharacterDataManager.Instance.TryRetrieveLordCharacterData(out PlayerCharacterData lordData))
+                    characterData.Add(lordData);
+                characterData.AddRange(CharacterDataManager.Instance.RetrieveCharacterData(levelSO.m_LockedInCharacters.Select(x => x.m_Id), true));
+                SaveManager.Instance.Save(() => GameSceneManager.Instance.LoadLevelScene(levelSO.m_LevelId, characterData));
+            }
         }
         #endregion
 

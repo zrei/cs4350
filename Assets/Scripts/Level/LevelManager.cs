@@ -405,7 +405,7 @@ public class LevelManager : Singleton<LevelManager>
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
         BattleSO battleSO = battleNode.BattleSO;
-        GameSceneManager.Instance.LoadBattleScene(battleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+        GameSceneManager.Instance.LoadBattleScene(battleSO, battleSO.m_OverrideCharacters ? battleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
             battleSO.m_OverrideBattleMap ? battleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, m_LevelRationsManager.GetInflictedTokens());
     }
     
@@ -562,7 +562,7 @@ public class LevelManager : Singleton<LevelManager>
             m_PendingRewards[RewardType.RATION] = 0;
         }
         
-        if (m_PendingRewards.ContainsKey(RewardType.EXP))
+        if (m_PendingRewards.ContainsKey(RewardType.EXP) && m_PendingRewards[RewardType.EXP] != 0)
         {
             hasEvent = true;
 

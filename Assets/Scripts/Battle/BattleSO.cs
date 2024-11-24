@@ -34,6 +34,10 @@ public class BattleSO : ScriptableObject
     public List<TutorialPageUIData> m_SetupPhaseTutorial;
     [Tooltip("Tutorial to play upon entering battle phase - leave empty for no tutorial")]
     public List<TutorialPageUIData> m_BattlePhaseTutorial;
+    [Tooltip("Whether to override the characters in the party")]
+    public bool m_OverrideCharacters = false;
+    [Tooltip("Which characters should be brought into the battle instead if overridden")]
+    public List<TutorialCharacterData> m_TutorialCharacters;
 
     [Header("Biome")]
     public bool m_OverrideBattleMap = false;
