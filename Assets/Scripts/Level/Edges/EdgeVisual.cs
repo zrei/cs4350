@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public class EdgeVisual : MonoBehaviour
 {
@@ -45,6 +44,13 @@ public class EdgeVisual : MonoBehaviour
             m_LineRenderer.SetPosition(i, position);
         }
         
+        m_CostText.text = m_EdgeInternal.Cost.ToString();
+        
+        SceneVisibilityManager.instance.DisablePicking(m_LineRenderer.gameObject, false);
+    }
+
+    public void ResetCostTextPosition()
+    {
         // Set Text position to the middle of the line
         m_CostText.transform.position = 
             (m_EdgeInternal.NodeInternalA.transform.position + m_EdgeInternal.NodeInternalB.transform.position) / 2 
@@ -60,7 +66,7 @@ public class EdgeVisual : MonoBehaviour
 public class EdgeVisualEditor : Editor
 {
     EdgeVisual m_Target;
-    EdgeVisual[] m_Targets;
+    EdgeVisual[] m_TargetEdgeVisuals;
 
     private void OnEnable()
     {
@@ -68,10 +74,10 @@ public class EdgeVisualEditor : Editor
             m_Target = (EdgeVisual) target;
         else
         {
-            m_Targets = new EdgeVisual[targets.Length];
+            m_TargetEdgeVisuals = new EdgeVisual[targets.Length];
             for (var i = 0; i < targets.Length; i++)
             {
-                m_Targets[i] = (EdgeVisual) targets[i];
+                m_TargetEdgeVisuals[i] = (EdgeVisual) targets[i];
             }
         }
     }
@@ -82,13 +88,26 @@ public class EdgeVisualEditor : Editor
         
         if (GUILayout.Button("Draw Edge"))
         {
-            if (m_Targets == null)
+            if (m_TargetEdgeVisuals == null)
                 DrawEdgeFromEditor(m_Target);
             else
             {
-                foreach (var edgeVisual in m_Targets)
+                foreach (var edgeVisual in m_TargetEdgeVisuals)
                 {
                     DrawEdgeFromEditor(edgeVisual);
+                }
+            }
+        }
+        
+        if (GUILayout.Button("Reset Cost Text Position"))
+        {
+            if (m_TargetEdgeVisuals == null)
+                ResetCostTextPositionFromEditor(m_Target);
+            else
+            {
+                foreach (var edgeVisual in m_TargetEdgeVisuals)
+                {
+                    ResetCostTextPositionFromEditor(edgeVisual);
                 }
             }
         }
@@ -101,6 +120,14 @@ public class EdgeVisualEditor : Editor
         Undo.RecordObject(edgeVisual.m_LineRenderer, "Updated LineRenderer");
         PrefabUtility.RecordPrefabInstancePropertyModifications(edgeVisual.m_LineRenderer);
             
+        Undo.RecordObject(edgeVisual.m_CostText, "Updated CostText");
+        PrefabUtility.RecordPrefabInstancePropertyModifications(edgeVisual.m_CostText);
+    }
+    
+    private void ResetCostTextPositionFromEditor(EdgeVisual edgeVisual)
+    {
+        edgeVisual.ResetCostTextPosition();
+        
         Undo.RecordObject(edgeVisual.m_CostText, "Updated CostText");
         PrefabUtility.RecordPrefabInstancePropertyModifications(edgeVisual.m_CostText);
     }

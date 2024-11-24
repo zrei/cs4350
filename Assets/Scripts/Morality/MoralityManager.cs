@@ -20,7 +20,11 @@ public class MoralityManager : Singleton<MoralityManager>
         GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
         SaveManager.OnSaveEvent += SaveMorality;
-        HandleDependencies();
+        
+        if (!TryLoadMoralitySave())
+        {
+            SetMorality(Mathf.FloorToInt(m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality));
+        }
     }
 
     protected override void HandleDestroy()
@@ -33,20 +37,9 @@ public class MoralityManager : Singleton<MoralityManager>
         SaveManager.OnSaveEvent -= SaveMorality;
     }
 
-    private void HandleDependencies()
-    {        
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-
-        if (!TryLoadMoralitySave())
-        {
-            SetMorality(Mathf.FloorToInt(m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality));
-        }
+    protected override void AddDependencies()
+    {
+        AddDependency<SaveManager>();
     }
     #endregion
 

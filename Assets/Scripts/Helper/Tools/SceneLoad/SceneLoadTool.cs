@@ -19,6 +19,8 @@ public class SceneLoadTool : EditorWindow
 
     private int m_LevelNumber = 1;
     private int m_BattleMapBiomeIndex = 0;
+    
+    private string m_TestLevelAdditivePath = "Assets/Scenes/TestScenes/TestLevelAdditiveScene";
 
     [MenuItem("Window/Scene Load Tool")]
     public static void ShowSceneLoadWindow()
@@ -49,6 +51,19 @@ public class SceneLoadTool : EditorWindow
         if (GUILayout.Button($"Load Level {m_LevelNumber} Scene"))
         {
             LoadScene(string.Format(SCENE_PATH_FORMAT, string.Format(m_LevelPath, m_LevelNumber)));
+        }
+        GUILayout.Space(5f);
+        m_TestLevelAdditivePath = EditorGUILayout.TextField("Test Level Additive Scene Path", m_TestLevelAdditivePath);
+        if (GUILayout.Button($"Load Test Level Additive Scene"))
+        {
+            LoadScene(string.Format(SCENE_PATH_FORMAT, string.Format(m_TestLevelAdditivePath)));
+        }
+        if (GUILayout.Button($"Load Game in Level {m_LevelNumber}"))
+        {
+            m_CurrentScenePath = EditorSceneManager.GetActiveScene().path;
+            var m_LevelScenePath = string.Format(SCENE_PATH_FORMAT, string.Format(m_LevelPath, m_LevelNumber));
+            var m_TestLevelAdditiveScenePath = string.Format(SCENE_PATH_FORMAT, m_TestLevelAdditivePath);
+            LoadScene(m_LevelScenePath, (() => LoadScene(m_TestLevelAdditiveScenePath, PlayScene, OpenSceneMode.Additive)));
         }
 
         GUILayout.Space(10f);
@@ -84,7 +99,7 @@ public class SceneLoadTool : EditorWindow
         }
     }
 
-    private void LoadScene(string scenePath, VoidEvent postEvent = null)
+    private void LoadScene(string scenePath, VoidEvent postEvent = null, OpenSceneMode mode = OpenSceneMode.Single)
     {
         if (EditorApplication.isPlaying)
         {
@@ -94,7 +109,7 @@ public class SceneLoadTool : EditorWindow
 
         if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
         {
-            EditorSceneManager.OpenScene(scenePath);
+            EditorSceneManager.OpenScene(scenePath, mode);
             postEvent?.Invoke();
         }
         else

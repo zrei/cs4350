@@ -97,8 +97,11 @@ namespace Game.UI
 
             GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
             GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
-
-            SetVisibilityWorld();
+        }
+        
+        protected override void AddDependencies()
+        {
+            AddDependency<CoroutineManager>();
         }
 
         protected override void HandleDestroy()

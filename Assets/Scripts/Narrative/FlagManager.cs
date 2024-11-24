@@ -46,7 +46,7 @@ public class FlagManager : Singleton<FlagManager>
     {
         base.HandleAwake();
 
-        HandleDependencies();
+        LoadPersistentFlags();
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
         GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
@@ -64,17 +64,9 @@ public class FlagManager : Singleton<FlagManager>
         SaveManager.OnSaveEvent -= SavePersistentFlags;
     }
 
-    private void HandleDependencies()
+    protected override void AddDependencies()
     {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-
-        LoadPersistentFlags();
+        AddDependency<SaveManager>();
     }
     #endregion
 
