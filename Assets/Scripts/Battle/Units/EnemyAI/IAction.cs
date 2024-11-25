@@ -7,7 +7,7 @@ public interface IConcreteAction
     /// Check if the current node is completed
     /// </summary>
     /// <returns></returns>
-    public abstract bool IsCompleted();
+    public abstract bool IsCompleted(EnemyUnit enemyUnit, MapLogic mapLogic);
 
     /// <summary>
     /// Goes directly to running, will not do any further checks.
@@ -48,7 +48,7 @@ public interface IConcreteAction
 }
 
 // has to be set to an object so it's serialisable
-public abstract class ActionSO : ScriptableObject 
+public abstract class EnemyAction : MonoBehaviour
 {
     public abstract IConcreteAction GenerateConcreteAction();
 }

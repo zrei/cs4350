@@ -6,9 +6,9 @@ using System.Collections.Generic;
 /// </summary>
 public abstract class EnemyActionWrapper : IConcreteAction
 {
-    public EnemyActionSO m_Action;
+    public EnemyActionInstance m_Action;
 
-    public bool IsCompleted()
+    public bool IsCompleted(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
         return true;
     }
@@ -49,7 +49,7 @@ public class EnemyUnit : Unit
     }
     private EnemyActionWrapper nextAction;
 
-    private BehaviourTree m_TopLevelBehaviour;
+    private BehaviourTreeRuntimeInstance m_TopLevelBehaviour;
 
     public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO, List<InflictedToken> permanentTokens)
     {
@@ -59,9 +59,9 @@ public class EnemyUnit : Unit
         InitialiseActions(enemyCharacterSO.EnemyActionSetSO);
     }
 
-    private void InitialiseActions(BehaviourTreeSO behaviourTreeSO)
+    private void InitialiseActions(BehaviourTree behaviourTree)
     {
-        m_TopLevelBehaviour = new(behaviourTreeSO);
+        m_TopLevelBehaviour = new(behaviourTree);
         
         /*
         m_OrderedConditions = new();
@@ -93,7 +93,7 @@ public class EnemyUnit : Unit
         if (m_TopLevelBehaviour.ShouldBreakOut(this, mapLogic))
         {
             m_TopLevelBehaviour.Reset();
-            NextAction = new EnemyPassActionWrapper {m_Action = new EnemyPassActionSO()};
+            NextAction = new EnemyPassActionWrapper {m_Action = new EnemyPassAction()};
             return NextAction;
         }
 
