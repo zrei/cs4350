@@ -6,37 +6,26 @@ using UnityEngine;
 public class EnemyMoveActionWrapper : EnemyActionWrapper
 {
     private IEnumerable<CoordPair> m_CanOccupyTiles;
-    private CoordPair m_CachedTarget;
 
     private EnemyMoveActionSO MoveAction => (EnemyMoveActionSO) m_Action;
 
-    public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
+    public override bool ShouldBreakOut(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return MoveAction.CanActionBePerformed(enemyUnit, mapLogic, out m_CanOccupyTiles);
+        return !MoveAction.CanActionBePerformed(enemyUnit, mapLogic, out m_CanOccupyTiles);
     }
 
-    public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public override void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
     {
-        /*
-        float baseWeight = 1f / m_ReachablePoints.Count;
-
-        List<(PathNode, float)> nodeWeights = m_ReachablePoints.Select(x => (x, baseWeight)).ToList();
-
-        for (int i = 0; i < nodeWeights.Count; ++i)
-        {
-            (PathNode node, float weight) = nodeWeights[i];
-            float finalNodeWeight = weight * MoveAction.GetFinalWeightProportionForTile(enemyUnit, mapLogic, node.m_Coordinates);
-            nodeWeights[i] = (node, finalNodeWeight);
-        }
-
-        PathNode toMoveTo = RandomHelper.GetRandomT(nodeWeights);
-        */
-
         // calculate the final tile that the unit wants to move towards
         CoordPair finalTile = MoveAction.GetChosenTile(enemyUnit, mapLogic, m_CanOccupyTiles);
         
         mapLogic.TryReachTile(GridType.ENEMY, enemyUnit, finalTile, completeActionEvent);
         enemyUnit.ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
+    }
+
+    public override HashSet<ActiveSkillSO> GetNestedActiveSkills()
+    {
+        return new();
     }
 }
 
@@ -73,8 +62,8 @@ public class EnemyMoveActionSO : EnemyActionSO
         return finalTiles.First();
     }
 
-    public override EnemyActionWrapper GetWrapper(int priority)
+    public override IConcreteAction GenerateConcreteAction()
     {
-        return new EnemyMoveActionWrapper {m_Action = this, m_Priority = priority};
+        return new EnemyMoveActionWrapper {m_Action = this};
     }
 }

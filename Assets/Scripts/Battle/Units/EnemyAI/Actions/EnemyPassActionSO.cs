@@ -1,23 +1,29 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyPassActionWrapper : EnemyActionWrapper
 {
-    public override bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
+    public override bool ShouldBreakOut(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return true;
+        return false;
     }
 
-    public override void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public override void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
     {
         completeActionEvent?.Invoke();
+    }
+
+    public override HashSet<ActiveSkillSO> GetNestedActiveSkills()
+    {
+        return new();
     }
 }
 
 [CreateAssetMenu(fileName = "EnemyPassActionSO", menuName = "ScriptableObject/Battle/Enemy/EnemyAI/Actions/EnemyPassActionSO")]
 public class EnemyPassActionSO : EnemyActionSO
 {
-    public override EnemyActionWrapper GetWrapper(int priority)
+    public override IConcreteAction GenerateConcreteAction()
     {
-        return new EnemyPassActionWrapper {m_Action = this, m_Priority = priority};
+        return new EnemyPassActionWrapper {m_Action = this};
     }   
 }

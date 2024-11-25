@@ -4,5 +4,5 @@ using UnityEngine;
 public class EnemyClassSO : ClassSO
 {
     [Header("Enemy Actions")]
-    public EnemyActionSetSO m_EnemyActionSet;
+    public BehaviourTreeSO m_EnemyBehaviourTree;
 }
