@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -14,6 +15,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 {
     [Tooltip("Characters to start with")]
     [SerializeField] List<StartingPlayerCharacter> m_StartingCharacters;
+
+    [Tooltip("Number of characters the player must own before the game starts blanket levelling up characters once completing a level")]
+    [SerializeField] private int m_NumCharasBeforeBlanketLevelUp = 5;
 
     private readonly Dictionary<int, PlayerCharacterData> m_CharacterData = new();
 
@@ -73,6 +77,30 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
 
         if (FlagManager.Instance.GetFlagValue(Flag.LOSE_LEVEL_FLAG) || FlagManager.Instance.GetFlagValue(Flag.QUIT_LEVEL_FLAG))
             TryLoadSaveData();
+    }
+
+    public void PostLevelBlanketLevelUp()
+    {
+        // do nothing if there are less characters than the required amount
+        if (m_CharacterData.Count <= m_NumCharasBeforeBlanketLevelUp)
+        {
+            return;
+        }
+
+        List<PlayerCharacterData> sortedByLevel = m_CharacterData.Values.ToList();
+        sortedByLevel.Sort((a, b) => {
+            if (a.m_CurrLevel < b.m_CurrLevel)
+                return -1;
+            else if (a.m_CurrLevel > b.m_CurrLevel)
+                return 1;
+            return 0;
+        });
+        int blanketLevel = sortedByLevel[sortedByLevel.Count - m_NumCharasBeforeBlanketLevelUp].m_CurrLevel;
+        
+        foreach (PlayerCharacterData playerCharacterData in m_CharacterData.Values)
+        {
+            LevellingManager.Instance.LevelCharacterToLevel(playerCharacterData, blanketLevel);
+        }
     }
     #endregion
 
