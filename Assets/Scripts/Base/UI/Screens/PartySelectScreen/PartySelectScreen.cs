@@ -17,6 +17,7 @@ namespace Game.UI
 
         [Header("Tutorial")]
         [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+        [SerializeField] private NamedObjectButton m_TutorialButton;
 
         [Space]
         [SerializeField] TextMeshProUGUI m_PartyText;
@@ -44,18 +45,24 @@ namespace Game.UI
             base.ShowDone();
 
             m_BeginLevelButton.onSubmit.AddListener(OnBeginLevel);
+            m_TutorialButton.onSubmit.AddListener(ShowTutorial);
 
             if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_PARTY_SELECT))
             {                
-                StartCoroutine(ShowTutorial());
+                StartCoroutine(ShowTutorial_Coroutine());
             }
         }
 
-        private IEnumerator ShowTutorial()
+        private IEnumerator ShowTutorial_Coroutine()
         {
             yield return null;
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            ShowTutorial();
             FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_PARTY_SELECT, true, FlagType.PERSISTENT);
+        }
+
+        private void ShowTutorial()
+        {
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
         }
 
         public override void Hide()
@@ -63,6 +70,7 @@ namespace Game.UI
             base.Hide();
 
             m_BeginLevelButton.onSubmit.RemoveListener(OnBeginLevel);
+            m_TutorialButton.onSubmit.RemoveListener(ShowTutorial);
         }
         #endregion
 
