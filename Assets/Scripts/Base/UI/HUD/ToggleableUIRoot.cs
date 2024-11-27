@@ -34,6 +34,12 @@ namespace Game.UI
             UIManager.Instance.Add(this);
         }
 
+        private void OnDestroy()
+        {
+            if (UIManager.IsReady)
+                UIManager.Instance.Remove(this);
+        }
+
         public void Show()
         {
             m_UIFader.Show();
