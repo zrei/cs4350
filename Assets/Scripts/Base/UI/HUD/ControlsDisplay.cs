@@ -12,7 +12,7 @@ namespace Game.UI
         {
             GlobalEvents.Scene.OnSceneTransitionEvent += ShowControls;
             
-            ShowWorldMapControls();
+            HideAll();
         }
         
         private void OnDestroy()
@@ -32,6 +32,9 @@ namespace Game.UI
                     break;
                 case SceneEnum.BATTLE:
                     ShowBattleControls();
+                    break;
+                default:
+                    HideAll();
                     break;
             }
         }
@@ -53,6 +56,13 @@ namespace Game.UI
         private void ShowWorldMapControls()
         {
             Show(m_WorldMapControls);
+            Hide(m_LevelControls);
+            Hide(m_BattleControls);
+        }
+
+        private void HideAll()
+        {
+            Hide(m_WorldMapControls);
             Hide(m_LevelControls);
             Hide(m_BattleControls);
         }

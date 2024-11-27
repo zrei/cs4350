@@ -7,6 +7,10 @@ using UnityEngine.UI;
 /// </summary>
 public class MainMenuScreen : MonoBehaviour
 {
+    [Header("Camera")]
+    [SerializeField] private Camera m_MainMenuCamera;
+
+    [Header("UI")]
     [SerializeField] private RawImage m_BottomGlow;
     [SerializeField] private float m_TextureAnimSpeed = 0.1f;
     [SerializeField] private NamedObjectButton m_NewGameButton;
@@ -71,30 +75,30 @@ public class MainMenuScreen : MonoBehaviour
 
     private void B_Credits()
     {
+        m_MainMenuCamera.enabled = false;
+        UIScreenManager.Instance.CreditsScreen.OnHideDone += OnSecondaryScreenClose;
         UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CreditsScreen);
     }
 
     private void B_Options()
     {
+        m_MainMenuCamera.enabled = false;
+        UIScreenManager.Instance.OptionScreen.OnHideDone += OnSecondaryScreenClose;
         UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.OptionScreen);
     }
 
-    private void Update()
+    private void OnSecondaryScreenClose(IUIScreen uiScreen)
     {
-        var rect = m_BottomGlow.uvRect;
-        rect.x = Time.time * m_TextureAnimSpeed;
-        m_BottomGlow.uvRect = rect;
-        //throw new System.NotImplementedException();
+        uiScreen.OnHideDone -= OnSecondaryScreenClose;
+        m_MainMenuCamera.enabled = true;
     }
 
-    /*
     private void Update()
     {
         var rect = m_BottomGlow.uvRect;
         rect.x = Time.time * m_TextureAnimSpeed;
         m_BottomGlow.uvRect = rect;
     }
-    */
     #endregion
 
     #region Btn Listeners
@@ -105,11 +109,4 @@ public class MainMenuScreen : MonoBehaviour
         m_QuitButton.onSubmit.RemoveListener(B_QuitGame);
     }
     #endregion
-
-    /*
-    public override void OnCancel(IInput input)
-    {
-        // pass
-    }
-    */
 }

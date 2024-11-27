@@ -283,7 +283,6 @@ GameObject:
   - component: {fileID: 7962295647433836688}
   - component: {fileID: 5386107828933816300}
   - component: {fileID: 6355113039036517106}
-  - component: {fileID: 5210080497330988660}
   - component: {fileID: 5178505859969193323}
   - component: {fileID: 295289016847975117}
   - component: {fileID: 8162464947564552337}
@@ -330,6 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97acd9453158e48779254d97999b68d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_MainMenuCamera: {fileID: 0}
   m_BottomGlow: {fileID: 400593198948785642}
   m_TextureAnimSpeed: 0.05
   m_NewGameButton: {fileID: 7930918539409791821}
@@ -350,18 +350,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_DefaultBGM: {fileID: 11400000, guid: 2902442577dc949cd874479ecc9c0ff9, type: 2}
---- !u!225 &5210080497330988660
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6257242371608671824}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!223 &5178505859969193323
 Canvas:
   m_ObjectHideFlags: 0
@@ -371,16 +359,16 @@ Canvas:
   m_GameObject: {fileID: 6257242371608671824}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 2
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -397,11 +385,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96

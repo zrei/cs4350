@@ -57,24 +57,6 @@ namespace Game.UI
         [SerializeField]
         private List<GameObject> screenPrefabs = new();
 
-        
-        protected override void HandleAwake()
-        {
-            base.HandleAwake();
-
-            //OpenScreen(MainMenuScreen);
-
-            //GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
-        }
-
-        protected override void HandleDestroy()
-        {
-            base.HandleDestroy();
-
-            //GlobalEvents.Scene.OnSceneTransitionEvent -= OnSceneTransition;
-        }
-        
-
         private IUIScreen LoadScreen(string name)
         {
             if (!screens.ContainsKey(name))
@@ -149,15 +131,5 @@ namespace Game.UI
         {
             CurrentScreen?.ScreenUpdate();
         }
-
-        /*
-        private void OnSceneTransition(SceneEnum finalScene)
-        {
-            if (finalScene == SceneEnum.MAIN_MENU)
-            {
-                OpenScreen(MainMenuScreen, true);
-            }
-        }
-        */
     }
 }
