@@ -15,11 +15,6 @@ public class MainMenuScreen : MonoBehaviour
     [SerializeField] private NamedObjectButton m_OptionsButton;
     [SerializeField] private NamedObjectButton m_QuitButton;
 
-    private void Awake()
-    {
-        HandleDependencies();
-    }
-
     private void Start()
     {
         m_NewGameButton.onSubmit.AddListener(B_StartNewGame);
@@ -27,6 +22,8 @@ public class MainMenuScreen : MonoBehaviour
         m_QuitButton.onSubmit.AddListener(B_QuitGame);
         m_CreditsButton.onSubmit.AddListener(B_Credits);
         m_OptionsButton.onSubmit.AddListener(B_Options);
+
+        HandleDependencies();
     }
 
     private void OnDestroy()
@@ -63,7 +60,6 @@ public class MainMenuScreen : MonoBehaviour
 
     private void GoToWorldMap()
     {
-        GlobalEvents.MainMenu.OnBeginLoadWorldMap?.Invoke();
         GameSceneManager.Instance.LoadWorldMapScene();
     }
 
@@ -88,7 +84,17 @@ public class MainMenuScreen : MonoBehaviour
         var rect = m_BottomGlow.uvRect;
         rect.x = Time.time * m_TextureAnimSpeed;
         m_BottomGlow.uvRect = rect;
+        //throw new System.NotImplementedException();
     }
+
+    /*
+    private void Update()
+    {
+        var rect = m_BottomGlow.uvRect;
+        rect.x = Time.time * m_TextureAnimSpeed;
+        m_BottomGlow.uvRect = rect;
+    }
+    */
     #endregion
 
     #region Btn Listeners
@@ -99,4 +105,11 @@ public class MainMenuScreen : MonoBehaviour
         m_QuitButton.onSubmit.RemoveListener(B_QuitGame);
     }
     #endregion
+
+    /*
+    public override void OnCancel(IInput input)
+    {
+        // pass
+    }
+    */
 }

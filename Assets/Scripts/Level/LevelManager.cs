@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game;
 using Game.Input;
 using Game.UI;
-using Level;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 public enum PlayerLevelSelectionState
@@ -43,14 +40,6 @@ public class LevelManager : Singleton<LevelManager>
     [SerializeField] private LevelSO m_LevelSO;
     [SerializeField] private StartNode m_StartNode;
     [SerializeField] private NodeInternal m_GoalNode;
-    
-    // UI
-    IUIScreen m_CharacterManagementScreen;
-    IUIScreen m_BattleNodeResultScreen;
-    IUIScreen m_RewardNodeResultScreen;
-    IUIScreen m_LevelUpResultScreen;
-    IUIScreen m_LevelResultScreen;
-    IUIScreen m_ExpScreen;
 
     #region Current State
     
@@ -68,7 +57,9 @@ public class LevelManager : Singleton<LevelManager>
     #region Input and Selected Node
     
     private NodeInternal m_CurrTargetNode;
-    private bool m_HasHitNode;
+
+    // for tutorial purposes
+    private BattleNode m_CurrBattleNode = null;
     
     #endregion
 
@@ -81,7 +72,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         base.HandleAwake();
 
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
         GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
 
@@ -89,7 +80,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         base.HandleDestroy();
 
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
     }
 
@@ -119,26 +110,16 @@ public class LevelManager : Singleton<LevelManager>
         m_LevelTokenManager.Initialise(m_CurrParty[0].GetBattleData(), 
             m_LevelNodeVisualManager.GetNodeVisual(m_StartNode));
         
-        Debug.Log(m_LevelCameraController);
-        Debug.Log(m_LevelTokenManager);
         // Set up level camera
         m_LevelCameraController.Initialise(m_LevelTokenManager.GetPlayerTokenTransform());
         
         m_LevelNodeManager.SetStartNode(m_StartNode);
         
         AddNodeEventCallbacks();
-
-        // Preload UI Screens
-        m_CharacterManagementScreen = UIScreenManager.Instance.CharacterManagementScreen;
-        m_BattleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
-        m_RewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
-        m_LevelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
-        m_LevelResultScreen = UIScreenManager.Instance.LevelResultScreen;
-        m_ExpScreen = UIScreenManager.Instance.ExpScreen;
         
         CameraManager.Instance.SetUpLevelCamera();
         
-        GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
+        //GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
         
         m_StartNode.StartNodeEvent(StartPlayerPhase);
     }
@@ -186,12 +167,41 @@ public class LevelManager : Singleton<LevelManager>
     #endregion
 
     #region Inputs
-
-    private void OnPointerPosition(IInput input)
+    
+    private void EnableLevelGraphInput()
     {
-        var inputVector = input.GetValue<Vector2>();
-        Vector3 mousePos = new Vector3(inputVector.x, inputVector.y, Camera.main.nearClipPlane);
-        m_HasHitNode = m_LevelNodeManager.TryRetrieveNode(Camera.main.ScreenPointToRay(mousePos), out m_CurrTargetNode);
+        GlobalEvents.Level.NodeHoverStartEvent += OnNodeHoverStart;
+        GlobalEvents.Level.NodeHoverEndEvent += OnNodeHoverEnd;
+        
+        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
+        
+        m_LevelCameraController.EnableCameraMovement();
+    }
+    
+    private void DisableLevelGraphInput()
+    {
+        GlobalEvents.Level.NodeHoverStartEvent -= OnNodeHoverStart;
+        GlobalEvents.Level.NodeHoverEndEvent -= OnNodeHoverEnd;
+        
+        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
+        
+        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= OnTogglePartyMenu;
+        
+        m_LevelCameraController.DisableCameraMovement();
+    }
+    
+    private void OnNodeHoverStart(NodeInternal node)
+    {
+        m_CurrTargetNode = node;
+        
+        UpdateState();
+    }
+    
+    private void OnNodeHoverEnd()
+    {
+        m_CurrTargetNode = null;
         
         UpdateState();
     }
@@ -205,37 +215,17 @@ public class LevelManager : Singleton<LevelManager>
     
     private void OnTogglePartyMenu(IInput input)
     {
-        if (!UIScreenManager.Instance.IsScreenOpen(m_CharacterManagementScreen))
+        IUIScreen characterManagementScreen = UIScreenManager.Instance.CharacterManagementScreen;
+        if (!UIScreenManager.Instance.IsScreenOpen(characterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(m_CurrParty, true);
-            UIScreenManager.Instance.OpenScreen(m_CharacterManagementScreen);
+            UIScreenManager.Instance.OpenScreen(characterManagementScreen, false, m_CurrParty);
         }
-        else if (UIScreenManager.Instance.IsScreenActive(m_CharacterManagementScreen))
+        else if (UIScreenManager.Instance.IsScreenActive(characterManagementScreen))
         {
             Debug.Log("Closing Party Management Screen");
             UIScreenManager.Instance.CloseScreen();
         }
-    }
-    
-    private void EnableLevelGraphInput()
-    {
-        InputManager.Instance.PointerPositionInput.OnChangeEvent += OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
-        
-        InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
-        
-        m_LevelCameraController.EnableCameraMovement();
-    }
-    
-    private void DisableLevelGraphInput()
-    {
-        InputManager.Instance.PointerPositionInput.OnChangeEvent -= OnPointerPosition;
-        InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
-        
-        InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= OnTogglePartyMenu;
-        
-        m_LevelCameraController.DisableCameraMovement();
     }
 
     #endregion
@@ -244,7 +234,7 @@ public class LevelManager : Singleton<LevelManager>
 
     private void UpdateState()
     {
-        if (m_CurrSelectedNode && m_HasHitNode && m_CurrSelectedNode == m_CurrTargetNode)
+        if (m_CurrSelectedNode && m_CurrSelectedNode == m_CurrTargetNode)
         {
             m_CurrState = m_CurrSelectedNode != m_LevelNodeManager.CurrentNode 
                 ? PlayerLevelSelectionState.MOVING_NODE
@@ -284,7 +274,7 @@ public class LevelManager : Singleton<LevelManager>
 
     private void TrySelectNode()
     {
-        if (m_HasHitNode)
+        if (m_CurrTargetNode)
         {
             if (m_CurrSelectedNode && m_CurrSelectedNode != m_CurrTargetNode)
             {
@@ -409,12 +399,14 @@ public class LevelManager : Singleton<LevelManager>
 
     private void OnBattleNodeStart(BattleNode battleNode)
     {
+        m_CurrBattleNode = battleNode;
         Debug.Log("LevelManager: Starting Battle Node");
         
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
-        GameSceneManager.Instance.LoadBattleScene(battleNode.BattleSO, m_CurrParty.Select(x => x.GetBattleData()).ToList(),
-            m_LevelSO.m_BiomeObject, m_LevelRationsManager.GetInflictedTokens());
+        BattleSO battleSO = battleNode.BattleSO;
+        GameSceneManager.Instance.LoadBattleScene(battleSO, battleSO.m_OverrideCharacters ? battleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            battleSO.m_OverrideBattleMap ? battleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, m_LevelRationsManager.GetInflictedTokens());
     }
     
     private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
@@ -431,7 +423,7 @@ public class LevelManager : Singleton<LevelManager>
         }
         else
         {
-            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete);
+            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete, !m_LevelSO.m_FailOnDefeat);
         }
         
         return;
@@ -448,14 +440,21 @@ public class LevelManager : Singleton<LevelManager>
             m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) 
                                                - numTurns;
         
-            UIScreenManager.Instance.OpenScreen(m_BattleNodeResultScreen);
-            
-            GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+            IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
+            battleNodeResultScreen.OnHideDone += OnCloseRewardScreen;
+            UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, new BattleNodeResultUIData(battleNode.BattleSO, victor, numTurns));
         }
 
         void OnFailureAnimComplete()
         {
-            OnLevelEnd(m_LevelSO, LevelResultType.DEFEAT);
+            if (m_LevelSO.m_FailOnDefeat)
+            {
+                OnLevelEnd(m_LevelSO, LevelResultType.DEFEAT);
+            }
+            else
+            {
+                StartPlayerPhase();
+            }
         }
     }
     
@@ -474,15 +473,14 @@ public class LevelManager : Singleton<LevelManager>
         else if (rewardNode.RewardType == RewardType.WEAPON)
             m_PendingWeaponRewards.Add(rewardNode.WeaponReward);
         
-        UIScreenManager.Instance.OpenScreen(m_RewardNodeResultScreen);
-        
-        // Wait for reward screen to close
-        GlobalEvents.Level.CloseRewardScreenEvent += OnCloseRewardScreen;
+        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        rewardNodeResultScreen.OnHideDone += OnCloseRewardScreen;
+        UIScreenManager.Instance.OpenScreen(rewardNodeResultScreen, false, rewardNode);
     }
     
-    private void OnCloseRewardScreen()
+    private void OnCloseRewardScreen(IUIScreen screen)
     {
-        GlobalEvents.Level.CloseRewardScreenEvent -= OnCloseRewardScreen;
+        screen.OnHideDone -= OnCloseRewardScreen;
         
         ProcessReward(out var hasEvent);
 
@@ -493,12 +491,11 @@ public class LevelManager : Singleton<LevelManager>
         }
     }
     
-    private void OnCloseLevellingScreen()
+    private void OnCloseLevellingScreen(IUIScreen screen)
     {
-        GlobalEvents.Level.CompleteExpGainEvent -= OnCloseLevellingScreen;
-        GlobalEvents.Level.CloseLevellingScreenEvent -= OnCloseLevellingScreen;
-        
-        StartPlayerPhase();
+        screen.OnHideDone -= OnCloseLevellingScreen;
+
+        m_CurrBattleNode?.PostTutorial(StartPlayerPhase);
     }
     
     private void OnDialogueNodeEnd(DialogueNode dialogueNode)
@@ -514,7 +511,8 @@ public class LevelManager : Singleton<LevelManager>
     {
         GlobalEvents.Level.LevelEndEvent?.Invoke();
 
-        UIScreenManager.Instance.OpenScreen(m_LevelResultScreen);
+        IUIScreen levelResultScreen = UIScreenManager.Instance.LevelResultScreen;
+        UIScreenManager.Instance.OpenScreen(levelResultScreen, false, new LevelResultUIData(levelSo, result));
 
         FlagManager.Instance.SetFlagValue(result == LevelResultType.SUCCESS ? Flag.WIN_LEVEL_FLAG : Flag.LOSE_LEVEL_FLAG, true, FlagType.SESSION);
 
@@ -522,7 +520,6 @@ public class LevelManager : Singleton<LevelManager>
         {
             Debug.Log("Receiving Reward Characters");
             CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
-            // CharacterDataManager.Instance.UpdateCharacterData(m_CurrParty); // TODO: Testing if this works first
             
             foreach (var weaponReward in levelSo.m_RewardWeapons)
             {
@@ -538,7 +535,7 @@ public class LevelManager : Singleton<LevelManager>
         GlobalEvents.Level.LevelResultsEvent?.Invoke(levelSo, result);
     }
 
-    private void OnEarlyQuit()
+    private void OnSceneChange(SceneEnum _, SceneEnum _2)
     {
         if (m_LevelBGM.HasValue)
         {
@@ -565,7 +562,7 @@ public class LevelManager : Singleton<LevelManager>
             m_PendingRewards[RewardType.RATION] = 0;
         }
         
-        if (m_PendingRewards.ContainsKey(RewardType.EXP))
+        if (m_PendingRewards.ContainsKey(RewardType.EXP) && m_PendingRewards[RewardType.EXP] != 0)
         {
             hasEvent = true;
 
@@ -573,25 +570,26 @@ public class LevelManager : Singleton<LevelManager>
             
             m_PendingRewards[RewardType.EXP] = 0;
             
+            IUIScreen expScreen = UIScreenManager.Instance.ExpScreen;
+
             if (levelledUpCharacters.Count > 0)
             {
-                GlobalEvents.Level.CompleteExpGainEvent += ShowLevelUpScreen;
+                expScreen.OnHideDone += ShowLevelUpScreen;
             }
             else
             {
-                GlobalEvents.Level.CompleteExpGainEvent += OnCloseLevellingScreen;
+                expScreen.OnHideDone += OnCloseLevellingScreen;
             }
 
-            void ShowLevelUpScreen()
+            void ShowLevelUpScreen(IUIScreen expScreen)
             {
-                GlobalEvents.Level.CompleteExpGainEvent -= ShowLevelUpScreen;
-                GlobalEvents.Level.MassLevellingEvent?.Invoke(levelledUpCharacters);
-                UIScreenManager.Instance.OpenScreen(m_LevelUpResultScreen);
-                GlobalEvents.Level.CloseLevellingScreenEvent += OnCloseLevellingScreen;
+                expScreen.OnHideDone -= ShowLevelUpScreen;
+                IUIScreen levelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
+                levelUpResultScreen.OnHideDone += OnCloseLevellingScreen;
+                UIScreenManager.Instance.OpenScreen(levelUpResultScreen, false, levelledUpCharacters);
             }
 
-            GlobalEvents.Level.ExpGainEvent?.Invoke(expGainSummaries);
-            UIScreenManager.Instance.OpenScreen(m_ExpScreen);
+            UIScreenManager.Instance.OpenScreen(expScreen, false, expGainSummaries);
         }
 
         if (m_PendingWeaponRewards.Count > 0)

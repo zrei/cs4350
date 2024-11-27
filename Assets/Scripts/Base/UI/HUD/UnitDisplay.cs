@@ -107,12 +107,15 @@ namespace Game.UI
             {
                 uiAnimator = GetComponent<UIAnimator>();
 
-                GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+                GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
             }
         }
 
-        private void OnSceneLoad()
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
         {
+            if (toScene != SceneEnum.BATTLE)
+                return;
+
             if (isCurrentUnitDisplay)
             {
                 GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewUnit;
@@ -123,7 +126,7 @@ namespace Game.UI
             }
 
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
-            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
             GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
         }
 
@@ -132,7 +135,7 @@ namespace Game.UI
             HandleQuit();
         }
 
-        private void OnEarlyQuit()
+        private void OnSceneChange(SceneEnum _, SceneEnum _2)
         {
             HandleQuit();
         }
@@ -147,7 +150,7 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
             GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
 
             Hide();
@@ -155,11 +158,11 @@ namespace Game.UI
 
         private void OnDestroy()
         {
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
             GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
         }
 

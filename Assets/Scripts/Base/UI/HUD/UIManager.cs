@@ -95,21 +95,47 @@ namespace Game.UI
         {
             base.HandleAwake();
 
-            GlobalEvents.WorldMap.OnBeginLoadLevelEvent += SetVisiblityNone;
+            GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
 
-            GlobalEvents.Level.ReturnFromLevelEvent += SetVisibilityWorld;
+            SetVisiblityNone();
+        }
+        
+        protected override void AddDependencies()
+        {
+            AddDependency<CoroutineManager>();
+        }
 
-            GlobalEvents.Scene.LevelSceneLoadedEvent += SetVisibilityLevel;
-            GlobalEvents.Battle.ReturnFromBattleEvent += SetVisibilityLevel;
+        protected override void HandleDestroy()
+        {
+            base.HandleDestroy();
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += SetVisibilityBattle;
-            //GlobalEvents.Battle.PlayerUnitSetupStartEvent += OnBattleSetUpStart;
-            //GlobalEvents.Battle.PlayerTurnStartEvent += OnBattlePlayerTurnStart;
-            //GlobalEvents.Battle.EnemyTurnStartEvent += OnBattleEnemyTurnStart;
-            //GlobalEvents.Battle.AttackAnimationEvent += OnBattleSkillAnimationEvent;
-            //GlobalEvents.Battle.BattleEndEvent += OnBattleEndEvent;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnBeginSceneChange;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
+        }
 
-            SetVisibilityWorld();
+        private void OnBeginSceneChange(SceneEnum _, SceneEnum _2)
+        {
+            SetVisiblityNone();
+        }
+
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
+        {
+            switch (toScene)
+            {
+                case SceneEnum.BATTLE:
+                    SetVisibilityBattle();
+                    break;
+                case SceneEnum.LEVEL:
+                    SetVisibilityLevel();
+                    break;
+                case SceneEnum.WORLD_MAP:
+                    SetVisibilityWorld();
+                    break;
+                default:
+                    SetVisiblityNone();
+                    break;
+            }
         }
 
         private void SetVisiblityNone() { VisibilityTags = VisibilityTags.None; }

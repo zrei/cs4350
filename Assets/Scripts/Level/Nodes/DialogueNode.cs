@@ -1,6 +1,5 @@
 using Game.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [System.Serializable]
 public struct FlagCondition
@@ -43,7 +42,7 @@ public class DialogueNode : NodeInternal
     [SerializeField] private Dialogue m_DefaultDialogue;
     [SerializeField] private ConditionalDialogue[] m_ConditionalDialogues;
     
-    public override void StartNodeEvent()
+    protected override void PerformNode(VoidEvent postEvent = null)
     {
         Debug.Log("Starting Dialogue Node");
         GlobalEvents.Dialogue.DialogueEndEvent += OnDialogueEnd;
@@ -64,6 +63,14 @@ public class DialogueNode : NodeInternal
         Debug.Log("Dialogue Ended");
         GlobalEvents.Dialogue.DialogueEndEvent -= OnDialogueEnd;
         
-        GlobalEvents.Level.DialogueNodeEndEvent?.Invoke(this);
+        if (!m_HasPlayedPostTutorial)
+        {
+            m_HasPlayedPostTutorial = true;
+            PlayTutorial(m_PostTutorial, () => GlobalEvents.Level.DialogueNodeEndEvent?.Invoke(this));
+        }
+        else
+        {
+            GlobalEvents.Level.DialogueNodeEndEvent?.Invoke(this);
+        }
     }
 }

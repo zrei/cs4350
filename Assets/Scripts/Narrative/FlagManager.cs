@@ -10,7 +10,10 @@ public enum Flag
 {
     WIN_LEVEL_FLAG,
     LOSE_LEVEL_FLAG,
-    QUIT_LEVEL_FLAG
+    QUIT_LEVEL_FLAG,
+    HAS_VISITED_WORLD_MAP,
+    HAS_VISITED_PARTY_SELECT,
+    HAS_VISITED_CHARACTER_MANAGEMENT
 }
 
 public enum FlagType
@@ -43,11 +46,12 @@ public class FlagManager : Singleton<FlagManager>
     {
         base.HandleAwake();
 
-        HandleDependencies();
+        LoadPersistentFlags();
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent += OnEndPreCutscene;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
+
+        SaveManager.OnSaveEvent += SavePersistentFlags;
     }
 
     protected override void HandleDestroy()
@@ -55,47 +59,33 @@ public class FlagManager : Singleton<FlagManager>
         base.HandleDestroy();
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
-        GlobalEvents.WorldMap.OnEndPreCutsceneEvent -= OnEndPreCutscene;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
+
+        SaveManager.OnSaveEvent -= SavePersistentFlags;
     }
 
-    private void HandleDependencies()
+    protected override void AddDependencies()
     {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-
-        LoadPersistentFlags();
+        AddDependency<SaveManager>();
     }
     #endregion
 
     #region Level Result
     private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
     {
-        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
-    }
-
-    private void OnEndPreCutscene()
-    {
-        HandleLevelResult(true);
-    }
-
-    private void OnEarlyQuit()
-    {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
+        if (levelResultType != LevelResultType.SUCCESS)
         {
-            SavePersistentFlags();
+            ClearPersistentFlags();
+            TryLoadSavedPersistentFlags();
         }
-        else
+    }
+
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
+    {
+        if (toScene != SceneEnum.WORLD_MAP)
+            return;
+
+        if (GetFlagValue(Flag.QUIT_LEVEL_FLAG) || GetFlagValue(Flag.LOSE_LEVEL_FLAG))
         {
             ClearPersistentFlags();
             TryLoadSavedPersistentFlags();
@@ -111,7 +101,6 @@ public class FlagManager : Singleton<FlagManager>
         if (!TryLoadSavedPersistentFlags())
         {
             LoadStartingFlags();
-            SavePersistentFlags();
         }
     }
 
@@ -137,7 +126,7 @@ public class FlagManager : Singleton<FlagManager>
         }
     }
 
-    private void SavePersistentFlags()
+    private void SavePersistentFlags(ISave save)
     {
         List<string> flagsToSave = new();
         foreach (KeyValuePair<string, FlagWrapper> flag in m_Flags)
@@ -147,7 +136,7 @@ public class FlagManager : Singleton<FlagManager>
                 flagsToSave.Add(flag.Key);
             }
         }
-        SaveManager.Instance.SavePersistentFlags(flagsToSave);
+        save.SavePersistentFlags(flagsToSave);
     } 
     #endregion
 

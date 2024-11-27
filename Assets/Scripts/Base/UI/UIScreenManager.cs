@@ -51,10 +51,29 @@ namespace Game.UI
         public IUIScreen DemoEndScreen => LoadScreen("EndDemoScreen");
         public IUIScreen SaveScreen => LoadScreen("SaveScreen");
         public IUIScreen CreditsScreen => LoadScreen("CreditsScreen");
-        public IUIScreen OptionScreen => LoadScreen("OptionScreen");
+        public IUIScreen OptionScreen => LoadScreen("OptionsScreen");
+        public IUIScreen TutorialScreen => LoadScreen("TutorialScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();
+
+        
+        protected override void HandleAwake()
+        {
+            base.HandleAwake();
+
+            //OpenScreen(MainMenuScreen);
+
+            //GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
+        }
+
+        protected override void HandleDestroy()
+        {
+            base.HandleDestroy();
+
+            //GlobalEvents.Scene.OnSceneTransitionEvent -= OnSceneTransition;
+        }
+        
 
         private IUIScreen LoadScreen(string name)
         {
@@ -73,7 +92,10 @@ namespace Game.UI
 
         public void OpenScreen(IUIScreen screen, bool clearStack = false, params object[] args)
         {
-            if ((CurrentScreen?.IsInTransition).GetValueOrDefault()) return;
+            if ((CurrentScreen?.IsInTransition).GetValueOrDefault())
+            {
+                return;
+            }
 
             if (IsScreenOpen(screen)) return;
 
@@ -88,6 +110,11 @@ namespace Game.UI
             screen.RectTransform.SetAsLastSibling();
 
             HUDRoot.Instance.Hide();
+        }
+
+        public void ClearScreen()
+        {
+            while (HasActiveScreen) CloseScreen();
         }
 
         public void CloseScreen()
@@ -122,5 +149,15 @@ namespace Game.UI
         {
             CurrentScreen?.ScreenUpdate();
         }
+
+        /*
+        private void OnSceneTransition(SceneEnum finalScene)
+        {
+            if (finalScene == SceneEnum.MAIN_MENU)
+            {
+                OpenScreen(MainMenuScreen, true);
+            }
+        }
+        */
     }
 }

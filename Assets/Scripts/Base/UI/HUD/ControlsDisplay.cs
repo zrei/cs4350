@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Game.UI
@@ -11,20 +10,30 @@ namespace Game.UI
 
         private void Awake()
         {
-            GlobalEvents.Scene.LevelSceneLoadedEvent += ShowLevelControls;
-            GlobalEvents.Scene.BattleSceneLoadedEvent += ShowBattleControls;
-            GlobalEvents.Battle.ReturnFromBattleEvent += ShowLevelControls;
-            GlobalEvents.Level.ReturnFromLevelEvent += ShowWorldMapControls;
+            GlobalEvents.Scene.OnSceneTransitionEvent += ShowControls;
             
             ShowWorldMapControls();
         }
         
         private void OnDestroy()
         {
-            GlobalEvents.Scene.LevelSceneLoadedEvent -= ShowLevelControls;
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= ShowBattleControls;
-            GlobalEvents.Battle.ReturnFromBattleEvent -= ShowLevelControls;
-            GlobalEvents.Level.ReturnFromLevelEvent -= ShowWorldMapControls;
+            GlobalEvents.Scene.OnSceneTransitionEvent -= ShowControls;
+        }
+
+        private void ShowControls(SceneEnum sceneEnum)
+        {
+            switch (sceneEnum)
+            {
+                case SceneEnum.WORLD_MAP:
+                    ShowWorldMapControls();
+                    break;
+                case SceneEnum.LEVEL:
+                    ShowLevelControls();
+                    break;
+                case SceneEnum.BATTLE:
+                    ShowBattleControls();
+                    break;
+            }
         }
 
         private void ShowLevelControls()
@@ -46,13 +55,6 @@ namespace Game.UI
             Show(m_WorldMapControls);
             Hide(m_LevelControls);
             Hide(m_BattleControls);
-        }
-
-        private void Hide()
-        {
-            Hide(m_LevelControls);
-            Hide(m_BattleControls);
-            Hide(m_WorldMapControls);
         }
 
         private void Hide(CanvasGroup canvasGroup)

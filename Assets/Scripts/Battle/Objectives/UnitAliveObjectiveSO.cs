@@ -151,21 +151,21 @@ public class UnitAliveObjectiveSO : ObjectiveSO
         bool isProtect = m_Mode == Mode.FailIfAnyDie || m_Mode == Mode.FailIfAllDie;
         foreach (var unit in stateData.m_TrackedUnits)
         {
-            var objectiveMarker = unit.ObjectiveMarker;
+            var objectiveMarker = unit.UnitMarker;
             objectiveMarker.SetColor(m_Color);
             if (isProtect)
             {
-                objectiveMarker.SetMarkerType(ObjectiveMarker.Type.Lord);
+                objectiveMarker.SetMarkerType(UnitMarker.IconType.Lord);
             }
             else
             {
                 if (unit is EnemyUnit enemyUnit && enemyUnit.m_EnemyTags.HasFlag(EnemyTag.Boss))
                 {
-                    objectiveMarker.SetMarkerType(ObjectiveMarker.Type.Boss);
+                    objectiveMarker.SetMarkerType(UnitMarker.IconType.Boss);
                 }
                 else
                 {
-                    objectiveMarker.SetMarkerType(ObjectiveMarker.Type.Enemy);
+                    objectiveMarker.SetMarkerType(UnitMarker.IconType.Enemy);
                 }
             }
             objectiveMarker.SetActive(active);

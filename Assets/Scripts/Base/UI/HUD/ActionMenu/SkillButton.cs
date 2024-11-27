@@ -28,7 +28,6 @@ namespace Game.UI
 
         public void SetFill(float fill)
         {
-            Debug.Log(fill);
             fillImage.fillAmount = 1f - fill;
         }
 

@@ -80,7 +80,7 @@ public abstract class LevelNodeVisual : BaseNodeVisual
         return false;
     }
 
-    public virtual void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete)
+    public virtual void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete, bool resetOnComplete = false)
     {
         // No animation by default
         onComplete?.Invoke();

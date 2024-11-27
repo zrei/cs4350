@@ -17,10 +17,14 @@ public class MoralityManager : Singleton<MoralityManager>
         base.HandleAwake();
 
         GlobalEvents.Morality.MoralityChangeEvent += ChangeMorality;
-        GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
-        HandleDependencies();
+        SaveManager.OnSaveEvent += SaveMorality;
+        
+        if (!TryLoadMoralitySave())
+        {
+            SetMorality(Mathf.FloorToInt(m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality));
+        }
     }
 
     protected override void HandleDestroy()
@@ -28,46 +32,24 @@ public class MoralityManager : Singleton<MoralityManager>
         base.HandleDestroy();
 
         GlobalEvents.Morality.MoralityChangeEvent -= ChangeMorality;
-        GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
+
+        SaveManager.OnSaveEvent -= SaveMorality;
     }
 
-    private void HandleDependencies()
-    {        
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-
-        if (!TryLoadMoralitySave())
-        {
-            SetMorality(Mathf.FloorToInt(m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality));
-            SaveMorality();
-        }
+    protected override void AddDependencies()
+    {
+        AddDependency<SaveManager>();
     }
     #endregion
 
     #region Level Result
-    private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
-        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
-    }
+        if (toScene != SceneEnum.WORLD_MAP)
+            return;
 
-    private void OnEarlyQuit()
-    {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
-        {
-            SaveMorality();
-        }
-        else
+        if (FlagManager.Instance.GetFlagValue(Flag.LOSE_LEVEL_FLAG) || FlagManager.Instance.GetFlagValue(Flag.QUIT_LEVEL_FLAG))
         {
             TryLoadMoralitySave();
         }
@@ -86,9 +68,9 @@ public class MoralityManager : Singleton<MoralityManager>
         return true;
     }
 
-    private void SaveMorality()
+    private void SaveMorality(ISave save)
     {
-        SaveManager.Instance.SaveMorality(m_CurrMorality);
+        save.SaveMorality(m_CurrMorality);
     }
     #endregion
 

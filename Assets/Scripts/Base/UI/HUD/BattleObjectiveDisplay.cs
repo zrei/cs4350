@@ -35,7 +35,6 @@ namespace Game.UI
             );
 
             GlobalEvents.Battle.BattleInitializedEvent += Initialize;
-            GlobalEvents.Level.ReturnFromLevelEvent += Clear;
 
             uiAnimator = GetComponent<UIAnimator>();
         }
@@ -43,7 +42,6 @@ namespace Game.UI
         private void OnDestroy()
         {
             GlobalEvents.Battle.BattleInitializedEvent -= Initialize;
-            GlobalEvents.Level.ReturnFromLevelEvent -= Clear;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= Show;

@@ -2,7 +2,6 @@ using System.Text;
 using Game.Input;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum LevelResultType
 {
@@ -13,6 +12,18 @@ public enum LevelResultType
 
 namespace Game.UI
 {
+    public struct LevelResultUIData
+    {
+        public LevelSO LevelSO;
+        public LevelResultType LevelResultType;
+
+        public LevelResultUIData(LevelSO levelSO, LevelResultType levelResultType)
+        {
+            LevelSO = levelSO;
+            LevelResultType = levelResultType;
+        }
+    }
+
     public class LevelResultScreen : BaseUIScreen
     {
         [SerializeField] GraphicGroup m_GraphicGroup;
@@ -27,27 +38,26 @@ namespace Game.UI
         
         private int currentLevelId;
 
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
+            if (args.Length == 0)
+                return;
+
+            ShowLevelResult((LevelResultUIData) args[0]);
+
+            base.Show();
         }
 
-        private void OnDestroy()
+        private void ShowLevelResult(LevelResultUIData levelResultUIData)
         {
-            GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
-        }
-        
-        private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
-        {
-            m_GraphicGroup.color = result switch
+            m_GraphicGroup.color = levelResultUIData.LevelResultType switch
             {
                 LevelResultType.SUCCESS => ColorUtils.VictoryColor,
                 LevelResultType.DEFEAT => ColorUtils.DefeatColor,
                 LevelResultType.OUT_OF_TIME => ColorUtils.DefeatColor,
                 _ => Color.white
             };
-            m_ResultText.text = result switch
+            m_ResultText.text = levelResultUIData.LevelResultType switch
             {
                 LevelResultType.SUCCESS => "Level Completed!",
                 LevelResultType.DEFEAT => "Defeat...",
@@ -55,10 +65,10 @@ namespace Game.UI
                 _ => "???"
             };
 
-            currentLevelId = levelSo.m_LevelId;
+            currentLevelId = levelResultUIData.LevelSO.m_LevelId;
             
-            bool hasRewards = levelSo.m_RewardCharacters.Count > 0 || levelSo.m_RewardWeapons.Count > 0;
-            if (result == LevelResultType.SUCCESS && hasRewards)
+            bool hasRewards = levelResultUIData.LevelSO.m_RewardCharacters.Count > 0 || levelResultUIData.LevelSO.m_RewardWeapons.Count > 0;
+            if (levelResultUIData.LevelResultType == LevelResultType.SUCCESS && hasRewards)
                 m_ReturnButton.onSubmit.AddListener(ShowRewards);
             else
                 m_ReturnButton.onSubmit.AddListener(ReturnFromLevel);
@@ -73,14 +83,14 @@ namespace Game.UI
                 m_ResultPanel.SetActive(false);
 
                 var builder = new StringBuilder();
-                foreach (var rewardChar in levelSo.m_RewardCharacters)
+                foreach (var rewardChar in levelResultUIData.LevelSO.m_RewardCharacters)
                 {
                     builder.AppendLine($"{rewardChar.m_CharacterName} has joined your party!");
                 }
                 
                 builder.AppendLine();
                 
-                foreach (var rewardWeapon in levelSo.m_RewardWeapons)
+                foreach (var rewardWeapon in levelResultUIData.LevelSO.m_RewardWeapons)
                 {
                     builder.AppendLine($"Gained {rewardWeapon.m_WeaponName}!");
                 }

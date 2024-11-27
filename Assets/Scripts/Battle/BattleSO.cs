@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.UI;
 using UnityEngine;
 
 [System.Serializable]
@@ -27,4 +28,18 @@ public class BattleSO : ScriptableObject
     public List<CoordPair> m_PlayerStartingTiles;
     public int m_ExpReward;
     public AudioDataSO m_BattleBGM;
+
+    [Header("Tutorial")]
+    [Tooltip("Tutorial to play upon entering setup phase - leave empty for no tutorial")]
+    public List<TutorialPageUIData> m_SetupPhaseTutorial;
+    [Tooltip("Tutorial to play upon entering battle phase - leave empty for no tutorial")]
+    public List<TutorialPageUIData> m_BattlePhaseTutorial;
+    [Tooltip("Whether to override the characters in the party")]
+    public bool m_OverrideCharacters = false;
+    [Tooltip("Which characters should be brought into the battle instead if overridden")]
+    public List<TutorialCharacterData> m_TutorialCharacters;
+
+    [Header("Biome")]
+    public bool m_OverrideBattleMap = false;
+    public BattleMapType m_OverriddenBattleMapType;
 }

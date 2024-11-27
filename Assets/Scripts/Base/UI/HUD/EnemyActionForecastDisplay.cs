@@ -59,7 +59,7 @@ namespace Game.UI
             uiAnimator = GetComponent<UIAnimator>();
             uiAnimator.onAnimationEnd += OnAnimationFinish;
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
             GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
             GlobalEvents.Battle.CompleteAttackAnimationEvent += OnCompleteAttackAnimation;
         }
@@ -74,8 +74,11 @@ namespace Game.UI
             Show();
         }
 
-        private void OnSceneLoad()
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
         {
+            if (toScene != SceneEnum.BATTLE)
+                return;
+
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         }
 
@@ -91,7 +94,7 @@ namespace Game.UI
 
         private void OnDestroy()
         {
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= OnCompleteAttackAnimation;

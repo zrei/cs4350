@@ -84,15 +84,15 @@ public class DefeatEnemiesObjectiveSO : ObjectiveSO
 
         foreach (var unit in stateData.m_TrackedUnits)
         {
-            var objectiveMarker = unit.ObjectiveMarker;
+            var objectiveMarker = unit.UnitMarker;
             objectiveMarker.SetColor(m_Color);
             if (unit.m_EnemyTags.HasFlag(EnemyTag.Boss))
             {
-                objectiveMarker.SetMarkerType(ObjectiveMarker.Type.Boss);
+                objectiveMarker.SetMarkerType(UnitMarker.IconType.Boss);
             }
             else
             {
-                objectiveMarker.SetMarkerType(ObjectiveMarker.Type.Enemy);
+                objectiveMarker.SetMarkerType(UnitMarker.IconType.Enemy);
             }
             objectiveMarker.SetActive(active);
         }

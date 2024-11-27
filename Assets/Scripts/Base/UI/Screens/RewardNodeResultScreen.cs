@@ -10,19 +10,17 @@ namespace Game.UI
         [SerializeField] TextMeshProUGUI m_ResultText;
         [SerializeField] SelectableBase m_ReturnButton;
 
-        public override void Initialize()
+        public override void Show(params object[] args)
         {
-            base.Initialize();
-            GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
+            if (args.Length == 0)
+                return;
+
+            ShowRewardNode((RewardNode) args[0]);
+
+            base.Show();
         }
 
-        private void OnDestroy()
-        {
-            GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
-        }
-
-        
-        private void OnRewardNodeStart(RewardNode rewardNode)
+        private void ShowRewardNode(RewardNode rewardNode)
         {
             if (rewardNode.RewardType == RewardType.RATION)
             {
@@ -40,7 +38,6 @@ namespace Game.UI
     
         private void CloseResults()
         {
-            GlobalEvents.Level.CloseRewardScreenEvent?.Invoke();
             UIScreenManager.Instance.CloseScreen();
             m_ReturnButton.onSubmit.RemoveListener(CloseResults);
         }

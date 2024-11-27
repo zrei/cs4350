@@ -28,6 +28,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
 
+    [Header("Tutorial")]
+    [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+
     //[Header("FadingFog")]
     //[SerializeField] private float m_FadeDuration = 1.0f;
 
@@ -37,8 +40,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private int m_CurrUnlockedLevel;
     private int m_CurrSelectedLevel;
 
-    private IUIScreen m_DemoEndScreen;
-
     private const float TOKEN_MOVE_DELAY = 0.3f;
 
     #region Initialisation
@@ -46,42 +47,28 @@ public class WorldMapManager : Singleton<WorldMapManager>
     {
         base.HandleAwake();
 
-        GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent += OnBeginLoadLevel;
-        GlobalEvents.Scene.LevelSceneLoadedEvent += OnLevelSceneLoaded;
+        GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
+        GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
 
-        HandleDependencies();
+        StartCoroutine(Initialise());
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
 
-        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
-        GlobalEvents.WorldMap.OnBeginLoadLevelEvent -= OnBeginLoadLevel;
-        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnLevelSceneLoaded;
+        GlobalEvents.Scene.OnSceneTransitionEvent -= OnSceneTransition;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnBeginSceneChange;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
         
         DisableAllControls();
     }
 
-    private void HandleDependencies()
+    protected override void AddDependencies()
     {
-        if (!CharacterDataManager.IsReady)
-        {
-            CharacterDataManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!FlagManager.IsReady)
-        {
-            FlagManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        CharacterDataManager.OnReady -= HandleDependencies;
-        FlagManager.OnReady -= HandleDependencies;
-
-        StartCoroutine(Initialise());
+        AddDependency<CharacterDataManager>();
+        AddDependency<FlagManager>();
     }
 
     private IEnumerator Initialise()
@@ -93,8 +80,6 @@ public class WorldMapManager : Singleton<WorldMapManager>
         }
 
         m_CurrSelectedLevel = GetFinalUnlockedLevel();
-
-        m_DemoEndScreen = UIScreenManager.Instance.DemoEndScreen;
 
         // check which level to initialise up to - if the post cutscene of the previous level
         // has not been registered as seen, we only want to initialise up to the previous level
@@ -142,7 +127,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         // initialise the camera
         m_CameraController.Initialise(m_PlayerTokenInstance.transform);
-        
+ 
         if (playPostCutsceneOfPrevLevel)
         {
             CutsceneSequence(levelToInitialiseUpTo);
@@ -153,7 +138,31 @@ public class WorldMapManager : Singleton<WorldMapManager>
         }
         else
         {
-            SelectLevel(m_CurrSelectedLevel);
+            ShowTutorial(() => SelectLevel(m_CurrSelectedLevel));
+        }
+    }
+    #endregion
+
+    #region Tutorial
+    private void ShowTutorial(VoidEvent postTutorialShown)
+    {
+        if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_WORLD_MAP))
+        {
+            FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_WORLD_MAP, true, FlagType.PERSISTENT);
+            IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
+            tutorialScreen.OnHideDone += PostTutorial;
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_Tutorial);
+        }
+        else
+        {
+            PostTutorial(null);
+        }
+
+        void PostTutorial(IUIScreen tutorialScreen)
+        {
+            if (tutorialScreen != null)
+                tutorialScreen.OnHideDone -= PostTutorial;
+            postTutorialShown?.Invoke();
         }
     }
     #endregion
@@ -206,19 +215,28 @@ public class WorldMapManager : Singleton<WorldMapManager>
     #endregion
 
     #region Level Loading
-    private void OnLevelSceneLoaded()
+    private void OnSceneTransition(SceneEnum sceneEnum)
     {
+        if (sceneEnum != SceneEnum.LEVEL)
+            return;
+
         m_WorldMap.SetActive(false);
     }
 
-    private void OnBeginLoadLevel()
+    private void OnBeginSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (fromScene != SceneEnum.WORLD_MAP || toScene == SceneEnum.MAIN_MENU)
+            return;
+
         m_CameraController.RecenterCamera();
         DisableAllControls();
     }
 
-    private void OnReturnFromLevel()
+    private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (toScene != SceneEnum.WORLD_MAP || fromScene == SceneEnum.MAIN_MENU)
+            return;
+
         m_WorldMap.SetActive(true);
 
         m_CameraController.RecenterCamera();
@@ -268,7 +286,11 @@ public class WorldMapManager : Singleton<WorldMapManager>
         {
             // saving always occurs after pre-cutscene is played
             FlagManager.Instance.SetFlagValue(node.LevelSO.PreDialogueFlag, true, FlagType.PERSISTENT);
-            GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
+            ShowTutorial(PostTutorial);
+        }
+
+        void PostTutorial()
+        {
             SaveManager.Instance.Save(() => SelectLevel(levelNum));
         }
     }
@@ -279,13 +301,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostCutscene()
         {
-            Debug.Log(levelNum + 1);
-            Debug.Log(GlobalSettings.IsDemo);
-            Debug.Log(GlobalSettings.FinalDemoLevel);
             if (levelNum + 1 >= m_WorldMapRegions.Count || (GlobalSettings.IsDemo && levelNum + 1 > GlobalSettings.FinalDemoLevel))
             {
-                GlobalEvents.WorldMap.OnEndPreCutsceneEvent?.Invoke();
-                SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(m_DemoEndScreen));
+                SaveManager.Instance.Save(() => UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.DemoEndScreen));
             }
             else
             {
@@ -301,6 +319,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     /// <param name="additionalCallback"></param>
     private void UnlockLevelAnimation(int levelNum)
     {
+        GlobalEvents.WorldMap.OnBeginLevelAnimationEvent?.Invoke();
+
         WorldMapNode currLevel = GetWorldMapNode(levelNum);
         WorldMapNode nextLevel = GetWorldMapNode(levelNum + 1);
         FogFader nextRegionFog = GetWorldMapFog(levelNum + 1);
@@ -325,6 +345,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         void PostMovement()
         {
+            GlobalEvents.WorldMap.OnEndLevelAnimationEvent?.Invoke();
             PreLevelCutscene(levelNum + 1);
         }
     }
@@ -447,8 +468,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         if (!UIScreenManager.Instance.IsScreenOpen(UIScreenManager.Instance.CharacterManagementScreen))
         {
             Debug.Log("Opening Party Management Screen");
-            GlobalEvents.UI.OpenPartyOverviewEvent?.Invoke(CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()), false);
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen);
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CharacterManagementScreen, false, CharacterDataManager.Instance.RetrieveAllCharacterData(new List<int>()));
         }
         else if (UIScreenManager.Instance.IsScreenActive(UIScreenManager.Instance.CharacterManagementScreen))
         {

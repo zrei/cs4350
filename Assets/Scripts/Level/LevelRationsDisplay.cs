@@ -64,7 +64,7 @@ public class LevelRationsDisplay : MonoBehaviour
     {
         m_UIAnimator = GetComponent<UIAnimator>();
 
-        GlobalEvents.Scene.LevelSceneLoadedEvent += OnSceneLoad;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
     }
 
     public void Initialise(LevelRationsManager levelRationsManager)
@@ -78,8 +78,13 @@ public class LevelRationsDisplay : MonoBehaviour
 
     #region Callbacks
 
-    private void OnSceneLoad()
+    private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (toScene != SceneEnum.LEVEL)
+            return;
+
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
+
         m_LevelRationsManager = FindObjectOfType<LevelRationsManager>();
 
         if (m_LevelRationsManager == null)
@@ -92,30 +97,26 @@ public class LevelRationsDisplay : MonoBehaviour
 
         GlobalEvents.Rations.RationsSetEvent += OnRationsSet;
         GlobalEvents.Rations.RationsChangeEvent += OnRationsChange;
-        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent += OnReturnFromLevel;
+        GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
 
         Show();
     }
 
-    private void OnReturnFromLevel()
+    private void OnBeginSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
         GlobalEvents.Rations.RationsSetEvent -= OnRationsSet;
         GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
-        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnBeginSceneChange;
+
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
     }
 
     private void OnDestroy()
     {
-        GlobalEvents.Scene.LevelSceneLoadedEvent -= OnSceneLoad;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
         GlobalEvents.Rations.RationsSetEvent -= OnRationsSet;
         GlobalEvents.Rations.RationsChangeEvent -= OnRationsChange;
-        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
-        GlobalEvents.Level.ReturnFromLevelEvent -= OnReturnFromLevel;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnBeginSceneChange;
     }
 
     private void OnRationsSet(float newRations)
@@ -128,16 +129,6 @@ public class LevelRationsDisplay : MonoBehaviour
     private void OnRationsChange(float changeAmount)
     {
         CurrRations = m_LevelRationsManager.CurrRations;
-    }
-
-    private void OnBattleNodeStart(BattleNode _)
-    {
-        Hide();
-    }
-
-    private void OnBattleNodeEnd(BattleNode node, UnitAllegiance _1, int _2)
-    {
-        Show();
     }
 
     #endregion

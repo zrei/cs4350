@@ -1,13 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
+using UnityEngine.Pool;
 
 namespace Game.UI
 {
     [RequireComponent(typeof(UIAnimator))]
     public class TurnDisplay : Singleton<TurnDisplay>
     {
+        [SerializeField]
+        private TurnDisplayUnit turnDisplayUnitPrefab;
+        private ObjectPool<TurnDisplayUnit> displayPool;
+        private Dictionary<Unit, TurnDisplayUnit> activeDisplays = new();
+
         [SerializeField]
         private FormattedTextDisplay unitName;
 
@@ -17,9 +21,6 @@ namespace Game.UI
         [SerializeField]
         private float radius = 111;
         public float Radius => radius;
-
-        private Dictionary<Unit, TurnDisplayUnit> mapping = new();
-        private TurnDisplayUnit prefab;
 
         private UIAnimator uiAnimator;
 
@@ -45,26 +46,46 @@ namespace Game.UI
             unitName.gameObject.SetActive(false);
             timeToAct.gameObject.SetActive(false);
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
+
+            displayPool = new(
+                createFunc: () =>
+                {
+                    var display = Instantiate(turnDisplayUnitPrefab, transform);
+                    display.gameObject.SetActive(false);
+                    return display;
+                },
+                actionOnGet: display =>
+                {
+                    display.gameObject.SetActive(true);
+                },
+                actionOnRelease: display => { },
+                actionOnDestroy: display => { },
+                defaultCapacity: 20,
+                maxSize: 10000
+            );
         }
 
         protected override void HandleDestroy()
         {
             base.HandleDestroy();
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.PlayerUnitSetupEndEvent -= OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         }
 
-        private void OnSceneLoad()
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
         {
+            if (toScene != SceneEnum.BATTLE)
+                return;
+
             GlobalEvents.Battle.PlayerUnitSetupEndEvent += OnSetupEnd;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
-            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
         }
 
         private void OnSetupEnd()
@@ -79,7 +100,7 @@ namespace Game.UI
             HandleQuit();
         }
 
-        private void OnEarlyQuit()
+        private void OnSceneChange(SceneEnum _, SceneEnum _2)
         {
             HandleQuit();
         }
@@ -88,21 +109,21 @@ namespace Game.UI
         {
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
             // Clear leftover mapping
-            foreach (var display in mapping.Values)
+            foreach (var display in activeDisplays.Values)
             {
                 Destroy(display.gameObject);
             }
-            mapping.Clear();
+            activeDisplays.Clear();
 
             Hide();
         }
 
-        private void OnPreviewUnit(Unit unit)
+        public void OnPreviewUnit(Unit unit)
         {
-            if (unit == null || !mapping.TryGetValue(unit, out var display))
+            if (unit == null || !activeDisplays.TryGetValue(unit, out var display))
             {
                 HighlightedDisplay = null;
                 unitName.gameObject.SetActive(false);
@@ -120,34 +141,28 @@ namespace Game.UI
 
         public TurnDisplayUnit InstantiateTurnDisplayUnit(Unit unit)
         {
-            Debug.Log("Instantiating turn display unit for " + unit.name);
-            if (prefab == null)
-            {
-                prefab = Addressables
-                    .LoadAssetAsync<GameObject>("TurnDisplayUnit")
-                    .WaitForCompletion()
-                    .GetComponent<TurnDisplayUnit>();
-            }
-
             TurnDisplayUnit display;
-            if (!mapping.ContainsKey(unit))
+            if (!activeDisplays.ContainsKey(unit))
             {
-                display = Instantiate(prefab);
-                display.transform.SetParent(transform, false);
+                display = displayPool.Get();
                 display.Initialize(unit);
-                mapping.Add(unit, display);
+                activeDisplays.Add(unit, display);
             }
             else
             {
-                display = mapping[unit];
+                display = activeDisplays[unit];
             }
-            
+
             return display;
         }
 
-        public void RemoveTurnDisplayUnit(Unit display)
+        public void RemoveTurnDisplayUnit(Unit unit)
         {
-            mapping.Remove(display);
+            if (!activeDisplays.ContainsKey(unit)) return;
+
+            var display = activeDisplays[unit];
+            displayPool.Release(display);
+            activeDisplays.Remove(unit);
         }
 
         private void Show()

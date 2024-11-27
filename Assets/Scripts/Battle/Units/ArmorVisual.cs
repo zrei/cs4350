@@ -287,12 +287,17 @@ public class ArmorVisual : MonoBehaviour
     /// Defeat animation without fade away
     /// </summary>
     /// <param name="onComplete"></param>
-    public void Defeat(VoidEvent onComplete)
+    /// <param name="resetOnComplete">Whether to reset model back to normal afterwards</param>
+    public void Defeat(VoidEvent onComplete, bool resetOnComplete = false)
     {
         m_Animator.SetBool(DeathAnimParam, true);
         IEnumerator DefeatCoroutine()
         {
             yield return new WaitForSeconds(2f);
+            if (resetOnComplete)
+            {
+                m_Animator.SetBool(DeathAnimParam, false);
+            }
             onComplete?.Invoke();
         }
         StartCoroutine(DefeatCoroutine());

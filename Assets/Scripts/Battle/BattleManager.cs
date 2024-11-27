@@ -4,6 +4,7 @@ using UnityEngine;
 using Game.Input;
 using Game;
 using System.Linq;
+using Game.UI;
 
 [RequireComponent(typeof(PlayerTurnManager))]
 [RequireComponent(typeof(EnemyTurnManager))]
@@ -53,6 +54,7 @@ public class BattleManager : Singleton<BattleManager>
     private bool m_BattleTick = false;
     private bool m_WithinBattle = false;
     private bool m_HasBattleConcluded = false;
+    private BattleSO m_CurrBattleSO = null;
     #endregion
 
     #region Objectives
@@ -79,6 +81,7 @@ public class BattleManager : Singleton<BattleManager>
     #region Initialisation
     private bool isBattleInitialised = false;
     
+    /*
     private void Start()
     {
         m_PlayerTurnManager = GetComponent<PlayerTurnManager>();
@@ -93,19 +96,30 @@ public class BattleManager : Singleton<BattleManager>
 
         GlobalEvents.Scene.BattleSceneLoadedEvent?.Invoke();
     }
+    */
 
     protected override void HandleAwake()
     {
         base.HandleAwake();
         GlobalEvents.Battle.UnitDefeatedEvent += OnUnitDeath;
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
+
+        m_PlayerTurnManager = GetComponent<PlayerTurnManager>();
+        m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
+        m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
+
+        InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
+
+        m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
+        m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
+        m_PlayerUnitSetup.Initialise(m_MapLogic, OnCompleteSetup);
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
         GlobalEvents.Battle.UnitDefeatedEvent -= OnUnitDeath;
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
         if (InputManager.IsReady)
         {
@@ -118,8 +132,9 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnitData"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, GameObject mapBiome, List<InflictedToken> fatigueTokens)
+    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, List<InflictedToken> fatigueTokens)
     {
+        m_CurrBattleSO = battleSO;
         m_TurnQueue.Clear();
         m_AllPlayerUnits.Clear();
         m_AllEnemyUnits.Clear();
@@ -129,7 +144,6 @@ public class BattleManager : Singleton<BattleManager>
         m_CurrMoralityPercentage = MoralityManager.Instance.CurrMoralityPercentage;
         m_PermanentFatigueTokens = fatigueTokens;
 
-        InstantiateBiome(mapBiome);
         m_BattleBGM = SoundManager.Instance.PlayWithFadeIn(battleSO.m_BattleBGM);
         StartCoroutine(BattleInitialise(battleSO, playerUnitData));
     }
@@ -155,7 +169,6 @@ public class BattleManager : Singleton<BattleManager>
         }
 
         m_TurnQueue.OrderTurnQueue();
-        m_PlayerUnitSetup.BeginSetup(battleSO.m_PlayerStartingTiles);
 
         foreach (var objective in m_Objectives)
         {
@@ -171,6 +184,26 @@ public class BattleManager : Singleton<BattleManager>
 
         isBattleInitialised = true;
         GlobalEvents.Battle.BattleInitializedEvent?.Invoke();
+
+        yield return null;
+
+        if (battleSO.m_SetupPhaseTutorial.Count > 0)
+        {
+            IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
+            tutorialScreen.OnHideDone += PostTutorial;
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, battleSO.m_SetupPhaseTutorial);
+        }
+        else
+        {
+            PostTutorial(null);
+        }
+
+        void PostTutorial(IUIScreen screen)
+        {
+            if (screen != null)
+                screen.OnHideDone -= PostTutorial;
+            m_PlayerUnitSetup.BeginSetup(battleSO.m_PlayerStartingTiles);
+        }
     }
 
     private CoordPair GetAvailableStartingPosition(PlayerCharacterBattleData playerBattleData, List<CoordPair> startingTiles)
@@ -197,14 +230,6 @@ public class BattleManager : Singleton<BattleManager>
                 return coordPair;
         }
         return default;
-    }
-
-    private void InstantiateBiome(GameObject biomeObj)
-    {
-        GameObject map = Instantiate(biomeObj, m_MapBiomeParent);
-        map.transform.localPosition = Vector3.zero;
-        map.transform.localRotation = Quaternion.identity;
-        map.transform.localScale = Vector3.one;
     }
 
     /// <summary>
@@ -313,10 +338,13 @@ public class BattleManager : Singleton<BattleManager>
         return m_Objectives.Any(x => x.CompletionStatus == ObjectiveState.Failed && x.ObjectiveTags.HasFlag(ObjectiveTag.LoseOnFail));
     }
 
-    private void OnEarlyQuit()
+    private void OnSceneChange(SceneEnum _, SceneEnum _2)
     {
-        SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
-        m_BattleBGM = null;
+        if (m_BattleBGM.HasValue)
+        {
+            SoundManager.Instance.FadeOutAndStop(m_BattleBGM.Value);
+            m_BattleBGM = null;
+        }
     }
 
     private void CompleteBattle(UnitAllegiance victoriousSide)
@@ -379,7 +407,23 @@ public class BattleManager : Singleton<BattleManager>
     private void OnCompleteSetup()
     {
         Logger.Log(this.GetType().Name, "Begin battle", LogLevel.LOG);
-        StartCoroutine(StartBattle());
+        if (m_CurrBattleSO.m_BattlePhaseTutorial.Count > 0)
+        {
+            IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
+            tutorialScreen.OnHideDone += PostTutorial;
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_CurrBattleSO.m_BattlePhaseTutorial);
+        }
+        else
+        {
+            PostTutorial(null);
+        }
+
+        void PostTutorial(IUIScreen screen)
+        {
+            if (screen != null)
+                screen.OnHideDone -= PostTutorial;
+            StartCoroutine(StartBattle());
+        }
     }
 
     private IEnumerator StartBattle()

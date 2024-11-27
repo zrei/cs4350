@@ -6,8 +6,9 @@ using UnityEngine.Splines;
 /// Class that maintains the internal representation of an edge in the graph
 /// (edge cost and connecting nodes),
 /// </summary>
-public class EdgeInternal : MonoBehaviour
+public class EdgeInternal : BaseEdge
 {
+    [Header("Level Edge")]
     [SerializeField] private NodeInternal nodeInternalA;
     public NodeInternal NodeInternalA => nodeInternalA;
     
@@ -24,6 +25,9 @@ public class EdgeInternal : MonoBehaviour
     [Tooltip("The spline container that holds the reverse path between the two nodes")]
     [SerializeField] private SplineContainer m_ReverseSplineContainer;
     public SplineContainer ReverseSplineContainer => m_ReverseSplineContainer;
+
+    protected override Transform EndPoint => nodeInternalA.transform;
+    protected override Transform StartingPoint => nodeInternalB.transform;
 
     public SplineContainer GetPathSplineTo(NodeInternal destNode)
     {
@@ -116,7 +120,7 @@ public class EdgeInternal : MonoBehaviour
 public class EdgeInternalEditor : Editor
 {
     EdgeInternal m_Target;
-    EdgeInternal[] m_Targets;
+    EdgeInternal[] m_TargetEdgeInternals;
 
     private void OnEnable()
     {
@@ -124,10 +128,10 @@ public class EdgeInternalEditor : Editor
             m_Target = (EdgeInternal) target;
         else
         {
-            m_Targets = new EdgeInternal[targets.Length];
+            m_TargetEdgeInternals = new EdgeInternal[targets.Length];
             for (var i = 0; i < targets.Length; i++)
             {
-                m_Targets[i] = (EdgeInternal)targets[i];
+                m_TargetEdgeInternals[i] = (EdgeInternal)targets[i];
             }
         }
     }
@@ -138,22 +142,22 @@ public class EdgeInternalEditor : Editor
 
         if (GUILayout.Button("Update Spline"))
         {
-            if (m_Targets == null)
+            if (m_TargetEdgeInternals == null)
                 UpdateTargetSpline(m_Target);
             else
             {
-                foreach (var edgeInternal in m_Targets)
+                foreach (var edgeInternal in m_TargetEdgeInternals)
                     UpdateTargetSpline(edgeInternal);
             }
         }
         
         if (GUILayout.Button("Update Reverse Spline"))
         {
-            if (m_Targets == null)
+            if (m_TargetEdgeInternals == null)
                 UpdateTargetReverseSpline(m_Target);
             else
             {
-                foreach (var edgeInternal in m_Targets)
+                foreach (var edgeInternal in m_TargetEdgeInternals)
                     UpdateTargetReverseSpline(edgeInternal);
             }
         }

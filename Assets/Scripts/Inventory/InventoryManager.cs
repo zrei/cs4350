@@ -56,66 +56,37 @@ public class InventoryManager : Singleton<InventoryManager>
     {
         base.HandleAwake();
 
-        HandleDependencies();
+        LoadWeapons();
 
-        GlobalEvents.Level.LevelResultsEvent += OnLevelResult;
-        GlobalEvents.UI.SavePartyChangesEvent += SaveWeapons;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
 
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        SaveManager.OnSaveEvent += SaveWeapons;
     }
 
-    private void HandleDependencies()
+    protected override void AddDependencies()
     {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!PersistentDataManager.IsReady)
-        {
-            PersistentDataManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-        PersistentDataManager.OnReady -= HandleDependencies;
-
-        LoadWeapons();
+        AddDependency<SaveManager>();
+        AddDependency<PersistentDataManager>();
     }
 
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
 
-        GlobalEvents.Level.LevelResultsEvent -= OnLevelResult;
-        GlobalEvents.UI.SavePartyChangesEvent -= SaveWeapons;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        SaveManager.OnSaveEvent -= SaveWeapons;
     }
     #endregion
 
     #region Level Result
-    private void OnLevelResult(LevelSO _, LevelResultType levelResultType)
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
     {
-        HandleLevelResult(levelResultType == LevelResultType.SUCCESS);
-    }
+        if (toScene != SceneEnum.WORLD_MAP) 
+            return;
 
-    private void OnEarlyQuit()
-    {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
-        {
-            SaveWeapons();
-        }
-        else
-        {
+        if (FlagManager.Instance.GetFlagValue(Flag.QUIT_LEVEL_FLAG) || FlagManager.Instance.GetFlagValue(Flag.LOSE_LEVEL_FLAG))
             TryLoadSaveData();
-        }
     }
     #endregion
 
@@ -125,9 +96,7 @@ public class InventoryManager : Singleton<InventoryManager>
         if (!TryLoadSaveData())
         {
             LoadStartingInventory();
-            SaveWeapons();
-        }
-            
+        }            
     }
 
     private bool TryLoadSaveData()
@@ -173,9 +142,9 @@ public class InventoryManager : Singleton<InventoryManager>
         m_CurrNextId = m_Inventory.Count;
     }
 
-    private void SaveWeapons()
+    private void SaveWeapons(ISave save)
     {
-        SaveManager.Instance.SaveInventoryData(m_Inventory.Values.Select(x => x.GetSaveData()));
+        save.SaveInventoryData(m_Inventory.Values.Select(x => x.GetSaveData()));
     }
     #endregion
 

@@ -26,42 +26,21 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent += OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent += OnLevelEnd;
-        GlobalEvents.UI.SavePartyChangesEvent += SaveCharacterData;
-
-        GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+        GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
     
-        HandleDependencies();
-    }
+        SaveManager.OnSaveEvent += SaveCharacterData;
 
-    private void HandleDependencies()
-    {
-        if (!SaveManager.IsReady)
-        {
-            SaveManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!PersistentDataManager.IsReady)
-        {
-            PersistentDataManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!LevellingManager.IsReady)
-        {
-            LevellingManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        SaveManager.OnReady -= HandleDependencies;
-        PersistentDataManager.OnReady -= HandleDependencies;
-        LevellingManager.OnReady -= HandleDependencies;
-        
         if (!TryLoadSaveData())
         {
             LoadStartingCharacters();
-            SaveCharacterData();
         }
+    }
+
+    protected override void AddDependencies()
+    {
+        AddDependency<SaveManager>();
+        AddDependency<PersistentDataManager>();
+        AddDependency<LevellingManager>();
     }
 
     protected override void HandleDestroy()
@@ -72,33 +51,28 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         GlobalEvents.Flags.SetFlagEvent -= OnFlagSet;
 
         GlobalEvents.Level.LevelResultsEvent -= OnLevelEnd;
-        GlobalEvents.UI.SavePartyChangesEvent -= SaveCharacterData;
+        GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
 
-        GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+        SaveManager.OnSaveEvent -= SaveCharacterData;
     }
     #endregion
 
     #region Level Result
     private void OnLevelEnd(LevelSO _, LevelResultType result)
     {
-        HandleLevelResult(result == LevelResultType.SUCCESS);
-    }
-
-    private void OnEarlyQuit()
-    {
-        HandleLevelResult(false);
-    }
-
-    private void HandleLevelResult(bool save)
-    {
-        if (save)
-        {
-            SaveCharacterData();
-        }
-        else
+        if (result != LevelResultType.SUCCESS)
         {
             TryLoadSaveData();
         }
+    }
+
+    private void OnSceneChange(SceneEnum fromScene, SceneEnum toScene)
+    {
+        if (toScene != SceneEnum.WORLD_MAP)
+            return;
+
+        if (FlagManager.Instance.GetFlagValue(Flag.LOSE_LEVEL_FLAG) || FlagManager.Instance.GetFlagValue(Flag.QUIT_LEVEL_FLAG))
+            TryLoadSaveData();
     }
     #endregion
 
@@ -147,9 +121,9 @@ public class CharacterDataManager : Singleton<CharacterDataManager>
         ReceiveStartingCharacters(m_StartingCharacters);
     }
 
-    private void SaveCharacterData()
+    private void SaveCharacterData(ISave save)
     {
-        SaveManager.Instance.SaveCharacterData(m_CharacterData.Values.Select(x => GetCharacterSaveData(x)));
+        save.SaveCharacterData(m_CharacterData.Values.Select(x => GetCharacterSaveData(x)));
     }
 
     private CharacterSaveData GetCharacterSaveData(PlayerCharacterData playerCharacterData)

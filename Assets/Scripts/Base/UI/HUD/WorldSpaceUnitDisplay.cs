@@ -75,7 +75,7 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
         uiAnimator = GetComponent<UIAnimator>();
         uiAnimator.onAnimationEnd += OnAnimationFinish;
 
-        GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
         GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
         GlobalEvents.Battle.CompleteAttackAnimationEvent += OnCompleteAttackAnimation;
     }
@@ -90,8 +90,11 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
         Show();
     }
 
-    private void OnSceneLoad()
+    private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
     {
+        if (toScene != SceneEnum.BATTLE)
+            return;
+
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
     }
 
@@ -107,7 +110,7 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
 
     private void OnDestroy()
     {
-        GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         GlobalEvents.Battle.AttackAnimationEvent -= OnAttackAnimation;
         GlobalEvents.Battle.CompleteAttackAnimationEvent -= OnCompleteAttackAnimation;

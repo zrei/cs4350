@@ -157,30 +157,35 @@ namespace Game.UI
             uiAnimator = GetComponent<UIAnimator>();
             uiAnimator.onAnimationEnd += OnAnimationFinish;
 
-            GlobalEvents.Scene.BattleSceneLoadedEvent += OnSceneLoad;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
 
             BindButtonEvents();
         }
 
         private void OnDestroy()
         {
-            GlobalEvents.Scene.BattleSceneLoadedEvent -= OnSceneLoad;
+            BindInputEvents(false);
+
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoad;
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         }
 
         #region Global Events
-        private void OnSceneLoad()
+        private void OnSceneLoad(SceneEnum fromScene, SceneEnum toScene)
         {
+            if (toScene != SceneEnum.BATTLE)
+                return;
+
             GlobalEvents.Battle.PreviewCurrentUnitEvent += OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent += OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
-            GlobalEvents.Scene.EarlyQuitEvent += OnEarlyQuit;
+            GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
         }
 
-        private void OnEarlyQuit()
+        private void OnSceneChange(SceneEnum _, SceneEnum _2)
         {
             HandleQuit();
         }
@@ -195,9 +200,7 @@ namespace Game.UI
             GlobalEvents.Battle.PreviewCurrentUnitEvent -= OnPreviewCurrentUnit;
             GlobalEvents.Battle.PreviewUnitEvent -= OnPreviewUnit;
             GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
-            GlobalEvents.Scene.EarlyQuitEvent -= OnEarlyQuit;
-
-            Hide();
+            GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         }
 
         private void OnPreviewUnit(Unit unit)
