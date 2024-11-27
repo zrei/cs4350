@@ -36,6 +36,7 @@ namespace Game.UI
 
         [Header("Tutorial")]
         [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+        [SerializeField] private NamedObjectButton m_TutorialButton;
         
         private List<NamedObjectButton> m_PartyMemberButtons = new();
         
@@ -69,6 +70,7 @@ namespace Game.UI
             m_SkillsAndStatusPanel.OnReclassEvent += () => TabSwitch(Tab.RECLASS);
 
             m_WeaponsOverviewButton.onSubmit.AddListener(() => TabSwitch(m_CurrTab != Tab.WEAPON ? Tab.WEAPON : Tab.OVERVIEW));
+            m_TutorialButton.onSubmit.AddListener(ShowTutorial);
         }
 
         public override void Show(params object[] args)
@@ -87,15 +89,20 @@ namespace Game.UI
 
             if (!FlagManager.Instance.GetFlagValue(Flag.HAS_VISITED_CHARACTER_MANAGEMENT))
             {                
-                StartCoroutine(ShowTutorial());
+                StartCoroutine(ShowTutorial_Coroutine());
             }
         }
 
-        private IEnumerator ShowTutorial()
+        private IEnumerator ShowTutorial_Coroutine()
         {
             yield return null;
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            ShowTutorial();
             FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_CHARACTER_MANAGEMENT, true, FlagType.PERSISTENT);
+        }
+
+        private void ShowTutorial()
+        {
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
         }
 
         private void ShowPartyOverview(List<PlayerCharacterData> playerCharacterData)
