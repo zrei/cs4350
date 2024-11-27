@@ -1,27 +1,39 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// Wraps around the EnemyActionSO as a runtime instance for each unit
 /// </summary>
-public abstract class EnemyActionWrapper
+public abstract class EnemyActionWrapper : IConcreteAction
 {
-    public EnemyActionSO m_Action;
-    public int m_Priority;
+    public EnemyActionInstance m_Action;
 
-    public abstract bool CanActionBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic);
+    public bool IsCompleted(EnemyUnit enemyUnit, MapLogic mapLogic)
+    {
+        return true;
+    }
 
-    public abstract void PerformAction(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
+    public void Reset()
+    {
+        // pass
+    }
+
+    public EnemyActionWrapper GetActionToBePerformed(EnemyUnit enemyUnit, MapLogic mapLogic)
+    {
+        return this;
+    }
+
+    public abstract void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent onCompleteAction);
+
+    public abstract bool ShouldBreakOut(EnemyUnit enemyUnit, MapLogic mapLogic);
+
+    public abstract HashSet<ActiveSkillSO> GetNestedActiveSkills();
 }
 
 public class EnemyUnit : Unit
 {
     public override UnitAllegiance UnitAllegiance => UnitAllegiance.ENEMY;
     public EnemyTag m_EnemyTags = EnemyTag.None;
-
-    private List<(EnemyActionCondition, EnemyActionWrapper)> m_OrderedConditions;
-    private List<EnemyActionWrapper> m_OrderedActions;
 
     public event Action<EnemyActionWrapper> OnDecideAction;
     public EnemyActionWrapper NextAction
@@ -37,6 +49,8 @@ public class EnemyUnit : Unit
     }
     private EnemyActionWrapper nextAction;
 
+    private BehaviourTreeRuntimeInstance m_TopLevelBehaviour;
+
     public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO, List<InflictedToken> permanentTokens)
     {
         CharacterSOInstanceID = enemyCharacterSO.GetInstanceID();
@@ -45,8 +59,11 @@ public class EnemyUnit : Unit
         InitialiseActions(enemyCharacterSO.EnemyActionSetSO);
     }
 
-    private void InitialiseActions(EnemyActionSetSO enemyActionSetSO)
+    private void InitialiseActions(BehaviourTree behaviourTree)
     {
+        m_TopLevelBehaviour = new(behaviourTree);
+        
+        /*
         m_OrderedConditions = new();
         m_OrderedActions = new();
         List<ActiveSkillSO> activeSkills = new();
@@ -64,14 +81,26 @@ public class EnemyUnit : Unit
                 activeSkills.Add(((EnemyActiveSkillActionSO) enemyAction.m_EnemyAction).m_ActiveSkill);
             }
         }
-        m_OrderedConditions.Sort((x, y) => y.Item1.m_Priority.CompareTo(x.Item1.m_Priority));
+        m_OrderedConditions.Sort((x, y) => y.Item1.m_ActionIndex.CompareTo(x.Item1.m_ActionIndex));
         m_OrderedActions.Sort((x, y) => y.m_Priority.CompareTo(x.m_Priority));
-        m_SkillCooldownTracker.SetSkills(activeSkills);
+        */
+        m_SkillCooldownTracker.SetSkills(m_TopLevelBehaviour.GetNestedActiveSkills());
     }
 
     // can cache action
     public EnemyActionWrapper GetActionToBePerformed(MapLogic mapLogic)
     {
+        if (m_TopLevelBehaviour.ShouldBreakOut(this, mapLogic))
+        {
+            m_TopLevelBehaviour.Reset();
+            NextAction = new EnemyPassActionWrapper {m_Action = new EnemyPassAction()};
+            return NextAction;
+        }
+
+        NextAction = m_TopLevelBehaviour.GetActionToBePerformed(this, mapLogic);
+        return NextAction;
+
+        /*
         HashSet<EnemyActionWrapper> unperformableActions = new();
 
         foreach ((EnemyActionCondition condition, EnemyActionWrapper action) in m_OrderedConditions)
@@ -107,28 +136,24 @@ public class EnemyUnit : Unit
             NextAction = enemyActionWrapper;
             return enemyActionWrapper;
         }
-
-        NextAction = new EnemyPassActionWrapper {m_Action = new EnemyPassActionSO()};
-        return NextAction;
+        */
     }
 
     public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
     {
+        m_TopLevelBehaviour.Run(this, mapLogic, completeActionEvent);
+        
+        /*
         if (NextAction == null)
         {
             GetActionToBePerformed(mapLogic);
         }
         NextAction.PerformAction(this, mapLogic, completeActionEvent);
+        */
     }
 
     public override IEnumerable<ActiveSkillSO> GetActiveSkills()
     {
-        var result = new List<ActiveSkillSO>();
-        foreach (var enemyAction in m_OrderedActions)
-        {
-            if (enemyAction.m_Action is not EnemyActiveSkillActionSO activeSkillAction) continue;
-            result.Add(activeSkillAction.m_ActiveSkill);
-        }
-        return result;
+        return m_TopLevelBehaviour.GetNestedActiveSkills();
     }
 }
