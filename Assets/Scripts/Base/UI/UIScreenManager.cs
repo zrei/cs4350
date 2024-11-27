@@ -50,6 +50,8 @@ namespace Game.UI
         public IUIScreen ExpScreen => LoadScreen("ExpScreen");
         public IUIScreen DemoEndScreen => LoadScreen("EndDemoScreen");
         public IUIScreen SaveScreen => LoadScreen("SaveScreen");
+        public IUIScreen CreditsScreen => LoadScreen("CreditsScreen");
+        public IUIScreen OptionScreen => LoadScreen("OptionScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();

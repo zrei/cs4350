@@ -15,14 +15,9 @@ public class MainMenuScreen : MonoBehaviour
     [SerializeField] private NamedObjectButton m_OptionsButton;
     [SerializeField] private NamedObjectButton m_QuitButton;
 
-    [Header("Screens")]
-    [SerializeField] private BaseUIScreen m_CreditsScreen;
-    [SerializeField] private BaseUIScreen m_OptionsScreen;
-
     private void Awake()
     {
         HandleDependencies();
-        m_CreditsScreen.Initialize();
     }
 
     private void Start()
@@ -80,12 +75,12 @@ public class MainMenuScreen : MonoBehaviour
 
     private void B_Credits()
     {
-        m_CreditsScreen.Show();
+        UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.CreditsScreen);
     }
 
     private void B_Options()
     {
-        m_OptionsScreen.Show();
+        UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.OptionScreen);
     }
 
     private void Update()
