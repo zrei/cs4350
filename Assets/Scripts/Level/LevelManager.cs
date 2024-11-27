@@ -519,6 +519,7 @@ public class LevelManager : Singleton<LevelManager>
         if (result == LevelResultType.SUCCESS)
         {
             Debug.Log("Receiving Reward Characters");
+            CharacterDataManager.Instance.PostLevelBlanketLevelUp();
             CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
             
             foreach (var weaponReward in levelSo.m_RewardWeapons)
