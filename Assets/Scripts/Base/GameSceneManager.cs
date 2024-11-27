@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Game;
+using Game.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -267,6 +268,9 @@ public class GameSceneManager : Singleton<GameSceneManager>
             if (numHandlesLoaded < numHandles)
                 return;
 
+            // clear all still open screens
+            UIScreenManager.Instance.ClearScreen();
+
             m_OnSceneChange?.Invoke();
             m_OnSceneChange = null;
 
@@ -299,6 +303,9 @@ public class GameSceneManager : Singleton<GameSceneManager>
         {
             handle.completed -= OnSceneLoadComplete;
 
+            // clear all still open screens
+            UIScreenManager.Instance.ClearScreen();
+            
             m_OnSceneChange?.Invoke();
             m_OnSceneChange = null;
             

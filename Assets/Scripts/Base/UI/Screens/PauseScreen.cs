@@ -4,6 +4,8 @@ namespace Game.UI
 {
     public class PauseScreen : BaseUIScreen
     {
+        [SerializeField] private NamedObjectButton m_TutorialBtn;
+        [SerializeField] private NamedObjectButton m_OptionBtn;
         [SerializeField] private NamedObjectButton m_MainMenuBtn;
         [SerializeField] private NamedObjectButton m_QuitLevelBtn;
 
@@ -24,6 +26,8 @@ namespace Game.UI
 
             m_MainMenuBtn.onSubmit.AddListener(B_MainMenu);
             m_QuitLevelBtn.onSubmit.AddListener(B_QuitLevel);
+            m_OptionBtn.onSubmit.AddListener(B_Options);
+            m_TutorialBtn.onSubmit.AddListener(B_Tutorial);
         }
 
         public override void Hide()
@@ -59,10 +63,22 @@ namespace Game.UI
             GameSceneManager.Instance.ReturnToWorldMap();
         }
 
+        private void B_Tutorial()
+        {
+            // pass for now
+        }
+
+        private void B_Options()
+        {
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.OptionScreen);
+        }
+
         private void RemoveListeners()
         {
             m_MainMenuBtn.onSubmit.RemoveListener(B_MainMenu);
             m_QuitLevelBtn.onSubmit.RemoveListener(B_QuitLevel);
+            m_OptionBtn.onSubmit.RemoveListener(B_Options);
+            m_TutorialBtn.onSubmit.RemoveListener(B_Tutorial);
         }
     }
 }

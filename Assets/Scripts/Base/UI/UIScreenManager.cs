@@ -50,6 +50,8 @@ namespace Game.UI
         public IUIScreen ExpScreen => LoadScreen("ExpScreen");
         public IUIScreen DemoEndScreen => LoadScreen("EndDemoScreen");
         public IUIScreen SaveScreen => LoadScreen("SaveScreen");
+        public IUIScreen CreditsScreen => LoadScreen("CreditsScreen");
+        public IUIScreen OptionScreen => LoadScreen("OptionsScreen");
         public IUIScreen TutorialScreen => LoadScreen("TutorialScreen");
 
         [SerializeField]
@@ -90,6 +92,11 @@ namespace Game.UI
             screen.RectTransform.SetAsLastSibling();
 
             HUDRoot.Instance.Hide();
+        }
+
+        public void ClearScreen()
+        {
+            while (HasActiveScreen) CloseScreen();
         }
 
         public void CloseScreen()

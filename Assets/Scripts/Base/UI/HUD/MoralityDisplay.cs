@@ -86,9 +86,15 @@ public class MoralityDisplay : MonoBehaviour
         GlobalEvents.Morality.MoralityChangeEvent += OnMoralityChange;
         GlobalEvents.Morality.MoralitySetEvent += OnMoralitySet;
         GlobalEvents.Level.LevelEndEvent += Hide;
+        MoralityManager.OnReady += OnMoralityReady;
 
         Show();
  
+        //Morality = MoralityManager.Instance.CurrMoralityPercentage;
+    }
+
+    private void OnMoralityReady()
+    {
         Morality = MoralityManager.Instance.CurrMoralityPercentage;
     }
 
@@ -98,6 +104,7 @@ public class MoralityDisplay : MonoBehaviour
         GlobalEvents.Morality.MoralityChangeEvent -= OnMoralityChange;
         GlobalEvents.Morality.MoralitySetEvent -= OnMoralitySet;
         GlobalEvents.Level.LevelEndEvent -= Hide;
+        MoralityManager.OnReady -= OnMoralityReady;
     }
 
     private void OnMoralitySet(int value)

@@ -16,7 +16,16 @@ namespace Game
         public Camera MainCamera => mainCamera;
         public Camera HUDCamera => hudCamera;
         public Camera UICamera => uiCamera;
+    
         
+        protected override void HandleAwake()
+        {
+            base.HandleAwake();
+
+            transform.SetParent(null);
+            DontDestroyOnLoad(this.gameObject);
+        }
+
         public void SetUpLevelCamera()
         {
             Instance.MainCamera.orthographic = true;

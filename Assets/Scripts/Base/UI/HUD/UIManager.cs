@@ -97,8 +97,11 @@ namespace Game.UI
 
             GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
             GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
+
             GlobalEvents.WorldMap.OnBeginLevelAnimationEvent += SetVisiblityNone;
             GlobalEvents.WorldMap.OnEndLevelAnimationEvent += SetVisibilityWorld;
+
+            SetVisiblityNone();
         }
         
         protected override void AddDependencies()
@@ -133,6 +136,9 @@ namespace Game.UI
                     break;
                 case SceneEnum.WORLD_MAP:
                     SetVisibilityWorld();
+                    break;
+                default:
+                    SetVisiblityNone();
                     break;
             }
         }
