@@ -98,10 +98,10 @@ namespace Game.UI
             GlobalEvents.Scene.OnBeginSceneChange += OnBeginSceneChange;
             GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoad;
 
-            SetVisiblityNone();
-
             GlobalEvents.WorldMap.OnBeginLevelAnimationEvent += SetVisiblityNone;
             GlobalEvents.WorldMap.OnEndLevelAnimationEvent += SetVisibilityWorld;
+
+            SetVisiblityNone();
         }
         
         protected override void AddDependencies()

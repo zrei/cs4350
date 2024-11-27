@@ -1,4 +1,3 @@
-using Game.UI;
 using UnityEngine;
 
 namespace Game
@@ -25,28 +24,6 @@ namespace Game
 
             transform.SetParent(null);
             DontDestroyOnLoad(this.gameObject);
-
-            GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
-
-            HandleDependencies();
-        }
-
-        private void HandleDependencies()
-        {
-            if (!UIScreenManager.IsReady)
-            {
-                UIScreenManager.OnReady += HandleDependencies;
-                return;
-            }
-
-            UIScreenManager.OnReady -= HandleDependencies;
-        }
-
-        protected override void HandleDestroy()
-        {
-            base.HandleDestroy();
-
-            GlobalEvents.Scene.OnSceneTransitionEvent -= OnSceneTransition;
         }
 
         public void SetUpLevelCamera()
@@ -57,10 +34,6 @@ namespace Game
         public void SetUpBattleCamera()
         {
             Instance.MainCamera.orthographic = false;
-        }
-
-        private void OnSceneTransition(SceneEnum finalScene)
-        {
         }
     }
 }
