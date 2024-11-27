@@ -26,8 +26,6 @@ namespace Game
             transform.SetParent(null);
             DontDestroyOnLoad(this.gameObject);
 
-            mainCamera.enabled = false;
-
             GlobalEvents.Scene.OnSceneTransitionEvent += OnSceneTransition;
 
             HandleDependencies();
@@ -42,9 +40,6 @@ namespace Game
             }
 
             UIScreenManager.OnReady -= HandleDependencies;
-
-            UIScreenManager.Instance.CreditsScreen.OnShowDone += OnShowSecondaryScreen;
-            UIScreenManager.Instance.OptionScreen.OnShowDone += OnShowSecondaryScreen;
         }
 
         protected override void HandleDestroy()
@@ -66,22 +61,6 @@ namespace Game
 
         private void OnSceneTransition(SceneEnum finalScene)
         {
-            mainCamera.enabled = finalScene != SceneEnum.MAIN_MENU;
-        }
-
-        private void OnShowSecondaryScreen(IUIScreen uiScreen)
-        {
-            if (GameSceneManager.Instance.CurrScene == SceneEnum.MAIN_MENU)
-            {
-                uiScreen.OnHideDone += OnHideSecondaryScreen;
-                mainCamera.enabled = true;
-            }
-        }
-
-        private void OnHideSecondaryScreen(IUIScreen uiScreen)
-        {
-            uiScreen.OnHideDone -= OnHideSecondaryScreen;
-            mainCamera.enabled = false;
         }
     }
 }
