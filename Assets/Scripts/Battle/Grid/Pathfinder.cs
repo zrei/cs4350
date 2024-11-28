@@ -12,7 +12,7 @@ public enum TileType
 
 public enum MovementType
 {
-    UNRESTRICTED,
+    CARDINAL,
     DIAGONALS
 }
 
@@ -223,7 +223,7 @@ public static class Pathfinder
         switch (movementType)
         {
             
-            case MovementType.UNRESTRICTED:
+            case MovementType.CARDINAL:
                 queue.Enqueue((new PathNode(coordinates.MoveLeft(), currentPathNode), currMovementRange - 1));
                 queue.Enqueue((new PathNode(coordinates.MoveRight(), currentPathNode), currMovementRange - 1));
                 queue.Enqueue((new PathNode(coordinates.MoveDown(), currentPathNode), currMovementRange - 1));

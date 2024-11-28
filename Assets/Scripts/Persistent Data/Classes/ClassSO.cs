@@ -21,5 +21,5 @@ public abstract class ClassSO : ScriptableObject
     [Header("Movement")]
     public TileType[] m_TraversableTileTypes = new TileType[] {TileType.NORMAL};
     public bool m_CanSwapTiles = false;
-    public MovementType m_MovementType = MovementType.UNRESTRICTED;
+    public MovementType m_MovementType = MovementType.CARDINAL;
 }
