@@ -71,6 +71,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public string ClassName => m_Class.m_ClassName;
 
     public bool CanSwapTiles => m_Class.m_CanSwapTiles;
+    public MovementType MovementType => m_Class.m_MovementType;
     public TileType[] TraversableTileTypes => m_Class.m_TraversableTileTypes;
 
     public string CharacterName { get; protected set; }
@@ -236,7 +237,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
             // TODO: Handle this better later
             Vector3 directionVec = (nextPos - currPos).normalized;
-            Vector3 localVec = transform.InverseTransformVector(directionVec);
             m_ArmorVisual.SetDirAnim(ArmorVisual.DirXAnimParam, directionVec.x);
             m_ArmorVisual.SetDirAnim(ArmorVisual.DirYAnimParam, directionVec.z);
             print($"x: {m_ArmorVisual.GetDirAnim(ArmorVisual.DirXAnimParam)}; z: {m_ArmorVisual.GetDirAnim(ArmorVisual.DirYAnimParam)}");
@@ -245,10 +245,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             {
                 time += Time.deltaTime;
                 float l = time / CHECKPOINT_MOVE_TIME;
-                float x = Mathf.Lerp(currPos.x, nextPos.x, l);
-                float y = Mathf.Lerp(currPos.y, nextPos.y, l);
-                float z = Mathf.Lerp(currPos.z, nextPos.z, l);
-                transform.position = new Vector3(x, y, z);
+                transform.position = Vector3.Lerp(currPos, nextPos, l);
                 yield return null;
             }
             transform.position = nextPos;
