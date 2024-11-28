@@ -187,11 +187,11 @@ public class BattleManager : Singleton<BattleManager>
 
         yield return null;
 
-        if (battleSO.m_SetupPhaseTutorial.Count > 0)
+        if (battleSO.m_SetupPhaseTutorial != null)
         {
             IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
             tutorialScreen.OnHideDone += PostTutorial;
-            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, battleSO.m_SetupPhaseTutorial);
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, battleSO.m_SetupPhaseTutorial.m_TutorialPages);
         }
         else
         {
@@ -407,11 +407,11 @@ public class BattleManager : Singleton<BattleManager>
     private void OnCompleteSetup()
     {
         Logger.Log(this.GetType().Name, "Begin battle", LogLevel.LOG);
-        if (m_CurrBattleSO.m_BattlePhaseTutorial.Count > 0)
+        if (m_CurrBattleSO.m_BattlePhaseTutorial != null)
         {
             IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
             tutorialScreen.OnHideDone += PostTutorial;
-            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_CurrBattleSO.m_BattlePhaseTutorial);
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_CurrBattleSO.m_BattlePhaseTutorial.m_TutorialPages);
         }
         else
         {

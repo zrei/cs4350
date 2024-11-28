@@ -35,7 +35,7 @@ namespace Game.UI
         private NamedObjectButton m_PartyMemberButtonPrefab;
 
         [Header("Tutorial")]
-        [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+        [SerializeField] private TutorialSO m_Tutorial;
         [SerializeField] private NamedObjectButton m_TutorialButton;
         
         private List<NamedObjectButton> m_PartyMemberButtons = new();
@@ -102,7 +102,7 @@ namespace Game.UI
 
         private void ShowTutorial()
         {
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial.m_TutorialPages);
         }
 
         private void ShowPartyOverview(List<PlayerCharacterData> playerCharacterData)
