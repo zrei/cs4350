@@ -100,6 +100,13 @@ public class GridLogic : MonoBehaviour
     }
     #endregion
 
+    #region Tick
+    public void Tick()
+    {
+        
+    }
+    #endregion
+
     #region Graphics
     public void ColorReachablePoints(HashSet<PathNode> reachablePoints)
     {

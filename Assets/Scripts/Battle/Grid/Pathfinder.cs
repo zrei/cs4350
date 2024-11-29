@@ -19,12 +19,39 @@ public class TileData
     // this follows the assumption that units cannot cross over the line, otherwise this requires information on the alliance
     public bool m_IsOccupied;
     public Unit m_CurrUnit;
+    public TileEffect m_CurrTileEffect;
 
     public TileData(TileType tileType, bool isOccupied)
     {
         m_TileType = tileType;
         m_IsOccupied = isOccupied;
         m_CurrUnit = null;
+        m_CurrTileEffect = null;
+    }
+
+    public void Tick(float passedTime, VoidEvent clearEvent)
+    {
+        if (m_CurrTileEffect != null)
+        {
+            m_CurrTileEffect.Tick(passedTime);
+            if (m_CurrTileEffect.IsEmpty)
+            {
+                clearEvent?.Invoke();
+                m_CurrTileEffect = null;
+            }
+        }
+    }
+
+    public void ApplyEffect(TileEffect tileEffect)
+    {
+        if (m_CurrTileEffect != null && tileEffect.TileType == m_CurrTileEffect.TileType)
+        {
+            m_CurrTileEffect.TopUp(tileEffect.m_TimeRemaining);
+        }
+        else
+        {
+            m_CurrTileEffect = tileEffect;
+        }
     }
 }
 
@@ -58,6 +85,20 @@ public class MapData
     public void UpdateTile(CoordPair coordPair, TileData tile)
     {
         tileMap[coordPair.m_Row, coordPair.m_Col] = tile;
+    }
+
+    public void Tick()
+    {
+        for (int r = 0; r < NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < NUM_COLS; ++c)
+            {
+                if (tileMap[r, c].m_CurrTileEffect != null)
+                {
+
+                }
+            }
+        }
     }
 
     public TileData RetrieveTile(CoordPair coordPair)
