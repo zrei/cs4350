@@ -31,9 +31,9 @@ public class BattleSO : ScriptableObject
 
     [Header("Tutorial")]
     [Tooltip("Tutorial to play upon entering setup phase - leave empty for no tutorial")]
-    public List<TutorialPageUIData> m_SetupPhaseTutorial;
+    public TutorialSO m_SetupPhaseTutorial;
     [Tooltip("Tutorial to play upon entering battle phase - leave empty for no tutorial")]
-    public List<TutorialPageUIData> m_BattlePhaseTutorial;
+    public TutorialSO m_BattlePhaseTutorial;
     [Tooltip("Whether to override the characters in the party")]
     public bool m_OverrideCharacters = false;
     [Tooltip("Which characters should be brought into the battle instead if overridden")]

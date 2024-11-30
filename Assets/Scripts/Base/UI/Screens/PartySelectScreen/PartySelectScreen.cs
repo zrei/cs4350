@@ -16,7 +16,7 @@ namespace Game.UI
         [SerializeField] Transform m_CharacterButtonParent;
 
         [Header("Tutorial")]
-        [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+        [SerializeField] private TutorialSO m_Tutorial;
         [SerializeField] private NamedObjectButton m_TutorialButton;
 
         [Space]
@@ -62,7 +62,7 @@ namespace Game.UI
 
         private void ShowTutorial()
         {
-            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial);
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialScreen, false, m_Tutorial.m_TutorialPages);
         }
 
         public override void Hide()

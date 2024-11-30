@@ -29,7 +29,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
 
     [Header("Tutorial")]
-    [SerializeField] private List<TutorialPageUIData> m_Tutorial;
+    [SerializeField] private TutorialSO m_Tutorial;
 
     //[Header("FadingFog")]
     //[SerializeField] private float m_FadeDuration = 1.0f;
@@ -151,7 +151,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
             FlagManager.Instance.SetFlagValue(Flag.HAS_VISITED_WORLD_MAP, true, FlagType.PERSISTENT);
             IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
             tutorialScreen.OnHideDone += PostTutorial;
-            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_Tutorial);
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, m_Tutorial.m_TutorialPages);
         }
         else
         {

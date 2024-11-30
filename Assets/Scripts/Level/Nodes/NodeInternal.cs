@@ -38,9 +38,9 @@ public abstract class NodeInternal : MonoBehaviour
     public Threshold MoralityThreshold => m_MoralityThreshold;
 
     [Tooltip("Tutorial to play upon first visiting the node - leave empty for no tutorial")]
-    [SerializeField] private List<TutorialPageUIData> m_PreTutorial;
+    [SerializeField] private TutorialSO m_PreTutorial;
     [Tooltip("Tutorial to play upon finishing the node for the first time - leave empty for no tutorial")]
-    [SerializeField] protected List<TutorialPageUIData> m_PostTutorial;
+    [SerializeField] protected TutorialSO m_PostTutorial;
 
     protected bool m_HasPlayedPreTutorial = false;
     protected bool m_HasPlayedPostTutorial = false;
@@ -158,9 +158,9 @@ public abstract class NodeInternal : MonoBehaviour
     #endregion
 
     #region Tutorial
-    protected void PlayTutorial(List<TutorialPageUIData> tutorial, VoidEvent postEvent)
+    protected void PlayTutorial(TutorialSO tutorial, VoidEvent postEvent)
     {
-        if (tutorial.Count == 0)
+        if (tutorial == null)
         {
             postEvent?.Invoke();
         } 
