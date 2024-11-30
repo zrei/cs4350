@@ -10,6 +10,12 @@ public enum TileType
     NORMAL
 }
 
+public enum MovementType
+{
+    CARDINAL,
+    DIAGONALS
+}
+
 /// <summary>
 /// Class packaging data on a single tile
 /// </summary>
@@ -103,6 +109,26 @@ public struct CoordPair
         return new CoordPair(m_Row, m_Col - 1);
     }
 
+    public CoordPair MoveDiagonalUpRight()
+    {
+        return new CoordPair(m_Row + 1, m_Col + 1);
+    }
+
+    public CoordPair MoveDiagonalDownRight()
+    {
+        return new CoordPair(m_Row - 1, m_Col + 1);
+    }
+
+    public CoordPair MoveDiagonalUpLeft()
+    {
+        return new CoordPair(m_Row + 1, m_Col - 1);
+    }
+
+    public CoordPair MoveDiagonalDownLeft()
+    {
+        return new CoordPair(m_Row - 1, m_Col - 1);
+    }
+
     public CoordPair Offset(CoordPair offset)
     {
         return new CoordPair(m_Row + offset.m_Row, m_Col + offset.m_Col);
@@ -157,7 +183,7 @@ public class PathNode
 /// </summary>
 public static class Pathfinder
 {
-    public static HashSet<PathNode> ReachablePoints(MapData map, CoordPair startPoint, int movementRange, bool canSwapSquares, params TileType[] traversableTiles)
+    public static HashSet<PathNode> ReachablePoints(MapData map, CoordPair startPoint, int movementRange, bool canSwapSquares, MovementType movementType, params TileType[] traversableTiles)
     {
         HashSet<PathNode> canTraverse = new HashSet<PathNode>();
         HashSet<CoordPair> checkedTiles = new HashSet<CoordPair>();
@@ -185,13 +211,31 @@ public static class Pathfinder
             if (!coordinates.Equals(startPoint) && map.RetrieveTile(coordinates).m_IsOccupied && !GlobalSettings.AllowCrossingOverOccupiedSquares)
                 continue;
 
-            q.Enqueue((new PathNode(coordinates.MoveLeft(), point), remainingMovement - 1));
-            q.Enqueue((new PathNode(coordinates.MoveRight(), point), remainingMovement - 1));
-            q.Enqueue((new PathNode(coordinates.MoveDown(), point), remainingMovement - 1));
-            q.Enqueue((new PathNode(coordinates.MoveUp(), point), remainingMovement - 1));
+            EnqueueNewPoints(point, movementType, remainingMovement, q);
         }
 
         return canTraverse;
+    }
+
+    private static void EnqueueNewPoints(PathNode currentPathNode, MovementType movementType, int currMovementRange, Queue<(PathNode,int)> queue)
+    {
+        CoordPair coordinates = currentPathNode.m_Coordinates;
+        switch (movementType)
+        {
+            
+            case MovementType.CARDINAL:
+                queue.Enqueue((new PathNode(coordinates.MoveLeft(), currentPathNode), currMovementRange - 1));
+                queue.Enqueue((new PathNode(coordinates.MoveRight(), currentPathNode), currMovementRange - 1));
+                queue.Enqueue((new PathNode(coordinates.MoveDown(), currentPathNode), currMovementRange - 1));
+                queue.Enqueue((new PathNode(coordinates.MoveUp(), currentPathNode), currMovementRange - 1));
+                break;
+            case MovementType.DIAGONALS:
+                queue.Enqueue((new PathNode(coordinates.MoveDiagonalDownLeft(), currentPathNode), currMovementRange - 1));
+                queue.Enqueue((new PathNode(coordinates.MoveDiagonalDownRight(), currentPathNode), currMovementRange - 1));
+                queue.Enqueue((new PathNode(coordinates.MoveDiagonalUpLeft(), currentPathNode), currMovementRange - 1));
+                queue.Enqueue((new PathNode(coordinates.MoveDiagonalUpRight(), currentPathNode), currMovementRange - 1));
+                break;
+        }
     }
 
     public static bool TryPathfind(MapData map, CoordPair startPosition, CoordPair destination, out PathNode pathNode, params TileType[] traversableTiles)

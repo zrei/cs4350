@@ -322,7 +322,7 @@ public class GridLogic : MonoBehaviour
 
     public HashSet<PathNode> CalculateReachablePoints(Unit unit, int remainingMovementRange)
     {
-        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.CanSwapTiles, unit.TraversableTileTypes);
+        return Pathfinder.ReachablePoints(MapData, unit.CurrPosition, remainingMovementRange, unit.CanSwapTiles, unit.MovementType, unit.TraversableTileTypes);
     }
 
     public void TryReachTile(Unit unit, CoordPair destination, VoidEvent onCompleteMovement)
