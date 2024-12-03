@@ -49,7 +49,7 @@ public class TileData
         if (m_CurrTileEffect != null && m_CurrTileEffect.IsPermanent)
             return false;
 
-        if (m_CurrTileEffect != null && tileEffect.m_TileEffect == m_CurrTileEffect.m_TileEffectSO)
+        if (m_CurrTileEffect != null && tileEffect.Id == m_CurrTileEffect.Id)
         {
             m_CurrTileEffect.TopUp(tileEffect.m_InitialTime);
         }

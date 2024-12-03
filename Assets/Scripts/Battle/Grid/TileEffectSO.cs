@@ -8,7 +8,7 @@ public struct InflictedTileEffect
     public TileEffectSO m_TileEffect;
     public float m_InitialTime;
 
-    public TileType TileType => m_TileEffect.m_TileType;
+    public int Id => m_TileEffect.m_Id;
     public GameObject[] TileEffectObjs => m_TileEffect.m_TileGameObjects;
 }
 
@@ -16,6 +16,8 @@ public struct InflictedTileEffect
 public class TileEffectSO : ScriptableObject
 {
     [Header("Details")]
+    public int m_Id;
+    [Tooltip("Indicates what units can traverse over this tile while this effect is active")]
     public TileType m_TileType;
     [Tooltip("Whether this tile effect is permanent and cannot be replaced")]
     public bool m_IsPermanent = false;
@@ -55,6 +57,7 @@ public class TileEffect
     public float m_TimeRemaining;
     public bool IsEmpty => !IsPermanent && m_TimeRemaining <= 0;
     public TileType TileType => m_TileEffectSO.m_TileType;
+    public int Id => m_TileEffectSO.m_Id;
     public bool IsPermanent => m_TileEffectSO.m_IsPermanent;
 
     public TileEffect(TileEffectSO tileEffectSO, float inflictedTime)
