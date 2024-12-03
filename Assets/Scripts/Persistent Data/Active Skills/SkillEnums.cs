@@ -7,7 +7,8 @@ public enum SkillEffectType
     SUMMON,
     ALTER_MANA,
     TELEPORT,
-    CLEANSE
+    CLEANSE,
+    APPLY_TILE_EFFECT
 }
 
 public enum SkillType

@@ -19,8 +19,17 @@ public class EnemyMoveActionWrapper : EnemyActionWrapper
         // calculate the final tile that the unit wants to move towards
         CoordPair finalTile = MoveAction.GetChosenTile(enemyUnit, mapLogic, m_CanOccupyTiles);
         
-        mapLogic.TryReachTile(GridType.ENEMY, enemyUnit, finalTile, completeActionEvent);
+        mapLogic.TryReachTile(GridType.ENEMY, enemyUnit, finalTile, () => OnMoveComplete(enemyUnit, mapLogic, completeActionEvent));
+    }
+
+    private void OnMoveComplete(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    {
         enemyUnit.ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
+        mapLogic.ApplyTileEffectOnUnit(GridType.ENEMY, enemyUnit);
+        if (enemyUnit.IsDead)
+            enemyUnit.Die();
+
+        completeActionEvent?.Invoke();
     }
 
     public override HashSet<ActiveSkillSO> GetNestedActiveSkills()

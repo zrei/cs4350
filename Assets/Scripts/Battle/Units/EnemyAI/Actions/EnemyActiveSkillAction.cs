@@ -89,12 +89,12 @@ public class EnemyActiveSkillAction : EnemyActionInstance
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                if (mapLogic.CanPerformSkill(m_ActiveSkill, enemyUnit, coordinates, targetGridType, true) && m_TargetConditions.All(cond => cond.IsConditionMet(enemyUnit, mapLogic, coordinates, m_ActiveSkill)) && (!isTeleportSkill || IsValidTeleportTargetTile(enemyUnit, mapLogic, coordinates)))
+                if (mapLogic.CanPerformSkill(m_ActiveSkill, enemyUnit, coordinates, targetGridType, m_ActiveSkill.RequiresOccupiedTiles) && m_TargetConditions.All(cond => cond.IsConditionMet(enemyUnit, mapLogic, coordinates, m_ActiveSkill)) && (!isTeleportSkill || IsValidTeleportTargetTile(enemyUnit, mapLogic, coordinates)))
                 {
                     targetablePositions = targetablePositions.Append(coordinates);
                     hasPossibleAttackPosition = true;
                 }
-                if (mapLogic.CanPerformSkill(m_ActiveSkill, enemyUnit, coordinates, targetGridType, false))
+                if (mapLogic.CanPerformSkill(m_ActiveSkill, enemyUnit, coordinates, targetGridType))
                 {
                     targetablePositionsIgnoreOccupiedAndAdditionalConditions = targetablePositionsIgnoreOccupiedAndAdditionalConditions.Append(coordinates);
                 }

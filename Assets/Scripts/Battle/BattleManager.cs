@@ -168,6 +168,11 @@ public class BattleManager : Singleton<BattleManager>
             InstantiatePlayerUnit(playerUnitData[i], GetAvailableStartingPosition(playerUnitData[i], battleSO.m_PlayerStartingTiles));
         }
 
+        foreach (StartingTileEffect startingTileEffect in battleSO.m_StartingTileEffects)
+        {
+            m_MapLogic.ApplyTileEffectOnTile(startingTileEffect.m_GridType, startingTileEffect.m_Coordinates, startingTileEffect.m_InflictedTileEffect);
+        }
+
         m_TurnQueue.OrderTurnQueue();
 
         foreach (var objective in m_Objectives)
@@ -467,7 +472,8 @@ public class BattleManager : Singleton<BattleManager>
             return;
         }
 
-        m_TurnQueue.Tick();
+        float tick = m_TurnQueue.Tick();
+        m_MapLogic.Tick(tick);
         // Logger.Log(this.GetType().Name, m_TurnQueue.ToString(), LogLevel.LOG);
     }
     #endregion

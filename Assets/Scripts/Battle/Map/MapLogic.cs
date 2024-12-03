@@ -287,4 +287,24 @@ public class MapLogic : MonoBehaviour
         RetrieveGrid(teleportTargetGrid).SwapTiles(teleportStartPoint, teleportDestination);
     }
     #endregion
+
+    #region Tick
+    public void Tick(float tickTime)
+    {
+        m_EnemyGrid.Tick(tickTime);
+        m_PlayerGrid.Tick(tickTime);
+    }
+    #endregion
+
+    #region Tile Effect
+    public void ApplyTileEffectOnUnit(GridType gridType, Unit unit)
+    {
+        RetrieveGrid(gridType).TryApplyTileEffectsOnUnit(unit);
+    }
+
+    public void ApplyTileEffectOnTile(GridType gridType, List<CoordPair> coordinates, InflictedTileEffect inflictedTileEffect)
+    {
+        RetrieveGrid(gridType).TryApplyEffectOnTiles(coordinates, inflictedTileEffect);
+    }
+    #endregion
 }

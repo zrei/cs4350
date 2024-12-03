@@ -2,16 +2,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
 public struct InflictedTileEffect
 {
     public TileEffectSO m_TileEffect;
     public float m_InitialTime;
+
+    public TileType TileType => m_TileEffect.m_TileType;
+    public GameObject[] TileEffectObjs => m_TileEffect.m_TileGameObjects;
 }
 
+[CreateAssetMenu(fileName = "TileEffectSO", menuName = "ScriptableObject/TileEffectSO")]
 public class TileEffectSO : ScriptableObject
 {
     [Header("Details")]
     public TileType m_TileType;
+    [Tooltip("Whether this tile effect is permanent and cannot be replaced")]
+    public bool m_IsPermanent = false;
+    [Tooltip("If permanent, this will not matter")]
     public float m_MaxTime;
 
     [Tooltip("Note that some skill types won't have any effect")]
@@ -33,8 +41,8 @@ public class TileEffectSO : ScriptableObject
     [Tooltip("Sign is important!")]
     public float m_ChangeManaAmount;
 
-    [Tooltip("Game object to spawn on top of the tile")]
-    public GameObject m_TileGameObject;
+    [Tooltip("Game objects to spawn on top of the tile")]
+    public GameObject[] m_TileGameObjects;
     // VFX to spawn
     // public List<VFXSO> m_TileVfx;
 
@@ -45,8 +53,9 @@ public class TileEffect
 {
     public TileEffectSO m_TileEffectSO;
     public float m_TimeRemaining;
-    public bool IsEmpty => m_TimeRemaining <= 0;
+    public bool IsEmpty => !IsPermanent && m_TimeRemaining <= 0;
     public TileType TileType => m_TileEffectSO.m_TileType;
+    public bool IsPermanent => m_TileEffectSO.m_IsPermanent;
 
     public TileEffect(TileEffectSO tileEffectSO, float inflictedTime)
     {

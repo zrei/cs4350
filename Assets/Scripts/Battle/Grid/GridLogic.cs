@@ -67,7 +67,7 @@ public class GridLogic : MonoBehaviour
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                m_TileData[r, c] = new TileData(TileType.NORMAL, false);
+                m_TileData[r, c] = new TileData(false);
             }
         }
     }
@@ -101,9 +101,15 @@ public class GridLogic : MonoBehaviour
     #endregion
 
     #region Tick
-    public void Tick()
+    public void Tick(float tickTime)
     {
-        
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                m_TileData[r, c].Tick(tickTime, m_TileVisuals[r, c].ClearEffects);
+            }
+        }
     }
     #endregion
 
@@ -603,6 +609,8 @@ public class GridLogic : MonoBehaviour
         {
             attacker.PostSkillEvent = null;
 
+            TryApplySkillTileEffects(activeSkill, targetTile);
+
             // TODO: Clean this up further?
             List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
 
@@ -612,7 +620,6 @@ public class GridLogic : MonoBehaviour
             {
                 deadUnit.PlayDeathSound(volumeModifier);
                 deadUnit.Die();
-                
             }
 
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
@@ -634,6 +641,8 @@ public class GridLogic : MonoBehaviour
         void CompleteSkill(List<IHealth> targets)
         {
             attacker.PostSkillEvent = null;
+
+            TryApplySkillTileEffects(activeSkill, targetTile);
 
             float volumeModifier = 1f / (1 + (attacker.IsDead ? 1 : 0));
             foreach (IHealth target in targets)
@@ -694,6 +703,16 @@ public class GridLogic : MonoBehaviour
             }
         }
     }
+
+    void TryApplySkillTileEffects(ActiveSkillSO activeSkill, CoordPair initialTargetTile)
+    {
+        List<CoordPair> targetTiles = GetInBoundsTargetTiles(activeSkill, initialTargetTile);
+
+        if (activeSkill.ContainsSkillType(SkillEffectType.APPLY_TILE_EFFECT))
+        {
+            TryApplyEffectOnTiles(targetTiles, activeSkill.m_InflictedTileEffect);
+        }
+    }
     #endregion
 
     #region Summon Helper
@@ -750,6 +769,26 @@ public class GridLogic : MonoBehaviour
         }
 
         return spawnTiles;
+    }
+    #endregion
+
+    #region Tile Effects
+    /// <summary>
+    /// Applies tile effects on a singular unit
+    /// </summary>
+    public void TryApplyTileEffectsOnUnit(Unit unit)
+    {
+        CoordPair position = unit.CurrPosition;
+        m_TileData[position.m_Row, position.m_Col].TryApplyEffectOnUnit();
+    }
+
+    public void TryApplyEffectOnTiles(List<CoordPair> coordinates, InflictedTileEffect inflictedTileEffect)
+    {
+        foreach (CoordPair coordPair in coordinates)
+        {
+            if (m_TileData[coordPair.m_Row, coordPair.m_Col].TryApplyEffect(inflictedTileEffect))
+                m_TileVisuals[coordPair.m_Row, coordPair.m_Col].SpawnTileEffects(inflictedTileEffect.TileEffectObjs);
+        }
     }
     #endregion
 }

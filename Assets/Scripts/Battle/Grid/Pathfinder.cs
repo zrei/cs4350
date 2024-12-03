@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// can add more tile types like trap or cliff in the future
-// if calculations become exceedingly class dependent it should be given to the class
-// to calculate
+/// <summary>
+/// Kindly keep this updated :)
+/// Can be used for more broad categories e.g. NORMAL means all units can cross
+/// Something like FLYERS may mean only flying units can cross
+/// </summary>
 public enum TileType
 {
-    NORMAL
+    NORMAL,
+    IMPASSABLE
 }
 
 /// <summary>
@@ -15,15 +18,14 @@ public enum TileType
 /// </summary>
 public class TileData
 {
-    public TileType m_TileType;
+    public TileType TileType => m_CurrTileEffect == null ? TileType.NORMAL : m_CurrTileEffect.TileType;
     // this follows the assumption that units cannot cross over the line, otherwise this requires information on the alliance
     public bool m_IsOccupied;
     public Unit m_CurrUnit;
     public TileEffect m_CurrTileEffect;
 
-    public TileData(TileType tileType, bool isOccupied)
+    public TileData(bool isOccupied)
     {
-        m_TileType = tileType;
         m_IsOccupied = isOccupied;
         m_CurrUnit = null;
         m_CurrTileEffect = null;
@@ -42,16 +44,30 @@ public class TileData
         }
     }
 
-    public void ApplyEffect(TileEffect tileEffect)
+    public bool TryApplyEffect(InflictedTileEffect tileEffect)
     {
-        if (m_CurrTileEffect != null && tileEffect.TileType == m_CurrTileEffect.TileType)
+        if (m_CurrTileEffect != null && m_CurrTileEffect.IsPermanent)
+            return false;
+
+        if (m_CurrTileEffect != null && tileEffect.m_TileEffect == m_CurrTileEffect.m_TileEffectSO)
         {
-            m_CurrTileEffect.TopUp(tileEffect.m_TimeRemaining);
+            m_CurrTileEffect.TopUp(tileEffect.m_InitialTime);
         }
         else
         {
-            m_CurrTileEffect = tileEffect;
+            m_CurrTileEffect = new TileEffect(tileEffect.m_TileEffect, tileEffect.m_InitialTime);
         }
+
+        return true;
+    }
+
+    public bool TryApplyEffectOnUnit()
+    {
+        if (!m_IsOccupied || m_CurrTileEffect == null)
+            return false;
+
+        m_CurrTileEffect.ApplyEffects(m_CurrUnit);
+        return true;
     }
 }
 
@@ -273,9 +289,8 @@ public static class Pathfinder
     private static bool IsTraversableTile(MapData map, CoordPair point, params TileType[] traversableTiles)
     {
         TileData tile = map.RetrieveTile(point);
-        if (!Array.Exists(traversableTiles, x => x == tile.m_TileType))
+        if (!Array.Exists(traversableTiles, x => x == tile.TileType))
             return false;
-
         return true;
     }
 }
