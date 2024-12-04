@@ -78,6 +78,10 @@ public class ActiveSkillSO : ScriptableObject
     [Space]
     [Tooltip("What this skill will cleanse")]
     public List<StatusType> m_CleansedStatusTypes;
+
+    [Space]
+    [Tooltip("The tile effects to be applied - these will be ignored if the skill does not apply tile effects")]
+    public InflictedTileEffect m_InflictedTileEffect;
     
     [Header("Animations")]
     public bool m_TargetWillPlayHurtAnimation = false;
@@ -112,7 +116,6 @@ public class ActiveSkillSO : ScriptableObject
             return sprite;
         }
     }
-
     
     public (Sprite sprite, bool isAlly) GetTargetPositioningSprite
     {
@@ -159,6 +162,7 @@ public class ActiveSkillSO : ScriptableObject
     public bool IsOpposingSideTarget => !IsSelfTarget && m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);
     public bool HasAttackerLimitations => m_TargetRules.Any(x => x is IAttackerRule);
     public bool HasTargetLimitations => m_TargetRules.Any(x => x is TargetLocationRuleSO);
+    public bool RequiresOccupiedTiles => !ContainsSkillType(SkillEffectType.APPLY_TILE_EFFECT);
     public GridType TargetGridType(UnitAllegiance unitAllegiance) => IsOpposingSideTarget ? GridHelper.GetOpposingSide(unitAllegiance) : GridHelper.GetSameSide(unitAllegiance);
     // depends on whether attacks that target the opposing side but only deal status effects will still use the attack animation
     // public bool WillPlaySupportAnimation => !DealsDamage && !m_TargetRules.Any(x => x is TargetOpposingSideRuleSO);

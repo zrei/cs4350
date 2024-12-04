@@ -440,7 +440,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         return HasToken(TokenType.EVADE);
     }
 
-    private void Cleanse(List<StatusType> statusTypes)
+    public void Cleanse(List<StatusType> statusTypes)
     {
         m_StatusManager.CleanseStatusTypes(statusTypes);
     }
@@ -478,7 +478,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         return CurrentMana >= skill.m_ConsumedMana;
     }
 
-    private void AlterMana(float amount)
+    public void AlterMana(float amount)
     {
         Logger.Log(this.GetType().Name, $"Add {amount} mana to {name}", name, this.gameObject, LogLevel.LOG);
         var max = MaxMana;

@@ -102,10 +102,10 @@ public class TurnQueue
         m_Turns.Sort(UnitSpeedComparer);
     }
 
-    public void Tick()
+    public float Tick()
     {
         if (m_Turns.Count <= 0)
-            return;
+            return 0;
 
         float tick = Mathf.Min(TICK_AMOUNT, m_Turns[0].m_TimeRemaining);
         foreach (TurnWrapper turnWrapper in m_Turns)
@@ -114,6 +114,7 @@ public class TurnQueue
         }
         m_AccumulatedTime += tick;
         GlobalEvents.Battle.BattleTimeTickEvent?.Invoke(m_AccumulatedTime);
+        return tick;
     }
 
     #region Helper

@@ -94,6 +94,7 @@ public class PlayerTurnManager : TurnManager
 
         m_CurrUnit = playerUnit;
         m_CurrUnit.PreTick();
+        m_MapLogic.ApplyTileEffectOnUnit(GridType.PLAYER, m_CurrUnit);
 
         GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
 
@@ -287,7 +288,7 @@ public class PlayerTurnManager : TurnManager
         if (!CheckSkillManaRequirement(m_CurrUnit, selectedSkill)) return false;
         if (!CheckCooldownRequirement(m_CurrUnit, selectedSkill)) return false;
 
-        if (m_MapLogic.CanPerformSkill(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, true))
+        if (m_MapLogic.CanPerformSkill(SelectedSkill, m_CurrUnit, selectedTileVisual.Coordinates, selectedTileVisual.GridType, SelectedSkill.RequiresOccupiedTiles))
         {
             if (selectedSkill.ContainsSkillType(SkillEffectType.TELEPORT))
             {
@@ -380,6 +381,11 @@ public class PlayerTurnManager : TurnManager
             //m_TileToPath.Clear();
             //m_TileToPath.Add(node.m_Coordinates, node);
             m_CurrUnit.ConsumeTokens(TokenConsumptionType.CONSUME_ON_MOVE);
+
+            m_MapLogic.ApplyTileEffectOnUnit(GridType.PLAYER, m_CurrUnit);
+            if (m_CurrUnit.IsDead)
+                m_CurrUnit.Die();
+
             EndTurn();
         }
         //TransitToAction(PlayerTurnState.SELECTING_MOVEMENT_SQUARE);

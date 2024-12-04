@@ -16,6 +16,14 @@ public class EnemyUnitPlacement
     }
 }
 
+[System.Serializable]
+public struct StartingTileEffect
+{
+    public GridType m_GridType;
+    public List<CoordPair> m_Coordinates;
+    public InflictedTileEffect m_InflictedTileEffect;
+}
+
 [CreateAssetMenu(fileName="BattleSO", menuName="ScriptableObject/Battle/BattleSO")]
 public class BattleSO : ScriptableObject
 {
@@ -26,6 +34,7 @@ public class BattleSO : ScriptableObject
     /// List of coordinates that the player units start in
     /// </summary>
     public List<CoordPair> m_PlayerStartingTiles;
+    public List<StartingTileEffect> m_StartingTileEffects;
     public int m_ExpReward;
     public AudioDataSO m_BattleBGM;
 

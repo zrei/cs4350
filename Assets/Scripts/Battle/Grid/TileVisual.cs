@@ -52,6 +52,8 @@ public class TileVisual : MonoBehaviour
     [SerializeField]
     private ParticleSystem skillCastBlockedParticleEffect;
 
+    [SerializeField] private Transform m_TileEffectObjParent;
+
     private TileState m_CurrState = TileState.NONE;
 
     private Color CurrentStateDefaultColor => m_CurrState switch
@@ -154,6 +156,25 @@ public class TileVisual : MonoBehaviour
         else
         {
             skillCastBlockedParticleEffect.Stop();
+        }
+    }
+    #endregion
+
+    #region Tile Effects
+    public void SpawnTileEffects(params GameObject[] tileEffectObjs)
+    {
+        ClearEffects();
+        foreach (GameObject gameObject in tileEffectObjs)
+        {
+            Instantiate(gameObject, m_TileEffectObjParent);
+        }
+    }
+
+    public void ClearEffects()
+    {
+        foreach (Transform child in m_TileEffectObjParent)
+        {
+            Destroy(child.gameObject);
         }
     }
     #endregion

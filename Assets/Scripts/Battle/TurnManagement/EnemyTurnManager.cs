@@ -8,27 +8,28 @@ public class EnemyTurnManager : TurnManager
         Logger.Log(this.GetType().Name, "Start enemy turn with " + m_CurrUnit.name, LogLevel.LOG);
 
         m_CurrUnit.PreTick();
+        m_MapLogic.ApplyTileEffectOnUnit(GridType.ENEMY, m_CurrUnit);
 
         if (m_CurrUnit.IsDead)
         {
             m_CurrUnit.Die();
-            CompleteTurn();
+            EndTurn();
             return;
         }
 
         if (!PreTurn(enemyUnit))
         {
-            CompleteTurn();
+            EndTurn();
             return;
         }   
 
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
         GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
 
-        enemyUnit.PerformAction(m_MapLogic, CompleteTurn);
+        enemyUnit.PerformAction(m_MapLogic, EndTurn);
     }
 
-    private void CompleteTurn()
+    private void EndTurn()
     {
         m_CurrUnit.PostTick();
         m_CompleteTurnEvent?.Invoke(m_CurrUnit);
