@@ -10,6 +10,11 @@ public struct InflictedTileEffect
 
     public int Id => m_TileEffect.m_Id;
     public GameObject[] TileEffectObjs => m_TileEffect.m_TileGameObjects;
+
+    public override int GetHashCode()
+    {
+        return m_TileEffect.m_Id.GetHashCode() ^ m_InitialTime.GetHashCode();
+    }
 }
 
 [CreateAssetMenu(fileName = "TileEffectSO", menuName = "ScriptableObject/TileEffectSO")]

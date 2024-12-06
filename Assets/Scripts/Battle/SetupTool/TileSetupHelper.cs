@@ -6,6 +6,7 @@ public class TileSetupHelper : MonoBehaviour
 {
     [SerializeField] private TileVisual m_TileVisual;
     [SerializeField] private ArmorVisual m_ArmorVisual;
+    [HideInInspector]
     [SerializeField] private bool m_IsSelected = false;
 
     #if UNITY_EDITOR
@@ -26,38 +27,53 @@ public class TileSetupHelper : MonoBehaviour
         {
             DestroyImmediate(child.gameObject);
         }
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void SpawnUnit(UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
     {
         ClearUnit();
         m_ArmorVisual.InstantiateModel(unitModelData, weaponSO, classSO);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void ResetTileColor()
     {
         m_TileVisual.SetTileState(TileState.NONE);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void SetTileAsSetupColor()
     {
         m_TileVisual.SetTileState(TileState.SWAPPABLE);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void SetupTileEffects(params GameObject[] tileEffects)
     {
         m_TileVisual.SpawnTileEffects(tileEffects);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void ClearTileEffects()
     {
         m_TileVisual.ClearEffects();
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
+    }
+
+    public void ToggleSelected(bool isSelected)
+    {
+        m_IsSelected = isSelected;
     }
 
     public void OnDrawGizmos()
     {
         if (m_IsSelected)
-            Gizmos.DrawSphere(this.transform.position + new Vector3(0, 5f, 0), 5);
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(this.transform.position + new Vector3(0, 0.5f, 0), 0.5f);
+        }
+            
     }
     #endif
 }

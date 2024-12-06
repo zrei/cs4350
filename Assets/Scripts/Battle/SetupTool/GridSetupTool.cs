@@ -22,31 +22,50 @@ public class GridSetupHelper : MonoBehaviour
     public void ClearUnit(CoordPair coordPair)
     {
         GetTileSetupHelper(coordPair).ClearUnit();
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void SpawnUnit(CoordPair coordPair, UnitModelData unitModelData, WeaponInstanceSO weaponSO, ClassSO classSO)
     {
         GetTileSetupHelper(coordPair).SpawnUnit(unitModelData, weaponSO, classSO);
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void ResetTileColor(CoordPair coordPair)
     {
         GetTileSetupHelper(coordPair).ResetTileColor();
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void SetTileAsSetupColor(CoordPair coordPair)
     {
         GetTileSetupHelper(coordPair).SetTileAsSetupColor();
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void SetupTileEffects(CoordPair coordPair, params GameObject[] tileEffects)
     {
         GetTileSetupHelper(coordPair).SetupTileEffects(tileEffects);
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
 
     public void ClearTileEffects(CoordPair coordPair)
     {
         GetTileSetupHelper(coordPair).ClearTileEffects();
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
+    }
+
+    public void ToggleTileSelected(CoordPair coordPair, bool isSelected)
+    {
+        GetTileSetupHelper(coordPair).ToggleSelected(isSelected);
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
     #endif
 }

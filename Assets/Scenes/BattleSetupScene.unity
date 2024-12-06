@@ -167,6 +167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769745}
   m_ArmorVisual: {fileID: 1523765806}
+  m_IsSelected: 0
 --- !u!1 &89013905
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769636}
   m_ArmorVisual: {fileID: 1454601986}
+  m_IsSelected: 0
 --- !u!1 &110186389
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,6 +334,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769669}
   m_ArmorVisual: {fileID: 1228008224}
+  m_IsSelected: 0
+--- !u!1 &187663563
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 187663564}
+  m_Layer: 0
+  m_Name: DownwardView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &187663564
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187663563}
+  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 15.95}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1222376082}
+  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &195842440
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,6 +428,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769648}
   m_ArmorVisual: {fileID: 1862845862}
+  m_IsSelected: 0
 --- !u!114 &221718171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -404,6 +443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769742}
   m_ArmorVisual: {fileID: 367523120}
+  m_IsSelected: 0
 --- !u!114 &221995942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,6 +458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769715}
   m_ArmorVisual: {fileID: 604865831}
+  m_IsSelected: 0
 --- !u!1 &229666437
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769615}
   m_ArmorVisual: {fileID: 1577067923}
+  m_IsSelected: 0
 --- !u!1 &261860666
 GameObject:
   m_ObjectHideFlags: 0
@@ -534,6 +576,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769651}
   m_ArmorVisual: {fileID: 1633136921}
+  m_IsSelected: 0
 --- !u!1 &288027302
 GameObject:
   m_ObjectHideFlags: 0
@@ -654,6 +697,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769757}
   m_ArmorVisual: {fileID: 1479059535}
+  m_IsSelected: 0
 --- !u!1 &338123607
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,6 +1011,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769751}
   m_ArmorVisual: {fileID: 1053001510}
+  m_IsSelected: 0
 --- !u!1 &458930280
 GameObject:
   m_ObjectHideFlags: 0
@@ -1012,6 +1057,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769718}
   m_ArmorVisual: {fileID: 1699759140}
+  m_IsSelected: 0
 --- !u!1 &463892799
 GameObject:
   m_ObjectHideFlags: 0
@@ -1176,6 +1222,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EnemyGrid: {fileID: 647046762}
   m_PlayerGrid: {fileID: 1010769113}
+  m_CurrTileEnemy:
+    m_InflictedTileEffect:
+      m_TileEffect: {fileID: 0}
+      m_InitialTime: 0
+    m_BattleEnemyUnit:
+      m_EnemyCharacter: {fileID: 11400000, guid: a9c3254e676586d4cb9f07762dce3348,
+        type: 2}
+      m_StatAugmnets:
+        m_Health: 0
+        m_Mana: 0
+        m_PhysicalAttack: 0
+        m_MagicAttack: 0
+        m_PhysicalDefence: 0
+        m_MagicDefence: 0
+        m_Speed: 0
+        m_MovementRange: 0
+      m_EnemyTag: 1
+  m_CurrTilePlayer:
+    m_InflictedTileEffect:
+      m_TileEffect: {fileID: 0}
+      m_InitialTime: 0
+    m_IsSetupTile: 1
 --- !u!1 &575585690
 GameObject:
   m_ObjectHideFlags: 0
@@ -1415,6 +1483,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769697}
   m_ArmorVisual: {fileID: 1017920100}
+  m_IsSelected: 0
 --- !u!114 &632780540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1429,6 +1498,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769691}
   m_ArmorVisual: {fileID: 1036662239}
+  m_IsSelected: 0
 --- !u!1 &633438898
 GameObject:
   m_ObjectHideFlags: 0
@@ -1517,6 +1587,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769739}
   m_ArmorVisual: {fileID: 1304043459}
+  m_IsSelected: 0
 --- !u!114 &690776522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1531,6 +1602,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769736}
   m_ArmorVisual: {fileID: 1127694545}
+  m_IsSelected: 0
 --- !u!114 &691039343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1545,6 +1617,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769730}
   m_ArmorVisual: {fileID: 1546684080}
+  m_IsSelected: 0
 --- !u!1 &701750992
 GameObject:
   m_ObjectHideFlags: 0
@@ -1621,6 +1694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769687}
   m_ArmorVisual: {fileID: 1233395916}
+  m_IsSelected: 0
 --- !u!114 &719750799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1635,6 +1709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769630}
   m_ArmorVisual: {fileID: 1495520356}
+  m_IsSelected: 0
 --- !u!114 &721298782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1649,6 +1724,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769721}
   m_ArmorVisual: {fileID: 1805306445}
+  m_IsSelected: 0
 --- !u!1 &745090776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1694,6 +1770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769727}
   m_ArmorVisual: {fileID: 1000776878}
+  m_IsSelected: 0
 --- !u!1 &767816961
 GameObject:
   m_ObjectHideFlags: 0
@@ -1783,6 +1860,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769754}
   m_ArmorVisual: {fileID: 338123609}
+  m_IsSelected: 0
 --- !u!1001 &779769610
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2049,6 +2127,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1577067922}
+    - targetCorrespondingSourceObject: {fileID: 8920562772494196666, guid: 0455c34086d6442e5b286c90018fa688,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 187663564}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8842452784501181969, guid: 0455c34086d6442e5b286c90018fa688,
         type: 3}
@@ -3495,6 +3577,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769760}
   m_ArmorVisual: {fileID: 767816963}
+  m_IsSelected: 0
 --- !u!114 &779769765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3509,6 +3592,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769763}
   m_ArmorVisual: {fileID: 261860668}
+  m_IsSelected: 0
 --- !u!114 &809497073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3523,6 +3607,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769645}
   m_ArmorVisual: {fileID: 575585692}
+  m_IsSelected: 0
 --- !u!1 &818947796
 GameObject:
   m_ObjectHideFlags: 0
@@ -3643,6 +3728,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769712}
   m_ArmorVisual: {fileID: 1877931211}
+  m_IsSelected: 0
 --- !u!1 &943731159
 GameObject:
   m_ObjectHideFlags: 0
@@ -3719,6 +3805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769621}
   m_ArmorVisual: {fileID: 1199315353}
+  m_IsSelected: 0
 --- !u!1 &953052373
 GameObject:
   m_ObjectHideFlags: 0
@@ -3821,6 +3908,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769663}
   m_ArmorVisual: {fileID: 818947798}
+  m_IsSelected: 0
 --- !u!1 &1000776876
 GameObject:
   m_ObjectHideFlags: 0
@@ -3922,6 +4010,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769657}
   m_ArmorVisual: {fileID: 1163867564}
+  m_IsSelected: 0
 --- !u!1 &1017920098
 GameObject:
   m_ObjectHideFlags: 0
@@ -4143,6 +4232,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769684}
   m_ArmorVisual: {fileID: 550307148}
+  m_IsSelected: 0
 --- !u!1 &1081726790
 GameObject:
   m_ObjectHideFlags: 0
@@ -4364,6 +4454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769627}
   m_ArmorVisual: {fileID: 1146479481}
+  m_IsSelected: 0
 --- !u!1 &1199315351
 GameObject:
   m_ObjectHideFlags: 0
@@ -4422,6 +4513,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769703}
   m_ArmorVisual: {fileID: 953052375}
+  m_IsSelected: 0
 --- !u!1 &1213839479
 GameObject:
   m_ObjectHideFlags: 0
@@ -4453,6 +4545,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!224 &1222376082 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8920562772494196666, guid: 0455c34086d6442e5b286c90018fa688,
+    type: 3}
+  m_PrefabInstance: {fileID: 779769610}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1228008222
 GameObject:
   m_ObjectHideFlags: 0
@@ -4555,6 +4653,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769666}
   m_ArmorVisual: {fileID: 1979675248}
+  m_IsSelected: 0
 --- !u!1 &1304043457
 GameObject:
   m_ObjectHideFlags: 0
@@ -4613,6 +4712,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769748}
   m_ArmorVisual: {fileID: 597344387}
+  m_IsSelected: 0
 --- !u!1 &1343369679
 GameObject:
   m_ObjectHideFlags: 0
@@ -4790,6 +4890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769700}
   m_ArmorVisual: {fileID: 1422319439}
+  m_IsSelected: 0
 --- !u!1 &1454601984
 GameObject:
   m_ObjectHideFlags: 0
@@ -5029,6 +5130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769633}
   m_ArmorVisual: {fileID: 2117394034}
+  m_IsSelected: 0
 --- !u!1 &1523765804
 GameObject:
   m_ObjectHideFlags: 0
@@ -5131,6 +5233,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769678}
   m_ArmorVisual: {fileID: 89013907}
+  m_IsSelected: 0
 --- !u!114 &1556480809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5145,6 +5248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769618}
   m_ArmorVisual: {fileID: 1367968845}
+  m_IsSelected: 0
 --- !u!1 &1565276557
 GameObject:
   m_ObjectHideFlags: 0
@@ -5508,6 +5612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769681}
   m_ArmorVisual: {fileID: 1138842687}
+  m_IsSelected: 0
 --- !u!1 &1699759138
 GameObject:
   m_ObjectHideFlags: 0
@@ -5597,6 +5702,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769694}
   m_ArmorVisual: {fileID: 1954776815}
+  m_IsSelected: 0
 --- !u!1 &1735880225
 GameObject:
   m_ObjectHideFlags: 0
@@ -5642,6 +5748,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769709}
   m_ArmorVisual: {fileID: 229666439}
+  m_IsSelected: 0
 --- !u!114 &1752000986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5656,6 +5763,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769639}
   m_ArmorVisual: {fileID: 1024882940}
+  m_IsSelected: 0
 --- !u!1 &1805306443
 GameObject:
   m_ObjectHideFlags: 0
@@ -5939,6 +6047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769660}
   m_ArmorVisual: {fileID: 1817439554}
+  m_IsSelected: 0
 --- !u!114 &1925150914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5953,6 +6062,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769733}
   m_ArmorVisual: {fileID: 1631963123}
+  m_IsSelected: 0
 --- !u!114 &1933622679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5967,6 +6077,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769654}
   m_ArmorVisual: {fileID: 313190410}
+  m_IsSelected: 0
 --- !u!1 &1934242637
 GameObject:
   m_ObjectHideFlags: 0
@@ -6144,6 +6255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769642}
   m_ArmorVisual: {fileID: 2052144128}
+  m_IsSelected: 0
 --- !u!1 &2007859007
 GameObject:
   m_ObjectHideFlags: 0
@@ -6189,6 +6301,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769706}
   m_ArmorVisual: {fileID: 1343369681}
+  m_IsSelected: 0
 --- !u!1 &2052144126
 GameObject:
   m_ObjectHideFlags: 0
@@ -6247,6 +6360,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769724}
   m_ArmorVisual: {fileID: 1934242639}
+  m_IsSelected: 0
 --- !u!1 &2087909463
 GameObject:
   m_ObjectHideFlags: 0
@@ -6292,6 +6406,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769624}
   m_ArmorVisual: {fileID: 463892801}
+  m_IsSelected: 0
 --- !u!1 &2109298618
 GameObject:
   m_ObjectHideFlags: 0
@@ -6412,6 +6527,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769672}
   m_ArmorVisual: {fileID: 981153431}
+  m_IsSelected: 0
 --- !u!114 &2144165274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6426,6 +6542,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769675}
   m_ArmorVisual: {fileID: 195842442}
+  m_IsSelected: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
