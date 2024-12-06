@@ -21,6 +21,7 @@ public class SceneLoadTool : EditorWindow
     private int m_BattleMapBiomeIndex = 0;
     
     private string m_TestLevelAdditivePath = "Assets/Scenes/TestScenes/TestLevelAdditiveScene";
+    private string m_SetupBattlePath = "Assets/Scenes/BattleSetupScene";
 
     [MenuItem("Window/Scene Load Tool")]
     public static void ShowSceneLoadWindow()
@@ -73,9 +74,14 @@ public class SceneLoadTool : EditorWindow
         string[] options = battleMapBiomes.Select(x => x.ToString()).ToArray();
         m_BattleMapBiomeIndex = EditorGUILayout.Popup("Battle Map Biome", m_BattleMapBiomeIndex, options);
         BattleMapType finalBiome = battleMapBiomes.ElementAt(m_BattleMapBiomeIndex);
+        m_SetupBattlePath = EditorGUILayout.TextField("Battle Setup Scene Path", m_SetupBattlePath);
         if (GUILayout.Button($"Load {finalBiome} Battle Scene"))
         {
             LoadScene(string.Format(SCENE_PATH_FORMAT, string.Format(m_BattlePath, finalBiome)));
+        }
+        if (GUILayout.Button($"Load Setup Battle Scene"))
+        {
+            LoadScene(string.Format(SCENE_PATH_FORMAT, m_SetupBattlePath));
         }
 
         GUILayout.Space(30f);

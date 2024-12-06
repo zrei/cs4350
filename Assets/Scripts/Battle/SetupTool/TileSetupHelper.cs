@@ -4,12 +4,12 @@ using UnityEngine;
 [RequireComponent(typeof(TileVisual))]
 public class TileSetupHelper : MonoBehaviour
 {
+    #if UNITY_EDITOR
     [SerializeField] private TileVisual m_TileVisual;
     [SerializeField] private ArmorVisual m_ArmorVisual;
     [HideInInspector]
     [SerializeField] private bool m_IsSelected = false;
 
-    #if UNITY_EDITOR
     private void Reset()
     {
         m_TileVisual = GetComponent<TileVisual>();
@@ -77,11 +77,3 @@ public class TileSetupHelper : MonoBehaviour
     }
     #endif
 }
-
-#if UNITY_EDITOR
-[CustomEditor(typeof(TileSetupHelper))]
-public class TileSetupHelperEditor : Editor
-{
-
-}
-#endif

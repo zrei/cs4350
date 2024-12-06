@@ -5,19 +5,25 @@ using UnityEngine;
 [RequireComponent(typeof(BattleManager))]
 public class BattleSetupTool : MonoBehaviour
 {
+    #if UNITY_EDITOR
     [SerializeField] private GridSetupHelper m_EnemyGrid;
     [SerializeField] private GridSetupHelper m_PlayerGrid;
 
-    /*
+    [Header("Ignore these fields")]
     [HideInInspector]
-    [SerializeField] 
-    */
-
-    [Header("Just ignore these two thanks :')")]
+    public BattleSO m_BattleSo = null;
+    public BattleSetupToolEditor.BattleToolTileDataEnemy[,] m_BattleDataEnemy = new BattleSetupToolEditor.BattleToolTileDataEnemy[MapData.NUM_ROWS, MapData.NUM_COLS];
+    public BattleSetupToolEditor.BattleToolTileDataPlayer[,] m_BattleDataPlayer = new BattleSetupToolEditor.BattleToolTileDataPlayer[MapData.NUM_ROWS, MapData.NUM_COLS];
+    [HideInInspector]
+    public CoordPair? m_SelectedCoordinates = null; 
+    [HideInInspector]
+    public GridType m_SelectedGrid;
     public BattleSetupToolEditor.BattleToolTileDataEnemy m_CurrTileEnemy;
     public BattleSetupToolEditor.BattleToolTileDataPlayer m_CurrTilePlayer;
 
-    #if UNITY_EDITOR
+    /// <summary>
+    /// Utility for adding the required children automatically
+    /// </summary>
     private void Reset()
     {
         foreach (GridLogic gridLogic in GetComponentsInChildren<GridLogic>())
@@ -30,19 +36,16 @@ public class BattleSetupTool : MonoBehaviour
         }
         PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
-    #endif
 
     public void ClearBattle(CoordPair coordPair)
     {
         m_EnemyGrid.ClearTileEffects(coordPair);
         m_EnemyGrid.ClearUnit(coordPair);
         m_EnemyGrid.ResetTileColor(coordPair);
-        m_EnemyGrid.ToggleTileSelected(coordPair, false);
 
         m_PlayerGrid.ClearTileEffects(coordPair);
         m_PlayerGrid.ClearUnit(coordPair);
         m_PlayerGrid.ResetTileColor(coordPair);
-        m_PlayerGrid.ToggleTileSelected(coordPair, false);
 
         PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
@@ -122,6 +125,7 @@ public class BattleSetupTool : MonoBehaviour
 
         PrefabUtility.RecordPrefabInstancePropertyModifications(this.gameObject);
     }
+    #endif
 }
 
 #if UNITY_EDITOR
@@ -172,14 +176,35 @@ public class BattleSetupToolEditor : Editor
     private bool m_ShowAdditionalInstructions = false;
 
     #region BattleSo Data
-    private BattleSO m_BattleSo;
-    private BattleToolTileDataEnemy[,] m_BattleDataEnemy = new BattleToolTileDataEnemy[MapData.NUM_ROWS, MapData.NUM_COLS];
-    private BattleToolTileDataPlayer[,] m_BattleDataPlayer = new BattleToolTileDataPlayer[MapData.NUM_ROWS, MapData.NUM_COLS];
+    private BattleSO BattleSO {
+        get {
+            return m_Target.m_BattleSo;
+        }
+        set {
+            m_Target.m_BattleSo = value;
+        }
+    }
+    private BattleToolTileDataEnemy[,] BattleDataEnemy => m_Target.m_BattleDataEnemy;
+    private BattleToolTileDataPlayer[,] BattleDataPlayer => m_Target.m_BattleDataPlayer;
     #endregion
 
     #region Selected Tile
-    private CoordPair? m_SelectedCoordinates;
-    private GridType m_SelectedGrid;
+    private CoordPair? SelectedCoordinates {
+        get {
+            return m_Target.m_SelectedCoordinates;
+        }
+        set {
+            m_Target.m_SelectedCoordinates = value;
+        }
+    }
+    private GridType SelectedGrid {
+        get {
+            return m_Target.m_SelectedGrid;
+        }
+        set {
+            m_Target.m_SelectedGrid = value;
+        }
+    }
     #endregion
 
     #region Serialising current tile data
@@ -193,12 +218,12 @@ public class BattleSetupToolEditor : Editor
     private static Color SELECTED_COLOR = Color.green;
     #endregion
 
+    #region Initialisation
     private void OnEnable()
     {
         m_Target = (BattleSetupTool) target;
         m_EnemyTileDataProp = serializedObject.FindProperty("m_CurrTileEnemy");
         m_PlayerTileDataProp = serializedObject.FindProperty("m_CurrTilePlayer");
-        ClearBattle();
     }
 
     public override void OnInspectorGUI()
@@ -211,10 +236,10 @@ public class BattleSetupToolEditor : Editor
 
         if (m_ShowAdditionalInstructions)
         {
-            GUILayout.Label("DO NOT click off this game object or your changes will reset!!");
             GUILayout.Label("Select a battle SO you want to edit, and use the setup map button to pre-input existing data.");
             GUILayout.Label("If you'd like to get a top-down view, right-click the DownwardView object in the hierarchy and select\nalign view to selected. You can also change the scene view camera from perspective to iso.");
             GUILayout.Label("Use the tile selection below to select a tile, inspect its current data, and edit it.");
+            GUILayout.Label("Tile color changes and gizmo changes take a while to register, one tip\nis to click over to the console window to force the change.");
             GUILayout.Label("Once done, save to SO to register your changes.");
         }
 
@@ -227,15 +252,15 @@ public class BattleSetupToolEditor : Editor
 
         GUILayout.Space(10f);
 
-        m_BattleSo = EditorGUILayout.ObjectField("", m_BattleSo, typeof(BattleSO), false) as BattleSO;
-        if (m_BattleSo != null)
+        BattleSO = EditorGUILayout.ObjectField("", BattleSO, typeof(BattleSO), false) as BattleSO;
+        if (BattleSO != null)
         {
             if (GUILayout.Button("Setup map using SO"))
             {
                 SetMapData();
             }
 
-            if (GUILayout.Button("Save to SO") && EditorUtility.DisplayDialog("Save data?", $"Save the data to the battleSO {m_BattleSo.name}? This can be undone immediately after",
+            if (GUILayout.Button("Save to SO") && EditorUtility.DisplayDialog("Save data?", $"Save the data to the battleSO {BattleSO.name}? This can be undone immediately after",
                 "Save", "Do not save"))
             {
                 SaveToSo();
@@ -248,46 +273,9 @@ public class BattleSetupToolEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
     }
+    #endregion
 
-    private void SetMapData()
-    {
-        ClearBattle();
-        foreach (EnemyUnitPlacement enemyUnitPlacement in m_BattleSo.m_EnemyUnitsToSpawn)
-        {
-            CoordPair coordinates = enemyUnitPlacement.m_Coordinates;
-            m_BattleDataEnemy[coordinates.m_Row, coordinates.m_Col].m_BattleEnemyUnit = new BattleEnemyUnit{m_EnemyCharacter = enemyUnitPlacement.m_EnemyCharacterData, m_StatAugmnets = enemyUnitPlacement.m_StatAugments, m_EnemyTag = enemyUnitPlacement.m_EnemyTags};
-            m_Target.SpawnEnemy(coordinates, enemyUnitPlacement.GetUnitModelData(), enemyUnitPlacement.m_EnemyCharacterData.m_EquippedWeapon, enemyUnitPlacement.m_EnemyCharacterData.m_EnemyClass);
-        }
-
-        foreach (StartingTileEffect startingTileEffect in m_BattleSo.m_StartingTileEffects)
-        {
-            foreach (CoordPair coordPair in startingTileEffect.m_Coordinates)
-            {
-                if (startingTileEffect.m_GridType == GridType.ENEMY)
-                {
-                    m_BattleDataEnemy[coordPair.m_Row, coordPair.m_Col].m_InflictedTileEffect = new InflictedTileEffect {m_TileEffect = startingTileEffect.m_InflictedTileEffect.m_TileEffect, m_InitialTime = startingTileEffect.m_InflictedTileEffect.m_InitialTime};
-                }
-                else
-                {
-                    m_BattleDataPlayer[coordPair.m_Row, coordPair.m_Col].m_InflictedTileEffect = new InflictedTileEffect {m_TileEffect = startingTileEffect.m_InflictedTileEffect.m_TileEffect, m_InitialTime = startingTileEffect.m_InflictedTileEffect.m_InitialTime};
-                }
-                m_Target.SpawnTileEffects(startingTileEffect.m_GridType, coordPair, startingTileEffect.m_InflictedTileEffect);
-            }
-        }
-
-        foreach (CoordPair coordPair in m_BattleSo.m_PlayerStartingTiles)
-        {
-            m_BattleDataPlayer[coordPair.m_Row, coordPair.m_Col].m_IsSetupTile = true;
-            m_Target.SetSetupTile(coordPair);
-        }
-
-        if (m_SelectedCoordinates.HasValue)
-        {
-            m_Target.ToggleTileSelected(m_SelectedGrid, m_SelectedCoordinates.Value, false);
-        }
-        m_SelectedCoordinates = null;
-    }
-
+    #region Render Map
     private void RenderMap()
     {
         GUILayout.Space(10f);
@@ -312,22 +300,23 @@ public class BattleSetupToolEditor : Editor
             {
                 CoordPair coordinates = new CoordPair(r, c);
                 Color oldColor = GUI.backgroundColor;
-                GUI.backgroundColor = m_SelectedGrid == GridType.ENEMY && m_SelectedCoordinates.Equals(coordinates) ? SELECTED_COLOR : ENEMY_COLOR;
+                GUI.backgroundColor = SelectedGrid == GridType.ENEMY && SelectedCoordinates.Equals(coordinates) ? SELECTED_COLOR : ENEMY_COLOR;
                 if (GUILayout.Button(string.Empty, GUILayout.Width(20), GUILayout.Height(20)))
                 {
-                    if (m_SelectedCoordinates.HasValue)
+                    if (SelectedCoordinates.HasValue)
                     {
-                        m_Target.ToggleTileSelected(m_SelectedGrid, m_SelectedCoordinates.Value, false);
+                        m_Target.ToggleTileSelected(SelectedGrid, SelectedCoordinates.Value, false);
                     }
-                    if (m_SelectedCoordinates.Equals(coordinates) && m_SelectedGrid == GridType.ENEMY)
-                        m_SelectedCoordinates = null;
+                    if (SelectedCoordinates.Equals(coordinates) && SelectedGrid == GridType.ENEMY)
+                        SelectedCoordinates = null;
                     else
                     {
-                        m_SelectedCoordinates = coordinates;
-                        m_SelectedGrid = GridType.ENEMY;
-                        m_Target.m_CurrTileEnemy = m_BattleDataEnemy[coordinates.m_Row, coordinates.m_Col];
+                        SelectedCoordinates = coordinates;
+                        SelectedGrid = GridType.ENEMY;
+                        m_Target.m_CurrTileEnemy = BattleDataEnemy[coordinates.m_Row, coordinates.m_Col];
                     }
-                    m_Target.ToggleTileSelected(m_SelectedGrid, m_SelectedCoordinates.Value, true);
+                    if (SelectedCoordinates.HasValue)
+                        m_Target.ToggleTileSelected(SelectedGrid, SelectedCoordinates.Value, true);
                 }
                 GUI.backgroundColor = oldColor;
             }
@@ -345,80 +334,120 @@ public class BattleSetupToolEditor : Editor
             {
                 CoordPair coordinates = new CoordPair(r, c);
                 Color oldColor = GUI.backgroundColor;
-                GUI.backgroundColor = m_SelectedGrid == GridType.PLAYER && m_SelectedCoordinates.Equals(coordinates) ? SELECTED_COLOR : PLAYER_COLOR;
+                GUI.backgroundColor = SelectedGrid == GridType.PLAYER && SelectedCoordinates.Equals(coordinates) ? SELECTED_COLOR : PLAYER_COLOR;
                 if (GUILayout.Button(string.Empty, GUILayout.Width(20), GUILayout.Height(20)))
                 {
-                    if (m_SelectedCoordinates.HasValue)
+                    if (SelectedCoordinates.HasValue)
                     {
-                        m_Target.ToggleTileSelected(m_SelectedGrid, m_SelectedCoordinates.Value, false);
+                        m_Target.ToggleTileSelected(SelectedGrid, SelectedCoordinates.Value, false);
                     }
-                    if (m_SelectedCoordinates.Equals(coordinates) && m_SelectedGrid == GridType.PLAYER)
-                        m_SelectedCoordinates = null;
+                    if (SelectedCoordinates.Equals(coordinates) && SelectedGrid == GridType.PLAYER)
+                        SelectedCoordinates = null;
                     else
                     {
-                        m_SelectedCoordinates = coordinates;
-                        m_SelectedGrid = GridType.PLAYER;
-                        m_Target.m_CurrTilePlayer = m_BattleDataPlayer[coordinates.m_Row, coordinates.m_Col];
+                        SelectedCoordinates = coordinates;
+                        SelectedGrid = GridType.PLAYER;
+                        m_Target.m_CurrTilePlayer = BattleDataPlayer[coordinates.m_Row, coordinates.m_Col];
                     }
-                    m_Target.ToggleTileSelected(m_SelectedGrid, m_SelectedCoordinates.Value, true);
+                    if (SelectedCoordinates.HasValue)
+                        m_Target.ToggleTileSelected(SelectedGrid, SelectedCoordinates.Value, true);
                 }
                 GUI.backgroundColor = oldColor;
             }
             GUILayout.EndHorizontal();
         }
     }
+    #endregion
 
+    #region Render Tile Data
     private void RenderTileData()
     {
-        if (!m_SelectedCoordinates.HasValue)
+        if (!SelectedCoordinates.HasValue)
             return;
 
         GUILayout.Space(10);
 
-        GUILayout.Label($"{(m_SelectedGrid == GridType.PLAYER ? "Player" : "Enemy")} tile at row {m_SelectedCoordinates.Value.m_Row}, col {m_SelectedCoordinates.Value.m_Col}");
+        GUILayout.Label($"{(SelectedGrid == GridType.PLAYER ? "Player" : "Enemy")} tile at row {SelectedCoordinates.Value.m_Row}, col {SelectedCoordinates.Value.m_Col}");
 
-        if (m_SelectedGrid == GridType.ENEMY)
+        if (SelectedGrid == GridType.ENEMY)
         {
             EditorGUILayout.PropertyField(m_EnemyTileDataProp, new GUIContent("Enemy Tile"));
         }
-        else if (m_SelectedGrid == GridType.PLAYER)
+        else if (SelectedGrid == GridType.PLAYER)
         {
             EditorGUILayout.PropertyField(m_PlayerTileDataProp, new GUIContent("Player Tile"));
         }
 
-        if (m_BattleSo == null)
+        if (BattleSO == null)
             return;
 
         if (GUILayout.Button("Apply changes"))
         {
-            if (m_SelectedGrid == GridType.ENEMY)
+            if (SelectedGrid == GridType.ENEMY)
             {
-                m_BattleDataEnemy[m_SelectedCoordinates.Value.m_Row, m_SelectedCoordinates.Value.m_Col] = m_Target.m_CurrTileEnemy;
-                m_Target.UpdateTile(m_SelectedCoordinates.Value, m_Target.m_CurrTileEnemy);
+                BattleDataEnemy[SelectedCoordinates.Value.m_Row, SelectedCoordinates.Value.m_Col] = m_Target.m_CurrTileEnemy;
+                m_Target.UpdateTile(SelectedCoordinates.Value, m_Target.m_CurrTileEnemy);
             }
             else
             {
-                m_BattleDataPlayer[m_SelectedCoordinates.Value.m_Row, m_SelectedCoordinates.Value.m_Col] = m_Target.m_CurrTilePlayer;
-                m_Target.UpdateTile(m_SelectedCoordinates.Value, m_Target.m_CurrTilePlayer);
+                BattleDataPlayer[SelectedCoordinates.Value.m_Row, SelectedCoordinates.Value.m_Col] = m_Target.m_CurrTilePlayer;
+                m_Target.UpdateTile(SelectedCoordinates.Value, m_Target.m_CurrTilePlayer);
             }
         }
     }
+    #endregion
 
+    #region Handle Tile Data
     private void ClearBattle()
     {
         for (int r = 0; r < MapData.NUM_ROWS; ++r)
         {
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
-                m_BattleDataEnemy[r, c] = new BattleToolTileDataEnemy();
-                m_BattleDataEnemy[r, c].Clear();
-                m_BattleDataPlayer[r, c] = new BattleToolTileDataPlayer();
-                m_BattleDataPlayer[r, c].Clear();
+                BattleDataEnemy[r, c] = new BattleToolTileDataEnemy();
+                BattleDataEnemy[r, c].Clear();
+                BattleDataPlayer[r, c] = new BattleToolTileDataPlayer();
+                BattleDataPlayer[r, c].Clear();
                 m_Target.ClearBattle(new CoordPair(r, c));
             }
         }
     }
 
+    private void SetMapData()
+    {
+        ClearBattle();
+        foreach (EnemyUnitPlacement enemyUnitPlacement in BattleSO.m_EnemyUnitsToSpawn)
+        {
+            CoordPair coordinates = enemyUnitPlacement.m_Coordinates;
+            BattleDataEnemy[coordinates.m_Row, coordinates.m_Col].m_BattleEnemyUnit = new BattleEnemyUnit{m_EnemyCharacter = enemyUnitPlacement.m_EnemyCharacterData, m_StatAugmnets = enemyUnitPlacement.m_StatAugments, m_EnemyTag = enemyUnitPlacement.m_EnemyTags};
+            m_Target.SpawnEnemy(coordinates, enemyUnitPlacement.GetUnitModelData(), enemyUnitPlacement.m_EnemyCharacterData.m_EquippedWeapon, enemyUnitPlacement.m_EnemyCharacterData.m_EnemyClass);
+        }
+
+        foreach (StartingTileEffect startingTileEffect in BattleSO.m_StartingTileEffects)
+        {
+            foreach (CoordPair coordPair in startingTileEffect.m_Coordinates)
+            {
+                if (startingTileEffect.m_GridType == GridType.ENEMY)
+                {
+                    BattleDataEnemy[coordPair.m_Row, coordPair.m_Col].m_InflictedTileEffect = new InflictedTileEffect {m_TileEffect = startingTileEffect.m_InflictedTileEffect.m_TileEffect, m_InitialTime = startingTileEffect.m_InflictedTileEffect.m_InitialTime};
+                }
+                else
+                {
+                    BattleDataPlayer[coordPair.m_Row, coordPair.m_Col].m_InflictedTileEffect = new InflictedTileEffect {m_TileEffect = startingTileEffect.m_InflictedTileEffect.m_TileEffect, m_InitialTime = startingTileEffect.m_InflictedTileEffect.m_InitialTime};
+                }
+                m_Target.SpawnTileEffects(startingTileEffect.m_GridType, coordPair, startingTileEffect.m_InflictedTileEffect);
+            }
+        }
+
+        foreach (CoordPair coordPair in BattleSO.m_PlayerStartingTiles)
+        {
+            BattleDataPlayer[coordPair.m_Row, coordPair.m_Col].m_IsSetupTile = true;
+            m_Target.SetSetupTile(coordPair);
+        }
+    }
+    #endregion
+
+    #region Save
     private void SaveToSo()
     {
         Dictionary<InflictedTileEffect, List<CoordPair>> inflictedTileEffectGroup = new();
@@ -431,7 +460,7 @@ public class BattleSetupToolEditor : Editor
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                BattleToolTileDataEnemy battleToolTileDataEnemy = m_BattleDataEnemy[r, c];
+                BattleToolTileDataEnemy battleToolTileDataEnemy = BattleDataEnemy[r, c];
                 if (battleToolTileDataEnemy.m_BattleEnemyUnit.m_EnemyCharacter != null)
                 {
                     enemyUnitPlacements.Add(battleToolTileDataEnemy.m_BattleEnemyUnit.GetEnemyUnitPlacement(coordinates));
@@ -457,7 +486,7 @@ public class BattleSetupToolEditor : Editor
             for (int c = 0; c < MapData.NUM_COLS; ++c)
             {
                 CoordPair coordinates = new CoordPair(r, c);
-                BattleToolTileDataPlayer battleToolTileDataPlayer = m_BattleDataPlayer[r, c];
+                BattleToolTileDataPlayer battleToolTileDataPlayer = BattleDataPlayer[r, c];
                 if (battleToolTileDataPlayer.m_IsSetupTile)
                 {
                     setupTiles.Add(coordinates);
@@ -477,11 +506,12 @@ public class BattleSetupToolEditor : Editor
             startingTileEffects.Add(new StartingTileEffect{m_GridType = GridType.PLAYER, m_InflictedTileEffect = keyValuePair.Key, m_Coordinates = keyValuePair.Value});
         }
 
-        Undo.RecordObject(m_BattleSo, "Save new changes to battleSO");
-        m_BattleSo.m_EnemyUnitsToSpawn = enemyUnitPlacements;
-        m_BattleSo.m_StartingTileEffects = startingTileEffects;
-        m_BattleSo.m_PlayerStartingTiles = setupTiles;
-        EditorUtility.SetDirty(m_BattleSo);
+        Undo.RecordObject(BattleSO, "Save new changes to battleSO");
+        BattleSO.m_EnemyUnitsToSpawn = enemyUnitPlacements;
+        BattleSO.m_StartingTileEffects = startingTileEffects;
+        BattleSO.m_PlayerStartingTiles = setupTiles;
+        EditorUtility.SetDirty(BattleSO);
     }
+    #endregion
 }
 #endif

@@ -69,11 +69,3 @@ public class GridSetupHelper : MonoBehaviour
     }
     #endif
 }
-
-#if UNITY_EDITOR
-[CustomEditor(typeof(GridSetupHelper))]
-public class GridSetupHelperEditor : Editor
-{
-
-}
-#endif
