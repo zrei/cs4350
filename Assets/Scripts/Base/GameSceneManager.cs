@@ -18,7 +18,10 @@ public enum BattleMapType
 {
     PLAINS,
     FOREST,
-    CAVE
+    CAVE,
+    DESOLATE,
+    DESSERT,
+    LAVA
 }
 
 /// <summary>
