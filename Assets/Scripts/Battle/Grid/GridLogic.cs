@@ -26,6 +26,8 @@ public class GridLogic : MonoBehaviour
     public delegate void TeleportEvent(GridType teleportTargetGrid, CoordPair teleportStartTile, CoordPair teleportDestination);
     public TeleportEvent OnTeleportUnit;
 
+    public GridType GridType => m_GridType;
+
     #region Initialisation
     private void Start()
     {
