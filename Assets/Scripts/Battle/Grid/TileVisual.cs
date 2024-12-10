@@ -174,7 +174,10 @@ public class TileVisual : MonoBehaviour
     {
         foreach (Transform child in m_TileEffectObjParent)
         {
-            Destroy(child.gameObject);
+            if (Application.isPlaying)
+                Destroy(child.gameObject);
+            else
+                DestroyImmediate(child.gameObject);
         }
     }
     #endregion
