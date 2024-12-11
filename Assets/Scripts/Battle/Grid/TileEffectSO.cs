@@ -28,9 +28,14 @@ public class TileEffectSO : ScriptableObject
     public bool m_IsPermanent = false;
     [Tooltip("If permanent, this will not matter")]
     public float m_MaxTime;
+    [Tooltip("Game objects to spawn on top of the tile")]
+    public GameObject[] m_TileGameObjects;
+    // VFX to spawn
+    // public List<VFXSO> m_TileVfx;
 
     [Tooltip("Note that some skill types won't have any effect")]
     public SkillEffectType[] m_EffectTypes;
+    public bool ContainsEffectType(SkillEffectType skillEffectType) => m_EffectTypes.Contains(skillEffectType);
 
     [Header("Effects")]
     public float m_DamageAmount;
@@ -47,13 +52,6 @@ public class TileEffectSO : ScriptableObject
     public float m_HealAmount;
     [Tooltip("Sign is important!")]
     public float m_ChangeManaAmount;
-
-    [Tooltip("Game objects to spawn on top of the tile")]
-    public GameObject[] m_TileGameObjects;
-    // VFX to spawn
-    // public List<VFXSO> m_TileVfx;
-
-    public bool ContainsEffectType(SkillEffectType skillEffectType) => m_EffectTypes.Contains(skillEffectType);
 }
 
 public class TileEffect 
