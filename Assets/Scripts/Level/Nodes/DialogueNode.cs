@@ -1,41 +1,6 @@
 using Game.UI;
+using Level.Nodes;
 using UnityEngine;
-
-[System.Serializable]
-public struct FlagCondition
-{
-    public string flagName;
-    public bool flagValue;
-}
-
-[System.Serializable]
-public struct ConditionalDialogue
-{
-    public Dialogue m_Dialogue;
-    public Threshold[] m_MoralityConditions;
-    public FlagCondition[] m_FlagConditions;
-    
-    public bool IsConditionsSatisfied()
-    {
-        foreach (var moralityCondition in m_MoralityConditions)
-        {
-            if (!moralityCondition.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage))
-            {
-                return false;
-            }
-        }
-
-        foreach (var flagCondition in m_FlagConditions)
-        {
-            if (FlagManager.Instance.GetFlagValue(flagCondition.flagName) != flagCondition.flagValue)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-}
 
 public class DialogueNode : NodeInternal
 {

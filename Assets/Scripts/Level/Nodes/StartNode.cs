@@ -1,4 +1,5 @@
 using Game.UI;
+using Level.Nodes;
 using UnityEngine;
 
 public class StartNode : NodeInternal
