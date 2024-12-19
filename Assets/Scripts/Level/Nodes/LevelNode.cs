@@ -9,9 +9,6 @@ namespace Level.Nodes
         public int nodeId;
         [Expandable] public NodeDataSO nodeData;
         public NodeType NodeType => nodeData.nodeType;
-        
-        protected bool m_HasPlayedPreTutorial = false;
-        protected bool m_HasPlayedPostTutorial = false;
 
         #region Node State Information
 
@@ -47,17 +44,17 @@ namespace Level.Nodes
         #region Node Graph
         
         // Adjacent nodes and their costs
-        private Dictionary<NodeInternal, float> m_AdjacentNodes = new();
-        public Dictionary<NodeInternal, float> AdjacentNodes => m_AdjacentNodes;
+        private Dictionary<LevelNode, float> m_AdjacentNodes = new();
+        public Dictionary<LevelNode, float> AdjacentNodes => m_AdjacentNodes;
 
-        public void AddAdjacentNode(NodeInternal nodeInternal, float cost)
+        public void AddAdjacentNode(LevelNode levelNode, float cost)
         {
-            m_AdjacentNodes.TryAdd(nodeInternal, cost);
+            m_AdjacentNodes.TryAdd(levelNode, cost);
         }
     
-        public void RemoveAdjacentNode(NodeInternal nodeInternal)
+        public void RemoveAdjacentNode(LevelNode levelNode)
         {
-            m_AdjacentNodes.Remove(nodeInternal);
+            m_AdjacentNodes.Remove(levelNode);
         }
         
         #endregion

@@ -7,7 +7,7 @@ namespace Level.Nodes
     [CreateAssetMenu(fileName = "DialogueNodeDataSO", menuName = "ScriptableObject/Level/DialogueNodeDataSO")]
     public class DialogueNodeDataSO : NodeDataSO
     {
-        public override NodeType nodeType => NodeType.Dialogue;
+        public override NodeType nodeType => NodeType.DIALOGUE;
 
         [Header("Dialogue Details")]
         [SerializeField] private Dialogue m_DefaultDialogue;

@@ -7,7 +7,7 @@ namespace Level.Nodes
     [CreateAssetMenu(fileName = "BattleNodeDataSO", menuName = "ScriptableObject/Level/BattleNodeDataSO")]
     public class BattleNodeDataSO : NodeDataSO
     {
-        public override NodeType nodeType => NodeType.Battle;
+        public override NodeType nodeType => NodeType.BATTLE;
 
         [Header("Battle Details")]
         public BattleSO battleSO;

@@ -4,16 +4,16 @@ namespace Level.Nodes
 {
     public enum NodeType
     {
-        Dialogue,
-        Reward,
-        Battle,
-        Empty,
+        DIALOGUE,
+        REWARD,
+        BATTLE,
+        EMPTY,
     }
 
     [CreateAssetMenu(fileName = "NodeDataSO", menuName = "ScriptableObject/Level/NodeDataSO")]
     public class NodeDataSO : ScriptableObject
     {
-        public virtual NodeType nodeType => NodeType.Empty;
+        public virtual NodeType nodeType => NodeType.EMPTY;
         
         [Header("Node Details")]
         public string nodeName;
@@ -37,6 +37,8 @@ namespace Level.Nodes
         public TutorialSO preTutorial;
         [Tooltip("Tutorial to play upon finishing the node for the first time - leave empty for no tutorial")]
         public TutorialSO postTutorial;
+        [Tooltip("Tutorial to play before next node selection phase after clearing this node for the first time - leave empty for no tutorial")]
+        public TutorialSO preSelectionTutorial;
         
         public virtual NodePreviewData GetNodePreviewData()
         {
