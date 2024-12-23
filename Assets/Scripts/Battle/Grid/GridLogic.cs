@@ -431,7 +431,7 @@ public class GridLogic : MonoBehaviour
     #endregion
 
     #region Helper
-    private Vector3 GetTilePosition(CoordPair coordPair)
+    public Vector3 GetTilePosition(CoordPair coordPair)
     {
         return m_TileVisuals[coordPair.m_Row, coordPair.m_Col].transform.position;
     }
@@ -605,7 +605,7 @@ public class GridLogic : MonoBehaviour
     /// <param name="damage"></param>
     public void PerformSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, VoidEvent completeSkillEvent)
     {
-        PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill);
+        PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill, null);
 
         void CompleteSkill(List<IHealth> targets)
         {
@@ -636,9 +636,15 @@ public class GridLogic : MonoBehaviour
         
     }
 
-    public void PerformTeleportSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, CoordPair teleportTile, VoidEvent completeSkillEvent)
+    public void PerformTeleportSkill(
+        Unit attacker, 
+        ActiveSkillSO activeSkill, 
+        CoordPair targetTile, 
+        CoordPair teleportTile, 
+        Vector3 teleportTargetPosition,
+        VoidEvent completeSkillEvent)
     {
-        PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill);
+        PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill, teleportTargetPosition);
 
         void CompleteSkill(List<IHealth> targets)
         {
@@ -678,7 +684,12 @@ public class GridLogic : MonoBehaviour
         }
     }
 
-    private void PerformSkill_Shared(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, Action<List<IHealth>> postSkillEvent)
+    private void PerformSkill_Shared(
+        Unit attacker, 
+        ActiveSkillSO activeSkill, 
+        CoordPair targetTile, 
+        Action<List<IHealth>> postSkillEvent, 
+        Vector3? targetMovePosition)
     {
         List<IHealth> targets = new();
         foreach (CoordPair coordPair in GetInBoundsTargetTiles(activeSkill, targetTile))
@@ -690,7 +701,7 @@ public class GridLogic : MonoBehaviour
         }
 
         attacker.PostSkillEvent += () => postSkillEvent(targets);
-        attacker.PerformSkill(activeSkill, targets);
+        attacker.PerformSkill(activeSkill, targets, targetMovePosition);
 
         if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))
         {

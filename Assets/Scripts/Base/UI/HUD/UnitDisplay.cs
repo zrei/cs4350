@@ -140,7 +140,7 @@ namespace Game.UI
             HandleQuit();
         }
 
-        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+        private void OnAttackAnimation()
         {
             Hide();
         }
