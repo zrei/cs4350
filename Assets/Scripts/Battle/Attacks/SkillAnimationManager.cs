@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SkillAnimationManager : MonoBehaviour
+public class SkillAnimationManager : Singleton<SkillAnimationManager>
 {
     private const float MeleePositionOffset = 2f;
 
@@ -16,23 +16,25 @@ public class SkillAnimationManager : MonoBehaviour
     private bool m_ResetAttackerPosition;
     private bool m_ResetAttackerRotation;
 
-    private void Awake()
+    protected override void HandleAwake()
     {
-        GlobalEvents.Battle.AttackAnimationEvent += OnSkillAnimation;
+        base.HandleAwake();
     }
 
-    private void OnDestroy()
+    protected override void HandleDestroy()
     {
-        GlobalEvents.Battle.AttackAnimationEvent -= OnSkillAnimation;
+        base.HandleDestroy();
     }
 
-    private void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
+    public void OnSkillAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets, Vector3? targetMovePosition)
     {
-        StartCoroutine(PlayAttackAnimation(activeSkill, attacker, targets));
+        StartCoroutine(PlayAttackAnimation(activeSkill, attacker, targets, targetMovePosition));
     }
 
-    private IEnumerator PlayAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets)
+    private IEnumerator PlayAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> targets, Vector3? targetMovePosition)
     {
+        GlobalEvents.Battle.AttackAnimationEvent?.Invoke();
+
         var onReleaseEndStopActions = new List<VoidEvent>(); // invoke stop on certain vfx on release end
         var waitForVFXInvokeHit = activeSkill.m_OnReleaseSkillVFXs.Any(x => x.m_InvokeHitEvent); // allow vfx to drive timing
         var isSkillHitInvoked = false; // ensure OnSkillHit is invoked exactly once
@@ -116,6 +118,11 @@ public class SkillAnimationManager : MonoBehaviour
         while (!isSkillHitInvoked || !isSkillComplete) yield return null;
 
         yield return HandleCamAnimTransitOut(attacker, targets, isAttack, isRanged);
+
+        if (targetMovePosition.HasValue)
+        {
+            yield return HandleMoveSkillAnimation(activeSkill.m_TeleportSelf ? attacker : targets[0], targetMovePosition.Value);
+        }
 
         GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke();
     }
@@ -220,5 +227,24 @@ public class SkillAnimationManager : MonoBehaviour
         foreach (var unit in battleManager.PlayerUnits) unit.FadeMesh(1, 0.25f);
         foreach (var unit in battleManager.EnemyUnits) unit.FadeMesh(1, 0.25f);
         yield return new WaitForSeconds(0.5f);
+    }
+
+    IEnumerator HandleMoveSkillAnimation(Unit target, Vector3 targetMovePosition)
+    {
+        var t = 0f;
+        var duration = 0.1f;
+        var progress = t / duration;
+        var startPos = target.transform.position;
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            progress = t / duration;
+
+            target.transform.position = Vector3.Lerp(startPos, targetMovePosition, progress);
+            yield return null;
+        }
+
+        target.transform.position = targetMovePosition;
     }
 }
