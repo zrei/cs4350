@@ -231,6 +231,8 @@ namespace Game.UI
         #region Inputs
         private void BindInputEvents(bool active)
         {
+            if (!InputManager.IsReady) return;
+
             if (active)
             {
                 InputManager.Instance.Action1Input.OnPressEvent += OnAction1;
