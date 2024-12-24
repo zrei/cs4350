@@ -34,12 +34,12 @@ public class RewardNodeVisual : LevelNodeVisual
     {
         if (m_RewardNode.IsCurrent)
         {
-            SetNodeState(NodePuckType.CURRENT);
+            SetNodeColor(NodePuckType.CURRENT);
             m_chestToken.SetActive(false);
         }
         else
         {
-            SetNodeState(m_RewardNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
+            SetNodeColor(m_RewardNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
             if (m_RewardNode.RewardType == RewardType.RATION)
                 m_rationToken.SetActive(!m_RewardNode.IsCleared);
             else if (m_RewardNode.RewardType == RewardType.WEAPON)
@@ -52,7 +52,7 @@ public class RewardNodeVisual : LevelNodeVisual
     public override void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Pointer entered Reward Node");
-        GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_RewardNode);
+        // GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_RewardNode);
     }
 
     public override void OnPointerExit(PointerEventData eventData)

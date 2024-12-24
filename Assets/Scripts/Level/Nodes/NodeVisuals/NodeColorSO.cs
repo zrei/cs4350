@@ -5,7 +5,8 @@ public enum NodePuckType
     CURRENT,
     CLEARED,
     BATTLE,
-    REWARD
+    REWARD,
+    DIALOGUE,
 }
 
 // ScriptableObject that holds the materials for the different node states
@@ -17,6 +18,7 @@ public class NodeColorSO : ScriptableObject
     public Material m_ClearedMaterial;
     public Material m_EnemyMaterial;
     public Material m_RewardMaterial;
+    public Material m_DialogueMaterial;
     
     public Material GetMaterial(NodePuckType puckType)
     {
@@ -30,6 +32,8 @@ public class NodeColorSO : ScriptableObject
                 return m_EnemyMaterial;
             case NodePuckType.REWARD:
                 return m_RewardMaterial;
+            case NodePuckType.DIALOGUE:
+                return m_DialogueMaterial;
             default:
                 return m_DefaultMaterial;
         }

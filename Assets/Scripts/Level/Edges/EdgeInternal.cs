@@ -1,3 +1,4 @@
+using Level.Nodes;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -9,11 +10,11 @@ using UnityEngine.Splines;
 public class EdgeInternal : BaseEdge
 {
     [Header("Level Edge")]
-    [SerializeField] private NodeInternal nodeInternalA;
-    public NodeInternal NodeInternalA => nodeInternalA;
+    [SerializeField] private LevelNode levelNodeA;
+    public LevelNode LevelNodeA => levelNodeA;
     
-    [SerializeField] private NodeInternal nodeInternalB;
-    public NodeInternal NodeInternalB => nodeInternalB;
+    [SerializeField] private LevelNode levelNodeB;
+    public LevelNode LevelNodeB => levelNodeB;
     
     [SerializeField] private float m_Cost;
     public float Cost => m_Cost;
@@ -26,17 +27,17 @@ public class EdgeInternal : BaseEdge
     [SerializeField] private SplineContainer m_ReverseSplineContainer;
     public SplineContainer ReverseSplineContainer => m_ReverseSplineContainer;
 
-    protected override Transform EndPoint => nodeInternalA.transform;
-    protected override Transform StartingPoint => nodeInternalB.transform;
+    protected override Transform EndPoint => levelNodeA.transform;
+    protected override Transform StartingPoint => levelNodeB.transform;
 
-    public SplineContainer GetPathSplineTo(NodeInternal destNode)
+    public SplineContainer GetPathSplineTo(LevelNode destNode)
     {
-        if (destNode == NodeInternalB)
+        if (destNode == LevelNodeB)
             return GetPathSpline();
-        if (destNode == NodeInternalA)
+        if (destNode == LevelNodeA)
             return GetPathSpline(true);
 
-        Debug.LogError("NodeInternal: Destination node is not connected to this edge");
+        Debug.LogError("LevelNode: Destination node is not connected to this edge");
         return null;
     }
     
@@ -83,14 +84,14 @@ public class EdgeInternal : BaseEdge
         
         m_SplineContainer.Spline[0] = new BezierKnot() {Position = Vector3.zero};
         
-        if (NodeInternalA != null)
-            transform.position = NodeInternalA.transform.position;
+        if (LevelNodeA != null)
+            transform.position = LevelNodeA.transform.position;
         
-        if (NodeInternalB != null)
+        if (LevelNodeB != null)
         {
             m_SplineContainer.Spline[^1] = new BezierKnot()
             {
-                Position = m_SplineContainer.transform.InverseTransformPoint(NodeInternalB.transform.position)
+                Position = m_SplineContainer.transform.InverseTransformPoint(LevelNodeB.transform.position)
             };
         }
         

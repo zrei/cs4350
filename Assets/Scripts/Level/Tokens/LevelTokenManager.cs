@@ -129,13 +129,7 @@ public class LevelTokenManager : MonoBehaviour
         // Entering the destination node
         void OnMoveToEdgeComplete()
         {
-            if (destNodeVisual.HasEntryAnimation())
-                destNodeVisual.PlayEntryAnimation(m_PlayerUnitToken, onMoveComplete);
-            else
-            {
-                Vector3 destPos = destNodeVisual.GetPlayerTargetPosition();
-                m_PlayerUnitToken.MoveToPosition(destPos, finalRotation, onMoveComplete, NODE_ENTRY_TIME);
-            }
+            destNodeVisual.PlayEntryAnimation(m_PlayerUnitToken, onMoveComplete);
         }
         
         m_CurrentNodeVisual = destNodeVisual;
@@ -143,26 +137,12 @@ public class LevelTokenManager : MonoBehaviour
     
     public void PlayClearAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
     {
-        if (nodeVisual.HasClearAnimation())
-        {
-            nodeVisual.PlayClearAnimation(m_PlayerUnitToken, onComplete);
-        }
-        else
-        {
-            onComplete?.Invoke();
-        }
+        nodeVisual.PlayClearAnimation(m_PlayerUnitToken, onComplete);
     }
     
     public void PlayFailureAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete, bool resetOnComplete = false)
     {
-        if (nodeVisual.HasFailureAnimation())
-        {
-            nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete, resetOnComplete);
-        }
-        else
-        {
-            onComplete?.Invoke();
-        }
+        nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete, resetOnComplete);
     }
 
     private void OnDestroy()

@@ -1,3 +1,4 @@
+using Level.Nodes;
 using UnityEngine;
 
 // Manages display of node previews, both anchored and hover
@@ -7,7 +8,7 @@ public class UI_NodePreviewManager : MonoBehaviour
     [SerializeField] UI_NodePreview m_AnchoredNodePreview;
     
     private GameObject m_CurrentPreviewPanel;
-    private NodeInternal m_CurrSelectedNode;
+    private LevelNode m_CurrSelectedNode;
 
     private void Awake()
     {
@@ -52,7 +53,7 @@ public class UI_NodePreviewManager : MonoBehaviour
         Hide();
     }
 
-    private void OnHoverStart(NodeInternal node)
+    private void OnHoverStart(LevelNode node)
     {
         if (m_CurrSelectedNode == node) return;
         
@@ -65,7 +66,7 @@ public class UI_NodePreviewManager : MonoBehaviour
         m_HoverNodePreview.Hide();
     }
     
-    private void OnNodeSelected(NodeInternal node)
+    private void OnNodeSelected(LevelNode node)
     {
         m_CurrSelectedNode = node;
         m_AnchoredNodePreview.SetUpPreview(node);
@@ -73,7 +74,7 @@ public class UI_NodePreviewManager : MonoBehaviour
         m_HoverNodePreview.Hide();
     }
     
-    private void OnNodeDeselected(NodeInternal node)
+    private void OnNodeDeselected(LevelNode node)
     {
         m_CurrSelectedNode = null;
         m_AnchoredNodePreview.Hide();

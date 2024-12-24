@@ -43,11 +43,11 @@ public class BattleNodeVisual : LevelNodeVisual
     {
         if (m_BattleNode.IsCurrent)
         {
-            SetNodeState(NodePuckType.CURRENT);
+            SetNodeColor(NodePuckType.CURRENT);
         }
         else
         {
-            SetNodeState(m_BattleNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.BATTLE);
+            SetNodeColor(m_BattleNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.BATTLE);
         }
     }
     
@@ -102,7 +102,7 @@ public class BattleNodeVisual : LevelNodeVisual
     public override void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Pointer entered Battle Node");
-        GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_BattleNode);
+        // GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_BattleNode);
     }
 
     public override void OnPointerExit(PointerEventData eventData)

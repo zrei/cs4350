@@ -53,7 +53,7 @@ public class EdgeVisual : MonoBehaviour
     {
         // Set Text position to the middle of the line
         m_CostText.transform.position = 
-            (m_EdgeInternal.NodeInternalA.transform.position + m_EdgeInternal.NodeInternalB.transform.position) / 2 
+            (m_EdgeInternal.LevelNodeA.transform.position + m_EdgeInternal.LevelNodeB.transform.position) / 2 
             + new Vector3(0f, 0.5f, 0f);
         m_CostText.text = m_EdgeInternal.Cost.ToString();
         m_CostText.enabled = true;

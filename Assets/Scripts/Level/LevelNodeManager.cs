@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Level.Nodes;
 using UnityEngine;
 
 /// <summary>
@@ -7,19 +8,19 @@ using UnityEngine;
 public class LevelNodeManager : MonoBehaviour
 {
     // Graph Information
-    private List<NodeInternal> m_LevelNodes = new();
-    public List<NodeInternal> LevelNodes => m_LevelNodes;
+    private List<LevelNode> m_LevelNodes = new();
+    public List<LevelNode> LevelNodes => m_LevelNodes;
     
     private List<EdgeInternal> m_LevelEdges = new();
     
-    private NodeInternal m_GoalNode;
+    private LevelNode m_GoalNode;
     
     // Current State
-    private NodeInternal m_CurrentNodeInternal;
+    private LevelNode m_CurrentLevelNode;
 
     #region Initialisation
 
-    public void Initialise(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
+    public void Initialise(List<LevelNode> levelNodes, List<EdgeInternal> levelEdges)
     {
         // Initialise the internal graph representation of the level
         InitialiseMap(levelNodes, levelEdges);
@@ -28,12 +29,11 @@ public class LevelNodeManager : MonoBehaviour
     /// <summary>
     /// Initialise the level map with the nodes and edges in scene
     /// </summary>
-    public void InitialiseMap(List<NodeInternal> levelNodes, List<EdgeInternal> levelEdges)
+    public void InitialiseMap(List<LevelNode> levelNodes, List<EdgeInternal> levelEdges)
     {
         // Retrieve all nodes in the level
         foreach (var levelNode in levelNodes)
         {
-            levelNode.Initialise();
             m_LevelNodes.Add(levelNode);
             
             // Check if goal node
@@ -46,8 +46,8 @@ public class LevelNodeManager : MonoBehaviour
         // Building the graph from the scene objects
         foreach (var levelEdge in levelEdges)
         {
-            levelEdge.NodeInternalA.AddAdjacentNode(levelEdge.NodeInternalB, levelEdge.Cost);
-            levelEdge.NodeInternalB.AddAdjacentNode(levelEdge.NodeInternalA, levelEdge.Cost);
+            levelEdge.LevelNodeA.AddAdjacentNode(levelEdge.LevelNodeB, levelEdge.Cost);
+            levelEdge.LevelNodeB.AddAdjacentNode(levelEdge.LevelNodeA, levelEdge.Cost);
             
             m_LevelEdges.Add(levelEdge);
         }
@@ -56,26 +56,23 @@ public class LevelNodeManager : MonoBehaviour
     #endregion
 
     #region Graph
-    public NodeInternal CurrentNode => m_CurrentNodeInternal;
+    public LevelNode CurrentNode => m_CurrentLevelNode;
     
-    public void SetStartNode(NodeInternal startNode)
+    public void SetStartNode(LevelNode startNode)
     {
-        m_CurrentNodeInternal = startNode;
-        m_CurrentNodeInternal.EnterNode();
+        m_CurrentLevelNode = startNode;
+        m_CurrentLevelNode.EnterNode();
     }
 
-    public void MoveToNode(NodeInternal destNode, out float cost)
+    public void MoveToNode(LevelNode destNode, out float cost)
     {
-        m_CurrentNodeInternal.ClearNode();
-        m_CurrentNodeInternal.ExitNode();
+        m_CurrentLevelNode.ExitNode();
             
         // Retrieve cost to move to the node
-        cost = m_CurrentNodeInternal.AdjacentNodes[destNode];
+        cost = m_CurrentLevelNode.AdjacentNodes[destNode];
         
-        GlobalEvents.Level.NodeMovementEvent(m_CurrentNodeInternal, destNode);
-        
-        m_CurrentNodeInternal = destNode;
-        m_CurrentNodeInternal.EnterNode();
+        m_CurrentLevelNode = destNode;
+        m_CurrentLevelNode.EnterNode();
     }
 
     #endregion
@@ -89,13 +86,13 @@ public class LevelNodeManager : MonoBehaviour
     /// <param name="ray"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    public bool TryRetrieveNode(Ray ray, out NodeInternal node)
+    public bool TryRetrieveNode(Ray ray, out LevelNode node)
     {
         RaycastHit[] raycastHits = Physics.RaycastAll(ray, Mathf.Infinity, LayerMask.GetMask("LevelMap"));
         //Debug.DrawRay(ray.origin, ray.direction * 100, Color.white, 100f, false); 
         foreach (RaycastHit raycastHit in raycastHits)
         {
-            node = raycastHit.collider.gameObject.GetComponentInParent<NodeInternal>();
+            node = raycastHit.collider.gameObject.GetComponentInParent<LevelNode>();
 
             if (node)
                 return true;
@@ -105,12 +102,12 @@ public class LevelNodeManager : MonoBehaviour
         return false;
     }
     
-   public EdgeInternal GetEdgeToNode(NodeInternal destNode)
+   public EdgeInternal GetEdgeToNode(LevelNode destNode)
     {
         foreach (var edge in m_LevelEdges)
         {
-            if (edge.NodeInternalA == m_CurrentNodeInternal && edge.NodeInternalB == destNode ||
-                edge.NodeInternalB == m_CurrentNodeInternal && edge.NodeInternalA == destNode)
+            if (edge.LevelNodeA == m_CurrentLevelNode && edge.LevelNodeB == destNode ||
+                edge.LevelNodeB == m_CurrentLevelNode && edge.LevelNodeA == destNode)
             {
                 return edge;
             }
@@ -124,28 +121,28 @@ public class LevelNodeManager : MonoBehaviour
     /// </summary>
     /// <param name="destNode"></param>
     /// <returns></returns>
-    public bool CanMoveToNode(NodeInternal destNode)
+    public bool CanMoveToNode(LevelNode destNode)
     {
         if (destNode.IsMoralityLocked && !destNode.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMorality))
         {
             return false;
         }
         
-        return m_CurrentNodeInternal.AdjacentNodes.ContainsKey(destNode);
+        return m_CurrentLevelNode.AdjacentNodes.ContainsKey(destNode);
     }
     
-    public List<NodeInternal> GetCurrentMovableNodes()
+    public List<LevelNode> GetCurrentMovableNodes()
     {
-        List<NodeInternal> movableNodes = new();
+        List<LevelNode> movableNodes = new();
         
         // If the node is not cleared, only the current node should be movable
-        if (m_CurrentNodeInternal.IsCleared == false)
+        if (m_CurrentLevelNode.IsCleared == false)
         {
-            movableNodes.Add(m_CurrentNodeInternal);
+            movableNodes.Add(m_CurrentLevelNode);
             return movableNodes;
         }
         
-        foreach (var node in m_CurrentNodeInternal.AdjacentNodes.Keys)
+        foreach (var node in m_CurrentLevelNode.AdjacentNodes.Keys)
         {
             if (CanMoveToNode(node))
             {
@@ -158,20 +155,15 @@ public class LevelNodeManager : MonoBehaviour
     
     public bool IsCurrentNodeCleared()
     {
-        return m_CurrentNodeInternal.IsCleared;
+        return m_CurrentLevelNode.IsCleared;
     }
     
     public void ClearCurrentNode()
     {
-        m_CurrentNodeInternal.ClearNode();
-    }
-    
-    public void StartCurrentNodeEvent()
-    {
-        m_CurrentNodeInternal.StartNodeEvent();
+        m_CurrentLevelNode.ClearNode();
     }
 
-    public void SetGoalNode(NodeInternal goalNode)
+    public void SetGoalNode(LevelNode goalNode)
     {
         m_GoalNode = goalNode;
         m_GoalNode.SetGoalNode();

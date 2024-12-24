@@ -6,6 +6,7 @@ public class EquippingArmor : MonoBehaviour
 {
     [Header("Bones")]
     [SerializeField] private List<Transform> m_UnitBonesArray;
+    public List<Transform> UnitBonesArray => m_UnitBonesArray;
     [SerializeField] private Transform m_BonesParent;
     [SerializeField] private Transform m_RootBone;
     [SerializeField] private Transform m_RightArmBone;
@@ -102,6 +103,7 @@ public class EquippingArmorEditor : Editor
         if (GUILayout.Button("Populate bones array"))
         {
             m_EquippingArmor.PopulateBones();
+            PrefabUtility.RecordPrefabInstancePropertyModifications(m_EquippingArmor.UnitBonesArray);
             Logger.LogEditor(this.GetType().Name, "Successfully populated bones for " + target.name, LogLevel.LOG);
         }
     }

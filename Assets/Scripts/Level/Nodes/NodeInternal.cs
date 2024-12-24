@@ -122,7 +122,7 @@ public abstract class NodeInternal : MonoBehaviour
     {
         Debug.Log("Entered Node: " + m_NodeInfo.m_NodeName);
         m_IsCurrent = true;
-        GlobalEvents.Level.NodeEnteredEvent(this);
+        // GlobalEvents.Level.NodeEnteredEvent(this);
     }
 
     public void StartNodeEvent(VoidEvent postEvent = null)
@@ -143,14 +143,14 @@ public abstract class NodeInternal : MonoBehaviour
     {
         Debug.Log("Cleared Node: " + m_NodeInfo.m_NodeName);
         SetCleared();
-        GlobalEvents.Level.NodeClearedEvent(this);
+        // GlobalEvents.Level.NodeClearedEvent(this);
     }
     
     public virtual void ExitNode()
     {
         Debug.Log("Exited Node: " + m_NodeInfo.m_NodeName);
         m_IsCurrent = false;
-        GlobalEvents.Level.NodeExitedEvent(this);
+        // GlobalEvents.Level.NodeExitedEvent(this);
     }
 
     protected abstract void PerformNode(VoidEvent postEvent = null);

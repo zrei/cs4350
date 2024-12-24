@@ -27,12 +27,12 @@ public class DialogueNodeVisual : LevelNodeVisual
     {
         if (m_DialogueNode.IsCurrent)
         {
-            SetNodeState(NodePuckType.CURRENT);
+            SetNodeColor(NodePuckType.CURRENT);
             m_dialogueToken.SetActive(false);
         }
         else
         {
-            SetNodeState(m_DialogueNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
+            SetNodeColor(m_DialogueNode.IsCleared ? NodePuckType.CLEARED : NodePuckType.REWARD);
             m_dialogueToken.SetActive(!m_DialogueNode.IsCleared);
         }
     }
@@ -42,7 +42,7 @@ public class DialogueNodeVisual : LevelNodeVisual
     public override void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Pointer entered Dialogue Node");
-        GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_DialogueNode);
+        // GlobalEvents.Level.NodeHoverStartEvent?.Invoke(m_DialogueNode);
     }
 
     public override void OnPointerExit(PointerEventData eventData)

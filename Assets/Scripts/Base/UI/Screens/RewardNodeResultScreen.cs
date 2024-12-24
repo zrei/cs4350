@@ -1,4 +1,6 @@
+using System.Text;
 using Game.Input;
+using Level.Nodes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,23 +17,30 @@ namespace Game.UI
             if (args.Length == 0)
                 return;
 
-            ShowRewardNode((RewardNode) args[0]);
+            ShowRewardNode((RewardNodeDataSO) args[0]);
 
             base.Show();
         }
 
-        private void ShowRewardNode(RewardNode rewardNode)
+        private void ShowRewardNode(RewardNodeDataSO rewardNodeData)
         {
-            if (rewardNode.RewardType == RewardType.RATION)
+            StringBuilder resultText = new StringBuilder();
+            
+            if (rewardNodeData.rationReward > 0)
             {
-                var rationReward = rewardNode.RationReward;
-                m_ResultText.text = $"Gained {rationReward} rations!";
+                var rationReward = rewardNodeData.rationReward;
+                resultText.Append($"Gained {rationReward} rations!");
+                resultText.AppendLine();
             }
-            else if (rewardNode.RewardType == RewardType.WEAPON)
+            if (rewardNodeData.weaponRewards.Count > 0)
             {
-                var weaponReward = rewardNode.WeaponReward;
-                m_ResultText.text = $"Gained {weaponReward.m_WeaponName}!";
+                foreach (var weaponReward in rewardNodeData.weaponRewards)
+                {
+                    resultText.Append($"Gained {weaponReward.m_WeaponName}!");
+                }
             }
+            
+            m_ResultText.text = resultText.ToString();
         
             m_ReturnButton.onSubmit.AddListener(CloseResults);
         }

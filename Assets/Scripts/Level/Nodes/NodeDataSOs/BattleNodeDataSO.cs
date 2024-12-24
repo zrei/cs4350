@@ -14,6 +14,10 @@ namespace Level.Nodes
         public int rationReward;
         public List<WeaponInstanceSO> weaponRewards;
         
+        [Header("Node Display Details")]
+        [Tooltip("Enemy unit to display on the node. If left empty, the first enemy unit in the battleSO will be used")]
+        public EnemyCharacterSO overrideDisplayEnemyUnit;
+        
         public override NodePreviewData GetNodePreviewData()
         {
             return new BattleNodePreviewData
@@ -25,6 +29,11 @@ namespace Level.Nodes
                 EnemyUnits = battleSO.m_EnemyUnitsToSpawn,
                 Objectives = battleSO.m_Objectives
             };
+        }
+        
+        public EnemyCharacterSO GetDisplayEnemyUnit()
+        {
+            return overrideDisplayEnemyUnit ? overrideDisplayEnemyUnit : battleSO.m_EnemyUnitsToSpawn[0].m_EnemyCharacterData;
         }
 
 #if UNITY_EDITOR
