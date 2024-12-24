@@ -24,6 +24,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Tooltip("World map nodes in order of level")]
     [SerializeField] private List<WorldMapRegion> m_WorldMapRegions;
     [SerializeField] private GameObject m_WorldMap;
+    [SerializeField] private GameObject m_PointsOfInterest;
 
     [Header("Cutscenes")]
     [SerializeField] private WorldMapCutsceneManager m_CutsceneManager;
@@ -221,6 +222,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
             return;
 
         m_WorldMap.SetActive(false);
+        m_PointsOfInterest.SetActive(false);
     }
 
     private void OnBeginSceneChange(SceneEnum fromScene, SceneEnum toScene)
@@ -238,6 +240,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
             return;
 
         m_WorldMap.SetActive(true);
+        m_PointsOfInterest.SetActive(true);
 
         m_CameraController.RecenterCamera();
 
