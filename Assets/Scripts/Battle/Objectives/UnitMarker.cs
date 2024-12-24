@@ -66,7 +66,7 @@ public class UnitMarker : MonoBehaviour
         SetActive(false);
     }
 
-    private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+    private void OnAttackAnimation()
     {
         SetActive(false);
     }

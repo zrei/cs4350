@@ -255,7 +255,13 @@ public class MapLogic : MonoBehaviour
 
     public void PerformTeleportSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, CoordPair teleportTargetTile, VoidEvent completeSkillEvent)
     {
-        RetrieveGrid(gridType).PerformTeleportSkill(attacker, attack, targetTile, teleportTargetTile, completeSkillEvent);
+        RetrieveGrid(gridType).PerformTeleportSkill(
+            attacker,
+            attack,
+            targetTile,
+            teleportTargetTile,
+            RetrieveGrid(attack.TeleportTargetGrid(attacker)).GetTilePosition(teleportTargetTile),
+            completeSkillEvent);
     }
 
     public bool IsValidTeleportTile(ActiveSkillSO activeSkillSO, Unit unit, CoordPair initialTarget, CoordPair targetTile, GridType gridType)

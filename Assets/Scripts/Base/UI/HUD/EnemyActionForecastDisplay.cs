@@ -64,7 +64,7 @@ namespace Game.UI
             GlobalEvents.Battle.CompleteAttackAnimationEvent += OnCompleteAttackAnimation;
         }
 
-        private void OnAttackAnimation(ActiveSkillSO activeSkill, Unit attacker, List<Unit> target)
+        private void OnAttackAnimation()
         {
             Hide();
         }

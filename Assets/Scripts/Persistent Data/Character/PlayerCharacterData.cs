@@ -66,7 +66,7 @@ public class PlayerCharacterData : ICanAttack
 
     // temp implementation for skill descriptions to calculate damage in level screen
     #region ICanAttack
-    public void PerformSkill(ActiveSkillSO attack, List<IHealth> targets)
+    public void PerformSkill(ActiveSkillSO attack, List<IHealth> targets, Vector3? targetMovePosition)
     {
         return;
     }

@@ -28,7 +28,7 @@ namespace Game.UI
                 return;
             }
             
-            if (!m_PauseAllowed)
+            if (!m_PauseAllowed || GameSceneManager.Instance.CurrScene == SceneEnum.MAIN_MENU)
                 return;
 
             var pauseScreen = UIScreenManager.Instance.PauseScreen;

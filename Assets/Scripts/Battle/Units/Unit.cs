@@ -529,10 +529,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #region Skills
     public abstract IEnumerable<ActiveSkillSO> GetActiveSkills();
 
-    public void PerformSkill(ActiveSkillSO attackSO, List<IHealth> targets)
+    public void PerformSkill(ActiveSkillSO attackSO, List<IHealth> targets, Vector3? targetMovePosition)
     {
         GlobalEvents.Battle.CompleteAttackAnimationEvent += CompleteAttackAnimationEvent;
-        GlobalEvents.Battle.AttackAnimationEvent?.Invoke(attackSO, this, targets.Select(x => (Unit) x).ToList());
+        SkillAnimationManager.Instance.OnSkillAnimation(attackSO, this, targets.Select(x => (Unit) x).ToList(), targetMovePosition);
 
         m_SkillCooldownTracker.UtiliseSkill(attackSO);
 
