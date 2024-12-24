@@ -50,6 +50,12 @@ public class LevelNodeVisual : BaseNodeVisual
     {
         m_LevelNode = GetComponent<LevelNode>();
         SetUpTokenAnimator();
+        
+        if (m_LevelNode.IsGoalNode)
+            ToggleStarOn();
+        
+        if (m_LevelNode.IsMoralityLocked)
+            SetMoralityThresholdText(m_LevelNode.MoralityThreshold);
     }
 
     private void SetUpTokenAnimator()
@@ -157,39 +163,25 @@ public class LevelNodeVisual : BaseNodeVisual
     
     #endregion
 
-    #region Token
-    public virtual bool HasEntryAnimation()
-    {
-        return false;
-    }
+    #region Token Animations
 
-    public virtual void PlayEntryAnimation(PlayerToken playerToken, VoidEvent onComplete)
+    public void PlayEntryAnimation(PlayerToken playerToken, VoidEvent onComplete)
     {
         if (m_LevelNode.IsCleared)
             m_NodeTokenAnimator = m_DefaultTokenAnimator;
         
         m_NodeTokenAnimator.PlayEntryAnimation(playerToken, onComplete);
     }
-    
-    public virtual bool HasClearAnimation()
-    {
-        return false;
-    }
 
-    public virtual void PlayClearAnimation(PlayerToken playerToken, VoidEvent onComplete)
+    public void PlayClearAnimation(PlayerToken playerToken, VoidEvent onComplete)
     {
         if (m_LevelNode.IsCleared)
             m_NodeTokenAnimator = m_DefaultTokenAnimator;
 
         m_NodeTokenAnimator.PlayClearAnimation(playerToken, onComplete);
     }
-    
-    public virtual bool HasFailureAnimation()
-    {
-        return false;
-    }
 
-    public virtual void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete, bool resetOnComplete)
+    public void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete, bool resetOnComplete)
     {
         if (m_LevelNode.IsCleared)
             m_NodeTokenAnimator = m_DefaultTokenAnimator;

@@ -11,6 +11,14 @@ using UnityEditor.SceneManagement;
 
 namespace Level.Nodes
 {
+    public class NodePreviewData
+    {
+        public string NodeName;
+        public string NodeDescription;
+        public bool IsMoralityLocked;
+        public Threshold MoralityThreshold;
+    }
+    
     public class LevelNode : MonoBehaviour
     {
         public int nodeId;

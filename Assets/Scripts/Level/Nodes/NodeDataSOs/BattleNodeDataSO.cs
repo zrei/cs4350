@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace Level.Nodes
 {
+    public class BattleNodePreviewData : NodePreviewData
+    {
+        public List<EnemyUnitPlacement> EnemyUnits;
+        public List<ObjectiveSO> Objectives;
+    }
+    
     [CreateAssetMenu(fileName = "BattleNodeDataSO", menuName = "ScriptableObject/Level/BattleNodeDataSO")]
     public class BattleNodeDataSO : NodeDataSO
     {
