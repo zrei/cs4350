@@ -46,13 +46,6 @@ public class Dialogue : MonoBehaviour
         [TextArea(3, 6)]
         public string lockedText;
 
-        [Tooltip("Whether this dialogue option will result in a change in morality")]
-        public bool changesMorality;
-        [Tooltip("How much the morality should change by")]
-        public int moralityChange;
-
-        public List<Flag> setFlags;
-
         public bool IsUnlocked => conditions.All(x => x.Evaluate());
     }
 
