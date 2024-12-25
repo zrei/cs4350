@@ -199,16 +199,6 @@ namespace Game.UI
                     button.onSubmit.RemoveAllListeners();
                     button.onSubmit.AddListener(() =>
                     {
-                        if (option.changesMorality)
-                        {
-                            GlobalEvents.Morality.MoralityChangeEvent?.Invoke(option.moralityChange);
-                        }
-
-                        foreach (Flag flag in option.setFlags)
-                        {
-                            FlagManager.Instance.SetFlagValue(flag, true, FlagType.PERSISTENT);
-                        }
-
                         TryNextDialogue(nextState);
                         foreach (var active in activeDisplays.ToList())
                         {
