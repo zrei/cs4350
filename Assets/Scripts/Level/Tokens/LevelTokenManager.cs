@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Level;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -37,18 +34,6 @@ public class LevelTokenManager : MonoBehaviour
     {
         m_PlayerUnitToken.UpdateAppearance(characterBattleData);
     }
-    
-    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
-    {
-        if (victor == UnitAllegiance.PLAYER)
-        {
-            LevelNodeVisual battleNodeVisual = battleNode.GetComponent<LevelNodeVisual>();
-            if (battleNodeVisual && battleNodeVisual.HasClearAnimation())
-            {
-                battleNodeVisual.PlayClearAnimation(m_PlayerUnitToken, null);
-            }
-        }
-    }
 
     #endregion
 
@@ -77,34 +62,6 @@ public class LevelTokenManager : MonoBehaviour
         return m_PlayerUnitToken.transform;
     }
     
-    /// <summary>
-    /// Move the player token to the destination node.
-    /// If the destination node has an entry animation, move to the edge of the node and
-    /// play the node's entry animation.
-    /// </summary>
-    /// <param name="destNodeVisual"></param>
-    /// <param name="onMoveComplete"></param>
-    public void MovePlayerToNode(LevelNodeVisual destNodeVisual, VoidEvent onMoveComplete)
-    {
-        if (destNodeVisual.HasEntryAnimation())
-        {
-            Vector3 destPos = GetNodeEdgePos(m_CurrentNodeVisual, destNodeVisual);
-            m_PlayerUnitToken.MoveToPosition(destPos, OnMoveToEdgeComplete, MOVE_TO_NODE_TIME);
-            
-            void OnMoveToEdgeComplete()
-            {
-                destNodeVisual.PlayEntryAnimation(m_PlayerUnitToken, onMoveComplete);
-            }
-        }
-        else
-        {
-            Vector3 destPos = destNodeVisual.GetPlayerTargetPosition();
-            m_PlayerUnitToken.MoveToPosition(destPos, onMoveComplete, MOVE_TO_NODE_TIME);
-        }
-        
-        m_CurrentNodeVisual = destNodeVisual;
-    }
-    
     public void MovePlayerToNode(SplineContainer pathSpline, LevelNodeVisual destNodeVisual, VoidEvent onMoveComplete)
     {
         var initialDirection = GetInitialSplineForwardDirection(pathSpline);
@@ -129,13 +86,7 @@ public class LevelTokenManager : MonoBehaviour
         // Entering the destination node
         void OnMoveToEdgeComplete()
         {
-            if (destNodeVisual.HasEntryAnimation())
-                destNodeVisual.PlayEntryAnimation(m_PlayerUnitToken, onMoveComplete);
-            else
-            {
-                Vector3 destPos = destNodeVisual.GetPlayerTargetPosition();
-                m_PlayerUnitToken.MoveToPosition(destPos, finalRotation, onMoveComplete, NODE_ENTRY_TIME);
-            }
+            destNodeVisual.PlayEntryAnimation(m_PlayerUnitToken, onMoveComplete);
         }
         
         m_CurrentNodeVisual = destNodeVisual;
@@ -143,26 +94,12 @@ public class LevelTokenManager : MonoBehaviour
     
     public void PlayClearAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
     {
-        if (nodeVisual.HasClearAnimation())
-        {
-            nodeVisual.PlayClearAnimation(m_PlayerUnitToken, onComplete);
-        }
-        else
-        {
-            onComplete?.Invoke();
-        }
+        nodeVisual.PlayClearAnimation(m_PlayerUnitToken, onComplete);
     }
     
     public void PlayFailureAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete, bool resetOnComplete = false)
     {
-        if (nodeVisual.HasFailureAnimation())
-        {
-            nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete, resetOnComplete);
-        }
-        else
-        {
-            onComplete?.Invoke();
-        }
+        nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete, resetOnComplete);
     }
 
     private void OnDestroy()

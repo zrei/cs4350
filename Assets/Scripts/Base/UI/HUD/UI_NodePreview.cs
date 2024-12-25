@@ -2,6 +2,7 @@ using Game;
 using Game.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Level.Nodes;
 using TMPro;
 using UnityEngine;
 
@@ -45,9 +46,9 @@ public class UI_NodePreview : MonoBehaviour
         StopAllCoroutines();
     }
 
-    public void SetUpPreview(NodeInternal node)
+    public void SetUpPreview(LevelNode node)
     {
-        var previewData = node.GetNodePreviewData();
+        var previewData = node.NodeData.GetNodePreviewData();
 
         m_NodeNameText.text = previewData.NodeName;
         m_DescriptionText.text = previewData.NodeDescription;

@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Game;
 using Game.Input;
 using Game.UI;
+using Level.Nodes;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -38,33 +40,33 @@ public class LevelManager : Singleton<LevelManager>
     
     [Header("Level Settings")]
     [SerializeField] private LevelSO m_LevelSO;
-    [SerializeField] private StartNode m_StartNode;
-    [SerializeField] private NodeInternal m_GoalNode;
+    [SerializeField] private LevelNode m_StartNode;
+    [SerializeField] private LevelNode m_GoalNode;
 
-    #region Current State
+    #region BGM
+    private int? m_LevelBGM = null;
+    #endregion
+    
+    #region Current State Information
     
     private List<PlayerCharacterData> m_CurrParty;
     public List<PlayerCharacterData> CurrParty => m_CurrParty;
     
-    private NodeInternal m_CurrSelectedNode;
-    private PlayerLevelSelectionState m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+    private LevelNode m_CurrInputTargetNode;
+    private LevelNode m_CurrSelectedNode;
+    private PlayerLevelSelectionState m_CurrInputState = PlayerLevelSelectionState.SELECTING_NODE;
+
+    private LevelNode m_DestNode;
+    
+    private UnitAllegiance m_PendingVictor;
+    private int m_PendingNumTurns;
     
     private Dictionary<RewardType, int> m_PendingRewards = new ();
     private List<WeaponInstanceSO> m_PendingWeaponRewards = new ();
     
-    #endregion
+    private LevelNode m_CurrNode => m_LevelNodeManager.CurrentNode;
+    private LevelResultType m_PendingLevelResult;
     
-    #region Input and Selected Node
-    
-    private NodeInternal m_CurrTargetNode;
-
-    // for tutorial purposes
-    private BattleNode m_CurrBattleNode = null;
-    
-    #endregion
-
-    #region BGM
-    private int? m_LevelBGM = null;
     #endregion
 
     #region Initialisation
@@ -73,7 +75,6 @@ public class LevelManager : Singleton<LevelManager>
         base.HandleAwake();
 
         GlobalEvents.Scene.OnBeginSceneChange += OnSceneChange;
-        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
     }
 
     protected override void HandleDestroy()
@@ -81,30 +82,40 @@ public class LevelManager : Singleton<LevelManager>
         base.HandleDestroy();
 
         GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
+        
+        GlobalEvents.Level.NodeHoverStartEvent -= OnNodeHoverStart;
+        GlobalEvents.Level.NodeHoverEndEvent -= OnNodeHoverEnd;
         GlobalEvents.CharacterManagement.OnLordUpdate -= OnLordUpdate;
-    }
+        
+        if (InputManager.Instance)
+        {
+            DisableLevelGraphInput();
+        }
 
-    private void Start()
-    {
-        m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
+        if (CurrentLevelState == LevelState.BATTLE_NODE)
+        {
+            GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+            GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoadAfterBattle;
+        }
     }
 
     public void Initialise(List<PlayerCharacterData> partyMembers)
     {
         m_CurrParty = partyMembers;
 
-        var levelNodes = FindObjectsOfType<NodeInternal>().ToList();
+        var levelNodes = FindObjectsOfType<LevelNode>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
+        
+        // Initialise the visuals of the level
+        m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         
         // Initialise the internal graph representation of the level
         m_LevelNodeManager.Initialise(levelNodes, levelEdges);
+        m_LevelNodeManager.SetStartNode(m_StartNode);
         m_LevelNodeManager.SetGoalNode(m_GoalNode);
         
         // Initialise the timer
         m_LevelRationsManager.Initialise(m_LevelSO.m_StartingRations);
-        
-        // Initialise the visuals of the level
-        m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         
         // Initialise the player token
         m_LevelTokenManager.Initialise(m_CurrParty[0].GetBattleData(), 
@@ -112,39 +123,404 @@ public class LevelManager : Singleton<LevelManager>
         
         // Set up level camera
         m_LevelCameraController.Initialise(m_LevelTokenManager.GetPlayerTokenTransform());
-        
-        m_LevelNodeManager.SetStartNode(m_StartNode);
-        
-        AddNodeEventCallbacks();
-        
         CameraManager.Instance.SetUpLevelCamera();
         
-        //GlobalEvents.Scene.LevelSceneLoadedEvent?.Invoke();
+        // Set up BGM
+        m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
         
-        m_StartNode.StartNodeEvent(StartPlayerPhase);
+        // Set up callbacks
+        GlobalEvents.Level.NodeHoverStartEvent += OnNodeHoverStart;
+        GlobalEvents.Level.NodeHoverEndEvent += OnNodeHoverEnd;
+        GlobalEvents.CharacterManagement.OnLordUpdate += OnLordUpdate;
+
+        // Start at start node's pre-dialogue stage
+        CurrentLevelState = LevelState.PRE_DIALOGUE;
     }
     
-    private void OnLordUpdate()
+    #endregion
+    
+    #region Level FSM
+
+    public enum LevelState
     {
-        m_LevelTokenManager.UpdateAppearance(m_CurrParty[0].GetBattleData());
+        NODE_SELECTION,
+        MOVEMENT_TO_NODE,
+        PRE_DIALOGUE,
+        PRE_TUTORIAL,
+        DIALOGUE_NODE,
+        BATTLE_NODE,
+        REWARD_NODE,
+        CALCULATE_REWARDS,
+        LEVELLING,
+        POST_TUTORIAL,
+        POST_DIALOGUE,
+        PRE_SELECTION_TUTORIAL,
+        LEVEL_END
     }
+    
+    private LevelState m_CurrentLevelState;
+
+    public LevelState CurrentLevelState
+    {
+        get => m_CurrentLevelState;
+        set
+        {
+            m_CurrentLevelState = value;
+            OnLevelStateChanged();
+        }
+    }
+
+    private void OnLevelStateChanged()
+    {
+        switch (CurrentLevelState)
+        {
+            case LevelState.NODE_SELECTION:
+                OnStateNodeSelection();
+                break;
+            case LevelState.MOVEMENT_TO_NODE:
+                OnStateMovementToNode();
+                break;
+            case LevelState.PRE_DIALOGUE:
+                OnStatePreDialogue();
+                break;
+            case LevelState.PRE_TUTORIAL:
+                OnStatePreTutorial();
+                break;
+            case LevelState.DIALOGUE_NODE:
+                OnStateDialogueNode();
+                break;
+            case LevelState.BATTLE_NODE:
+                OnStateBattleNode();
+                break;
+            case LevelState.REWARD_NODE:
+                OnStateRewardNode();
+                break;
+            case LevelState.CALCULATE_REWARDS:
+                OnStateCalculateRewards();
+                break;
+            case LevelState.LEVELLING:
+                OnStateLevelling();
+                break;
+            case LevelState.POST_TUTORIAL:
+                OnStatePostTutorial();
+                break;
+            case LevelState.POST_DIALOGUE:
+                OnStatePostDialogue();
+                break;
+            case LevelState.PRE_SELECTION_TUTORIAL:
+                OnStatePreSelectionTutorial();
+                break;
+            case LevelState.LEVEL_END:
+                OnStateLevelEnd();
+                break;
+            default:
+                Debug.Log("LevelManager: Invalid State");
+                GameSceneManager.Instance.UnloadLevelScene(m_LevelSO.m_LevelId);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// This state handles the player's node selection phase logic, including moving around the map and
+    /// previewing nodes.
+    /// Transitions to MOVEMENT_TO_NODE state when a neighbouring node is selected to move to, or
+    /// to the appropriate node event state if retrying the current node.
+    /// </summary>
+    private void OnStateNodeSelection()
+    {
+        DisplayMovableNodes();
+        EnableLevelGraphInput();
+    }
+
+    /// <summary>
+    /// This state handles the movement of the player token to the selected node.
+    /// Transitions to PRE_DIALOGUE state after the movement is complete.
+    /// </summary>
+    private void OnStateMovementToNode()
+    {
+        var destNode = m_DestNode;
+        var pathSpline = m_LevelNodeManager.GetEdgeToNode(destNode).GetPathSplineTo(destNode);
+        
+        if (pathSpline == null)
+        {
+            Debug.LogError("Node Movement: Path Spline is null");
+            CurrentLevelState = LevelState.NODE_SELECTION;
+            return;
+        }
+        
+        m_LevelTokenManager.MovePlayerToNode(pathSpline, m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
+        
+        return;
+
+        void OnMovementComplete()
+        {
+            m_LevelNodeManager.MoveToNode(destNode, out var rationCost);
+            GlobalEvents.Rations.RationsChangeEvent?.Invoke(-rationCost);
+            m_DestNode = null;
+
+            CurrentLevelState = m_LevelNodeManager.IsCurrentNodeCleared() ? LevelState.NODE_SELECTION : LevelState.PRE_DIALOGUE;
+        }
+    }
+    
+    /// <summary>
+    /// This state plays the pre-dialogue of the current node if any.
+    /// Transitions to PRE_TUTORIAL state immediately if there are no dialogues, otherwise
+    /// after the dialogue is finished.
+    /// </summary>
+    private void OnStatePreDialogue()
+    {
+        PlayDialogue(m_CurrNode.NodeData.GetPreDialogueToPlay(), () => CurrentLevelState = LevelState.PRE_TUTORIAL);
+    }
+
+    /// <summary>
+    /// This state plays the pre-tutorial of the current node if any.
+    /// Transitions to the appropriate node event state immediately if there are no tutorials, otherwise
+    /// after the pre-tutorial screen is closed.
+    /// </summary>
+    private void OnStatePreTutorial()
+    {
+        PlayTutorial(m_CurrNode.NodeData.preTutorial, EnterNodeEventState);
+    }
+    
+    /// <summary>
+    /// This state handles the Dialogue type of node event.
+    /// Transitions to POST_TUTORIAL state after the dialogue is finished.
+    /// </summary>
+    private void OnStateDialogueNode()
+    {
+        if (m_CurrNode.NodeData is not DialogueNodeDataSO dialogueNodeData)
+        {
+            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Dialogue type");
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+            return;
+        }
+        
+        var mainDialogue = dialogueNodeData.GetMainDialogueToPlay();
+        PlayDialogue(mainDialogue, () => StartCoroutine(TransitionToPostTutorialAfterDelay()));
+        
+        IEnumerator TransitionToPostTutorialAfterDelay()
+        {
+            // Add small delay for morality and ration animation changes
+            yield return new WaitForSeconds(1.0f);
+            m_LevelNodeManager.ClearCurrentNode();
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+        }
+    }
+
+    /// <summary>
+    /// This state handles the Battle type of node event.
+    /// Transitions to CALCULATE_REWARDS state after the battle reward screen is closed.
+    /// </summary>
+    private void OnStateBattleNode()
+    {
+        if (m_CurrNode.NodeData is not BattleNodeDataSO battleNodeData)
+        {
+            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Battle type");
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+            return;
+        }
+        
+        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+        m_LevelBGM = null;
+        
+        GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
+        
+        var battleSO = battleNodeData.battleSO;
+        GameSceneManager.Instance.LoadBattleScene(battleSO, 
+            battleSO.m_OverrideCharacters ? battleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            battleSO.m_OverrideBattleMap ? battleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, 
+            m_LevelRationsManager.GetInflictedTokens());
+    }
+
+    /// <summary>
+    /// This state handles the Reward type of node event.
+    /// Transitions to CALCULATE_REWARDS state after the reward screen is closed.
+    /// </summary>
+    private void OnStateRewardNode()
+    {
+        if (m_CurrNode.NodeData is not RewardNodeDataSO rewardNodeData)
+        {
+            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Reward type");
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+            return;
+        }
+        
+        m_LevelNodeManager.ClearCurrentNode();
+
+        // Add reward to pending rewards
+        m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) + rewardNodeData.rationReward;
+        m_PendingWeaponRewards.AddRange(rewardNodeData.weaponRewards);
+        
+        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        rewardNodeResultScreen.OnHideDone += OnCloseRewardScreen;
+        UIScreenManager.Instance.OpenScreen(rewardNodeResultScreen, false, rewardNodeData);
+    }
+
+    /// <summary>
+    /// This state processes the pending rewards (Ration, Weapons) and apply them to the player.
+    /// Transitions to LEVELLING state if there are EXP rewards to process, else transitions to POST_TUTORIAL state. 
+    /// </summary>
+    private void OnStateCalculateRewards()
+    {
+        // Process ration rewards
+        if (m_PendingRewards.ContainsKey(RewardType.RATION) && m_PendingRewards[RewardType.RATION] != 0)
+        {
+            GlobalEvents.Rations.RationsChangeEvent?.Invoke(m_PendingRewards[RewardType.RATION]);
+            m_PendingRewards[RewardType.RATION] = 0;
+        }
+        
+        // Process weapon rewards
+        if (m_PendingWeaponRewards.Count > 0)
+        {
+            foreach (var weapon in m_PendingWeaponRewards)
+            {
+                InventoryManager.Instance.ObtainWeapon(weapon);
+            }
+            
+            m_PendingWeaponRewards.Clear();
+        }
+        
+        // If has EXP rewards, transition to levelling state to process exp gains
+        var hasExpRewards = m_PendingRewards.ContainsKey(RewardType.EXP) && m_PendingRewards[RewardType.EXP] != 0;
+        
+        CurrentLevelState = hasExpRewards ? LevelState.LEVELLING : LevelState.POST_TUTORIAL;
+    }
+
+    /// <summary>
+    /// This state processes the pending EXP rewards and apply them to the player characters.
+    /// Will display EXP gain summaries and level up summaries.
+    /// Transitions to POST_TUTORIAL state after EXP gain and level up screens are closed. 
+    /// </summary>
+    private void OnStateLevelling()
+    {
+        AddCharacterExp(m_PendingRewards[RewardType.EXP], out var expGainSummaries, out var levelledUpCharacters);
+        m_PendingRewards[RewardType.EXP] = 0;
+            
+        IUIScreen expScreen = UIScreenManager.Instance.ExpScreen;
+        expScreen.OnHideDone += levelledUpCharacters.Count > 0 ? ShowLevelUpScreen : OnCloseLevellingScreen;
+        UIScreenManager.Instance.OpenScreen(expScreen, false, expGainSummaries);
+        
+        void ShowLevelUpScreen(IUIScreen expScreen)
+        {
+            expScreen.OnHideDone -= ShowLevelUpScreen;
+            IUIScreen levelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
+            levelUpResultScreen.OnHideDone += OnCloseLevellingScreen;
+            UIScreenManager.Instance.OpenScreen(levelUpResultScreen, false, levelledUpCharacters);
+        }
+        
+        void OnCloseLevellingScreen(IUIScreen screen)
+        {
+            screen.OnHideDone -= OnCloseLevellingScreen;
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+        }
+    }
+    
+    /// <summary>
+    /// This state plays the post-tutorial of the current node if any.
+    /// Transitions to POST_DIALOGUE state immediately if there are no tutorials, otherwise
+    /// after the post-tutorial screen is closed.
+    /// </summary>
+    private void OnStatePostTutorial()
+    {
+        PlayTutorial(m_CurrNode.NodeData.postTutorial, () => CurrentLevelState = LevelState.POST_DIALOGUE);
+    }
+    
+    /// <summary>
+    /// This state plays the post-dialogue of the current node if any.
+    /// Transitions to PRE_SELECTION_TUTORIAL state immediately if there are no dialogues, otherwise
+    /// after the dialogue is finished.
+    /// </summary>
+    private void OnStatePostDialogue()
+    {
+        PlayDialogue(m_CurrNode.NodeData.GetPostDialogueToPlay(), () => CurrentLevelState = LevelState.PRE_SELECTION_TUTORIAL);
+    }
+    
+    /// <summary>
+    /// This state plays the tutorial before resuming player node selection, if any.
+    /// Transitions to the next state immediately if there are no tutorials, otherwise
+    /// after the post-tutorial screen is closed.
+    /// The next state is either LEVEL_END if the goal node is cleared, or NODE_SELECTION otherwise.
+    /// </summary>
+    private void OnStatePreSelectionTutorial()
+    {
+        PlayTutorial(m_CurrNode.NodeData.preSelectionTutorial, () =>
+        {
+            if (m_LevelNodeManager.IsGoalNodeCleared())
+            {
+                m_PendingLevelResult = LevelResultType.SUCCESS;
+                CurrentLevelState = LevelState.LEVEL_END;
+            }
+            else
+            {
+                CurrentLevelState = LevelState.NODE_SELECTION;
+            }
+        });
+    }
+    
+    /// <summary>
+    /// This state handles the end of the level, processing level rewards, performing post-level clean up and
+    /// displaying the level results screen.
+    /// This is a terminal state and will not transition to any other states.
+    /// </summary>
+    private void OnStateLevelEnd()
+    {
+        GlobalEvents.Level.LevelEndEvent?.Invoke();
+
+        IUIScreen levelResultScreen = UIScreenManager.Instance.LevelResultScreen;
+        levelResultScreen.OnHideDone += OnCloseLevelResultScreen;
+        UIScreenManager.Instance.OpenScreen(levelResultScreen, false, new LevelResultUIData(m_LevelSO, m_PendingLevelResult));
+
+        FlagManager.Instance.SetFlagValue(m_PendingLevelResult == LevelResultType.SUCCESS ? Flag.WIN_LEVEL_FLAG : Flag.LOSE_LEVEL_FLAG, true, FlagType.SESSION);
+
+        if (m_PendingLevelResult == LevelResultType.SUCCESS)
+        {
+            Debug.Log("Receiving Reward Characters");
+            CharacterDataManager.Instance.PostLevelBlanketLevelUp();
+            CharacterDataManager.Instance.ReceiveCharacters(m_LevelSO.m_RewardCharacters);
+            
+            foreach (var weaponReward in m_LevelSO.m_RewardWeapons)
+            {
+                InventoryManager.Instance.ObtainWeapon(weaponReward);
+            }
+            // InventoryManager.Instance.SaveWeapons();
+            
+            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
+        }
+
+        if (m_LevelBGM != null) SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
+        m_LevelBGM = null;
+        GlobalEvents.Level.LevelResultsEvent?.Invoke(m_LevelSO, m_PendingLevelResult);
+        
+        void OnCloseLevelResultScreen(IUIScreen screen)
+        {
+            screen.OnHideDone -= OnCloseLevelResultScreen;
+            GameSceneManager.Instance.UnloadLevelScene(m_LevelSO.m_LevelId);
+        }
+    }
+
+    private void EnterNodeEventState()
+    {
+        switch (m_CurrNode.NodeType)
+        {
+            case NodeType.DIALOGUE:
+                CurrentLevelState = LevelState.DIALOGUE_NODE;
+                break;
+            case NodeType.BATTLE:
+                CurrentLevelState = LevelState.BATTLE_NODE;
+                break;
+            case NodeType.REWARD:
+                CurrentLevelState = LevelState.REWARD_NODE;
+                break;
+            case NodeType.EMPTY:
+                m_LevelNodeManager.ClearCurrentNode();
+                CurrentLevelState = LevelState.POST_TUTORIAL;
+                break;
+        }
+    }
+
     #endregion
 
     #region Player Phase
-    
-    private void StartPlayerPhase()
-    {
-        if (m_LevelNodeManager.IsGoalNodeCleared())
-        {
-            OnLevelEnd(m_LevelSO, LevelResultType.SUCCESS);
-        }
-        else
-        {
-            DisplayMovableNodes();
-            EnableLevelGraphInput();
-            GlobalEvents.Level.StartPlayerPhaseEvent?.Invoke();
-        }
-    }
 
     private void EndPlayerPhase()
     {
@@ -156,7 +532,7 @@ public class LevelManager : Singleton<LevelManager>
         GlobalEvents.Level.EndPlayerPhaseEvent?.Invoke();
     }
     
-    public void DisplayMovableNodes()
+    private void DisplayMovableNodes()
     {
         var movableNodes = m_LevelNodeManager.GetCurrentMovableNodes();
         
@@ -170,9 +546,6 @@ public class LevelManager : Singleton<LevelManager>
     
     private void EnableLevelGraphInput()
     {
-        GlobalEvents.Level.NodeHoverStartEvent += OnNodeHoverStart;
-        GlobalEvents.Level.NodeHoverEndEvent += OnNodeHoverEnd;
-        
         InputManager.Instance.PointerSelectInput.OnPressEvent += OnPointerSelect;
         
         InputManager.Instance.TogglePartyMenuInput.OnPressEvent += OnTogglePartyMenu;
@@ -182,9 +555,6 @@ public class LevelManager : Singleton<LevelManager>
     
     private void DisableLevelGraphInput()
     {
-        GlobalEvents.Level.NodeHoverStartEvent -= OnNodeHoverStart;
-        GlobalEvents.Level.NodeHoverEndEvent -= OnNodeHoverEnd;
-        
         InputManager.Instance.PointerSelectInput.OnPressEvent -= OnPointerSelect;
         
         InputManager.Instance.TogglePartyMenuInput.OnPressEvent -= OnTogglePartyMenu;
@@ -192,25 +562,25 @@ public class LevelManager : Singleton<LevelManager>
         m_LevelCameraController.DisableCameraMovement();
     }
     
-    private void OnNodeHoverStart(NodeInternal node)
+    private void OnNodeHoverStart(LevelNode node)
     {
-        m_CurrTargetNode = node;
+        m_CurrInputTargetNode = node;
         
-        UpdateState();
+        UpdateInputState();
     }
     
     private void OnNodeHoverEnd()
     {
-        m_CurrTargetNode = null;
+        m_CurrInputTargetNode = null;
         
-        UpdateState();
+        UpdateInputState();
     }
     
     private void OnPointerSelect(IInput input)
     {
         TryPerformAction();
         
-        UpdateState();
+        UpdateInputState();
     }
     
     private void OnTogglePartyMenu(IInput input)
@@ -232,17 +602,17 @@ public class LevelManager : Singleton<LevelManager>
 
     #region Update Input State
 
-    private void UpdateState()
+    private void UpdateInputState()
     {
-        if (m_CurrSelectedNode && m_CurrSelectedNode == m_CurrTargetNode)
+        if (m_CurrSelectedNode && m_CurrSelectedNode == m_CurrInputTargetNode)
         {
-            m_CurrState = m_CurrSelectedNode != m_LevelNodeManager.CurrentNode 
+            m_CurrInputState = m_CurrSelectedNode != m_LevelNodeManager.CurrentNode 
                 ? PlayerLevelSelectionState.MOVING_NODE
                 : PlayerLevelSelectionState.RETRYING_NODE;
         }
         else
         {
-            m_CurrState = PlayerLevelSelectionState.SELECTING_NODE;
+            m_CurrInputState = PlayerLevelSelectionState.SELECTING_NODE;
         }
     }
 
@@ -252,7 +622,7 @@ public class LevelManager : Singleton<LevelManager>
 
     private void TryPerformAction()
     {
-        switch (m_CurrState)
+        switch (m_CurrInputState)
         {
             case PlayerLevelSelectionState.SELECTING_NODE:
                 Debug.Log("Player Action: Selecting Node");
@@ -274,14 +644,14 @@ public class LevelManager : Singleton<LevelManager>
 
     private void TrySelectNode()
     {
-        if (m_CurrTargetNode)
+        if (m_CurrInputTargetNode)
         {
-            if (m_CurrSelectedNode && m_CurrSelectedNode != m_CurrTargetNode)
+            if (m_CurrSelectedNode && m_CurrSelectedNode != m_CurrInputTargetNode)
             {
                 GlobalEvents.Level.NodeDeselectedEvent(m_CurrSelectedNode);
             }
 
-            SelectNode(m_CurrTargetNode);
+            SelectNode(m_CurrInputTargetNode);
         }
         else if (m_CurrSelectedNode)
         {
@@ -305,35 +675,10 @@ public class LevelManager : Singleton<LevelManager>
             return;
         }
         
-        var pathSpline = m_LevelNodeManager.GetEdgeToNode(destNode).GetPathSplineTo(destNode);
-        
-        if (pathSpline == null)
-        {
-            Debug.LogError("Node Movement: Path Spline is null");
-            return;
-        }
-        
         EndPlayerPhase();
         
-        m_LevelTokenManager.MovePlayerToNode(pathSpline, m_LevelNodeVisualManager.GetNodeVisual(destNode), OnMovementComplete);
-        
-        return;
-
-        void OnMovementComplete()
-        {
-            m_LevelNodeManager.MoveToNode(destNode, out var rationCost);
-            
-            GlobalEvents.Rations.RationsChangeEvent?.Invoke(-rationCost);
-
-            if (m_LevelNodeManager.IsCurrentNodeCleared())
-            {
-                StartPlayerPhase();
-            }
-            else
-            {
-                m_LevelNodeManager.StartCurrentNodeEvent();
-            }
-        }
+        m_DestNode = destNode;
+        CurrentLevelState = LevelState.MOVEMENT_TO_NODE;
     }
     
     private void TryRetryNode()
@@ -346,10 +691,10 @@ public class LevelManager : Singleton<LevelManager>
         
         EndPlayerPhase();
         
-        m_LevelNodeManager.StartCurrentNodeEvent();
+        EnterNodeEventState();
     }
     
-    private void SelectNode(NodeInternal node)
+    private void SelectNode(LevelNode node)
     {
         if (m_CurrSelectedNode)
         {
@@ -357,7 +702,7 @@ public class LevelManager : Singleton<LevelManager>
         }
         
         m_CurrSelectedNode = node;
-        GlobalEvents.Level.NodeSelectedEvent(m_CurrTargetNode);
+        GlobalEvents.Level.NodeSelectedEvent(m_CurrInputTargetNode);
     }
     
     private void DeselectNode()
@@ -371,53 +716,56 @@ public class LevelManager : Singleton<LevelManager>
 
     #region Callbacks
     
-    public void OnDisable()
+    void OnBattleEnd(UnitAllegiance victor, int numTurns)
     {
-        if (InputManager.Instance)
+        GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
+        
+        if (m_CurrNode.NodeData is not BattleNodeDataSO battleNodeData)
         {
-            DisableLevelGraphInput();
+            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Battle type");
+            return;
+        }
+
+        // Save the battle result
+        m_PendingVictor = victor;
+        m_PendingNumTurns = numTurns;
+            
+        // Add exp reward to pending rewards
+        m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
+                                           + battleNodeData.battleSO.m_ExpReward;
+            
+        // Add time cost to pending rewards
+        m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) 
+                                              - m_PendingNumTurns;
+            
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent += OnSceneLoadAfterBattle;
+    }
+    
+    void OnSceneLoadAfterBattle(SceneEnum fromScene, SceneEnum toScene)
+    {
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent -= OnSceneLoadAfterBattle;
+        
+        // If the scene did not transition from Battle to Level after battle ended, the results will be nullified
+        if (fromScene != SceneEnum.BATTLE && toScene != SceneEnum.LEVEL)
+        {
+            Debug.LogWarning("LevelManager.OnSceneLoadAfterBattle: Scene did not transition from Battle to Level");
+            m_PendingRewards.Clear();
+            return;
         }
         
-        RemoveNodeEventCallbacks();
-    }
-    
-    private void AddNodeEventCallbacks()
-    {
-        GlobalEvents.Level.BattleNodeStartEvent += OnBattleNodeStart;
-        GlobalEvents.Level.BattleNodeEndEvent += OnBattleNodeEnd;
-        GlobalEvents.Level.RewardNodeStartEvent += OnRewardNodeStart;
-        GlobalEvents.Level.DialogueNodeEndEvent += OnDialogueNodeEnd;
-    }
-    
-    private void RemoveNodeEventCallbacks()
-    {
-        GlobalEvents.Level.BattleNodeStartEvent -= OnBattleNodeStart;
-        GlobalEvents.Level.BattleNodeEndEvent -= OnBattleNodeEnd;
-        GlobalEvents.Level.RewardNodeStartEvent -= OnRewardNodeStart;
-        GlobalEvents.Level.DialogueNodeEndEvent -= OnDialogueNodeEnd;
-    }
+        if (m_CurrNode.NodeData is not BattleNodeDataSO battleNodeData)
+        {
+            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Battle type");
+            return;
+        }
 
-    private void OnBattleNodeStart(BattleNode battleNode)
-    {
-        m_CurrBattleNode = battleNode;
-        Debug.Log("LevelManager: Starting Battle Node");
-        
-        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
-        m_LevelBGM = null;
-        BattleSO battleSO = battleNode.BattleSO;
-        GameSceneManager.Instance.LoadBattleScene(battleSO, battleSO.m_OverrideCharacters ? battleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
-            battleSO.m_OverrideBattleMap ? battleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, m_LevelRationsManager.GetInflictedTokens());
-    }
-    
-    private void OnBattleNodeEnd(BattleNode battleNode, UnitAllegiance victor, int numTurns)
-    {
         m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
 
         Debug.Log("LevelManager: Ending Battle Node");
 
-        LevelNodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(battleNode);
+        LevelNodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(m_CurrNode);
         
-        if (victor == UnitAllegiance.PLAYER)
+        if (m_PendingVictor == UnitAllegiance.PLAYER)
         {
             m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnSuccessAnimComplete);
         }
@@ -431,109 +779,31 @@ public class LevelManager : Singleton<LevelManager>
         void OnSuccessAnimComplete()
         {
             m_LevelNodeManager.ClearCurrentNode();
-        
-            // Add exp reward to pending rewards
-            m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
-                                              + battleNode.BattleSO.m_ExpReward;
+            var battleNodeUIResults = new BattleNodeResultUIData(battleNodeData.battleSO, m_PendingVictor, m_PendingNumTurns);
             
-            // Add time cost to pending rewards
-            m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) 
-                                               - numTurns;
-        
             IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
             battleNodeResultScreen.OnHideDone += OnCloseRewardScreen;
-            UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, new BattleNodeResultUIData(battleNode.BattleSO, victor, numTurns));
+            UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, battleNodeUIResults);
         }
 
         void OnFailureAnimComplete()
         {
             if (m_LevelSO.m_FailOnDefeat)
             {
-                OnLevelEnd(m_LevelSO, LevelResultType.DEFEAT);
+                m_PendingLevelResult = LevelResultType.DEFEAT;
+                CurrentLevelState = LevelState.LEVEL_END;
             }
             else
             {
-                StartPlayerPhase();
+                CurrentLevelState = LevelState.NODE_SELECTION;
             }
         }
-    }
-    
-    private void OnRewardNodeStart(RewardNode rewardNode)
-    {
-        Debug.Log("LevelManager: Starting Reward Node");
-        
-        // Maybe insert open chest animation here
-        
-        // Update the level state
-        m_LevelNodeManager.ClearCurrentNode();
-        
-        // Add reward to pending rewards
-        if (rewardNode.RewardType == RewardType.RATION)
-            m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) + rewardNode.RationReward;
-        else if (rewardNode.RewardType == RewardType.WEAPON)
-            m_PendingWeaponRewards.Add(rewardNode.WeaponReward);
-        
-        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
-        rewardNodeResultScreen.OnHideDone += OnCloseRewardScreen;
-        UIScreenManager.Instance.OpenScreen(rewardNodeResultScreen, false, rewardNode);
     }
     
     private void OnCloseRewardScreen(IUIScreen screen)
     {
         screen.OnHideDone -= OnCloseRewardScreen;
-        
-        ProcessReward(out var hasEvent);
-
-        // If there are no further events, resume player phase
-        if (!hasEvent)
-        {
-            StartPlayerPhase();
-        }
-    }
-    
-    private void OnCloseLevellingScreen(IUIScreen screen)
-    {
-        screen.OnHideDone -= OnCloseLevellingScreen;
-
-        m_CurrBattleNode?.PostTutorial(StartPlayerPhase);
-    }
-    
-    private void OnDialogueNodeEnd(DialogueNode dialogueNode)
-    {
-        Debug.Log("LevelManager: Ending Dialogue Node");
-        
-        m_LevelNodeManager.ClearCurrentNode();
-        
-        StartPlayerPhase();
-    }
-
-    private void OnLevelEnd(LevelSO levelSo, LevelResultType result)
-    {
-        GlobalEvents.Level.LevelEndEvent?.Invoke();
-
-        IUIScreen levelResultScreen = UIScreenManager.Instance.LevelResultScreen;
-        UIScreenManager.Instance.OpenScreen(levelResultScreen, false, new LevelResultUIData(levelSo, result));
-
-        FlagManager.Instance.SetFlagValue(result == LevelResultType.SUCCESS ? Flag.WIN_LEVEL_FLAG : Flag.LOSE_LEVEL_FLAG, true, FlagType.SESSION);
-
-        if (result == LevelResultType.SUCCESS)
-        {
-            Debug.Log("Receiving Reward Characters");
-            CharacterDataManager.Instance.PostLevelBlanketLevelUp();
-            CharacterDataManager.Instance.ReceiveCharacters(levelSo.m_RewardCharacters);
-            
-            foreach (var weaponReward in levelSo.m_RewardWeapons)
-            {
-                InventoryManager.Instance.ObtainWeapon(weaponReward);
-            }
-            // InventoryManager.Instance.SaveWeapons();
-            
-            FlagManager.Instance.SetFlagValue($"Level{m_LevelSO.m_LevelId+1}Complete", true, FlagType.PERSISTENT);
-        }
-        
-        SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
-        m_LevelBGM = null;
-        GlobalEvents.Level.LevelResultsEvent?.Invoke(levelSo, result);
+        CurrentLevelState = LevelState.CALCULATE_REWARDS;
     }
 
     private void OnSceneChange(SceneEnum _, SceneEnum _2)
@@ -545,64 +815,61 @@ public class LevelManager : Singleton<LevelManager>
         }
     }
     
+    private void OnLordUpdate()
+    {
+        m_LevelTokenManager.UpdateAppearance(m_CurrParty[0].GetBattleData());
+    }
+    
+    #endregion
+
+    #region Tutorial
+
+    private void PlayTutorial(TutorialSO tutorial, VoidEvent postEvent)
+    {
+        if (tutorial == null)
+        {
+            postEvent?.Invoke();
+        } 
+        else
+        {
+            IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
+            tutorialScreen.OnHideDone += PostTutorial;
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, tutorial);
+        }
+
+        void PostTutorial(IUIScreen screen)
+        {
+            screen.OnHideDone -= PostTutorial;
+            postEvent?.Invoke();
+        }
+    }
+
+    #endregion
+
+    #region Dialogue
+
+    private void PlayDialogue(Dialogue dialogue, VoidEvent postEvent)
+    {
+        if (dialogue == null)
+        {
+            postEvent?.Invoke();
+        } 
+        else
+        {
+            GlobalEvents.Dialogue.DialogueEndEvent += PostDialogue;
+            DialogueDisplay.Instance.StartDialogue(dialogue);
+        }
+
+        void PostDialogue()
+        {
+            GlobalEvents.Dialogue.DialogueEndEvent -= PostDialogue;
+            postEvent?.Invoke();
+        }
+    }
+
     #endregion
 
     #region Reward Handling
-
-    /// <summary>
-    /// Process the pending rewards (EXP, Gold) and apply them to the player
-    /// </summary>
-    /// <param name="hasEvent"> whether there are further events like levelling up </param>
-    private void ProcessReward(out bool hasEvent)
-    {
-        hasEvent = false;
-
-        if (m_PendingRewards.ContainsKey(RewardType.RATION) && m_PendingRewards[RewardType.RATION] != 0)
-        {
-            GlobalEvents.Rations.RationsChangeEvent?.Invoke(m_PendingRewards[RewardType.RATION]);
-            m_PendingRewards[RewardType.RATION] = 0;
-        }
-        
-        if (m_PendingRewards.ContainsKey(RewardType.EXP) && m_PendingRewards[RewardType.EXP] != 0)
-        {
-            hasEvent = true;
-
-            AddCharacterExp(m_PendingRewards[RewardType.EXP], out var expGainSummaries, out var levelledUpCharacters);
-            
-            m_PendingRewards[RewardType.EXP] = 0;
-            
-            IUIScreen expScreen = UIScreenManager.Instance.ExpScreen;
-
-            if (levelledUpCharacters.Count > 0)
-            {
-                expScreen.OnHideDone += ShowLevelUpScreen;
-            }
-            else
-            {
-                expScreen.OnHideDone += OnCloseLevellingScreen;
-            }
-
-            void ShowLevelUpScreen(IUIScreen expScreen)
-            {
-                expScreen.OnHideDone -= ShowLevelUpScreen;
-                IUIScreen levelUpResultScreen = UIScreenManager.Instance.LevelUpResultScreen;
-                levelUpResultScreen.OnHideDone += OnCloseLevellingScreen;
-                UIScreenManager.Instance.OpenScreen(levelUpResultScreen, false, levelledUpCharacters);
-            }
-
-            UIScreenManager.Instance.OpenScreen(expScreen, false, expGainSummaries);
-        }
-
-        if (m_PendingWeaponRewards.Count > 0)
-        {
-            foreach (var weapon in m_PendingWeaponRewards)
-            {
-                InventoryManager.Instance.ObtainWeapon(weapon);
-            }
-            
-            m_PendingWeaponRewards.Clear();
-        }
-    }
     
     private void AddCharacterExp(int expAmount, out List<ExpGainSummary> expGainSummaries, out List<LevelUpSummary> levelledUpCharacters)
     {

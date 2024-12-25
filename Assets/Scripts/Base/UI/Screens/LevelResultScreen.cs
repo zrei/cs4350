@@ -64,8 +64,6 @@ namespace Game.UI
                 LevelResultType.OUT_OF_TIME => "Out of time...",
                 _ => "???"
             };
-
-            currentLevelId = levelResultUIData.LevelSO.m_LevelId;
             
             bool hasRewards = levelResultUIData.LevelSO.m_RewardCharacters.Count > 0 || levelResultUIData.LevelSO.m_RewardWeapons.Count > 0;
             if (levelResultUIData.LevelResultType == LevelResultType.SUCCESS && hasRewards)
@@ -107,7 +105,6 @@ namespace Game.UI
             m_RewardsReturnButton.onSubmit.RemoveListener(ReturnFromLevel);
             
             UIScreenManager.Instance.CloseScreen();
-            GameSceneManager.Instance.UnloadLevelScene(currentLevelId);
         }
         
         public override void ScreenUpdate()

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Game.UI;
+using Level.Nodes;
 using UnityEngine;
 
 public delegate void IntEvent(int _);
@@ -54,23 +55,13 @@ public static class GlobalEvents
 
     public static class Level
     {
-        public delegate void NodeEvent(NodeInternal _);
-        public delegate void NodeTransitionEvent(NodeInternal _1, NodeInternal _2);
-        public delegate void BattleNodeEvent(BattleNode _);
-        public delegate void BattleNodeResultEvent(BattleNode battleNode, UnitAllegiance victor, int numTurns);
-        public delegate void RewardNodeEvent(RewardNode _);
-        public delegate void DialogueNodeEvent(DialogueNode _);
+        public delegate void NodeEvent(LevelNode _);
         public delegate void LevelResultEvent(LevelSO levelSo, LevelResultType _);
         public static NodeEvent NodeEnteredEvent;
         public static NodeEvent NodeClearedEvent;
         public static NodeEvent NodeExitedEvent;
         public static NodeEvent NodeSelectedEvent;
         public static NodeEvent NodeDeselectedEvent;
-        public static NodeTransitionEvent NodeMovementEvent;
-        public static BattleNodeEvent BattleNodeStartEvent;
-        public static BattleNodeResultEvent BattleNodeEndEvent;
-        public static RewardNodeEvent RewardNodeStartEvent;
-        public static DialogueNodeEvent DialogueNodeEndEvent;
         /// <summary>
         /// This event is called the moment the level ends
         /// </summary>
@@ -81,7 +72,6 @@ public static class GlobalEvents
         public static LevelResultEvent LevelResultsEvent;
         public static NodeEvent NodeHoverStartEvent;
         public static VoidEvent NodeHoverEndEvent;
-        public static VoidEvent StartPlayerPhaseEvent;
         public static VoidEvent EndPlayerPhaseEvent;
 
         public static void ClearEvents()
@@ -91,16 +81,10 @@ public static class GlobalEvents
             NodeExitedEvent = null;
             NodeSelectedEvent = null;
             NodeDeselectedEvent = null;
-            NodeMovementEvent = null;
-            BattleNodeStartEvent = null;
-            BattleNodeEndEvent = null;
-            RewardNodeStartEvent = null;
-            DialogueNodeEndEvent = null;
             LevelEndEvent = null;
             LevelResultsEvent = null;
             NodeHoverStartEvent = null;
             NodeHoverEndEvent = null;
-            StartPlayerPhaseEvent = null;
             EndPlayerPhaseEvent = null;
         }
     }
