@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5510be21b76ff4def82015b84d96eece, type: 3}
+  m_Name: EliteEnemy1BattleSO
+  m_EditorClassIdentifier: 
+  m_Objectives:
+  - {fileID: 11400000, guid: ebf379d0be579ab4f83708746a24cb7c, type: 2}
+  - {fileID: 11400000, guid: 11bd86be2f6a01a46834e575dab5218b, type: 2}
+  m_EnemyUnitsToSpawn:
+  - m_Coordinates:
+      m_Row: 1
+      m_Col: 3
+    m_EnemyCharacterData: {fileID: 11400000, guid: 41dccbca3166ca54b965d82323d713ca,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_EnemyTags: 1
+  - m_Coordinates:
+      m_Row: 1
+      m_Col: 1
+    m_EnemyCharacterData: {fileID: 11400000, guid: 41dccbca3166ca54b965d82323d713ca,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_EnemyTags: 1
+  - m_Coordinates:
+      m_Row: 4
+      m_Col: 3
+    m_EnemyCharacterData: {fileID: 11400000, guid: 8d1aedf95a4028d4da173d20d4d9018d,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_EnemyTags: 1
+  - m_Coordinates:
+      m_Row: 4
+      m_Col: 1
+    m_EnemyCharacterData: {fileID: 11400000, guid: 057921593f09c0f408130a1ef1f24831,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_EnemyTags: 1
+  m_PlayerStartingTiles:
+  - m_Row: 1
+    m_Col: 0
+  - m_Row: 1
+    m_Col: 1
+  - m_Row: 1
+    m_Col: 2
+  - m_Row: 1
+    m_Col: 3
+  - m_Row: 1
+    m_Col: 4
+  - m_Row: 2
+    m_Col: 0
+  - m_Row: 2
+    m_Col: 1
+  - m_Row: 2
+    m_Col: 2
+  - m_Row: 2
+    m_Col: 3
+  - m_Row: 2
+    m_Col: 4
+  - m_Row: 3
+    m_Col: 0
+  - m_Row: 3
+    m_Col: 1
+  - m_Row: 3
+    m_Col: 2
+  - m_Row: 3
+    m_Col: 3
+  - m_Row: 3
+    m_Col: 4
+  m_ExpReward: 125
+  m_BattleBGM: {fileID: 11400000, guid: de5eca94e3fbc45c9aeb31a34a8c05d2, type: 2}
