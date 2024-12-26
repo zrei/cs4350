@@ -4,21 +4,25 @@ using UnityEngine;
 
 namespace Game.UI
 {
-    public struct BattleNodeResultUIData
+    public struct BattleResultUIData
     {
         public BattleSO BattleSO;
         public UnitAllegiance Victor;
+        public bool IsSkipped;
+        public int ExpReward;
         public int NumTurns;
 
-        public BattleNodeResultUIData(BattleSO battleSO, UnitAllegiance victor, int numTurns)
+        public BattleResultUIData(BattleSO battleSO, UnitAllegiance victor, bool isSkipped, int expReward, int numTurns)
         {
             BattleSO = battleSO;
             Victor = victor;
+            IsSkipped = isSkipped;
+            ExpReward = expReward;
             NumTurns = numTurns;
         }
     }
 
-    public class BattleNodeResultScreen : BaseUIScreen
+    public class NodeBattleResultScreen : BaseUIScreen
     {
         [SerializeField] TextMeshProUGUI m_TitleText;
         [SerializeField] TextMeshProUGUI m_TimeTakenText;
@@ -31,26 +35,28 @@ namespace Game.UI
             if (args.Length == 0)
                 return;
 
-            ShowBattleNodeEnd((BattleNodeResultUIData) args[0]);
+            ShowBattleNodeEnd((BattleResultUIData) args[0]);
 
             base.Show();
         }
 
-        private void ShowBattleNodeEnd(BattleNodeResultUIData battleNodeResultUIData)
+        private void ShowBattleNodeEnd(BattleResultUIData battleResultUIData)
         {
-            if (battleNodeResultUIData.Victor == UnitAllegiance.PLAYER)
+            if (battleResultUIData.IsSkipped)
             {
-                var expReward = battleNodeResultUIData.BattleSO.m_ExpReward;
-                
+                m_TitleText.text = "Battle Avoided!";
+                m_ResultText.text = $"Gained {battleResultUIData.ExpReward} EXP!";
+                m_GraphicGroup.color = ColorUtils.VictoryColor;
+            }
+            else if (battleResultUIData.Victor == UnitAllegiance.PLAYER)
+            {
                 m_TitleText.text = "Victory!";
-                //m_TimeTakenText.text = $"Time taken: {numTurns}";
-                m_ResultText.text = $"Gained {expReward} EXP!";
+                m_ResultText.text = $"Gained {battleResultUIData.ExpReward} EXP!";
                 m_GraphicGroup.color = ColorUtils.VictoryColor;
             }
             else
             {
                 m_TitleText.text = "Defeat...";
-                //m_TimeTakenText.text = $"Time taken: {numTurns}";
                 m_ResultText.text = "";
                 m_GraphicGroup.color = ColorUtils.DefeatColor;
             }

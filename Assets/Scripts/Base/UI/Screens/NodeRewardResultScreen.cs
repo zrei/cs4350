@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Game.UI
 {
-    public class RewardNodeResultScreen : BaseUIScreen
+    public class NodeRewardResultScreen : BaseUIScreen
     {
         [SerializeField] TextMeshProUGUI m_ResultText;
         [SerializeField] SelectableBase m_ReturnButton;
@@ -17,26 +17,26 @@ namespace Game.UI
             if (args.Length == 0)
                 return;
 
-            ShowRewardNode((RewardNodeDataSO) args[0]);
+            ShowRewardNode((NodeReward) args[0]);
 
             base.Show();
         }
 
-        private void ShowRewardNode(RewardNodeDataSO rewardNodeData)
+        private void ShowRewardNode(NodeReward nodeReward)
         {
             StringBuilder resultText = new StringBuilder();
             
-            if (rewardNodeData.rationReward > 0)
+            if (nodeReward.rationReward > 0)
             {
-                var rationReward = rewardNodeData.rationReward;
-                resultText.Append($"Gained {rationReward} rations!");
+                var rationReward = nodeReward.rationReward;
+                resultText.AppendLine($"Gained {rationReward} rations!");
                 resultText.AppendLine();
             }
-            if (rewardNodeData.weaponRewards.Count > 0)
+            if (nodeReward.weaponRewards.Length > 0)
             {
-                foreach (var weaponReward in rewardNodeData.weaponRewards)
+                foreach (var weaponReward in nodeReward.weaponRewards)
                 {
-                    resultText.Append($"Gained {weaponReward.m_WeaponName}!");
+                    resultText.AppendLine($"Gained {weaponReward.m_WeaponName}!");
                 }
             }
             
