@@ -188,6 +188,18 @@ public class LevelNodeVisual : BaseNodeVisual
 
         m_NodeTokenAnimator.PlayFailureAnimation(playerToken, onComplete, resetOnComplete);
     }
+    
+    public void PlayBattleSkipAnimation(PlayerToken playerToken, VoidEvent onComplete)
+    {
+        if (m_NodeTokenAnimator is not BattleNodeTokenAnimator battleNodeTokenAnimator)
+        {
+            Debug.LogError($"{name}: No Battle Node Animator to play skip animation");
+            onComplete?.Invoke();
+            return;
+        }
+
+        battleNodeTokenAnimator.PlayBattleSkipAnimation(playerToken, onComplete);
+    }
 
     #endregion
 

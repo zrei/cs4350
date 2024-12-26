@@ -102,6 +102,11 @@ public class LevelTokenManager : MonoBehaviour
         nodeVisual.PlayFailureAnimation(m_PlayerUnitToken, onComplete, resetOnComplete);
     }
 
+    public void PlayBattleSkipAnimation(LevelNodeVisual nodeVisual, VoidEvent onComplete)
+    {
+        nodeVisual.PlayBattleSkipAnimation(m_PlayerUnitToken, onComplete);
+    }
+
     private void OnDestroy()
     {
         if (m_PlayerUnitToken)

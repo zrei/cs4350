@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace Level.Nodes
@@ -72,6 +73,24 @@ namespace Level.Nodes
 
             return defaultPostDialogue;
         }
+        
+        public virtual NodeReward GetNodeReward()
+        {
+            // Default reward is empty
+            return new NodeReward();
+        }
+    }
+    
+    [System.Serializable]
+    public struct NodeReward
+    {
+        public int rationReward;
+        public WeaponInstanceSO[] weaponRewards;
+        
+        public bool IsEmpty()
+        {
+            return rationReward == 0 && weaponRewards.Length == 0;
+        }
     }
     
     [System.Serializable]
@@ -79,6 +98,11 @@ namespace Level.Nodes
     {
         public string flagName;
         public bool flagValue;
+        
+        public bool IsSatisfied()
+        {
+            return FlagManager.Instance.GetFlagValue(flagName) == flagValue;
+        }
     }
 
     [System.Serializable]
@@ -90,20 +114,14 @@ namespace Level.Nodes
     
         public bool IsConditionsSatisfied()
         {
-            foreach (var moralityCondition in m_MoralityConditions)
+            if (m_MoralityConditions.Any(moralityCondition => !moralityCondition.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage)))
             {
-                if (!moralityCondition.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage))
-                {
-                    return false;
-                }
+                return false;
             }
-
-            foreach (var flagCondition in m_FlagConditions)
+            
+            if (m_FlagConditions.Any(flagCondition => !flagCondition.IsSatisfied()))
             {
-                if (FlagManager.Instance.GetFlagValue(flagCondition.flagName) != flagCondition.flagValue)
-                {
-                    return false;
-                }
+                return false;
             }
 
             return true;

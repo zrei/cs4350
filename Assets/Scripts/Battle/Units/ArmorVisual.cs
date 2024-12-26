@@ -302,6 +302,22 @@ public class ArmorVisual : MonoBehaviour
         }
         StartCoroutine(DefeatCoroutine());
     }
+    
+    /// <summary>
+    /// Fade away with no death animation
+    /// </summary>
+    /// <param name="onComplete"></param>
+    public void FadeAway(VoidEvent onComplete)
+    {
+        IEnumerator FadeAwayCoroutine()
+        {
+            yield return new WaitForSeconds(0.5f);
+            FadeMesh(0, 0.5f);
+            yield return new WaitForSeconds(1f);
+            onComplete?.Invoke();
+        }
+        StartCoroutine(FadeAwayCoroutine());
+    }
     #endregion
 
     #region Attack Animations

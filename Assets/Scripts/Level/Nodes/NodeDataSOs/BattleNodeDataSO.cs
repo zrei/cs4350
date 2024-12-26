@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Game.UI;
 using UnityEngine;
 
 namespace Level.Nodes
@@ -17,8 +16,9 @@ namespace Level.Nodes
 
         [Header("Battle Details")]
         public BattleSO battleSO;
-        public int rationReward;
-        public List<WeaponInstanceSO> weaponRewards;
+        public NodeReward BattleReward;
+        public int SkipBattleExpReward;
+        public NodeReward SkipBattleReward;
         
         [Header("Node Display Details")]
         [Tooltip("Enemy unit to display on the node. If left empty, the first enemy unit in the battleSO will be used")]
@@ -40,6 +40,11 @@ namespace Level.Nodes
         public EnemyCharacterSO GetDisplayEnemyUnit()
         {
             return overrideDisplayEnemyUnit ? overrideDisplayEnemyUnit : battleSO.m_EnemyUnitsToSpawn[0].m_EnemyCharacterData;
+        }
+        
+        public override NodeReward GetNodeReward()
+        {
+            return FlagManager.Instance.GetFlagValue(Flag.SKIP_BATTLE_FLAG) ? SkipBattleReward : BattleReward;
         }
 
 #if UNITY_EDITOR
