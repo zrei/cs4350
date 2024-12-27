@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Level.Nodes
 {
@@ -19,9 +20,10 @@ namespace Level.Nodes
         [Header("Node Details")]
         public string nodeName;
         public string nodeDescription;
-        
+
         public bool isMoralityLocked;
-        public Threshold moralityThreshold;
+        [Expandable]
+        [FormerlySerializedAs("moralityThreshold")] public MoralityCondition moralityCondition;
         
         [Header("Dialogues")]
         [Tooltip("Dialogue to play upon first visiting the node - leave empty for no dialogue")]
@@ -48,7 +50,7 @@ namespace Level.Nodes
                 NodeName = nodeName,
                 NodeDescription = nodeDescription,
                 IsMoralityLocked = isMoralityLocked,
-                MoralityThreshold = moralityThreshold
+                MoralityCondition = moralityCondition
             };
         }
 

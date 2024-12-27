@@ -31,7 +31,7 @@ namespace Level.Nodes
                 NodeName = nodeName,
                 NodeDescription = nodeDescription,
                 IsMoralityLocked = isMoralityLocked,
-                MoralityThreshold = moralityThreshold,
+                MoralityCondition = moralityCondition,
                 EnemyUnits = battleSO.m_EnemyUnitsToSpawn,
                 Objectives = battleSO.m_Objectives
             };

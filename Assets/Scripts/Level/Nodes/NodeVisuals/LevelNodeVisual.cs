@@ -54,8 +54,10 @@ public class LevelNodeVisual : BaseNodeVisual
         if (m_LevelNode.IsGoalNode)
             ToggleStarOn();
         
+        m_MoralityThresholdDisplay.Initialise();
+        
         if (m_LevelNode.IsMoralityLocked)
-            SetMoralityThresholdText(m_LevelNode.MoralityThreshold);
+            SetMoralityThresholdText(m_LevelNode.MoralityCondition);
     }
 
     private void SetUpTokenAnimator()
@@ -155,9 +157,9 @@ public class LevelNodeVisual : BaseNodeVisual
         m_selectedCursorToken.transform.position = position + new Vector3(0, 0.3f, 0.3f);
     }
     
-    public void SetMoralityThresholdText(Threshold moralityThreshold)
+    public void SetMoralityThresholdText(MoralityCondition moralityCondition)
     {
-        m_MoralityThresholdDisplay.SetMoralityThresholdText(moralityThreshold);
+        m_MoralityThresholdDisplay.SetMoralityThresholdText(moralityCondition);
         m_MoralityThresholdDisplay.Show();
     }
     
