@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca7fff4b9ba14e83a44de4059ce858b8, type: 3}
-  m_Name: DialogueANodeDataSO
+  m_Script: {fileID: 11500000, guid: 3c8ad9f34c8c41d09ea8199af6037830, type: 3}
+  m_Name: Lvl3EliteEnemy3NodeDataSO
   m_EditorClassIdentifier: 
-  nodeName: Story Node
-  nodeDescription: Progress the Story here
+  nodeName: Battle Node
+  nodeDescription: Enemies! These seem stronger than usual...
   isMoralityLocked: 0
   moralityThreshold:
     m_GreaterThan: 0
@@ -25,6 +25,12 @@ MonoBehaviour:
   preTutorial: {fileID: 0}
   postTutorial: {fileID: 0}
   preSelectionTutorial: {fileID: 0}
-  m_DefaultDialogue: {fileID: 2578122031409413761, guid: e8f8ebe0bf3b14077942e5b7fd5af7a4,
-    type: 3}
-  m_ConditionalDialogues: []
+  battleSO: {fileID: 11400000, guid: 8f7ac9a6b02bd43cf9f186bd00fa4301, type: 2}
+  BattleReward:
+    rationReward: 0
+    weaponRewards: []
+  SkipBattleExpReward: 0
+  SkipBattleReward:
+    rationReward: 0
+    weaponRewards: []
+  overrideDisplayEnemyUnit: {fileID: 0}
