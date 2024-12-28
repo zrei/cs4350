@@ -40,8 +40,8 @@ namespace Game.UI
         
         public IUIScreen CharacterManagementScreen => LoadScreen("CharacterManagementScreen");
         
-        public IUIScreen BattleNodeResultScreen => LoadScreen("BattleNodeResultScreen");
-        public IUIScreen RewardNodeResultScreen => LoadScreen("RewardNodeResultScreen");
+        public IUIScreen NodeBattleResultScreen => LoadScreen("NodeBattleResultScreen");
+        public IUIScreen NodeRewardResultScreen => LoadScreen("NodeRewardResultScreen");
         public IUIScreen LevelUpResultScreen => LoadScreen("LevelUpResultScreen");
         public IUIScreen LevelResultScreen => LoadScreen("LevelResultScreen");
         public IUIScreen PartySelectScreen => LoadScreen("PartySelectScreen");

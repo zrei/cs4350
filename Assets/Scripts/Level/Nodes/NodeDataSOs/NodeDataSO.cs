@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -91,7 +92,7 @@ namespace Level.Nodes
         
         public bool IsEmpty()
         {
-            return rationReward == 0 && weaponRewards.Length == 0;
+            return rationReward == 0 && (weaponRewards == null || weaponRewards.Length == 0);
         }
     }
     

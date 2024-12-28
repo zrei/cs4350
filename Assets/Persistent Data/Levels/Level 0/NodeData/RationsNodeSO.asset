@@ -15,9 +15,7 @@ MonoBehaviour:
   nodeName: Rations
   nodeDescription: 
   isMoralityLocked: 0
-  moralityThreshold:
-    m_GreaterThan: 0
-    m_Threshold: 0
+  moralityCondition: {fileID: 0}
   defaultPreDialogue: {fileID: 2578122031409413761, guid: a46f17deb167d4c05862f7ee38df52a5,
     type: 3}
   conditionalPreDialogues: []
@@ -27,5 +25,6 @@ MonoBehaviour:
   postTutorial: {fileID: 11400000, guid: 5abd299affa4b475f9b1921900b46e99, type: 2}
   preSelectionTutorial: {fileID: 0}
   rewardType: 1
-  rationReward: 30
-  weaponRewards: []
+  nodeReward:
+    rationReward: 30
+    weaponRewards: []
