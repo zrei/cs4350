@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5510be21b76ff4def82015b84d96eece, type: 3}
+  m_Name: Battle2SO
+  m_EditorClassIdentifier: 
+  m_Objectives:
+  - {fileID: 11400000, guid: dfb3d79d601e8454c9df9f0999199c47, type: 2}
+  - {fileID: 11400000, guid: ebf379d0be579ab4f83708746a24cb7c, type: 2}
+  m_EnemyUnitsToSpawn:
+  - m_Coordinates:
+      m_Row: 0
+      m_Col: 0
+    m_EnemyCharacterData: {fileID: 11400000, guid: 41513385b70894155a43f68622f7f101,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_EnemyTags: 2
+  - m_Coordinates:
+      m_Row: 0
+      m_Col: 4
+    m_EnemyCharacterData: {fileID: 11400000, guid: a5b80232ae2104a21bcde3f14bda275d,
+      type: 2}
+    m_StatAugments:
+      m_Health: 0
+      m_Mana: 0
+      m_PhysicalAttack: 0
+      m_MagicAttack: 0
+      m_PhysicalDefence: 0
+      m_MagicDefence: 0
+      m_Speed: 0
+      m_MovementRange: 0
+    m_EnemyTags: 1
+  m_PlayerStartingTiles:
+  - m_Row: 0
+    m_Col: 0
+  - m_Row: 0
+    m_Col: 1
+  - m_Row: 0
+    m_Col: 2
+  - m_Row: 0
+    m_Col: 3
+  - m_Row: 0
+    m_Col: 4
+  m_StartingTileEffects: []
+  m_ExpReward: 0
+  m_BattleBGM: {fileID: 11400000, guid: de5eca94e3fbc45c9aeb31a34a8c05d2, type: 2}
+  m_SetupPhaseTutorial: {fileID: 11400000, guid: 6362ba58abf5b4e92b90d14171beacea,
+    type: 2}
+  m_BattlePhaseTutorial: {fileID: 11400000, guid: c25e86736c0174b77843123f3f8b6be8,
+    type: 2}
+  m_OverrideCharacters: 1
+  m_TutorialCharacters:
+  - m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
+    m_CurrCharaLevel: 1
+    m_OverrideStats: 1
+    m_OverridenStats:
+      m_Health: 10
+      m_Mana: 4
+      m_PhysicalAttack: 5
+      m_MagicAttack: 2
+      m_PhysicalDefence: 5
+      m_MagicDefence: 4
+      m_Speed: 4
+      m_MovementRange: 1
+    m_ClassSO: {fileID: 11400000, guid: 91a9d94d6441944e99a0c1381b67f0ad, type: 2}
+    m_CurrEquippedWeapon: {fileID: 11400000, guid: e4d17d5b01e024d46a7a812087d88082,
+      type: 2}
+    m_CannotDieWithoutLosingBattle: 1
+  m_OverrideBattleMap: 0
+  m_OverriddenBattleMapType: 0

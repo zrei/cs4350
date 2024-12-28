@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f065d900e2ac314bac8ccfd2aa3a75f, type: 3}
+  m_Name: StationarySoldierEnemySO
+  m_EditorClassIdentifier: 
+  m_Gender: 0
+  m_Race: {fileID: 11400000, guid: 5266948bbd4bb493882065acdb9fc9d2, type: 2}
+  m_CharacterName: Soldier
+  m_Description: A soldier.
+  m_CharacterSprite: {fileID: 21300000, guid: cf7adf573bf6a564083c4b40b20a5be4, type: 3}
+  m_SkinColor: {r: 0, g: 0, b: 0, a: 0}
+  m_EyeColor: {r: 0, g: 0, b: 0, a: 0}
+  m_EnemyClass: {fileID: 11400000, guid: cb4edc6b5a6764f589128b0b3cbac730, type: 2}
+  m_Stats:
+    m_Health: 3
+    m_Mana: 2
+    m_PhysicalAttack: 2
+    m_MagicAttack: 1
+    m_PhysicalDefence: 4
+    m_MagicDefence: 4
+    m_Speed: 2
+    m_MovementRange: 1
+  m_EquippedWeapon: {fileID: 11400000, guid: e4d17d5b01e024d46a7a812087d88082, type: 2}

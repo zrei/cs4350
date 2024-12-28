@@ -42,7 +42,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
     private const int MAIN_MENU_INDEX = 0;
     private const int WORLD_MAP_INDEX = 1;
     // Respective level scenes indexes will accessed by adding the level id to the level 1 value
-    private const int LEVEL_1_SCENE_INDEX = 2;
+    private const int LEVEL_1_SCENE_INDEX = 3;
     
     private VoidEvent m_OnSceneChange;
     private VoidEvent m_AfterSceneChange;

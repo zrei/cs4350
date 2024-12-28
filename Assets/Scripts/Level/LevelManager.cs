@@ -834,7 +834,7 @@ public class LevelManager : Singleton<LevelManager>
         {
             IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
             tutorialScreen.OnHideDone += PostTutorial;
-            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, tutorial);
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, tutorial.m_TutorialPages);
         }
 
         void PostTutorial(IUIScreen screen)
