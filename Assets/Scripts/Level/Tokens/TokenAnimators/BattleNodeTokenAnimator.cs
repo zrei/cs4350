@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace Level.Tokens
@@ -13,6 +14,7 @@ namespace Level.Tokens
     
         public float entryAnimTime = 0.3f;
         public float clearAnimTime = 0.3f;
+        public float skipAnimTime = 0.1f;
         
         private LevelNodeVisual m_LevelNodeVisual;
         private EnemyToken m_EnemyCharacterToken;
@@ -58,6 +60,25 @@ namespace Level.Tokens
         public override void PlayFailureAnimation(PlayerToken playerToken, VoidEvent onComplete, bool resetOnComplete)
         {
             playerToken.Defeat(onComplete, resetOnComplete);
+        }
+        
+        public void PlayBattleSkipAnimation(PlayerToken playerToken, VoidEvent onComplete)
+        {
+            var enemyTokenPos = m_EnemyCharacterToken.transform.position;
+            var enemyTargetPos = enemyTokenPos + (enemyTokenPos - m_PlayerTokenTransform.position).normalized * 0.01f;
+            m_EnemyCharacterToken.MoveToPosition(enemyTargetPos, OnEnemyMovementComplete, skipAnimTime);
+            return;
+            
+            void OnEnemyMovementComplete()
+            {
+                m_EnemyCharacterToken.FadeAway(OnEnemyFadeAwayComplete);
+            }
+        
+            void OnEnemyFadeAwayComplete()
+            {
+                m_EnemyCharacterToken.gameObject.SetActive(false);
+                playerToken.MoveToPosition(m_LevelNodeVisual.GetPlayerTargetPosition(), onComplete, clearAnimTime);
+            }
         }
     }
 }

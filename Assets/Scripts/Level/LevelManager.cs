@@ -58,6 +58,8 @@ public class LevelManager : Singleton<LevelManager>
 
     private LevelNode m_DestNode;
     
+    private BattleSO m_CurrBattleSO;
+    private bool m_IsBattleSkipped;
     private UnitAllegiance m_PendingVictor;
     private int m_PendingNumTurns;
     
@@ -80,6 +82,8 @@ public class LevelManager : Singleton<LevelManager>
     protected override void HandleDestroy()
     {
         base.HandleDestroy();
+        
+        FlagManager.Instance.SetFlagValue(Flag.SKIP_BATTLE_FLAG, false, FlagType.SESSION);
 
         GlobalEvents.Scene.OnBeginSceneChange -= OnSceneChange;
         
@@ -149,8 +153,9 @@ public class LevelManager : Singleton<LevelManager>
         PRE_TUTORIAL,
         DIALOGUE_NODE,
         BATTLE_NODE,
+        POST_BATTLE,
         REWARD_NODE,
-        CALCULATE_REWARDS,
+        ASSIGN_REWARDS,
         LEVELLING,
         POST_TUTORIAL,
         POST_DIALOGUE,
@@ -192,11 +197,14 @@ public class LevelManager : Singleton<LevelManager>
             case LevelState.BATTLE_NODE:
                 OnStateBattleNode();
                 break;
+            case LevelState.POST_BATTLE:
+                OnStatePostBattle();
+                break;
             case LevelState.REWARD_NODE:
                 OnStateRewardNode();
                 break;
-            case LevelState.CALCULATE_REWARDS:
-                OnStateCalculateRewards();
+            case LevelState.ASSIGN_REWARDS:
+                OnStateAssignRewards();
                 break;
             case LevelState.LEVELLING:
                 OnStateLevelling();
@@ -309,7 +317,7 @@ public class LevelManager : Singleton<LevelManager>
 
     /// <summary>
     /// This state handles the Battle type of node event.
-    /// Transitions to CALCULATE_REWARDS state after the battle reward screen is closed.
+    /// Transitions to POST_BATTLE state after the battle is over and return to level.
     /// </summary>
     private void OnStateBattleNode()
     {
@@ -320,16 +328,123 @@ public class LevelManager : Singleton<LevelManager>
             return;
         }
         
+        m_CurrBattleSO = battleNodeData.battleSO;
+        
+        if (FlagManager.Instance.GetFlagValue(Flag.SKIP_BATTLE_FLAG))
+        {
+            Debug.Log($"{m_CurrNode.name}: Skipping Battle");
+            m_IsBattleSkipped = true;
+            CurrentLevelState = LevelState.POST_BATTLE;
+            return;
+        }
+        
         SoundManager.Instance.FadeOutAndStop(m_LevelBGM.Value);
         m_LevelBGM = null;
         
         GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
         
-        var battleSO = battleNodeData.battleSO;
-        GameSceneManager.Instance.LoadBattleScene(battleSO, 
-            battleSO.m_OverrideCharacters ? battleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
-            battleSO.m_OverrideBattleMap ? battleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, 
+        GameSceneManager.Instance.LoadBattleScene(m_CurrBattleSO, 
+            m_CurrBattleSO.m_OverrideCharacters ? m_CurrBattleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            m_CurrBattleSO.m_OverrideBattleMap ? m_CurrBattleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, 
             m_LevelRationsManager.GetInflictedTokens());
+    }
+
+    /// <summary>
+    /// This state handles the Post-Battle cleanup.
+    /// Transitions to LEVELLING state after the battle result screen is closed.
+    /// </summary>
+    private void OnStatePostBattle()
+    {
+        if (!m_CurrBattleSO)
+        {
+            Debug.LogError($"{m_CurrNode.name}: No battle in progress to end");
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+            return;
+        }
+
+        Debug.Log("LevelManager: Ending Battle");
+
+        LevelNodeVisual levelNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(m_CurrNode);
+
+        if (m_IsBattleSkipped)
+        {
+            if (m_CurrNode.NodeData is not BattleNodeDataSO battleNodeDataSo)
+            {
+                Debug.LogError($"{m_CurrNode.name}: Node Data is not of Battle type");
+                CurrentLevelState = LevelState.POST_TUTORIAL;
+                return;
+            }
+            
+            m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
+                                               + battleNodeDataSo.SkipBattleExpReward;
+            m_LevelTokenManager.PlayBattleSkipAnimation(levelNodeVisual, OnSkipBattleAnimComplete);
+            
+            void OnSkipBattleAnimComplete()
+            {
+                m_LevelNodeManager.ClearCurrentNode();
+            
+                var battleNodeUIResults = new BattleResultUIData(m_CurrBattleSO, m_PendingVictor, true, battleNodeDataSo.SkipBattleExpReward, m_PendingNumTurns);
+            
+                IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
+                battleNodeResultScreen.OnHideDone += OnCloseBattleResultScreen;
+                UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, battleNodeUIResults);
+            
+                CleanupBattle();
+            }
+        }
+        else if (m_PendingVictor == UnitAllegiance.PLAYER)
+        {
+            m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
+                                               + m_CurrBattleSO.m_ExpReward;
+            m_LevelTokenManager.PlayClearAnimation(levelNodeVisual, OnSuccessAnimComplete);
+            
+            void OnSuccessAnimComplete()
+            {
+                m_LevelNodeManager.ClearCurrentNode();
+            
+                var battleNodeUIResults = new BattleResultUIData(m_CurrBattleSO, m_PendingVictor, false, m_CurrBattleSO.m_ExpReward, m_PendingNumTurns);
+            
+                IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
+                battleNodeResultScreen.OnHideDone += OnCloseBattleResultScreen;
+                UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, battleNodeUIResults);
+            
+                CleanupBattle();
+            }
+        }
+        else
+        {
+            m_LevelTokenManager.PlayFailureAnimation(levelNodeVisual, OnFailureAnimComplete, !m_LevelSO.m_FailOnDefeat);
+            
+            void OnFailureAnimComplete()
+            {
+                if (m_LevelSO.m_FailOnDefeat)
+                {
+                    m_PendingLevelResult = LevelResultType.DEFEAT;
+                    CurrentLevelState = LevelState.LEVEL_END;
+                }
+                else
+                {
+                    CurrentLevelState = LevelState.NODE_SELECTION;
+                }
+                CleanupBattle();
+            }
+        }
+        
+        return;
+        
+        void OnCloseBattleResultScreen(IUIScreen screen)
+        {
+            screen.OnHideDone -= OnCloseBattleResultScreen;
+            CurrentLevelState = LevelState.LEVELLING;
+        }
+        
+        void CleanupBattle()
+        {
+            m_CurrBattleSO = null;
+            m_IsBattleSkipped = false;
+            m_PendingVictor = UnitAllegiance.NONE;
+            m_PendingNumTurns = 0;
+        }
     }
 
     /// <summary>
@@ -346,44 +461,35 @@ public class LevelManager : Singleton<LevelManager>
         }
         
         m_LevelNodeManager.ClearCurrentNode();
-
-        // Add reward to pending rewards
-        m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) + rewardNodeData.rationReward;
-        m_PendingWeaponRewards.AddRange(rewardNodeData.weaponRewards);
         
-        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
-        rewardNodeResultScreen.OnHideDone += OnCloseRewardScreen;
-        UIScreenManager.Instance.OpenScreen(rewardNodeResultScreen, false, rewardNodeData);
+        CurrentLevelState = LevelState.ASSIGN_REWARDS;
     }
 
     /// <summary>
     /// This state processes the pending rewards (Ration, Weapons) and apply them to the player.
     /// Transitions to LEVELLING state if there are EXP rewards to process, else transitions to POST_TUTORIAL state. 
     /// </summary>
-    private void OnStateCalculateRewards()
+    private void OnStateAssignRewards()
     {
-        // Process ration rewards
-        if (m_PendingRewards.ContainsKey(RewardType.RATION) && m_PendingRewards[RewardType.RATION] != 0)
+        var nodeReward = m_CurrNode.NodeData.GetNodeReward();
+        
+        if (nodeReward.IsEmpty())
         {
-            GlobalEvents.Rations.RationsChangeEvent?.Invoke(m_PendingRewards[RewardType.RATION]);
-            m_PendingRewards[RewardType.RATION] = 0;
+            Debug.Log($"{m_CurrNode.name}: No rewards");
+            CurrentLevelState = LevelState.POST_TUTORIAL;
+            return;
         }
         
-        // Process weapon rewards
-        if (m_PendingWeaponRewards.Count > 0)
+        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        rewardNodeResultScreen.OnHideDone += OnCloseRewardScreen;
+        UIScreenManager.Instance.OpenScreen(rewardNodeResultScreen, false, nodeReward);
+        
+        void OnCloseRewardScreen(IUIScreen screen)
         {
-            foreach (var weapon in m_PendingWeaponRewards)
-            {
-                InventoryManager.Instance.ObtainWeapon(weapon);
-            }
-            
-            m_PendingWeaponRewards.Clear();
+            screen.OnHideDone -= OnCloseRewardScreen;
+            ProcessNodeRewards(nodeReward);
+            CurrentLevelState = LevelState.POST_TUTORIAL;
         }
-        
-        // If has EXP rewards, transition to levelling state to process exp gains
-        var hasExpRewards = m_PendingRewards.ContainsKey(RewardType.EXP) && m_PendingRewards[RewardType.EXP] != 0;
-        
-        CurrentLevelState = hasExpRewards ? LevelState.LEVELLING : LevelState.POST_TUTORIAL;
     }
 
     /// <summary>
@@ -411,7 +517,7 @@ public class LevelManager : Singleton<LevelManager>
         void OnCloseLevellingScreen(IUIScreen screen)
         {
             screen.OnHideDone -= OnCloseLevellingScreen;
-            CurrentLevelState = LevelState.POST_TUTORIAL;
+            CurrentLevelState = LevelState.ASSIGN_REWARDS;
         }
     }
     
@@ -443,6 +549,8 @@ public class LevelManager : Singleton<LevelManager>
     /// </summary>
     private void OnStatePreSelectionTutorial()
     {
+        FlagManager.Instance.SetFlagValue(Flag.SKIP_BATTLE_FLAG, false, FlagType.SESSION);
+        
         PlayTutorial(m_CurrNode.NodeData.preSelectionTutorial, () =>
         {
             if (m_LevelNodeManager.IsGoalNodeCleared())
@@ -720,9 +828,9 @@ public class LevelManager : Singleton<LevelManager>
     {
         GlobalEvents.Battle.BattleEndEvent -= OnBattleEnd;
         
-        if (m_CurrNode.NodeData is not BattleNodeDataSO battleNodeData)
+        if (!m_CurrBattleSO)
         {
-            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Battle type");
+            Debug.LogError($"{m_CurrNode.name}: No battle in progress to end");
             return;
         }
 
@@ -732,7 +840,7 @@ public class LevelManager : Singleton<LevelManager>
             
         // Add exp reward to pending rewards
         m_PendingRewards[RewardType.EXP] = m_PendingRewards.GetValueOrDefault(RewardType.EXP, 0) 
-                                           + battleNodeData.battleSO.m_ExpReward;
+                                           + m_CurrBattleSO.m_ExpReward;
             
         // Add time cost to pending rewards
         m_PendingRewards[RewardType.RATION] = m_PendingRewards.GetValueOrDefault(RewardType.RATION, 0) 
@@ -753,57 +861,15 @@ public class LevelManager : Singleton<LevelManager>
             return;
         }
         
-        if (m_CurrNode.NodeData is not BattleNodeDataSO battleNodeData)
+        if (!m_CurrBattleSO)
         {
-            Debug.LogError($"{m_CurrNode.name}: Node Data is not of Battle type");
+            Debug.LogError($"{m_CurrNode.name}: No battle in progress to end");
             return;
         }
-
+        
         m_LevelBGM = SoundManager.Instance.PlayWithFadeIn(m_LevelSO.m_LevelBGM);
-
-        Debug.Log("LevelManager: Ending Battle Node");
-
-        LevelNodeVisual battleNodeVisual = m_LevelNodeVisualManager.GetNodeVisual(m_CurrNode);
         
-        if (m_PendingVictor == UnitAllegiance.PLAYER)
-        {
-            m_LevelTokenManager.PlayClearAnimation(battleNodeVisual, OnSuccessAnimComplete);
-        }
-        else
-        {
-            m_LevelTokenManager.PlayFailureAnimation(battleNodeVisual, OnFailureAnimComplete, !m_LevelSO.m_FailOnDefeat);
-        }
-        
-        return;
-
-        void OnSuccessAnimComplete()
-        {
-            m_LevelNodeManager.ClearCurrentNode();
-            var battleNodeUIResults = new BattleNodeResultUIData(battleNodeData.battleSO, m_PendingVictor, m_PendingNumTurns);
-            
-            IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
-            battleNodeResultScreen.OnHideDone += OnCloseRewardScreen;
-            UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, battleNodeUIResults);
-        }
-
-        void OnFailureAnimComplete()
-        {
-            if (m_LevelSO.m_FailOnDefeat)
-            {
-                m_PendingLevelResult = LevelResultType.DEFEAT;
-                CurrentLevelState = LevelState.LEVEL_END;
-            }
-            else
-            {
-                CurrentLevelState = LevelState.NODE_SELECTION;
-            }
-        }
-    }
-    
-    private void OnCloseRewardScreen(IUIScreen screen)
-    {
-        screen.OnHideDone -= OnCloseRewardScreen;
-        CurrentLevelState = LevelState.CALCULATE_REWARDS;
+        CurrentLevelState = LevelState.POST_BATTLE;
     }
 
     private void OnSceneChange(SceneEnum _, SceneEnum _2)
@@ -870,6 +936,24 @@ public class LevelManager : Singleton<LevelManager>
     #endregion
 
     #region Reward Handling
+    
+    private void ProcessNodeRewards(NodeReward nodeReward)
+    {
+        // Process ration rewards
+        if (nodeReward.rationReward != 0)
+        {
+            GlobalEvents.Rations.RationsChangeEvent?.Invoke(nodeReward.rationReward);
+        }
+        
+        // Process weapon rewards
+        if (nodeReward.weaponRewards.Length > 0)
+        {
+            foreach (var weapon in nodeReward.weaponRewards)
+            {
+                InventoryManager.Instance.ObtainWeapon(weapon);
+            }
+        }
+    }
     
     private void AddCharacterExp(int expAmount, out List<ExpGainSummary> expGainSummaries, out List<LevelUpSummary> levelledUpCharacters)
     {

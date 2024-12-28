@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 [CreateAssetMenu(fileName = "MoralityCondition", menuName = "ScriptableObject/Conditions/MoralityCondition")]
 public class MoralityCondition : Condition
 {
