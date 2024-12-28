@@ -123,7 +123,7 @@ public class LevelNodeManager : MonoBehaviour
     /// <returns></returns>
     public bool CanMoveToNode(LevelNode destNode)
     {
-        if (destNode.IsMoralityLocked && !destNode.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMorality))
+        if (destNode.IsMoralityLocked && !destNode.MoralityCondition.Evaluate())
         {
             return false;
         }

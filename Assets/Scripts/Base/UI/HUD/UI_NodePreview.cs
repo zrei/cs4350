@@ -111,12 +111,19 @@ public class UI_NodePreview : MonoBehaviour
 
     private void SetUpUnlockConditionsDisplay(NodePreviewData previewData)
     {
-        int thresholdValue = MoralityManager.Instance.GetMoralityValue(previewData.MoralityThreshold.m_Threshold);
-        bool isSatisfied = previewData.MoralityThreshold.IsSatisfied(MoralityManager.Instance.CurrMoralityPercentage);
+        int thresholdValue = previewData.MoralityCondition.threshold;
+        bool isSatisfied = previewData.MoralityCondition.Evaluate();
 
         m_UnlockConditionSection.SetActive(true);
         m_UnlockConditionText.text = $"Morality<sprite name=\"Morality\" tint>: ";
-        m_UnlockConditionText.text += previewData.MoralityThreshold.m_GreaterThan ? $">{thresholdValue}" : $"<{thresholdValue}";
+        m_UnlockConditionText.text += previewData.MoralityCondition.mode switch
+        {
+            MoralityCondition.Mode.GreaterThan => $">{thresholdValue}",
+            MoralityCondition.Mode.GreaterThanOrEqual => $"≥{thresholdValue}",
+            MoralityCondition.Mode.LessThan => $"<{thresholdValue}",
+            MoralityCondition.Mode.LessThanOrEqual => $"≤{thresholdValue}",
+            _ => "null"
+        };
         m_UnlockConditionText.text += isSatisfied ? " (Satisfied)" : " (Not Satisfied)";
         m_UnlockConditionText.color = isSatisfied ? Color.green : Color.red;
     }

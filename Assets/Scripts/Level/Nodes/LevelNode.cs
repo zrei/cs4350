@@ -16,7 +16,7 @@ namespace Level.Nodes
         public string NodeName;
         public string NodeDescription;
         public bool IsMoralityLocked;
-        public Threshold MoralityThreshold;
+        public MoralityCondition MoralityCondition;
     }
     
     public class LevelNode : MonoBehaviour
@@ -106,7 +106,7 @@ namespace Level.Nodes
         #region Morality
 
         public bool IsMoralityLocked => m_NodeData.isMoralityLocked;
-        public Threshold MoralityThreshold => m_NodeData.moralityThreshold;
+        public MoralityCondition MoralityCondition => m_NodeData.moralityCondition;
 
         #endregion
         

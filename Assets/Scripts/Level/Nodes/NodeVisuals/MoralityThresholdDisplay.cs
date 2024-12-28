@@ -13,25 +13,37 @@ namespace Level.Nodes.NodeVisuals
         [SerializeField]
         private TextMeshPro m_MoralityThresholdText;
 
-        private void Awake()
+        public void Initialise()
         {
             m_Renderer = GetComponent<Renderer>();
             m_Renderer.enabled = false;
         }
 
-        public void SetMoralityThresholdText(Threshold threshold)
+        public void SetMoralityThresholdText(MoralityCondition condition)
         {
-            int thresholdValue = MoralityManager.Instance.GetMoralityValue(threshold.m_Threshold);
-            
-            if (threshold.m_GreaterThan)
+            int thresholdValue = condition.threshold;
+
+            switch (condition.mode)
             {
-                m_MoralityThresholdText.text = $">{thresholdValue}<sprite name=\"Morality\" tint>";
-                m_MoralityThresholdText.color = GOOD_COLOR;
-            }
-            else
-            {
-                m_MoralityThresholdText.text = $"<{thresholdValue}<sprite name=\"Morality\" tint>";
-                m_MoralityThresholdText.color = BAD_COLOR;
+                case MoralityCondition.Mode.GreaterThan:
+                    m_MoralityThresholdText.text = $">{thresholdValue}<sprite name=\"Morality\" tint>";
+                    m_MoralityThresholdText.color = GOOD_COLOR;
+                    break;
+                case MoralityCondition.Mode.GreaterThanOrEqual:
+                    m_MoralityThresholdText.text = $"≥{thresholdValue}<sprite name=\"Morality\" tint>";
+                    m_MoralityThresholdText.color = GOOD_COLOR;
+                    break;
+                case MoralityCondition.Mode.LessThan:
+                    m_MoralityThresholdText.text = $"<{thresholdValue}<sprite name=\"Morality\" tint>";
+                    m_MoralityThresholdText.color = BAD_COLOR;
+                    break;
+                case MoralityCondition.Mode.LessThanOrEqual:
+                    m_MoralityThresholdText.text = $"≤{thresholdValue}<sprite name=\"Morality\" tint>";
+                    m_MoralityThresholdText.color = BAD_COLOR;
+                    break;
+                default:
+                    Debug.LogError("Invalid morality condition mode");
+                    break;
             }
         }
 
