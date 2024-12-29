@@ -53,6 +53,7 @@ namespace Game.UI
         public IUIScreen CreditsScreen => LoadScreen("CreditsScreen");
         public IUIScreen OptionScreen => LoadScreen("OptionsScreen");
         public IUIScreen TutorialScreen => LoadScreen("TutorialScreen");
+        public IUIScreen TutorialCompilationScreen => LoadScreen("TutorialCompilationScreen");
 
         [SerializeField]
         private List<GameObject> screenPrefabs = new();
