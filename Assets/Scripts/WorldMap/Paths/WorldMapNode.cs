@@ -10,6 +10,7 @@ public enum LevelState
 
 public class WorldMapNode : MonoBehaviour
 {
+    [SerializeField] bool m_IsTutorialLevel = false;
     [SerializeField] LevelSO m_LevelInfo;
     [SerializeField] CutsceneSpawner m_PreCutscene;
     [SerializeField] CutsceneSpawner m_PostCutscene;
@@ -37,7 +38,7 @@ public class WorldMapNode : MonoBehaviour
     {
         if (initialState != LevelState.LOCKED)
             m_WorldMapVisual.Initialise();
-        if (initialState == LevelState.CLEARED && !isCurrentLevel)
+        if (m_IsTutorialLevel || (initialState == LevelState.CLEARED && !isCurrentLevel))
             m_WorldMapEdge.InstantiatePath(m_WorldMapVisual.NodeRadiusOffset);
         
         ToggleCurrLevel(isCurrentLevel);

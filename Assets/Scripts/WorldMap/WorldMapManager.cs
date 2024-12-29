@@ -16,6 +16,9 @@ public class WorldMapManager : Singleton<WorldMapManager>
     [Header("Level")]
     [SerializeField] private int m_StartingLevel = 1;
 
+    [Header("Tutorial Level")]
+    [SerializeField] private WorldMapNode m_TutorialLevel;
+
     [Header("Camera")]
     [SerializeField] private PlaneCameraController m_CameraController;
 
@@ -42,6 +45,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     private int m_CurrSelectedLevel;
 
     private const float TOKEN_MOVE_DELAY = 0.3f;
+
+    private const int TUTORIAL_LEVEL_NUMBER = 0;
 
     #region Initialisation
     protected override void HandleAwake()
@@ -72,19 +77,28 @@ public class WorldMapManager : Singleton<WorldMapManager>
         AddDependency<FlagManager>();
     }
 
+    private void ActivateTutorialLevel(bool isCurrLevel)
+    {
+        m_TutorialLevel.Initialise(LevelState.UNLOCKED, isCurrLevel);
+    }
+
     private IEnumerator Initialise()
     {
         yield return null;
+
+        bool isFirstPlay = false;
         if (!SaveManager.Instance.TryLoadCurrentLevel(out m_CurrUnlockedLevel))
         {
+            isFirstPlay = true;
             m_CurrUnlockedLevel = m_StartingLevel;
+            SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
         }
 
-        m_CurrSelectedLevel = GetFinalUnlockedLevel();
+        m_CurrSelectedLevel = isFirstPlay ? TUTORIAL_LEVEL_NUMBER : GetFinalUnlockedLevel();
 
         // check which level to initialise up to - if the post cutscene of the previous level
         // has not been registered as seen, we only want to initialise up to the previous level
-        int levelToInitialiseUpTo = m_CurrSelectedLevel;
+        int levelToInitialiseUpTo = GetFinalUnlockedLevel(); //m_CurrSelectedLevel;
         bool playPostCutsceneOfPrevLevel = false;
         
         // check for existing post-cutscene of the previous level that was not seen
@@ -116,6 +130,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
                 m_WorldMapRegions[i].m_FogFade.gameObject.SetActive(true);
         }
 
+        ActivateTutorialLevel(isFirstPlay);
+
         // instantiate the player token
         m_PlayerTokenInstance = Instantiate(m_PlayerToken, Vector3.zero, Quaternion.identity);
         if (CharacterDataManager.Instance.TryRetrieveLordCharacterData(out PlayerCharacterData lordData))
@@ -123,7 +139,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
             m_PlayerTokenInstance.Initialise(lordData.m_BaseData, lordData.CurrClass, lordData.GetWeaponInstanceSO());
         
         // place the player on the current node
-        WorldMapNode currNode = GetWorldMapNode(levelToInitialiseUpTo);
+        WorldMapNode currNode = isFirstPlay ? m_TutorialLevel : GetWorldMapNode(levelToInitialiseUpTo);
         currNode.PlacePlayerToken(m_PlayerTokenInstance);
 
         // initialise the camera
@@ -244,7 +260,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
         m_CameraController.RecenterCamera();
 
-        if (FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
+        if (m_CurrSelectedLevel != TUTORIAL_LEVEL_NUMBER && FlagManager.Instance.GetFlagValue(Flag.WIN_LEVEL_FLAG))
         {
             m_CurrUnlockedLevel += 1;
             SaveManager.Instance.SetCurrentLevel(m_CurrUnlockedLevel);
@@ -359,7 +375,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
         WorldMapNode node = GetWorldMapNode(levelNum);
         node.ToggleCurrLevel(true);
         EnableAllControls();
-        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(node.LevelSO, levelNum < m_CurrUnlockedLevel));
+        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(node.LevelSO, levelNum != TUTORIAL_LEVEL_NUMBER && levelNum < m_CurrUnlockedLevel));
     }
     #endregion
 
@@ -405,7 +421,7 @@ public class WorldMapManager : Singleton<WorldMapManager>
 
     private void NavigateToPrev()
     {
-        if (m_CurrSelectedLevel <= 1)
+        if (m_CurrSelectedLevel < 1)
             return;
 
         StartCoroutine(MoveToLevel(m_CurrSelectedLevel, GetWorldMapNode(m_CurrSelectedLevel - 1)));
@@ -437,11 +453,18 @@ public class WorldMapManager : Singleton<WorldMapManager>
         
         // update the current node
         m_CurrSelectedLevel = newWorldMapNode.LevelNum;
-        newWorldMapNode.ToggleCurrLevel(true);
-        GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(newWorldMapNode.LevelSO, newWorldMapNode.LevelNum < m_CurrUnlockedLevel));
-        
-        // re-enable controls
-        EnableAllControls();
+
+        if (m_CurrSelectedLevel != TUTORIAL_LEVEL_NUMBER && !FlagManager.Instance.GetFlagValue(newWorldMapNode.LevelSO.PreDialogueFlag))
+        {
+            PreLevelCutscene(m_CurrSelectedLevel);
+        }
+        else
+        {
+            newWorldMapNode.ToggleCurrLevel(true);
+            GlobalEvents.WorldMap.OnGoToLevel?.Invoke(new LevelData(newWorldMapNode.LevelSO, newWorldMapNode.LevelNum != TUTORIAL_LEVEL_NUMBER && newWorldMapNode.LevelNum < m_CurrUnlockedLevel));
+            // re-enable controls
+            EnableAllControls();
+        }
     }
     #endregion
 
@@ -496,6 +519,8 @@ public class WorldMapManager : Singleton<WorldMapManager>
     /// <returns></returns>
     private WorldMapNode GetWorldMapNode(int levelNumber)
     {
+        if (levelNumber == TUTORIAL_LEVEL_NUMBER)
+            return m_TutorialLevel;
         return m_WorldMapRegions[levelNumber - 1].m_LevelNode;
     }
 

@@ -110,13 +110,13 @@ public class LevelManager : Singleton<LevelManager>
         var levelNodes = FindObjectsOfType<LevelNode>().ToList();
         var levelEdges = FindObjectsOfType<EdgeInternal>().ToList();
         
-        // Initialise the visuals of the level
-        m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
-        
         // Initialise the internal graph representation of the level
         m_LevelNodeManager.Initialise(levelNodes, levelEdges);
         m_LevelNodeManager.SetStartNode(m_StartNode);
         m_LevelNodeManager.SetGoalNode(m_GoalNode);
+        
+        // Initialise the visuals of the level
+        m_LevelNodeVisualManager.Initialise(levelNodes, levelEdges);
         
         // Initialise the timer
         m_LevelRationsManager.Initialise(m_LevelSO.m_StartingRations);
@@ -385,7 +385,7 @@ public class LevelManager : Singleton<LevelManager>
             
                 var battleNodeUIResults = new BattleResultUIData(m_CurrBattleSO, m_PendingVictor, true, battleNodeDataSo.SkipBattleExpReward, m_PendingNumTurns);
             
-                IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
+                IUIScreen battleNodeResultScreen = UIScreenManager.Instance.NodeBattleResultScreen;
                 battleNodeResultScreen.OnHideDone += OnCloseBattleResultScreen;
                 UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, battleNodeUIResults);
             
@@ -404,9 +404,9 @@ public class LevelManager : Singleton<LevelManager>
             
                 var battleNodeUIResults = new BattleResultUIData(m_CurrBattleSO, m_PendingVictor, false, m_CurrBattleSO.m_ExpReward, m_PendingNumTurns);
             
-                IUIScreen battleNodeResultScreen = UIScreenManager.Instance.BattleNodeResultScreen;
-                battleNodeResultScreen.OnHideDone += OnCloseBattleResultScreen;
-                UIScreenManager.Instance.OpenScreen(battleNodeResultScreen, false, battleNodeUIResults);
+                IUIScreen nodeBattleResultScreen = UIScreenManager.Instance.NodeBattleResultScreen;
+                nodeBattleResultScreen.OnHideDone += OnCloseBattleResultScreen;
+                UIScreenManager.Instance.OpenScreen(nodeBattleResultScreen, false, battleNodeUIResults);
             
                 CleanupBattle();
             }
@@ -480,7 +480,7 @@ public class LevelManager : Singleton<LevelManager>
             return;
         }
         
-        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.RewardNodeResultScreen;
+        IUIScreen rewardNodeResultScreen = UIScreenManager.Instance.NodeRewardResultScreen;
         rewardNodeResultScreen.OnHideDone += OnCloseRewardScreen;
         UIScreenManager.Instance.OpenScreen(rewardNodeResultScreen, false, nodeReward);
         
@@ -900,7 +900,7 @@ public class LevelManager : Singleton<LevelManager>
         {
             IUIScreen tutorialScreen = UIScreenManager.Instance.TutorialScreen;
             tutorialScreen.OnHideDone += PostTutorial;
-            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, tutorial);
+            UIScreenManager.Instance.OpenScreen(tutorialScreen, false, tutorial.m_TutorialPages);
         }
 
         void PostTutorial(IUIScreen screen)
@@ -946,7 +946,7 @@ public class LevelManager : Singleton<LevelManager>
         }
         
         // Process weapon rewards
-        if (nodeReward.weaponRewards.Length > 0)
+        if (nodeReward.weaponRewards is { Length: > 0 })
         {
             foreach (var weapon in nodeReward.weaponRewards)
             {

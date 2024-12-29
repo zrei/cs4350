@@ -32,7 +32,7 @@ namespace Game.UI
                 resultText.AppendLine($"Gained {rationReward} rations!");
                 resultText.AppendLine();
             }
-            if (nodeReward.weaponRewards.Length > 0)
+            if (nodeReward.weaponRewards is { Length: > 0 })
             {
                 foreach (var weaponReward in nodeReward.weaponRewards)
                 {

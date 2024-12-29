@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 178583811ae444978de56580c5b2b3c6, type: 3}
+  m_Name: EndNodeSO
+  m_EditorClassIdentifier: 
+  nodeName: Goal
+  nodeDescription: 
+  isMoralityLocked: 0
+  moralityThreshold:
+    m_GreaterThan: 0
+    m_Threshold: 0
+  defaultPreDialogue: {fileID: 2578122031409413761, guid: 285764c1e21ad4c04ab9b2129c8f9b4d,
+    type: 3}
+  conditionalPreDialogues: []
+  defaultPostDialogue: {fileID: 0}
+  conditionalPostDialogues: []
+  preTutorial: {fileID: 0}
+  postTutorial: {fileID: 11400000, guid: 9b4b687e0e7fe495f865090a7044e79c, type: 2}
+  preSelectionTutorial: {fileID: 0}

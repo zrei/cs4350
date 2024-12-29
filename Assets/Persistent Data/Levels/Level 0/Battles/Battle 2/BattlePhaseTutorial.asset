@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ada158f16e16423090bc7303f4214ae, type: 3}
+  m_Name: BattlePhaseTutorial
+  m_EditorClassIdentifier: 
+  m_TutorialPages:
+  - TutorialSprite: {fileID: 21300000, guid: dc09fd2c9dc0c4993a27403042c0e028, type: 3}
+    TutorialText: Some skills have different effects, such as healing, restoring
+      mana, casting status effects and tokens, and many more.
+  - TutorialSprite: {fileID: 21300000, guid: 1b9eb25ff73d545f9b8469834d39b3ec, type: 3}
+    TutorialText: Status effects deal damage over turns.
+  - TutorialSprite: {fileID: 21300000, guid: 6b27ef5a17ace4033a64daab143b487e, type: 3}
+    TutorialText: Tokens are effects that are consumed upon certain actions. Tokens
+      come in tiers - higher tiers are consumed first.

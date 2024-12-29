@@ -196,6 +196,9 @@ public class TutorialCharacterData
     public PlayerCharacterSO m_BaseData;
 
     public int m_CurrCharaLevel = 1;
+    [Tooltip("Whether to override stats instead of using the levelled up stats based on level")]
+    public bool m_OverrideStats = false;
+    public Stats m_OverridenStats;
     public PlayerClassSO m_ClassSO;
 
     public WeaponInstanceSO m_CurrEquippedWeapon;
@@ -205,6 +208,6 @@ public class TutorialCharacterData
 
     public PlayerCharacterBattleData GetBattleData()
     {
-        return new PlayerCharacterBattleData(m_BaseData, LevellingManager.Instance.LevelUpStats(m_BaseData.m_StartingStats, new StatProgress(), m_BaseData.m_GrowthRates.FlatAugment(m_ClassSO.m_GrowthRateAugments), m_CurrCharaLevel - 1).FlatAugment(m_ClassSO.m_StatAugments), m_ClassSO, m_CurrEquippedWeapon, m_CannotDieWithoutLosingBattle, m_ClassSO.GetInflictedTokens(m_CurrCharaLevel));
+        return new PlayerCharacterBattleData(m_BaseData, m_OverrideStats ? m_OverridenStats : LevellingManager.Instance.LevelUpStats(m_BaseData.m_StartingStats, new StatProgress(), m_BaseData.m_GrowthRates.FlatAugment(m_ClassSO.m_GrowthRateAugments), m_CurrCharaLevel - 1).FlatAugment(m_ClassSO.m_StatAugments), m_ClassSO, m_CurrEquippedWeapon, m_CannotDieWithoutLosingBattle, m_ClassSO.GetInflictedTokens(m_CurrCharaLevel));
     }
 } 

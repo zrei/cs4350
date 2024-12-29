@@ -124,6 +124,8 @@ public class BehaviourTreeRuntimeInstance : IConcreteAction
     public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent onCompleteEvent)
     { 
         Reset();
+        if (m_CurrActionIndex == -1)
+            GetActionToBePerformed(enemyUnit, mapLogic);
         m_IndividualLeaves[m_CurrActionIndex].m_Action.Run(enemyUnit, mapLogic, onCompleteEvent);
         m_PrevActionIndex = m_CurrActionIndex;
     }

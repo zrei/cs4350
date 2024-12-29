@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a6ec85c905c4d9a9428b2188d54b88a, type: 3}
+  m_Name: RationsNodeSO
+  m_EditorClassIdentifier: 
+  nodeName: Rations
+  nodeDescription: 
+  isMoralityLocked: 0
+  moralityCondition: {fileID: 0}
+  defaultPreDialogue: {fileID: 2578122031409413761, guid: a46f17deb167d4c05862f7ee38df52a5,
+    type: 3}
+  conditionalPreDialogues: []
+  defaultPostDialogue: {fileID: 0}
+  conditionalPostDialogues: []
+  preTutorial: {fileID: 0}
+  postTutorial: {fileID: 11400000, guid: 5abd299affa4b475f9b1921900b46e99, type: 2}
+  preSelectionTutorial: {fileID: 0}
+  rewardType: 1
+  nodeReward:
+    rationReward: 30
+    weaponRewards: []

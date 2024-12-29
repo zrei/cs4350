@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ada158f16e16423090bc7303f4214ae, type: 3}
+  m_Name: BattlePhaseTutorial
+  m_EditorClassIdentifier: 
+  m_TutorialPages:
+  - TutorialSprite: {fileID: 21300000, guid: f0537b046e5664b679ef005cf53e56dd, type: 3}
+    TutorialText: The turn order is found at the top left corner. It shows which
+      units will act next.
+  - TutorialSprite: {fileID: 21300000, guid: 1763c48104dc84aa096fcc003534bc68, type: 3}
+    TutorialText: Hover over any unit to see more information.
+  - TutorialSprite: {fileID: 21300000, guid: 5c00088998fd343758ad69cdbbed23bb, type: 3}
+    TutorialText: The action menu is found at the bottom, where you can select the
+      next action. Each unit is allowed one action per turn.
+  - TutorialSprite: {fileID: 21300000, guid: 048215af0c1cb4af0898eae700f8ae2c, type: 3}
+    TutorialText: Use the inspect action to learn more about any unit on the map.
+  - TutorialSprite: {fileID: 21300000, guid: bbb372bc40a4e45b8accebcd27632aee, type: 3}
+    TutorialText: Some skills have additional requirements like positioning, mana,
+      and cooldowns.
+  - TutorialSprite: {fileID: 21300000, guid: 9ffb452d0797d45e49a931f9f56a3c7a, type: 3}
+    TutorialText: You can pass the turn if you don't want to do anything.
