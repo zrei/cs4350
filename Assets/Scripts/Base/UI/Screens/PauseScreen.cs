@@ -65,7 +65,7 @@ namespace Game.UI
 
         private void B_Tutorial()
         {
-            // pass for now
+            UIScreenManager.Instance.OpenScreen(UIScreenManager.Instance.TutorialCompilationScreen);
         }
 
         private void B_Options()
