@@ -39,6 +39,7 @@ public class LevelManager : Singleton<LevelManager>
     [SerializeField] PlaneCameraController m_LevelCameraController;
     
     [Header("Level Settings")]
+    [Expandable]
     [SerializeField] private LevelSO m_LevelSO;
     [SerializeField] private LevelNode m_StartNode;
     [SerializeField] private LevelNode m_GoalNode;
