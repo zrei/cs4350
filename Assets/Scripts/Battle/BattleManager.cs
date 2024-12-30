@@ -108,7 +108,10 @@ public class BattleManager : Singleton<BattleManager>
         m_EnemyTurnManager = GetComponent<EnemyTurnManager>();
         m_PlayerUnitSetup = GetComponent<PlayerUnitSetup>();
 
-        InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
+        if (InputManager.IsReady)
+            InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
+        else
+            InputManager.OnReady += () => InputManager.Instance.PrimaryAxisInput.OnHoldEvent += OnRotateCamera;
 
         m_PlayerTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
         m_EnemyTurnManager.Initialise(OnCompleteTurn, m_MapLogic);
