@@ -8,6 +8,6 @@ public class MapHasUnitsTokenConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return mapLogic.HasAnyUnitWithToken(m_GridType, m_TokenType);
+        return m_IsInverted ^ mapLogic.HasAnyUnitWithToken(m_GridType, m_TokenType);
     }
 }

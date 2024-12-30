@@ -3,7 +3,7 @@ public interface IHealth : IStat
     public float CurrentHealth { get; }
     public float MaxHealth { get; }
     public bool IsDead => true;
-    public void TakeDamage(float damage);
+    public void TakeDamage(float damage, bool isNonLethal = false);
 
     public void Heal(float healAmount);
 

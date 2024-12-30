@@ -6,9 +6,12 @@ public enum SkillEffectType
     HEAL,
     SUMMON,
     ALTER_MANA,
+    ALTER_MANA_SELF,
     TELEPORT,
     CLEANSE,
-    APPLY_TILE_EFFECT
+    APPLY_TILE_EFFECT,
+    DAMAGE_SELF,
+    LIFESTEAL,
 }
 
 public enum SkillType

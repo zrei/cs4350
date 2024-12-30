@@ -5,7 +5,7 @@ using UnityEngine;
 public class StatusEffect :
     IStatus
 {
-    private StatusEffectSO m_StatusEffectSO;
+    public StatusEffectSO m_StatusEffectSO;
     private int m_StackRemaining;
 
     public int Id => m_StatusEffectSO.m_Id;

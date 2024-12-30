@@ -8,6 +8,6 @@ public class NumberOfUnitsConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return m_NumberUnitsThreshold.IsSatisfied(mapLogic.GetNumberOfUnitsOnGrid(m_GridType));
+        return m_IsInverted ^ m_NumberUnitsThreshold.IsSatisfied(mapLogic.GetNumberOfUnitsOnGrid(m_GridType));
     }
 }

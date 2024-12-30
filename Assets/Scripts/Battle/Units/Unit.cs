@@ -185,10 +185,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         OnHealthChange?.Invoke(change, m_CurrHealth, MaxHealth);
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, bool isNonLethal = false)
     {
         Logger.Log(this.GetType().Name, $"Unit {name} took {damage} damage", name, this.gameObject, LogLevel.LOG);
-        var value = Mathf.Max(0f, m_CurrHealth - damage);
+        var value = Mathf.Max(isNonLethal ? 1f : 0f, m_CurrHealth - damage);
         var change = value - m_CurrHealth;
         m_CurrHealth = value;
         OnHealthChange?.Invoke(change, value, MaxHealth);
@@ -572,7 +572,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
             if (skill.DealsDamage)
             {
-                float damage = DamageCalc.CalculateDamage(this, target, skill);
+                SkillType? forcedDmgType = null;
+                if (m_StatusManager.StatusEffects.Any(x => x.m_StatusEffectSO is ConvertDealtDamageTypeStatusEffectSO))
+                {
+                    forcedDmgType = skill.m_SkillType == SkillType.PHYSICAL ? SkillType.MAGIC : SkillType.PHYSICAL;
+                }
+                float damage = DamageCalc.CalculateDamage(this, target, skill, forcedDmgType);
                 dealtDamage += damage;
                 target.TakeDamage(damage);
 
@@ -593,6 +598,11 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                 target.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill));
             }
 
+            if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA_SELF))
+            {
+                this.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill));
+            }
+
             if (!target.IsDead)
             {
                 target.InflictStatus(inflictedStatusEffects);
@@ -609,8 +619,22 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         {
             AlterMana(-skill.m_ConsumedMana);
 
-            if (skill.DealsDamage && HasToken(TokenType.LIFESTEAL))
-                Heal(GetLifestealProportion() * dealtDamage);
+            if (skill.DealsDamage && (skill.m_SkillTypes.Contains(SkillEffectType.LIFESTEAL) || HasToken(TokenType.LIFESTEAL)))
+            {
+                if (HasToken(TokenType.LIFESTEAL))
+                {
+                    Heal(GetLifestealProportion() * dealtDamage);
+                }
+                else
+                {
+                    Heal(skill.m_LifestealModifier * dealtDamage);
+                }
+            }
+
+            if (skill.m_SkillTypes.Contains(SkillEffectType.DAMAGE_SELF))
+            {
+                TakeDamage(DamageCalc.CalculateSelfDamage(this, skill), true);
+            }
 
             if (skill.IsMagicAttack)
                 ConsumeTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK);
@@ -620,7 +644,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             if (skill.IsHeal)
                 ConsumeTokens(TokenConsumptionType.CONSUME_ON_HEAL);
 
-            if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA))
+            if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA) || skill.ContainsSkillType(SkillEffectType.ALTER_MANA_SELF))
                 ConsumeTokens(TokenConsumptionType.CONSUME_ON_MANA_ALTER);
 
             if (skill.IsSelfTarget)

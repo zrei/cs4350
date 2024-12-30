@@ -10,6 +10,6 @@ public class MapHasUnitsManaThresholdConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return mapLogic.HasAnyUnitWithManaThreshold(m_GridType, m_ManaThreshold, m_IsFlat);
+        return m_IsInverted ^ mapLogic.HasAnyUnitWithManaThreshold(m_GridType, m_ManaThreshold, m_IsFlat);
     }
 }

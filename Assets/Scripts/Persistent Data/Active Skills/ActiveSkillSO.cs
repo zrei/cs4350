@@ -56,6 +56,10 @@ public class ActiveSkillSO : ScriptableObject
     [Range(0f, 5f)]
     public float m_DamageModifier = 1f;
 
+    public float m_SelfDamageModifier = 0f;
+
+    public float m_LifestealModifier = 0f;
+
     [Space]
     // healing
     [Tooltip("Determines the proportion of health to heal from magic attack - only used if skill heals")]
@@ -194,6 +198,21 @@ public class ActiveSkillSO : ScriptableObject
             var dmgText = $"{(target != null ? DamageCalc.CalculateDamage(caster, target, this) : DamageCalc.CalculateDamage(caster, this)):F1}";
             builder.AppendLine($"DMG: {dmgText} {dmgSpriteTag}");
         }
+        if (skillTypesSet.Contains(SkillEffectType.DAMAGE_SELF))
+        {
+            var dmgSpriteTag = m_SkillType switch
+            {
+                SkillType.PHYSICAL => "Physical <sprite name=\"PhysicalAttack\" tint>",
+                SkillType.MAGIC => "Magic <sprite name=\"MagicAttack\" tint>",
+                _ => string.Empty,
+            };
+            var dmgText = $"{(target != null ? DamageCalc.CalculateDamage(caster, target, this) : DamageCalc.CalculateDamage(caster, this)):F1}";
+            builder.AppendLine($"Self DMG: {dmgText} {dmgSpriteTag}");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.LIFESTEAL))
+        {
+            builder.AppendLine($"{Mathf.RoundToInt(m_LifestealModifier * 100)}% Lifesteal");
+        }
         if (skillTypesSet.Contains(SkillEffectType.HEAL))
         {
             builder.AppendLine($"HEAL: {DamageCalc.CalculateHealAmount(caster, this):F1}");
@@ -201,6 +220,10 @@ public class ActiveSkillSO : ScriptableObject
         if (skillTypesSet.Contains(SkillEffectType.ALTER_MANA))
         {
             builder.AppendLine($"ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this):F1}");
+        }
+        if (skillTypesSet.Contains(SkillEffectType.ALTER_MANA_SELF))
+        {
+            builder.AppendLine($"Self ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this):F1}");
         }
         if (skillTypesSet.Contains(SkillEffectType.SUMMON))
         {

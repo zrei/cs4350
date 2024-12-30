@@ -3,6 +3,7 @@ using UnityEngine;
 public enum StatusEffectType
 {
     INFLICT_DAMAGE,
+    CONVERT_DEALT_DAMAGE_TYPE
 }
 
 public abstract class StatusEffectSO : ScriptableObject
