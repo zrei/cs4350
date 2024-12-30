@@ -10,6 +10,6 @@ public class MapHasUnitsHealthThresholdConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return mapLogic.HasAnyUnitWithHealthThreshold(m_GridType, m_HealthThreshold, m_IsFlat);
+        return m_IsInverted ^ mapLogic.HasAnyUnitWithHealthThreshold(m_GridType, m_HealthThreshold, m_IsFlat);
     }
 }

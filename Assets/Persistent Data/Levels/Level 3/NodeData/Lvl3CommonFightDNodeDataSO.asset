@@ -15,9 +15,7 @@ MonoBehaviour:
   nodeName: Battle Node
   nodeDescription: Enemies! Defeat them!
   isMoralityLocked: 0
-  moralityThreshold:
-    m_GreaterThan: 0
-    m_Threshold: 0
+  moralityCondition: {fileID: 0}
   defaultPreDialogue: {fileID: 0}
   conditionalPreDialogues: []
   defaultPostDialogue: {fileID: 0}
@@ -25,7 +23,7 @@ MonoBehaviour:
   preTutorial: {fileID: 0}
   postTutorial: {fileID: 0}
   preSelectionTutorial: {fileID: 0}
-  battleSO: {fileID: 11400000, guid: 15dcee63079fa4785b8cb57ec7441473, type: 2}
+  battleSO: {fileID: 11400000, guid: bd0a75b54ddb24fa5bcdfc63eb42beba, type: 2}
   BattleReward:
     rationReward: 0
     weaponRewards: []

@@ -9,6 +9,6 @@ public class EnemyUnitManaThresholdConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return m_ManaThreshold.IsSatisfied(m_ChecksFlat ? enemyUnit.CurrentMana : enemyUnit.CurrentManaProportion);
+        return m_IsInverted ^ m_ManaThreshold.IsSatisfied(m_ChecksFlat ? enemyUnit.CurrentMana : enemyUnit.CurrentManaProportion);
     }
 }

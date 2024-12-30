@@ -7,6 +7,6 @@ public class EnemyUnitHasTokenConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return enemyUnit.HasToken(m_TokenType);
+        return m_IsInverted ^ enemyUnit.HasToken(m_TokenType);
     }
 }

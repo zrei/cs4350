@@ -9,6 +9,6 @@ public class EnemyUnitHealthThresholdConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return m_HealthThreshold.IsSatisfied(m_ChecksFlat ? enemyUnit.CurrentHealth : enemyUnit.CurrentHealthProportion);
+        return m_IsInverted ^ m_HealthThreshold.IsSatisfied(m_ChecksFlat ? enemyUnit.CurrentHealth : enemyUnit.CurrentHealthProportion);
     }
 }

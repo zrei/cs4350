@@ -8,6 +8,6 @@ public class UnitWithinColConditionSO : EnemyActionConditionSO
 
     public override bool IsConditionMet(EnemyUnit enemyUnit, MapLogic mapLogic)
     {
-        return m_Cols.Contains(enemyUnit.CurrPosition.m_Col);
+        return m_IsInverted ^ m_Cols.Contains(enemyUnit.CurrPosition.m_Col);
     }
 }
