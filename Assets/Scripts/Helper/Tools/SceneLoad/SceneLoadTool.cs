@@ -20,6 +20,7 @@ public class SceneLoadTool : EditorWindow
     private int m_LevelNumber = 1;
     private int m_BattleMapBiomeIndex = 0;
     
+    private string m_TestBattleAdditivePath = "Assets/Scenes/TestScenes/TestBattleAdditiveScene";
     private string m_TestLevelAdditivePath = "Assets/Scenes/TestScenes/TestLevelAdditiveScene";
     private string m_SetupBattlePath = "Assets/Scenes/BattleSetupScene";
 
@@ -82,6 +83,19 @@ public class SceneLoadTool : EditorWindow
         if (GUILayout.Button($"Load Setup Battle Scene"))
         {
             LoadScene(string.Format(SCENE_PATH_FORMAT, m_SetupBattlePath));
+        }
+        GUILayout.Space(5f);
+        m_TestBattleAdditivePath = EditorGUILayout.TextField("Test Battle Additive Scene Path", m_TestBattleAdditivePath);
+        if (GUILayout.Button($"Load Test Battle Additive Scene"))
+        {
+            LoadScene(string.Format(SCENE_PATH_FORMAT, string.Format(m_TestBattleAdditivePath)));
+        }
+        if (GUILayout.Button($"Load Game in Battle Biome {finalBiome}"))
+        {
+            m_CurrentScenePath = EditorSceneManager.GetActiveScene().path;
+            var m_BattleScenePath = string.Format(SCENE_PATH_FORMAT, string.Format(m_BattlePath, finalBiome));
+            var m_TestBattleAdditiveScenePath = string.Format(SCENE_PATH_FORMAT, m_TestBattleAdditivePath);
+            LoadScene(m_BattleScenePath, (() => LoadScene(m_TestBattleAdditiveScenePath, PlayScene, OpenSceneMode.Additive)));
         }
 
         GUILayout.Space(30f);

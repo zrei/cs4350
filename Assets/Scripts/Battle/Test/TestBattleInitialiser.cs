@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Game;
 using UnityEngine;
 
 /// <summary>
@@ -7,23 +8,38 @@ using UnityEngine;
 /// </summary>
 public class TestBattleInitialiser : MonoBehaviour
 {
-    [SerializeField] private List<PlayerCharacterBattleData> m_TestData;
+    [Header("Battle Data")]
+    [SerializeField] private List<PlayerCharacterData> m_TestData;
     [SerializeField] private BattleSO m_TestBattle;
-    
-    private void Awake()
+
+    [Header("Fatigue Tokens")]
+    [SerializeField] private InflictedToken m_FatigueToken;
+    [SerializeField] private bool m_ApplyFatigueTokens = false;
+
+    private void Start()
     {
-        // If BattleSceneLoadedEvent has any subscribers (from level manager), don't add the test battle initialiser
-        if (BattleManager.OnReady != null) return;
+        for (int i = 0; i < m_TestData.Count; i++)
+        {
+            m_TestData[i].m_CurrStats = m_TestData[i].m_BaseData.m_StartingStats;
+            m_TestData[i].m_CurrClassIndex = m_TestData[i].m_BaseData.m_PathGroup.GetDefaultClassIndex();
+        }
+
+        List<InflictedToken> inflictedTokens = new();
+        if (m_ApplyFatigueTokens)
+        {
+            inflictedTokens.Add(m_FatigueToken);
+        }
+
+        if (BattleManager.IsReady)
+            BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), new());
+        else 
+            LevelManager.OnReady += () => BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), new());
+
+        if (CameraManager.IsReady)
+            CameraManager.Instance.SetUpBattleCamera();
+        else
+            CameraManager.OnReady += () => CameraManager.Instance.SetUpBattleCamera();
         
-        Debug.Log("TestBattleInitializer: No subscribers to BattleSceneLoadedEvent. Adding test battle initialiser.");
-        BattleManager.OnReady += OnBattleSceneLoaded;
-    }
-    
-    private void OnBattleSceneLoaded()
-    {
-        BattleManager.OnReady -= OnBattleSceneLoaded;
-        
-        Debug.Log("TestBattleInitializer: Battle scene loaded. Initialising battle.");
-        BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData, new());
+        GlobalEvents.Scene.OnSceneTransitionCompleteEvent?.Invoke(SceneEnum.LEVEL, SceneEnum.BATTLE);
     }
 }
