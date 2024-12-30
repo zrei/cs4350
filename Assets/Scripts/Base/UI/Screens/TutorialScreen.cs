@@ -18,6 +18,7 @@ namespace Game.UI
         [Header("UI Reference")]
         [SerializeField] private Image m_TutorialImage;
         [SerializeField] private TextMeshProUGUI m_TutorialText;
+        [SerializeField] private FormattedTextDisplay m_PageNumberText;
 
         [Header("Buttons")]
         [SerializeField] private ActionButton m_LeftScrollButton;
@@ -26,6 +27,7 @@ namespace Game.UI
 
         private List<TutorialPageUIData> m_PageData;
         private int m_PageIndex = 0;
+        private int m_NumPages = 0;
     
         private void Awake()
         {
@@ -53,6 +55,7 @@ namespace Game.UI
 
             m_PageData = (List<TutorialPageUIData>) args[0];
             m_PageIndex = 0;
+            m_NumPages = m_PageData.Count;
 
             ShowPage();
 
@@ -61,13 +64,14 @@ namespace Game.UI
 
         private void ShowPage()
         {
+            m_PageNumberText.SetValue(m_PageIndex + 1, m_NumPages);
             m_TutorialImage.sprite = m_PageData[m_PageIndex].TutorialSprite;
             m_TutorialText.text = m_PageData[m_PageIndex].TutorialText;
 
             m_LeftScrollButton.interactable = m_PageIndex > 0;
-            m_RightScrollButton.interactable = m_PageIndex < m_PageData.Count - 1;
+            m_RightScrollButton.interactable = m_PageIndex < m_NumPages - 1;
 
-            m_CloseButton.interactable = m_PageIndex == m_PageData.Count - 1;
+            m_CloseButton.interactable = m_PageIndex == m_NumPages - 1;
         }
 
         private void LastPage()
