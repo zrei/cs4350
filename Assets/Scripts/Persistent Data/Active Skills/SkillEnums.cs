@@ -6,6 +6,9 @@ public enum SkillEffectType
     HEAL,
     SUMMON,
     ALTER_MANA,
+    /// <summary>
+    /// This should be used in conjunction with other skill types to alter one's own mana despite not targetting self
+    /// </summary>
     ALTER_MANA_SELF,
     TELEPORT,
     CLEANSE,

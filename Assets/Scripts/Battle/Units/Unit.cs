@@ -279,6 +279,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void PostTick()
     {
         m_SkillCooldownTracker.Tick();
+        m_StatusManager.ConsumeTokens(TokenConsumptionType.CONSUME_POST_TURN);
     }
     #endregion
 
@@ -363,7 +364,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public float GetTotalStat(StatType statType, float externalBaseModifier = 1f)
     {
-        return (m_Stats.GetStat(statType) * externalBaseModifier + GetFlatStatChange(statType)) * GetMultStatChange(statType);
+        return Mathf.Max(0, (m_Stats.GetStat(statType) * externalBaseModifier + GetFlatStatChange(statType)) * GetMultStatChange(statType));
     }
     #endregion
 
@@ -595,12 +596,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
             if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA))
             {
-                target.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill));
+                target.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill, false));
             }
 
             if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA_SELF))
             {
-                this.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill));
+                this.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill, true));
             }
 
             if (!target.IsDead)

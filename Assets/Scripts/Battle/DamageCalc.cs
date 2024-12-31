@@ -67,8 +67,8 @@ public static class DamageCalc
         return finalHealAmount;
     }
 
-    public static float CalculateManaAlterAmount(ICanAttack healer, ActiveSkillSO attackSO)
+    public static float CalculateManaAlterAmount(ICanAttack healer, ActiveSkillSO attackSO, bool isSelf)
     {
-        return healer.GetTotalStat(StatType.MAG_ATTACK, attackSO.m_ManaAlterProportion);
+        return healer.GetTotalStat(StatType.MAG_ATTACK, isSelf ? attackSO.m_ManaAlterSelfProportion : attackSO.m_ManaAlterProportion);
     }
 }

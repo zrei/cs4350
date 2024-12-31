@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2402099c6e4d84a4ea7968b5c38457f7, type: 3}
+  m_Name: FlatPhysicalAttackBoost
+  m_EditorClassIdentifier: 
+  m_Id: 10
+  m_AllowStack: 1
+  m_IsBuff: 1
+  m_TokenName: Physical Attack Boost
+  m_Description: Boosts physical attack by a flat amount.
+  m_Icon: {fileID: -4908866313223265412, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_Color: {r: 1, g: 0.8039216, b: 0, a: 1}
+  m_TieredTokens:
+  - {fileID: 11400000, guid: 3cab3580e8ae1489e96d12a0593f0931, type: 2}
+  - {fileID: 11400000, guid: 4dbf8891564444eba9ee80d30899efad, type: 2}
+  m_Consumption: 03000000
+  m_AffectedStats: 02000000

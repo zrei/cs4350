@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
+  m_Name: Regrowth
+  m_EditorClassIdentifier: 
+  m_SkillName: Regrowth
+  m_Description: 
+  m_Icon: {fileID: -1840183259, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillType: 1
+  m_ConsumedMana: 0
+  m_CooldownTurns: 0
+  m_SkillTypes: 02000000
+  m_InflictedTokens: []
+  m_InflictedStatusEffects: []
+  m_DamageModifier: 1
+  m_SelfDamageModifier: 0
+  m_LifestealModifier: 0
+  m_HealProportion: 0.83
+  m_ManaAlterProportion: 0
+  m_Summons: []
+  m_TeleportSelf: 0
+  m_TeleportTargetRules: []
+  m_CleansedStatusTypes: 
+  m_InflictedTileEffect:
+    m_TileEffect: {fileID: 0}
+    m_InitialTime: 0
+  m_TargetWillPlayHurtAnimation: 0
+  m_OverrideWeaponAnimationType: 0
+  m_OverriddenWeaponAnimationType: 0
+  m_SkillAnimationType: 1
+  m_TargetRules:
+  - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
+  m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
+  m_IsRangedAttack: 0
+  m_OnWindUpSkillVFXs: []
+  m_OnReleaseSkillVFXs: []
+  m_OnHitSkillVFXs:
+  - {fileID: 11400000, guid: b7f8fdf61cf4c8b4683864779ccb7b1c, type: 2}
