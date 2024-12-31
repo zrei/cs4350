@@ -54,21 +54,35 @@ public class RaceSO : ScriptableObject
         };
     }
 
-    private Material[] GetBaseMaterials(Color newSkinColor, Color newEyeColor) {
-        Material skinMaterial = Instantiate(m_DefaultSkinMat);
-        Material eyeMaterial = Instantiate(m_DefaultEyeMat);
+    private Material[] GetBaseMaterials(Color newSkinColor, Color newEyeColor)
+    {
+        List<Material> baseModelMaterial = new();
 
-        if (newSkinColor != Color.clear) {
-            skinMaterial.color = newSkinColor;
+        if (m_DefaultSkinMat != null)
+        {
+            Material skinMaterial = Instantiate(m_DefaultSkinMat);
+
+            if (newSkinColor != Color.clear)
+            {
+                skinMaterial.color = newSkinColor;
+            }
+
+            baseModelMaterial.Add(skinMaterial);
         }
 
-        if (newEyeColor != Color.clear) {
-            eyeMaterial.color = newEyeColor;
+        if (m_DefaultEyeMat != null)
+        {
+            Material eyeMaterial = Instantiate(m_DefaultEyeMat);
+
+            if (newEyeColor != Color.clear)
+            {
+                eyeMaterial.color = newEyeColor;
+            }
+
+            baseModelMaterial.Add(eyeMaterial);
         }
 
-        Material[] baseModelMaterial = {skinMaterial, eyeMaterial};
-
-        return baseModelMaterial;
+        return baseModelMaterial.ToArray();
     }
 
 #if UNITY_EDITOR
