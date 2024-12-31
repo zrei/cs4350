@@ -18,17 +18,23 @@ MonoBehaviour:
   m_SkillType: 1
   m_ConsumedMana: 2
   m_CooldownTurns: 0
-  m_SkillTypes: 0000000005000000
+  m_SkillTypes: 0000000006000000
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1.5
+  m_SelfDamageModifier: 0
+  m_LifestealModifier: 0
   m_HealProportion: 1
   m_ManaAlterProportion: 0
+  m_ManaAlterSelfProportion: 0
   m_Summons: []
   m_TeleportSelf: 1
   m_TeleportTargetRules:
   - {fileID: 11400000, guid: 0a88b1822c6e8f644acbd5d0e98a3d32, type: 2}
   m_CleansedStatusTypes: 
+  m_InflictedTileEffect:
+    m_TileEffect: {fileID: 0}
+    m_InitialTime: 0
   m_TargetWillPlayHurtAnimation: 1
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0
