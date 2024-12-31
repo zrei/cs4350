@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b4c41cc7a05437ea9ebcd79a797f8d, type: 3}
+  m_Name: RaceSO
+  m_EditorClassIdentifier: 
+  m_RaceName: 
+  m_DefaultSkinMat: {fileID: 0}
+  m_DefaultEyeMat: {fileID: 0}
+  m_MaleItems:
+    m_BaseModel: {fileID: 8007177161401546688, guid: b6b71edf82211864db1071431dbdb203,
+      type: 3}
+    m_GridYOffset: 0
+    m_MageMeshes: []
+    m_HoodedMeshes: []
+    m_ArmorMeshes: []
+  m_FemaleItems:
+    m_BaseModel: {fileID: 8007177161401546688, guid: b6b71edf82211864db1071431dbdb203,
+      type: 3}
+    m_GridYOffset: 0
+    m_MageMeshes: []
+    m_HoodedMeshes: []
+    m_ArmorMeshes: []
+  m_HurtSound: {fileID: 11400000, guid: 25c32ef2208f64afe8f4455fd4093a85, type: 2}
+  m_DeathSound: {fileID: 11400000, guid: 824f221d2c1634f809ef3c38ebdbd93c, type: 2}
+  m_MaleArmorFolder: Assets/Models/Armors/
+  m_MaleMagePrefix: M_Mage
+  m_MaleHoodedPrefix: M_Rogue
+  m_MaleArmorPrefix: M_Heavy
+  m_FemaleArmorFolder: Assets/Models/Armors/
+  m_FemaleMagePrefix: F_Mage
+  m_FemaleHoodedPrefix: F_Rogue
+  m_FemaleArmorPrefix: F_Heavy
