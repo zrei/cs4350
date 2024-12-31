@@ -36,9 +36,9 @@ MonoBehaviour:
   m_InflictedTileEffect:
     m_TileEffect: {fileID: 0}
     m_InitialTime: 0
-  m_TargetWillPlayHurtAnimation: 0
-  m_OverrideWeaponAnimationType: 0
-  m_OverriddenWeaponAnimationType: 0
+  m_TargetWillPlayHurtAnimation: 1
+  m_OverrideWeaponAnimationType: 1
+  m_OverriddenWeaponAnimationType: 300
   m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
@@ -47,6 +47,6 @@ MonoBehaviour:
   m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
   m_IsRangedAttack: 0
   m_OnWindUpSkillVFXs: []
-  m_OnReleaseSkillVFXs:
-  - {fileID: 11400000, guid: 5ba47f59eb7e27f48ba8dc2072210cac, type: 2}
-  m_OnHitSkillVFXs: []
+  m_OnReleaseSkillVFXs: []
+  m_OnHitSkillVFXs:
+  - {fileID: 11400000, guid: d354e5cb73cd4ea48a26eec172c0b933, type: 2}

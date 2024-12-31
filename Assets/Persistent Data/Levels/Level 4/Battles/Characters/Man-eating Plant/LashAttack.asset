@@ -28,6 +28,7 @@ MonoBehaviour:
   m_LifestealModifier: 0
   m_HealProportion: 1
   m_ManaAlterProportion: 0
+  m_ManaAlterSelfProportion: 0
   m_Summons: []
   m_TeleportSelf: 0
   m_TeleportTargetRules: []
@@ -35,9 +36,9 @@ MonoBehaviour:
   m_InflictedTileEffect:
     m_TileEffect: {fileID: 0}
     m_InitialTime: 0
-  m_TargetWillPlayHurtAnimation: 0
-  m_OverrideWeaponAnimationType: 0
-  m_OverriddenWeaponAnimationType: 0
+  m_TargetWillPlayHurtAnimation: 1
+  m_OverrideWeaponAnimationType: 1
+  m_OverriddenWeaponAnimationType: 300
   m_SkillAnimationType: 2
   m_TargetRules:
   - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
