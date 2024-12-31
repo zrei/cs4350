@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -6,7 +7,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
 public class SceneLoadTool : EditorWindow
 {
     private string m_MainMenuPath = "Assets/Scenes/MainMenuScene";

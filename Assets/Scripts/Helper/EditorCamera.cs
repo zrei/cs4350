@@ -1,7 +1,8 @@
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
 using UnityEditorInternal;
-using Unity.VisualScripting;
+#endif
+using UnityEngine;
 
 /// <summary>
 /// Blows itself up in an actual game run
