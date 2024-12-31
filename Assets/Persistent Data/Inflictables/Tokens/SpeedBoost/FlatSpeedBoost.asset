@@ -9,18 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f584b98fbf82e44fc81ac0ec2cd4a4c8, type: 3}
-  m_Name: SpeedBoost
+  m_Script: {fileID: 11500000, guid: 2402099c6e4d84a4ea7968b5c38457f7, type: 3}
+  m_Name: FlatSpeedBoost
   m_EditorClassIdentifier: 
-  m_Id: 13
+  m_Id: 11
   m_AllowStack: 1
   m_IsBuff: 1
   m_TokenName: Speed Boost
-  m_Description: Increased speed until next turn. (+100% per tier)
+  m_Description: Increases speed by a flat amount.
   m_Icon: {fileID: 6823316075010515700, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_Color: {r: 1, g: 0.8039216, b: 0, a: 1}
   m_TieredTokens:
-  - {fileID: 11400000, guid: 2a783b3a2f929be40936c6fa6d26fffc, type: 2}
-  - {fileID: 11400000, guid: a5bbe86914fafa645a5caff95c66b4f3, type: 2}
+  - {fileID: 11400000, guid: 56d346b99e7f3414d980760b7e83860a, type: 2}
+  - {fileID: 11400000, guid: 3638629f726d84a39abd8fb51a09b65c, type: 2}
   m_Consumption: 09000000
   m_AffectedStats: 06000000

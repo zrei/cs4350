@@ -9,19 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f584b98fbf82e44fc81ac0ec2cd4a4c8, type: 3}
-  m_Name: DefenceDown
+  m_Script: {fileID: 11500000, guid: 2402099c6e4d84a4ea7968b5c38457f7, type: 3}
+  m_Name: FlatDefenceDown
   m_EditorClassIdentifier: 
-  m_Id: 4
+  m_Id: 5
   m_AllowStack: 1
-  m_IsBuff: 0
+  m_IsBuff: 1
   m_TokenName: Defence Down
-  m_Description: Reduced defence for next hit taken. (33% per tier)
+  m_Description: Reduces defences by a flat amount.
   m_Icon: {fileID: -1113224844, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_Color: {r: 0, g: 0.5647059, b: 1, a: 1}
   m_TieredTokens:
-  - {fileID: 11400000, guid: 9af96da7a73e1b84da258f4910f11b12, type: 2}
-  - {fileID: 11400000, guid: 9c02dfaba549ce046a99e7ebe5c7d00a, type: 2}
-  - {fileID: 11400000, guid: 9f91dfdf0cded124e8e9f37fe0b87c32, type: 2}
+  - {fileID: 11400000, guid: 6ba9f1beefbae4d35824bab7e0899a90, type: 2}
+  - {fileID: 11400000, guid: 9029ddb3f08d34c4589890746e73ecfe, type: 2}
   m_Consumption: 0500000004000000
   m_AffectedStats: 0400000005000000
