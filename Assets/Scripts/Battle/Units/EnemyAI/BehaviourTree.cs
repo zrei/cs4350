@@ -93,6 +93,7 @@ public class BehaviourTreeRuntimeInstance : IConcreteAction
 
     public BehaviourTreeRuntimeInstance(BehaviourTree behaviourTree)
     {
+        Debug.Log(behaviourTree == null);
         m_IndividualLeaves = behaviourTree.m_Actions.Select(x => new ConcreteBehaviourTreeAction(x.m_Action.GenerateConcreteAction(), x.m_AdditionalConditions)).ToList();
         m_PriorityChangeConditions = behaviourTree.m_PriorityChangeConditions;
     }
