@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d767f8ab760c0fa488f717c2b23e5a38, type: 3}
-  m_Name: BossObjective
+  m_Name: DefeatTreant
   m_EditorClassIdentifier: 
   m_IsHiddenObjective: 0
-  m_Color: {r: 0.88704157, g: 0, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0.8782673, a: 1}
   m_HideProgressBar: 0
-  m_IsOverrideDisplayText: 0
-  m_DisplayTextOverride: 
+  m_IsOverrideDisplayText: 1
+  m_DisplayTextOverride: 'Defeat: Ancient Treant'
   m_ObjectiveType: 1
   m_OnCompleteActions: []
   m_OnFailActions: []
   m_PlayerCharacterSOs: []
   m_EnemyCharacterSOs:
-  - {fileID: 11400000, guid: 0d05a020256206e479741caf471e1a90, type: 2}
+  - {fileID: 11400000, guid: 65af4292422a7aa4fad729db9cde9f84, type: 2}
   m_Mode: 2

@@ -59,7 +59,7 @@ namespace Game.UI
                 {
                     display.gameObject.SetActive(true);
                 },
-                actionOnRelease: display => { },
+                actionOnRelease: display => { display.gameObject.SetActive(false); },
                 actionOnDestroy: display => { },
                 defaultCapacity: 20,
                 maxSize: 10000
