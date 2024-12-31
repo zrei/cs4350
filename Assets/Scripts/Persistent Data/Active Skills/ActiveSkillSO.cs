@@ -68,6 +68,8 @@ public class ActiveSkillSO : ScriptableObject
     [Space]
     [Tooltip("Determines the proportion of mana to add to the target from magic attack - only used if skill alters mana")]
     public float m_ManaAlterProportion = 0f;
+    [Tooltip("Determines the proportion of mana to add to the attacker from magic attack - only used if skill alters mana")]
+    public float m_ManaAlterSelfProportion = 0f;
 
     [Space]
     [Tooltip("Adds to summon upon attack - only used if skill summons")]
@@ -219,11 +221,11 @@ public class ActiveSkillSO : ScriptableObject
         }
         if (skillTypesSet.Contains(SkillEffectType.ALTER_MANA))
         {
-            builder.AppendLine($"ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this):F1}");
+            builder.AppendLine($"ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this, false):F1}");
         }
         if (skillTypesSet.Contains(SkillEffectType.ALTER_MANA_SELF))
         {
-            builder.AppendLine($"Self ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this):F1}");
+            builder.AppendLine($"Self ALTER MANA: {DamageCalc.CalculateManaAlterAmount(caster, this, true):F1}");
         }
         if (skillTypesSet.Contains(SkillEffectType.SUMMON))
         {

@@ -595,12 +595,12 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
             if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA))
             {
-                target.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill));
+                target.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill, false));
             }
 
             if (skill.ContainsSkillType(SkillEffectType.ALTER_MANA_SELF))
             {
-                this.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill));
+                this.AlterMana(DamageCalc.CalculateManaAlterAmount(this, skill, true));
             }
 
             if (!target.IsDead)

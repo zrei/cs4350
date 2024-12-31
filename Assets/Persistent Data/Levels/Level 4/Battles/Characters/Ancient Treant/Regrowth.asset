@@ -10,23 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: Harness Power
+  m_Name: Regrowth
   m_EditorClassIdentifier: 
-  m_SkillName: Harness Power
+  m_SkillName: Regrowth
   m_Description: 
-  m_Icon: {fileID: 875926485, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
-  m_SkillType: 0
+  m_Icon: {fileID: -1840183259, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_SkillType: 1
   m_ConsumedMana: 0
   m_CooldownTurns: 0
-  m_SkillTypes: 0500000009000000
+  m_SkillTypes: 02000000
   m_InflictedTokens: []
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_SelfDamageModifier: 0.16666667
+  m_SelfDamageModifier: 0
   m_LifestealModifier: 0
-  m_HealProportion: 1
+  m_HealProportion: 0.83
   m_ManaAlterProportion: 0
-  m_ManaAlterSelfProportion: 0.1666667
   m_Summons: []
   m_TeleportSelf: 0
   m_TeleportTargetRules: []
@@ -45,5 +44,4 @@ MonoBehaviour:
   m_OnWindUpSkillVFXs: []
   m_OnReleaseSkillVFXs: []
   m_OnHitSkillVFXs:
-  - {fileID: 11400000, guid: 9d953883ab4e1ef44b483b9fb2f67bba, type: 2}
-  - {fileID: 11400000, guid: b0e3d11b259402647ad2637ba2f6b825, type: 2}
+  - {fileID: 11400000, guid: b7f8fdf61cf4c8b4683864779ccb7b1c, type: 2}

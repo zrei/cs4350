@@ -10,23 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c721609b1ccae4fbd896dccad7c2762c, type: 3}
-  m_Name: Harness Power
+  m_Name: Nature'sWrath
   m_EditorClassIdentifier: 
-  m_SkillName: Harness Power
+  m_SkillName: Nature's Wrath
   m_Description: 
-  m_Icon: {fileID: 875926485, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_Icon: {fileID: 1069948953, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
   m_SkillType: 0
-  m_ConsumedMana: 0
-  m_CooldownTurns: 0
-  m_SkillTypes: 0500000009000000
-  m_InflictedTokens: []
+  m_ConsumedMana: 20
+  m_CooldownTurns: 3
+  m_SkillTypes: 0000000001000000
+  m_InflictedTokens:
+  - m_TokenTierData: {fileID: 11400000, guid: 3bd20286dd9b2c44c9977a2f23463996, type: 2}
+    m_Tier: 1
+    m_Number: 1
   m_InflictedStatusEffects: []
   m_DamageModifier: 1
-  m_SelfDamageModifier: 0.16666667
+  m_SelfDamageModifier: 0
   m_LifestealModifier: 0
   m_HealProportion: 1
   m_ManaAlterProportion: 0
-  m_ManaAlterSelfProportion: 0.1666667
   m_Summons: []
   m_TeleportSelf: 0
   m_TeleportTargetRules: []
@@ -37,13 +39,14 @@ MonoBehaviour:
   m_TargetWillPlayHurtAnimation: 0
   m_OverrideWeaponAnimationType: 0
   m_OverriddenWeaponAnimationType: 0
-  m_SkillAnimationType: 1
+  m_SkillAnimationType: 2
   m_TargetRules:
-  - {fileID: 11400000, guid: d268b682d0c8745928210e76eab4a622, type: 2}
+  - {fileID: 11400000, guid: 5594ad7acc2dc44508b9aaf0cae4c662, type: 2}
+  - {fileID: 11400000, guid: bafa5c363338c0849bc028b7798a2cd0, type: 2}
+  - {fileID: 11400000, guid: 3532326be7568d1419b024ef2dccee87, type: 2}
   m_TargetSO: {fileID: 11400000, guid: 8a24e54c7d084402bbec2086c58fc80e, type: 2}
   m_IsRangedAttack: 0
   m_OnWindUpSkillVFXs: []
   m_OnReleaseSkillVFXs: []
   m_OnHitSkillVFXs:
-  - {fileID: 11400000, guid: 9d953883ab4e1ef44b483b9fb2f67bba, type: 2}
-  - {fileID: 11400000, guid: b0e3d11b259402647ad2637ba2f6b825, type: 2}
+  - {fileID: 11400000, guid: 5ba47f59eb7e27f48ba8dc2072210cac, type: 2}
