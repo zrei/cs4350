@@ -850,7 +850,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EnemyGrid: {fileID: 647046762}
   m_PlayerGrid: {fileID: 1010769113}
-  m_BattleSo: {fileID: 11400000, guid: 57c731adc7b3b47b78d56e5556f17014, type: 2}
+  m_BattleSo: {fileID: 11400000, guid: a06c0330c8258429f99255edda4f1bc8, type: 2}
   m_SelectedGrid: 0
   m_CurrTileEnemy:
     m_InflictedTileEffect:
@@ -1268,6 +1268,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7880542336918112882, guid: 0455c34086d6442e5b286c90018fa688,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7880542336918112882, guid: 0455c34086d6442e5b286c90018fa688,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8842452784501181969, guid: 0455c34086d6442e5b286c90018fa688,
         type: 3}
@@ -4211,7 +4221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TileVisual: {fileID: 779769678}
   m_ArmorVisual: {fileID: 89013907}
-  m_IsSelected: 0
+  m_IsSelected: 1
 --- !u!114 &1556480809
 MonoBehaviour:
   m_ObjectHideFlags: 0
