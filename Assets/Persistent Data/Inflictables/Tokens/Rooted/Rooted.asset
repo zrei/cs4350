@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2402099c6e4d84a4ea7968b5c38457f7, type: 3}
-  m_Name: DesperationAuraMAtk
+  m_Name: Rooted
   m_EditorClassIdentifier: 
-  m_Id: 19
-  m_AllowStack: 0
+  m_Id: 11
+  m_AllowStack: 1
   m_IsBuff: 1
-  m_TokenName: Desperation Aura
-  m_Description: +20 Magic Attack
-  m_Icon: {fileID: -1531901422, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_TokenName: Rooted
+  m_Description: Cannot move.
+  m_Icon: {fileID: 5525114383923495870, guid: 252e5e02ea1c1674bb61c4b536890029, type: 3}
+  m_Color: {r: 0, g: 0.5647059, b: 1, a: 1}
   m_TieredTokens:
-  - {fileID: 11400000, guid: e639eb3213df8e948a23fb0ee4e94be9, type: 2}
-  m_Consumption: 
-  m_AffectedStats: 03000000
+  - {fileID: 11400000, guid: 0b66391b1e7be48fe894c3aacb81b565, type: 2}
+  m_Consumption: 0d000000
+  m_AffectedStats: 07000000
