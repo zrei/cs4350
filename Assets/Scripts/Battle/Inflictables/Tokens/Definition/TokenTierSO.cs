@@ -29,7 +29,19 @@ public abstract class TokenTierSO : ScriptableObject
     public List<TokenSO> m_TieredTokens;
     public int NumTiers => m_TieredTokens.Count;
 
-    public bool TryRetreiveTier(int tier, out TokenSO token)
+    [Header("Conditions")]
+    [Tooltip("Conditions, that if not met, the token will not be consumed")]
+    public List<ActionConditionSO> m_ActivationConditions;
+    [Tooltip("Tick this if the effect will always remain once activated. If so, the effect will not deactivate even if the conditions are no longer met")]
+    public bool m_CannotBeDeactivated = true;
+
+    // not sure if this can be handled under the activation conditions, but I think not, so here it lays for now
+    [Tooltip("Whether this skill can only activate for a limited number of times")]
+    public bool m_LimitedActivation = false;
+    [Tooltip("Number of times this token can be activated. Will be ignored if limited activation is not true")]
+    public int m_MaxActivations = 1;
+
+    public bool TryRetrieveTier(int tier, out TokenSO token)
     {
         if (tier > NumTiers)
         {
@@ -40,6 +52,15 @@ public abstract class TokenTierSO : ScriptableObject
 
         token = m_TieredTokens[tier - 1];
         return true;
+    }
+
+    /// <summary>
+    /// For static conditions, limited activation check will have to be done by the runtime wrapper as no state is stored here
+    /// </summary>
+    /// <returns></returns>
+    public bool IsConditionsMet(Unit unit, MapLogic mapLogic)
+    {
+        return m_ActivationConditions.All(x => x.IsConditionMet(unit, mapLogic));
     }
 
     [Header("Consumption")]

@@ -8,7 +8,7 @@ public class StatusEffectTokenTierSO : TokenTierSO
 
     public StatusEffect GetInflictedStatusEffect(int tier)
     {
-        if (TryRetreiveTier(tier, out TokenSO tokenSO))
+        if (TryRetrieveTier(tier, out TokenSO tokenSO))
         {
             return new StatusEffect(m_StatusEffect, (int) tokenSO.m_Amount);
         }

@@ -7,7 +7,7 @@ public class FlatStatChangeTokenTierSO : StatChangeTokenTierSO
 
     public float GetFlatStatChange(int tier)
     {
-        if (TryRetreiveTier(tier, out TokenSO tokenSO))
+        if (TryRetrieveTier(tier, out TokenSO tokenSO))
         {
             return tokenSO.m_Amount;
         }

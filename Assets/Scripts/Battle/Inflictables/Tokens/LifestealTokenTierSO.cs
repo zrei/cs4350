@@ -7,7 +7,7 @@ public class LifestealTokenTierSO : TokenTierSO
 
     public float GetLifestealProportion(int tier)
     {
-        if (TryRetreiveTier(tier, out TokenSO tokenSO))
+        if (TryRetrieveTier(tier, out TokenSO tokenSO))
         {
             return tokenSO.m_Amount;
         }

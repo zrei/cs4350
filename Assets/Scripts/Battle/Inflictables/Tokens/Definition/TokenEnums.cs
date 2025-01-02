@@ -10,7 +10,31 @@ public enum TokenType
     STUN,
     EVADE,
     LIFESTEAL,
-    REFLECT
+    REFLECT,
+    /// <summary>
+    /// Flat change health or mana
+    /// </summary>
+    FLAT_PASSIVE_CHANGE,
+    /// <summary>
+    /// Proportion change health or mana
+    /// </summary>
+    MULT_PASSIVE_CHANGE,
+    /// <summary>
+    /// Multiply exp gained
+    /// </summary>
+    EXP_MULTIPLIER,
+    /// <summary>
+    /// Summon units
+    /// </summary>
+    SUMMON,
+    /// <summary>
+    /// Extend your current turn
+    /// </summary>
+    EXTEND_TURN,
+    /// <summary>
+    /// Apply a token
+    /// </summary>
+    APPLY_TOKEN
 }
 
 public enum TokenConsumptionType
@@ -28,5 +52,6 @@ public enum TokenConsumptionType
     CONSUME_ON_OPPOSING_TARGET,
     CONSUME_ON_SELF_TARGET,
     CONSUME_ON_ALLY_TARGET,
-    CONSUME_POST_TURN
+    CONSUME_POST_TURN,
+    CONSUME_ON_DEFEAT_UNIT
 }

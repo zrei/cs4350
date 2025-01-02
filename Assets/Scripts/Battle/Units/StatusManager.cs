@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class StatusManager :
+    /*
     IFlatStatChange,
     IMultStatChange,
+    */
     IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
@@ -148,13 +150,13 @@ public class StatusManager :
     }
     */
 
-    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
+    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType, Unit unit)
     {
         List<StatusEffect> statusEffects = new();
 
         foreach (TokenStack tokenStack in TokenStacks)
         {
-            if (tokenStack.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
+            if (tokenStack.TryGetInflictedStatusEffect(unit, out StatusEffect statusEffect))
             {
                 statusEffects.Add(statusEffect);
             }
@@ -258,25 +260,25 @@ public class StatusManager :
     #endregion
 
     #region Stat Change
-    public float GetFlatStatChange(StatType statType)
+    public float GetFlatStatChange(StatType statType, Unit unit)
     {
         float totalFlatStatChange = 0;
 
         foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
-            totalFlatStatChange += tokenStack.GetFlatStatChange(statType);
+            totalFlatStatChange += tokenStack.GetFlatStatChange(statType, unit);
         }
 
         return totalFlatStatChange;
     }
 
-    public float GetMultStatChange(StatType statType)
+    public float GetMultStatChange(StatType statType, Unit unit)
     {
         float totalFlatStatChange = 1;
 
         foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
-            totalFlatStatChange *= tokenStack.GetMultStatChange(statType);
+            totalFlatStatChange *= tokenStack.GetMultStatChange(statType, unit);
         }
 
         return totalFlatStatChange;
@@ -320,32 +322,32 @@ public class StatusManager :
         return false;
     }
 
-    public float GetCritAmount()
+    public float GetCritAmount(Unit unit)
     {
         float finalCritProportion = 1f;
         foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
-            finalCritProportion *= tokenStack.GetFinalCritProportion();
+            finalCritProportion *= tokenStack.GetFinalCritProportion(unit);
         }
         return finalCritProportion;
     }
 
-    public float GetLifestealProportion()
+    public float GetLifestealProportion(Unit unit)
     {
         float finalLifestealProportion = 0f;
         foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
-            finalLifestealProportion += tokenStack.GetLifestealProportion();
+            finalLifestealProportion += tokenStack.GetLifestealProportion(unit);
         }
         return finalLifestealProportion;
     }
 
-    public float GetReflectProportion()
+    public float GetReflectProportion(Unit unit)
     {
         float finalReflectProportion = 0f;
         foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
         {
-            finalReflectProportion += tokenStack.GetReflectProportion();
+            finalReflectProportion += tokenStack.GetReflectProportion(unit);
         }
         return finalReflectProportion;
     }

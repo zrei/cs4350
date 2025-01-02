@@ -20,6 +20,8 @@ public class BattleManager : Singleton<BattleManager>
     [SerializeField] private Transform m_CameraLookAtPoint;
     [SerializeField] private Transform m_MapBiomeParent;
 
+    public MapLogic MapLogic => m_MapLogic;
+
     [Header("SFX")]
     [SerializeField] private AudioDataSO m_VictorySFX;
 

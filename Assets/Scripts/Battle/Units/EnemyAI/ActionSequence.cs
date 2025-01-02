@@ -6,7 +6,7 @@ public class ActionSequence : EnemyAction
 {
     public List<SequenceAction> m_SequenceActions;
     [Tooltip("Conditions that will result in this sequence being broken early")]
-    public List<EnemyActionConditionSO> m_DefaultBreakConditions;
+    public List<ActionConditionSO> m_DefaultBreakConditions;
 
     public override IConcreteAction GenerateConcreteAction()
     {
@@ -19,15 +19,15 @@ public struct SequenceAction
 {
     public EnemyAction m_Action;
     [Tooltip("Conditions that will be checked when the sequence is at this stage that can result in the whole sequence being broken early")]
-    public List<EnemyActionConditionSO> m_BreakConditions;
+    public List<ActionConditionSO> m_BreakConditions;
 }
 
 public struct ConcreteSequenceAction
 {
     public IConcreteAction m_Action;
-    public List<EnemyActionConditionSO> m_BreakConditions;
+    public List<ActionConditionSO> m_BreakConditions;
 
-    public ConcreteSequenceAction(IConcreteAction concreteAction, List<EnemyActionConditionSO> breakConditions)
+    public ConcreteSequenceAction(IConcreteAction concreteAction, List<ActionConditionSO> breakConditions)
     {
         m_Action = concreteAction;
         m_BreakConditions = breakConditions;
@@ -48,7 +48,7 @@ public struct ConcreteSequenceAction
 public class ActionSequenceRuntimeInstance : IConcreteAction
 {
     private List<ConcreteSequenceAction> m_Sequence;
-    private List<EnemyActionConditionSO> m_DefaultBreakConditions;
+    private List<ActionConditionSO> m_DefaultBreakConditions;
 
     private int m_Index = 0;
 
