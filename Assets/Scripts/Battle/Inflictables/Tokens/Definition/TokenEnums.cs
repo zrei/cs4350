@@ -34,7 +34,11 @@ public enum TokenType
     /// <summary>
     /// Apply a token
     /// </summary>
-    APPLY_TOKEN
+    APPLY_TOKEN,
+    /// <summary>
+    /// Spawn a tile effect
+    /// </summary>
+    SPAWN_TILE_EFFECT
 }
 
 public enum TokenConsumptionType
@@ -53,5 +57,11 @@ public enum TokenConsumptionType
     CONSUME_ON_SELF_TARGET,
     CONSUME_ON_ALLY_TARGET,
     CONSUME_POST_TURN,
-    CONSUME_ON_DEFEAT_UNIT
+    CONSUME_ON_DEFEAT_UNIT,
+    /// <summary>
+    /// This is different from on next turn, which is always consumed when the unit is brought out of the queue.
+    /// This is only consumed when the unit actually starts their turn, i.e. they're not unable to act
+    /// and are still alive after pre-tick
+    /// </summary>
+    CONSUME_ON_START_TURN
 }

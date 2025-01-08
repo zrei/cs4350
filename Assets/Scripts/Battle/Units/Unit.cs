@@ -56,8 +56,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     private CoordPair m_CurrPosition;
     public CoordPair CurrPosition => m_CurrPosition;
 
-    protected StatusManager m_StatusManager = new StatusManager();
-    public IStatusManager StatusManager => m_StatusManager;
+    protected StatusManager m_TempStatusManager = new StatusManager();
+    public IStatusManager StatusManager => m_TempStatusManager;
+    protected TokenManager m_PermanentTokenManager = new TokenManager(true);
 
     protected SkillCooldownTracker m_SkillCooldownTracker = new();
 
@@ -91,8 +92,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     #endregion
 
     private WeaponInstanceSO m_EquippedWeapon;
-    private readonly List<TokenStack> m_PermanentTokens = new();
-    public IEnumerable<TokenStack> PermanentTokens => m_PermanentTokens;
+    //private readonly List<TokenStack> m_PermanentTokens = new();
+    public IEnumerable<TokenStack> PermanentTokens => m_PermanentTokenManager.TokenStacks;
 
     public List<WeaponModel> WeaponModels => m_ArmorVisual.WeaponModels;
 
@@ -111,7 +112,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     {
         if (defeatedUnit.Equals(this))
             return;
-        m_StatusManager.TryClearTauntToken(defeatedUnit);
+        m_TempStatusManager.TryClearTauntToken(defeatedUnit);
     }
 
     protected void Initialise(Stats stats, RaceSO raceSO, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
@@ -136,14 +137,14 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     private void InitialisePermanentTokens(WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
-        m_PermanentTokens.Clear();
+        m_PermanentTokenManager.ClearTokens();
         foreach (InflictedToken inflictedToken in weaponInstanceSO.m_PassiveTokens)
         {
-            m_PermanentTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, 1, true));
+            m_PermanentTokenManager.AddToken(inflictedToken, null);
         }
         foreach (InflictedToken inflictedToken in permanentTokens)
         {
-            m_PermanentTokens.Add(new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, 1, true));
+            m_PermanentTokenManager.AddToken(inflictedToken, null);
         }
     }
     #endregion
@@ -272,7 +273,13 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     /// </summary>
     public void PreTick()
     {
-        m_StatusManager.Tick(this);
+        m_TempStatusManager.Tick(this);
+    }
+
+    public void StartTurn()
+    {
+        HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_START_TURN, BattleManager.Instance.MapLogic);
+        ConsumeTokens(TokenConsumptionType.CONSUME_ON_START_TURN);
     }
 
     /// <summary>
@@ -281,7 +288,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void PostTick()
     {
         m_SkillCooldownTracker.Tick();
+        HandleSpecialTokens(TokenConsumptionType.CONSUME_POST_TURN, BattleManager.Instance.MapLogic);
         ConsumeTokens(TokenConsumptionType.CONSUME_POST_TURN);
+        ++CurrTurnCount;
     }
     #endregion
 
@@ -294,34 +303,26 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     */
     public bool HasToken(TokenType tokenType)
     {
-        return m_StatusManager.HasTokenType(tokenType) || m_PermanentTokens.Any(x => x.TokenType == tokenType);
-    }
-
-    private void ActivatePermanentTokens(TokenConsumptionType consumeType)
-    {
-        m_PermanentTokens.Where(x => x.ContainsConsumptionType(consumeType)).ToList().ForEach(x => x.ConsumeToken());
-    }
-
-    private void ActivatePermanentTokens(TokenType tokenType)
-    {
-        m_PermanentTokens.Where(x => x.TokenType == tokenType).ToList().ForEach(x => x.ConsumeToken());
+        return m_TempStatusManager.HasTokenType(tokenType) || m_PermanentTokenManager.HasTokenType(tokenType);
     }
 
     public void ConsumeTokens(TokenConsumptionType consumeType)
     {
-        m_StatusManager.ConsumeTokens(consumeType);
-        ActivatePermanentTokens(consumeType);
+        m_TempStatusManager.ConsumeTokens(consumeType);
+        m_PermanentTokenManager.ConsumeTokens(consumeType);
     }
 
     public void ConsumeTokens(TokenType tokenType)
     {
-        m_StatusManager.ConsumeTokens(tokenType);
-        ActivatePermanentTokens(tokenType);
+        m_TempStatusManager.ConsumeTokens(tokenType);
+        m_PermanentTokenManager.ConsumeTokens(tokenType);
     }
 
+    /*
     public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
     {
-        List<StatusEffect> inflictedStatusEffects = m_StatusManager.GetInflictedStatusEffects(consumeType, this);
+        List<TargetBundle<StatusEffect>> inflictedStatusEffects = m_TempStatusManager.GetInflictedStatusEffects(consumeType, this);
+        inflictedStatusEffects.AddRange()
         foreach (TokenStack token in m_PermanentTokens)
         {
             if (token.TryGetInflictedStatusEffect(this, out StatusEffect statusEffect))
@@ -329,6 +330,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         }
         return inflictedStatusEffects;
     }
+    */
     #endregion
 
     #region Stats
@@ -346,22 +348,16 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     // for preview purposes: ADD THE WEAPON STUFF
     public float GetFlatStatChange(StatType statType)
     {
-        float flatStatChange = m_StatusManager.GetFlatStatChange(statType, this);
-        foreach (TokenStack tokenStack in m_PermanentTokens)
-        {
-            flatStatChange += tokenStack.GetFlatStatChange(statType, this);
-        }
+        float flatStatChange = m_TempStatusManager.GetFlatStatChange(statType, this);
+        flatStatChange += m_PermanentTokenManager.GetFlatStatChange(statType, this);
         return flatStatChange;
     }
 
     // for preview purposes
     public float GetMultStatChange(StatType statType)
     {
-        float multStatChange = m_StatusManager.GetMultStatChange(statType, this);
-        foreach (TokenStack tokenStack in m_PermanentTokens)
-        {
-            multStatChange *= tokenStack.GetMultStatChange(statType, this);
-        }
+        float multStatChange = m_TempStatusManager.GetMultStatChange(statType, this);
+        multStatChange *= m_PermanentTokenManager.GetMultStatChange(statType, this);
         return multStatChange;
     }
 
@@ -378,23 +374,28 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public float GetTotalStat(StatType statType, float externalBaseModifier = 1f)
     {
-        return Mathf.Max(0, (m_Stats.GetStat(statType) * externalBaseModifier + GetFlatStatChange(statType)) * GetMultStatChange(statType));
+        float baseStat = m_Stats.GetStat(statType);
+        float flatStatChange = GetFlatStatChange(statType);
+        float multStatChange = GetMultStatChange(statType);
+        return Mathf.Max(0, (baseStat * externalBaseModifier + flatStatChange) * multStatChange);
     }
     #endregion
 
     #region Damage Modifier
     public float GetFinalCritProportion()
     {
-        float critProportion = m_StatusManager.GetCritAmount(this);
-        foreach (TokenStack tokenStack in m_PermanentTokens)
-        {
-            critProportion *= tokenStack.GetFinalCritProportion(this);
-        }
+        float critProportion = m_TempStatusManager.GetCritAmount(this);
+        critProportion *= m_PermanentTokenManager.GetCritAmount(this);
         return critProportion;
     }
     #endregion
 
     #region Status
+    public bool CanExtendTurn(AttackInfo attackInfo)
+    {
+        return m_TempStatusManager.CanExtendTurn(this, attackInfo) || m_PermanentTokenManager.CanExtendTurn(this, attackInfo);
+    }
+
     public bool CanPerformTurn()
     {
         return !HasToken(TokenType.STUN);
@@ -407,27 +408,21 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public float GetReflectProportion()
     {
-        float reflectProportion = m_StatusManager.GetReflectProportion(this);
-        foreach (TokenStack tokenStack in m_PermanentTokens)
-        {
-            reflectProportion += tokenStack.GetReflectProportion(this);
-        }
+        float reflectProportion = m_TempStatusManager.GetReflectProportion(this);
+        reflectProportion += m_PermanentTokenManager.GetReflectProportion(this);
         return reflectProportion;
     }
 
     public float GetLifestealProportion()
     {
-        float lifestealProportion = m_StatusManager.GetLifestealProportion(this);
-        foreach (TokenStack tokenStack in m_PermanentTokens)
-        {
-            lifestealProportion += tokenStack.GetLifestealProportion(this);
-        }
+        float lifestealProportion = m_TempStatusManager.GetLifestealProportion(this);
+        lifestealProportion += m_PermanentTokenManager.GetLifestealProportion(this);
         return lifestealProportion;
     }
 
     public void InflictStatus(StatusEffect statusEffect)
     {
-        m_StatusManager.AddEffect(statusEffect);
+        m_TempStatusManager.AddEffect(statusEffect);
         DamageDisplayManager.Instance?.ShowDamage($"<sprite name=\"{statusEffect.Icon.name}\" tint>", statusEffect.Color, transform);
     }
 
@@ -437,7 +432,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         var color = Color.clear;
         foreach (StatusEffect statusEffect in statusEffects)
         {
-            m_StatusManager.AddEffect(statusEffect);
+            m_TempStatusManager.AddEffect(statusEffect);
             sb.Append($"<sprite name=\"{statusEffect.Icon.name}\" color=#{ColorUtility.ToHtmlStringRGB(statusEffect.Color)}> ");
             color += statusEffect.Color;
         }
@@ -447,7 +442,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public bool IsTaunted(out Unit forceTarget)
     {
-        return m_StatusManager.IsTaunted(out forceTarget);
+        return m_TempStatusManager.IsTaunted(out forceTarget);
     }
 
     public bool CanEvade()
@@ -457,14 +452,17 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public void Cleanse(List<StatusType> statusTypes)
     {
-        m_StatusManager.CleanseStatusTypes(statusTypes);
+        m_TempStatusManager.CleanseStatusTypes(statusTypes);
     }
     #endregion
 
     #region Token
     public void InflictToken(InflictedToken token, Unit inflicter)
     {
-        m_StatusManager.AddToken(token, inflicter);
+        if (token.m_IsPermanent)
+            m_PermanentTokenManager.AddToken(token, inflicter);
+        else
+            m_TempStatusManager.AddToken(token, inflicter);
         DamageDisplayManager.Instance?.ShowDamage($"<sprite name=\"{token.m_TokenTierData.m_Icon.name}\" tint>", token.m_TokenTierData.m_Color, transform);
     }
 
@@ -474,12 +472,62 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         var color = Color.clear;
         foreach (InflictedToken token in tokens)
         {
-            m_StatusManager.AddToken(token, inflicter);
+            m_TempStatusManager.AddToken(token, inflicter);
             sb.Append($"<sprite name=\"{token.m_TokenTierData.m_Icon.name}\" color=#{ColorUtility.ToHtmlStringRGB(token.m_TokenTierData.m_Color)}> ");
             color += token.m_TokenTierData.m_Color;
         }
         color /= tokens.Count;
         DamageDisplayManager.Instance?.ShowDamage(sb.ToString(), color, transform);
+    }
+
+    private void PreConsumptionCheck(TokenConsumptionType tokenConsumptionType, params TokenType[] tokenTypes)
+    {
+        foreach (TokenType tokenType in tokenTypes)
+        {
+            m_TempStatusManager.PreConsumptionConditionCheck(this, tokenConsumptionType, tokenType);
+            m_PermanentTokenManager.PreConsumptionConditionCheck(this, tokenConsumptionType, tokenType);
+        }
+    }
+
+    /// <summary>
+    /// Handle special tokens that can occur at multiple points in a turn phase
+    /// Run this BEFORE consuming tokens
+    /// </summary>
+    /// <param name="mapLogic"></param>
+    private void HandleSpecialTokens(TokenConsumptionType tokenConsumptionType, MapLogic mapLogic, List<Unit> filteredUnits = null)
+    {
+        // do a check of all conditions first to ensure consistency in behaviour
+        PreConsumptionCheck(tokenConsumptionType, TokenType.INFLICT_STATUS, TokenType.APPLY_TOKEN, TokenType.FLAT_PASSIVE_CHANGE, TokenType.MULT_PASSIVE_CHANGE, TokenType.SPAWN_TILE_EFFECT, TokenType.SUMMON);
+        
+        // status effects
+        List<TargetBundle<StatusEffect>> statusEffects = m_TempStatusManager.GetInflictedStatusEffects(tokenConsumptionType, this, filteredUnits);
+        statusEffects.AddRange(m_PermanentTokenManager.GetInflictedStatusEffects(tokenConsumptionType, this, filteredUnits));
+        mapLogic.ApplyStatusEffects(statusEffects);
+
+        // inflicted tokens
+        List<TargetBundle<InflictedToken>> inflictedTokens = m_TempStatusManager.GetInflictedTokens(tokenConsumptionType, this, filteredUnits);
+        inflictedTokens.AddRange(m_PermanentTokenManager.GetInflictedTokens(tokenConsumptionType, this, filteredUnits));
+        mapLogic.ApplyTokens(inflictedTokens, this);
+
+        // flat passive changes
+        List<TargetBundle<PassiveChangeBundle>> flatPassiveChanges = m_TempStatusManager.GetFlatPassiveChange(tokenConsumptionType, this, filteredUnits);
+        flatPassiveChanges.AddRange(m_PermanentTokenManager.GetFlatPassiveChange(tokenConsumptionType, this, filteredUnits));
+
+        // mult passive changes
+        List<TargetBundle<PassiveChangeBundle>> multPassiveChanges = m_TempStatusManager.GetMultPassiveChange(tokenConsumptionType, this, filteredUnits);
+        multPassiveChanges.AddRange(m_PermanentTokenManager.GetMultPassiveChange(tokenConsumptionType, this, filteredUnits));
+
+        mapLogic.ApplyPassiveChanges(flatPassiveChanges, multPassiveChanges);
+
+        // tile effects
+        List<TargetBundle<InflictedTileEffect>> inflictedTileEffects = m_TempStatusManager.GetInflictedTileEffects(tokenConsumptionType, this, filteredUnits);
+        inflictedTileEffects.AddRange(m_PermanentTokenManager.GetInflictedTileEffects(tokenConsumptionType, this, filteredUnits));
+        mapLogic.ApplyTileEffects(inflictedTileEffects);
+
+        // summon wrappers
+        List<SummonWrapper> summonWrappers = m_TempStatusManager.GetSummonWrappers(tokenConsumptionType, this);
+        summonWrappers.AddRange(m_PermanentTokenManager.GetSummonWrappers(tokenConsumptionType, this));
+        mapLogic.SummonUnits(summonWrappers);
     }
     #endregion
 
@@ -551,23 +599,23 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
         m_SkillCooldownTracker.UtiliseSkill(attackSO);
 
-        void CompleteAttackAnimationEvent()
+        void CompleteAttackAnimationEvent(bool canExtendTurn)
         {
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
-            PostSkillEvent?.Invoke();
+            PostSkillEvent?.Invoke(canExtendTurn);
         }
     }
 
-    public void ApplySkillEffects(ActiveSkillSO skill, List<Unit> targets)
+    public void ApplySkillEffects(ActiveSkillSO skill, List<Unit> targets, out bool canExtendTurn)
     {
         float dealtDamage = 0f;
 
+        HandleSpecialTokens(TokenConsumptionType.CONSUME_PRE_ATTACK, BattleManager.Instance.MapLogic, targets);
+        ConsumeTokens(TokenConsumptionType.CONSUME_PRE_ATTACK);
+
         List<StatusEffect> inflictedStatusEffects = new();
 
-        if (skill.IsPhysicalAttack)
-            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK));
-        else if (skill.IsMagicAttack)
-            inflictedStatusEffects.AddRange(GetInflictedStatusEffects(TokenConsumptionType.CONSUME_ON_MAG_ATTACK));
+        canExtendTurn = false;
 
         if (skill.ContainsSkillType(SkillEffectType.DEALS_STATUS_OR_TOKENS))
             inflictedStatusEffects.AddRange(skill.m_InflictedStatusEffects.Select(x => new StatusEffect(x.m_StatusEffect, x.m_Stack)));
@@ -588,7 +636,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             if (skill.DealsDamage)
             {
                 SkillType? forcedDmgType = null;
-                if (m_StatusManager.StatusEffects.Any(x => x.m_StatusEffectSO is ConvertDealtDamageTypeStatusEffectSO))
+                if (m_TempStatusManager.StatusEffects.Any(x => x.m_StatusEffectSO is ConvertDealtDamageTypeStatusEffectSO))
                 {
                     forcedDmgType = skill.m_SkillType == SkillType.PHYSICAL ? SkillType.MAGIC : SkillType.PHYSICAL;
                 }
@@ -600,6 +648,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                 {
                     TakeDamage(damage * target.GetReflectProportion());
                 }
+
+                target.HandleSpecialTokens(skill.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND, BattleManager.Instance.MapLogic, new() {this});
                 target.ConsumeTokens(skill.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
 
@@ -623,6 +673,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                 target.InflictStatus(inflictedStatusEffects);
                 target.InflictTokens(inflictedTokens, this);
             }
+            else
+            {
+                canExtendTurn = canExtendTurn || HasToken(TokenType.EXTEND_TURN);
+            }
 
             if (skill.ContainsSkillType(SkillEffectType.CLEANSE))
             {
@@ -630,9 +684,21 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
             }
         }
 
+        AttackInfo attackInfo = new(this, dealtDamage, targets);
+
+        if (skill.IsPhysicalAttack)
+            HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK, BattleManager.Instance.MapLogic, targets);
+        else
+            HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK, BattleManager.Instance.MapLogic, targets);
+
         if (!IsDead)
         {
             AlterMana(-skill.m_ConsumedMana);
+
+            if (skill.DealsDamage)
+            {
+                canExtendTurn = CanExtendTurn(attackInfo);
+            }
 
             if (skill.DealsDamage && (skill.m_SkillTypes.Contains(SkillEffectType.LIFESTEAL) || HasToken(TokenType.LIFESTEAL)))
             {
@@ -692,7 +758,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         return m_SkillCooldownTracker.GetCooldownProportion(activeSkillSO);
     }
 
-    public VoidEvent PostSkillEvent;
+    public BoolEvent PostSkillEvent;
     #endregion
 
     #region SFX

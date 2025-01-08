@@ -15,7 +15,7 @@ public class TokenStack :
     IStatus
 {
     #region Details
-    private TokenTierSO m_TokenTierData;
+    protected TokenTierSO m_TokenTierData;
     public bool AllowStack => m_TokenTierData.m_AllowStack;
     private int m_NumTiers;
     public int Id => m_TokenTierData.m_Id;
@@ -32,6 +32,11 @@ public class TokenStack :
     public virtual bool IsEmpty => m_NumTokensOfEachTier.All(x => x <= 0);
     private bool m_IsPermanent;
     private int m_NumActivationTimes;
+    /// <summary>
+    /// On the latest check for the current situation, were the conditiions met?
+    /// </summary>
+    private bool m_IsConditionMetThisIteration = false;
+    private bool m_HasBeenCheckedThisIteration = false;
     #endregion
 
     #region IStatus
@@ -70,22 +75,15 @@ public class TokenStack :
         m_IsPermanent = isPermanent;
     }
 
-    public TokenSO GetToken()
-    {
-        int maxTier = GetMaxTier();
-        if (maxTier > 0 && m_TokenTierData.TryRetrieveTier(maxTier, out TokenSO tokenSO))
-        {
-            return tokenSO;
-        }
-        return default;
-    }
-
     /// <summary>
     /// Consume a single token, taking the highest tiered one first
     /// </summary>
     public void ConsumeToken()
     {
-        ++m_NumActivationTimes;
+        m_HasBeenCheckedThisIteration = false;
+        if (m_IsConditionMetThisIteration)
+            ++m_NumActivationTimes;
+        m_IsConditionMetThisIteration = false;
         if (m_IsPermanent)
         {
             return;
@@ -129,7 +127,7 @@ public class TokenStack :
         if (TokenType == TokenType.MULT_STAT_CHANGE)
         {
             MultStatChangeTokenTierSO mult = (MultStatChangeTokenTierSO) m_TokenTierData;
-            if (!mult.m_AffectedStats.Contains(statType) && AreConditionsMet(unit))
+            if (!mult.m_AffectedStats.Contains(statType) || !CheckConditions(unit))
             {
                 return 1f;
             }
@@ -149,7 +147,7 @@ public class TokenStack :
         if (TokenType == TokenType.FLAT_STAT_CHANGE)
         {
             FlatStatChangeTokenTierSO flat = (FlatStatChangeTokenTierSO) m_TokenTierData;
-            if (!flat.m_AffectedStats.Contains(statType) && AreConditionsMet(unit))
+            if (!flat.m_AffectedStats.Contains(statType) || !CheckConditions(unit))
             {
                 return 0f;
             }
@@ -164,9 +162,57 @@ public class TokenStack :
         }
     }
 
+    public bool TryGetFlatPassiveChange(Unit unit, out PassiveChangeBundle passiveChangeBundle)
+    {
+        if (TokenType == TokenType.FLAT_PASSIVE_CHANGE)
+        {
+            FlatPassiveChangeTokenTierSO flat = (FlatPassiveChangeTokenTierSO) m_TokenTierData;
+            if (!CheckConditions(unit))
+            {
+                passiveChangeBundle = new PassiveChangeBundle(0f, 0f);
+                return false;
+            }
+            else
+            {
+                flat.GetFlatChange(GetMaxTier(), out float healthAmount, out float manaAmount);
+                passiveChangeBundle = new PassiveChangeBundle(healthAmount, manaAmount);
+                return true;
+            }
+        }
+        else
+        {
+            passiveChangeBundle = new PassiveChangeBundle(0f, 0f);
+            return false;
+        }
+    }
+
+    public bool TryGetMultPassiveChange(Unit unit, out PassiveChangeBundle passiveChangeBundle)
+    {
+        if (TokenType == TokenType.MULT_PASSIVE_CHANGE)
+        {
+            MultPassiveChangeTokenTierSO flat = (MultPassiveChangeTokenTierSO) m_TokenTierData;
+            if (!CheckConditions(unit))
+            {
+                passiveChangeBundle = new PassiveChangeBundle(0f, 0f);
+                return false;
+            }
+            else
+            {
+                flat.GetMultChange(GetMaxTier(), out float healthAmount, out float manaAmount);
+                passiveChangeBundle = new PassiveChangeBundle(healthAmount, manaAmount);
+                return true;
+            }
+        }
+        else
+        {
+            passiveChangeBundle = new PassiveChangeBundle(0f, 0f);
+            return false;
+        }
+    }
+
     public bool TryGetInflictedStatusEffect(Unit unit, out StatusEffect statusEffect)
     {
-        if (TokenType == TokenType.INFLICT_STATUS && AreConditionsMet(unit))
+        if (TokenType == TokenType.INFLICT_STATUS && CheckConditions(unit))
         {
             statusEffect = ((StatusEffectTokenTierSO) m_TokenTierData).GetInflictedStatusEffect(GetMaxTier());
             return true;
@@ -178,9 +224,51 @@ public class TokenStack :
         }
     }
 
+    public bool TryGetInflictedToken(Unit unit, out InflictedToken inflictedToken)
+    {
+        if (TokenType == TokenType.APPLY_TOKEN && CheckConditions(unit))
+        {
+            inflictedToken = ((ApplyTokenTierSO) m_TokenTierData).GetInflictedToken(GetMaxTier());
+            return true;
+        }
+        else
+        {
+            inflictedToken = null;
+            return false;
+        }
+    }
+
+    public bool TryGetInflictedTileEffect(Unit unit, out InflictedTileEffect tileEffect)
+    {
+        if (TokenType == TokenType.SPAWN_TILE_EFFECT && CheckConditions(unit))
+        {
+            tileEffect = ((ApplyTileEffectTokenTierSO) m_TokenTierData).GetInflictedTileEffect(GetMaxTier());
+            return true;
+        }
+        else
+        {
+            tileEffect = default;
+            return false;
+        }
+    }
+
+    public bool TryGetSummonedUnits(Unit unit, out List<SummonWrapper> summonWrappers)
+    {
+        if (TokenType == TokenType.SUMMON && CheckConditions(unit))
+        {
+            summonWrappers = ((SummonUnitsTokenTierSO) m_TokenTierData).GetSummonWrappers(GetMaxTier());
+            return true;
+        }
+        else
+        {
+            summonWrappers = default;
+            return false;
+        }
+    }
+
     public float GetFinalCritProportion(Unit unit)
     {
-        if (TokenType == TokenType.CRIT && AreConditionsMet(unit))
+        if (TokenType == TokenType.CRIT && CheckConditions(unit))
         {
             return ((CritTokenTierSO) m_TokenTierData).GetFinalDamageModifier(GetMaxTier());
         }
@@ -192,7 +280,7 @@ public class TokenStack :
 
     public float GetLifestealProportion(Unit unit)
     {
-        if (TokenType == TokenType.LIFESTEAL && AreConditionsMet(unit))
+        if (TokenType == TokenType.LIFESTEAL && CheckConditions(unit))
         {
             return ((LifestealTokenTierSO) m_TokenTierData).GetLifestealProportion(GetMaxTier());
         }
@@ -204,7 +292,7 @@ public class TokenStack :
 
     public float GetReflectProportion(Unit unit)
     {
-        if (TokenType == TokenType.REFLECT && AreConditionsMet(unit))
+        if (TokenType == TokenType.REFLECT && CheckConditions(unit))
         {
             return ((ReflectTokenTierSO) m_TokenTierData).GetReflectProportion(GetMaxTier());
         }
@@ -214,9 +302,14 @@ public class TokenStack :
         }
     }
 
-    private bool AreConditionsMet(Unit unit)
+    public bool CheckConditions(Unit unit, AttackInfo attackInfo = null)
     {
-        return (!m_TokenTierData.m_LimitedActivation || m_NumActivationTimes < m_TokenTierData.m_MaxActivations) && ((m_IsPermanent && m_NumActivationTimes > 0 ) || m_TokenTierData.IsConditionsMet(unit, BattleManager.Instance.MapLogic));
+        if (!m_TokenTierData.m_ResetConditionMet && m_HasBeenCheckedThisIteration)
+            return m_IsConditionMetThisIteration;
+
+        m_IsConditionMetThisIteration = (!m_TokenTierData.m_LimitedActivation || m_NumActivationTimes < m_TokenTierData.m_MaxActivations) && ((m_TokenTierData.m_CannotBeDeactivated && m_NumActivationTimes > 0 ) || m_TokenTierData.IsConditionsMet(unit, BattleManager.Instance.MapLogic, attackInfo));
+        m_HasBeenCheckedThisIteration = true;
+        return m_IsConditionMetThisIteration;
     }
 }
 
@@ -228,5 +321,63 @@ public class TauntTokenStack : TokenStack
     public TauntTokenStack(Unit targetedUnit, TokenTierSO tokenTierSO, int initialNumber = 1) : base(tokenTierSO, 1, initialNumber)
     {
         TauntedUnit = targetedUnit;
+    }
+}
+
+public class TargetOtherUnitsTokenStack : TokenStack 
+{
+    private TargetOtherTilesTokenTierSO TargetOtherUnitsTokenTierSO => (TargetOtherTilesTokenTierSO) m_TokenTierData;
+
+    public TargetOtherUnitsTokenStack(TokenTierSO tokenTierSO, int tier, int initialNumber = 1, bool isPermanent = false) : base(tokenTierSO, tier, initialNumber, isPermanent) {}
+
+    public IEnumerable<(CoordPair, GridType)> GetTargettedUnits(Unit currUnit, List<Unit> filteredUnits = null)
+    {
+        List<(CoordPair, GridType)> targetedCoordinates = new();
+
+        bool requireOccupiedTiles = TargetOtherUnitsTokenTierSO.RequiresTargetedSquares;
+        
+        List<ActionConditionSO> targetRules = TargetOtherUnitsTokenTierSO.m_TargetRules;
+        MapLogic mapLogic = BattleManager.Instance.MapLogic;
+
+        GetTargetPositionsOnGrid(currUnit, GridType.PLAYER, requireOccupiedTiles, mapLogic, targetedCoordinates);
+        GetTargetPositionsOnGrid(currUnit, GridType.ENEMY, requireOccupiedTiles, mapLogic, targetedCoordinates);
+
+        IEnumerable<(CoordPair, GridType)> finalTargets = targetedCoordinates.Where(x => {
+            Unit unitAtTile = mapLogic.GetUnitAtTile(x.Item2, x.Item1);
+            return unitAtTile == null || targetRules.All(rule => rule.IsConditionMet(unitAtTile, mapLogic));
+        });
+            
+        if (TargetOtherUnitsTokenTierSO.m_TargetFilteredUnitsOnly)
+        {
+            if (filteredUnits == null)
+                return new List<(CoordPair, GridType)>{};
+            else
+                return finalTargets.Where(x => filteredUnits.Contains(mapLogic.GetUnitAtTile(x.Item2, x.Item1)));
+        }
+        return finalTargets;
+    }
+
+    private void GetTargetPositionsOnGrid(Unit currUnit, GridType gridType, bool requiresOccupiedTiles, MapLogic mapLogic, in List<(CoordPair, GridType)> positions)
+    {
+        for (int r = 0; r < MapData.NUM_ROWS; ++r)
+        {
+            for (int c = 0; c < MapData.NUM_COLS; ++c)
+            {
+                CoordPair position = new CoordPair(r, c);
+                bool isOccupied = mapLogic.IsTileOccupied(gridType, position);
+                if (requiresOccupiedTiles && !isOccupied)
+                    continue;
+                if (!AreTargetConditionsMet(currUnit, position, gridType))
+                    continue;
+                positions.Add((position, gridType));
+            }
+        }
+    }
+
+    private bool AreTargetConditionsMet(Unit currUnit, CoordPair coordPair, GridType gridType)
+    {
+        List<TargetLocationRuleSO> targetLocationRules = TargetOtherUnitsTokenTierSO.m_TargetLocationRules;
+        List<TargetSideLimitRuleSO> targetSideLimitRules = TargetOtherUnitsTokenTierSO.m_TargetSideRules;
+        return targetLocationRules.All(x => x.IsValidTargetTile(coordPair, currUnit, gridType)) && targetSideLimitRules.All(x => x.IsValidTargetTile(coordPair, currUnit, gridType));
     }
 }

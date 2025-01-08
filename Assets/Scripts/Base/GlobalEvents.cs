@@ -32,7 +32,7 @@ public static class GlobalEvents
         public static UnitEvent PreviewUnitEvent;
         public static UnitEvent PreviewCurrentUnitEvent;
         public static VoidEvent AttackAnimationEvent; 
-        public static VoidEvent CompleteAttackAnimationEvent;
+        public static BoolEvent CompleteAttackAnimationEvent;
 
         public static void ClearEvents()
         {

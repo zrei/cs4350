@@ -4,4 +4,5 @@ using UnityEngine;
 public class EvadeTokenTierSO : TokenTierSO
 {
     public override TokenType TokenType => TokenType.EVADE;
+    public override bool m_ResetConditionMet => true;
 }

@@ -111,6 +111,8 @@ public class PlayerTurnManager : TurnManager
             return;
         }
 
+        m_CurrUnit.StartTurn();
+
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
 
         m_TotalMovementRange = (int)m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);
@@ -160,7 +162,7 @@ public class PlayerTurnManager : TurnManager
                             enemyActiveSkillAction.TargetGridType,
                             enemyActiveSkillAction.PossibleAttackPositions);
                     }
-                }
+                }GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
                 break;
             case PlayerTurnState.SELECTING_MOVEMENT_SQUARE:
                 UpdateMoveState();
@@ -314,10 +316,18 @@ public class PlayerTurnManager : TurnManager
             return false;
         }
 
-        void CompleteSkill()
+        void CompleteSkill(bool canExtendTurn)
         {
-            EndTurn();
-            m_IsPerformingAction = false;
+            if (!canExtendTurn)
+            {
+                EndTurn();
+                m_IsPerformingAction = false;
+            }
+            else
+            {
+                GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
+                TransitToAction(PlayerTurnState.SELECTING_ACTION);
+            }
         }
     }
 
@@ -346,10 +356,17 @@ public class PlayerTurnManager : TurnManager
             return false;
         }
 
-        void CompleteSkill()
+        void CompleteSkill(bool canExtendTurn)
         {
-            EndTurn();
-            m_IsPerformingAction = false;
+            if (!canExtendTurn)
+            {
+                EndTurn();
+                m_IsPerformingAction = false;
+            }
+            else
+            {
+                TransitToAction(PlayerTurnState.SELECTING_ACTION);
+            }
         }
     }
 

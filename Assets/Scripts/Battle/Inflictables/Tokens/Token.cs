@@ -9,6 +9,8 @@ public class InflictedToken : IStatus
     public int m_Tier = 1;
     [Tooltip("Number of this token to inflict at once")]
     public int m_Number = 1;
+    [HideInInspector]
+    public bool m_IsPermanent = false;
 
     public int Id => m_TokenTierData.m_Id;
     public TokenType TokenType => m_TokenTierData.TokenType;

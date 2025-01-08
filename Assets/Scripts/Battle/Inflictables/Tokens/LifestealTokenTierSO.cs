@@ -4,6 +4,7 @@ using UnityEngine;
 public class LifestealTokenTierSO : TokenTierSO
 {
     public override TokenType TokenType => TokenType.LIFESTEAL;
+    public override bool m_ResetConditionMet => true;
 
     public float GetLifestealProportion(int tier)
     {

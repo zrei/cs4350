@@ -69,7 +69,7 @@ namespace Game.UI
             Hide();
         }
 
-        private void OnCompleteAttackAnimation()
+        private void OnCompleteAttackAnimation(bool _)
         {
             Show();
         }

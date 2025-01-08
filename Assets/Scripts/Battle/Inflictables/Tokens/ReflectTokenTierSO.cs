@@ -4,7 +4,8 @@ using UnityEngine;
 public class ReflectTokenTierSO : TokenTierSO
 {
     public override TokenType TokenType => TokenType.REFLECT;
-    
+    public override bool m_ResetConditionMet => true;
+
     public float GetReflectProportion(int tier)
     {
         if (TryRetrieveTier(tier, out TokenSO tokenSO))

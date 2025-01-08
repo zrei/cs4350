@@ -122,7 +122,7 @@ public class BehaviourTreeRuntimeInstance : IConcreteAction
         m_PrevActionIndex = -1;
     }
 
-    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent onCompleteEvent)
+    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent onCompleteEvent)
     { 
         Reset();
         if (m_CurrActionIndex == -1)

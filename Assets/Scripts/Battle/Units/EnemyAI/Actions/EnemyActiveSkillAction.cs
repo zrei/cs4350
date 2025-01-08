@@ -19,7 +19,7 @@ public class EnemyActiveSkillActionWrapper : EnemyActionWrapper
         return !ActiveSkillAction.CanActionBePerformed(enemyUnit, mapLogic, out m_PossibleAttackPositions, out m_PossibleAttackPositionsIgnoreOccupied);
     }
 
-    public override void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public override void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent completeActionEvent)
     {
         CoordPair finalTarget = ActiveSkillAction.GetChosenTargetTile(enemyUnit, mapLogic, m_PossibleAttackPositions);
         var attackDelay = 1.5f;

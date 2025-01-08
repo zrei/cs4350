@@ -1,5 +1,20 @@
 // static class not linked to MonoBehaviour atm
+using System.Collections.Generic;
 using UnityEngine;
+
+public class AttackInfo 
+{
+    public Unit m_Attacker;
+    public float m_TotalDamageDealt;
+    public List<Unit> m_Targets;
+
+    public AttackInfo(Unit attacker, float totalDamageDealt, List<Unit> targets)
+    {
+        m_Attacker = attacker;
+        m_TotalDamageDealt = totalDamageDealt;
+        m_Targets = targets;
+    }
+}
 
 public static class DamageCalc
 {

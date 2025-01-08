@@ -85,7 +85,7 @@ public class WorldSpaceUnitDisplay : MonoBehaviour
         Hide();
     }
 
-    private void OnCompleteAttackAnimation()
+    private void OnCompleteAttackAnimation(bool _)
     {
         Show();
     }

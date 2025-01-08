@@ -23,7 +23,7 @@ public abstract class EnemyActionWrapper : IConcreteAction
         return this;
     }
 
-    public abstract void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent onCompleteAction);
+    public abstract void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent onCompleteAction);
 
     public abstract bool ShouldBreakOut(EnemyUnit enemyUnit, MapLogic mapLogic);
 
@@ -51,10 +51,13 @@ public class EnemyUnit : Unit
 
     private BehaviourTreeRuntimeInstance m_TopLevelBehaviour;
 
-    public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO, List<InflictedToken> permanentTokens)
+    public void Initialise(Stats statAugments, EnemyCharacterSO enemyCharacterSO, List<InflictedToken> additionalPermanentTokens, int maxPlayerLevel)
     {
         CharacterSOInstanceID = enemyCharacterSO.GetInstanceID();
         CharacterName = enemyCharacterSO.m_CharacterName;
+        List<InflictedToken> permanentTokens = new();
+        permanentTokens.AddRange(additionalPermanentTokens);
+        permanentTokens.AddRange(enemyCharacterSO.GetInflictedTokens(maxPlayerLevel));
         base.Initialise(enemyCharacterSO.m_Stats.FlatAugment(statAugments), enemyCharacterSO.m_Race, enemyCharacterSO.m_EnemyClass, enemyCharacterSO.m_CharacterSprite, enemyCharacterSO.GetUnitModelData(), enemyCharacterSO.m_EquippedWeapon, permanentTokens);
         InitialiseActions(enemyCharacterSO.EnemyActionSetSO);
     }
@@ -139,7 +142,7 @@ public class EnemyUnit : Unit
         */
     }
 
-    public void PerformAction(MapLogic mapLogic, VoidEvent completeActionEvent)
+    public void PerformAction(MapLogic mapLogic, BoolEvent completeActionEvent)
     {
         m_TopLevelBehaviour.Run(this, mapLogic, completeActionEvent);
         

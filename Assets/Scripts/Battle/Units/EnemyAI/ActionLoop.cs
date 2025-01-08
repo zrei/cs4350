@@ -44,7 +44,7 @@ public class ActionLoopRuntimeInstance : IConcreteAction
         // pass
     }
 
-    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent completeActionEvent)
     {
         m_Action.Run(enemyUnit, mapLogic, completeActionEvent);
     }

@@ -248,12 +248,12 @@ public class MapLogic : MonoBehaviour
     #endregion
 
     #region Attacks
-    public void PerformSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, VoidEvent completeSkillEvent)
+    public void PerformSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, BoolEvent completeSkillEvent)
     {
         RetrieveGrid(gridType).PerformSkill(attacker, attack, targetTile, completeSkillEvent);
     }
 
-    public void PerformTeleportSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, CoordPair teleportTargetTile, VoidEvent completeSkillEvent)
+    public void PerformTeleportSkill(GridType gridType, Unit attacker, ActiveSkillSO attack, CoordPair targetTile, CoordPair teleportTargetTile, BoolEvent completeSkillEvent)
     {
         RetrieveGrid(gridType).PerformTeleportSkill(
             attacker,
@@ -311,6 +311,37 @@ public class MapLogic : MonoBehaviour
     public void ApplyTileEffectOnTile(GridType gridType, List<CoordPair> coordinates, InflictedTileEffect inflictedTileEffect)
     {
         RetrieveGrid(gridType).TryApplyEffectOnTiles(coordinates, inflictedTileEffect);
+    }
+    #endregion
+
+    #region Token Handler
+    public void ApplyStatusEffects(List<TargetBundle<StatusEffect>> statusEffects)
+    {
+        m_EnemyGrid.ApplyStatusEffects(statusEffects);
+        m_PlayerGrid.ApplyStatusEffects(statusEffects);
+    }
+
+    public void ApplyTokens(List<TargetBundle<InflictedToken>> inflictedTokens, Unit inflictor)
+    {
+        m_EnemyGrid.InflictTokenBundles(inflictedTokens, inflictor);
+        m_PlayerGrid.InflictTokenBundles(inflictedTokens, inflictor);
+    }
+
+    public void ApplyPassiveChanges(List<TargetBundle<PassiveChangeBundle>> flatPassiveChanges, List<TargetBundle<PassiveChangeBundle>> multPassiveChanges)
+    {
+        m_EnemyGrid.ApplyPassiveChangeBundles(flatPassiveChanges, multPassiveChanges);
+        m_PlayerGrid.ApplyPassiveChangeBundles(flatPassiveChanges, multPassiveChanges);
+    }
+
+    public void SummonUnits(List<SummonWrapper> summonWrappers)
+    {
+        m_EnemyGrid.SummonUnits(summonWrappers);
+    }
+
+    public void ApplyTileEffects(List<TargetBundle<InflictedTileEffect>> inflictedTileEffects)
+    {
+        m_EnemyGrid.InflictTileEffectBundles(inflictedTileEffects);
+        m_PlayerGrid.InflictTileEffectBundles(inflictedTileEffects);
     }
     #endregion
 }

@@ -87,7 +87,8 @@ public class TurnQueue
 
     public void AddUnit(Unit unit)
     {
-        m_Turns.Add(new TurnWrapper(DISTANCE_THRESHOLD / unit.GetTotalStat(StatType.SPEED), unit));
+        float speedStat = unit.GetTotalStat(StatType.SPEED);
+        m_Turns.Add(new TurnWrapper(DISTANCE_THRESHOLD / speedStat, unit));
     }
 
     public void Clear()

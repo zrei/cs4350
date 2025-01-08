@@ -57,6 +57,7 @@ public class BattleManager : Singleton<BattleManager>
     private bool m_WithinBattle = false;
     private bool m_HasBattleConcluded = false;
     private BattleSO m_CurrBattleSO = null;
+    public int MaxPlayerLevel {get; private set;}
     #endregion
 
     #region Objectives
@@ -160,6 +161,8 @@ public class BattleManager : Singleton<BattleManager>
 
         m_MapLogic.ResetMap();
 
+        MaxPlayerLevel = Mathf.Max(CharacterDataManager.Instance.RetrieveCharacterData(playerUnitData.Select(x => x.m_BaseData.m_Id)).Select(x => x.m_CurrLevel).ToArray());
+
         foreach (EnemyUnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
             InstantiateEnemyUnit(unitPlacement);
@@ -252,7 +255,7 @@ public class BattleManager : Singleton<BattleManager>
     {
         EnemyUnit enemyUnit = Instantiate(m_EnemyUnit);
         // leaving it open to give enemy units permanent debuffs/buffs depending on the state of the level
-        enemyUnit.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData, new());
+        enemyUnit.Initialise(unitPlacement.m_StatAugments, unitPlacement.m_EnemyCharacterData, new(), MaxPlayerLevel);
         m_MapLogic.PlaceUnit(GridType.ENEMY, enemyUnit, unitPlacement.m_Coordinates);
         m_TurnQueue.AddUnit(enemyUnit);
         m_AllEnemyUnits.Add(enemyUnit);

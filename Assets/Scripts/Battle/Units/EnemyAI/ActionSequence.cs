@@ -78,18 +78,18 @@ public class ActionSequenceRuntimeInstance : IConcreteAction
         m_Index = 0;
     }
 
-    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent completeActionEvent)
     {
         m_Sequence[m_Index].m_Action.Run(enemyUnit, mapLogic, OnComplete);
 
-        void OnComplete()
+        void OnComplete(bool canExtendTurn)
         {
             if (m_Sequence[m_Index].m_Action.IsCompleted(enemyUnit, mapLogic))
             {
                 ++m_Index;   
             }
 
-            completeActionEvent?.Invoke();
+            completeActionEvent?.Invoke(canExtendTurn);
         }
     }
 

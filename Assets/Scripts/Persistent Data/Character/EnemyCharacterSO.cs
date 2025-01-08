@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "EnemyCharacterSO", menuName = "ScriptableObject/Battle/Enemy/EnemyCharacterSO")]
 public class EnemyCharacterSO : CharacterSO
@@ -12,6 +13,13 @@ public class EnemyCharacterSO : CharacterSO
     public UnitModelData GetUnitModelData()
     {
         return m_Race.GetUnitModelData(m_Gender, m_SkinColor, m_EyeColor, m_EnemyClass.m_OutfitType);
+    }
+
+    public List<InflictedToken> GetInflictedTokens(int maxLevel)
+    {
+        List<InflictedToken> inflictedTokens = new();
+        inflictedTokens.AddRange(m_EnemyClass.GetInflictedTokens(maxLevel));
+        return inflictedTokens;
     }
 
     public BehaviourTree EnemyActionSetSO => m_EnemyClass.m_EnemyBehaviourTree;
