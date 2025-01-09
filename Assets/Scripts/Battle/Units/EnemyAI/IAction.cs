@@ -16,7 +16,7 @@ public interface IConcreteAction
     /// <param name="enemyUnit"></param>
     /// <param name="mapLogic"></param>
     /// <param name="completeActionEvent"></param>
-    public abstract void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent);
+    public abstract void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent completeActionEvent);
     
     /// <summary>
     /// Checks whether the parent should stop performing this child

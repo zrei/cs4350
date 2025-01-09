@@ -22,15 +22,15 @@ public struct BehaviourTreeAction
 {
     public EnemyAction m_Action;
     [Tooltip("Additional Conditions that need to be fulfilled for this action to be allowed")]
-    public List<EnemyActionConditionSO> m_AdditionalConditions;
+    public List<ActionConditionSO> m_AdditionalConditions;
 }
 
 public struct ConcreteBehaviourTreeAction
 {
     public IConcreteAction m_Action;
-    public List<EnemyActionConditionSO> m_AdditionalConditions;
+    public List<ActionConditionSO> m_AdditionalConditions;
 
-    public ConcreteBehaviourTreeAction(IConcreteAction concreteAction, List<EnemyActionConditionSO> additionalConditions)
+    public ConcreteBehaviourTreeAction(IConcreteAction concreteAction, List<ActionConditionSO> additionalConditions)
     {
         m_Action = concreteAction;
         m_AdditionalConditions = additionalConditions;
@@ -122,7 +122,7 @@ public class BehaviourTreeRuntimeInstance : IConcreteAction
         m_PrevActionIndex = -1;
     }
 
-    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent onCompleteEvent)
+    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent onCompleteEvent)
     { 
         Reset();
         if (m_CurrActionIndex == -1)
@@ -170,7 +170,7 @@ public class BehaviourTreeRuntimeInstance : IConcreteAction
 [System.Serializable]
 public struct EnemyActionCondition
 {
-    public EnemyActionConditionSO m_Condition;
+    public ActionConditionSO m_Condition;
     [Tooltip("The index of the tree this condition corresponds to")]
     public int m_ActionIndex;
 

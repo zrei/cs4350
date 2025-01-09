@@ -23,10 +23,35 @@ public class EnemyTurnManager : TurnManager
             return;
         }   
 
-        GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
-        GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
+        m_CurrUnit.StartTurn();
 
-        enemyUnit.PerformAction(m_MapLogic, EndTurn);
+        if (m_CurrUnit.IsDead)
+        {
+            m_CurrUnit.Die();
+            EndTurn();
+            return;
+        }
+
+        // need to re-evaluate for this specific enemy unit as the map situation may have changed
+        enemyUnit.GetActionToBePerformed(BattleManager.Instance.MapLogic);
+
+        GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
+
+        ChooseAction();
+    }
+
+    private void ChooseAction()
+    {
+        GlobalEvents.Battle.PreviewCurrentUnitEvent?.Invoke(m_CurrUnit);
+        m_CurrUnit.PerformAction(m_MapLogic, CompleteAction);
+    }
+
+    private void CompleteAction(bool canExtendTurn)
+    {
+        if (!canExtendTurn)
+            EndTurn();
+        else
+            ChooseAction();
     }
 
     private void EndTurn()

@@ -6,9 +6,9 @@ public class ActionLoop : EnemyAction
 {
     public EnemyAction m_Action;
     [Tooltip("Conditions that cause the loop to break early")]
-    public List<EnemyActionConditionSO> m_BreakConditions;
+    public List<ActionConditionSO> m_BreakConditions;
     [Tooltip("Conditions that cause the loop to be fulfilled")]
-    public List<EnemyActionConditionSO> m_LoopConditionsToFulfill;
+    public List<ActionConditionSO> m_LoopConditionsToFulfill;
 
     public override IConcreteAction GenerateConcreteAction()
     {
@@ -19,8 +19,8 @@ public class ActionLoop : EnemyAction
 public class ActionLoopRuntimeInstance : IConcreteAction
 {
     private IConcreteAction m_Action;
-    private List<EnemyActionConditionSO> m_BreakConditions;
-    private List<EnemyActionConditionSO> m_LoopConditionsToFulfill;
+    private List<ActionConditionSO> m_BreakConditions;
+    private List<ActionConditionSO> m_LoopConditionsToFulfill;
 
     public ActionLoopRuntimeInstance(ActionLoop actionLoop)
     {
@@ -44,7 +44,7 @@ public class ActionLoopRuntimeInstance : IConcreteAction
         // pass
     }
 
-    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent completeActionEvent)
     {
         m_Action.Run(enemyUnit, mapLogic, completeActionEvent);
     }

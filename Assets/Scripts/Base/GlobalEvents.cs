@@ -19,6 +19,7 @@ public static class GlobalEvents
         public delegate void TurnOrderEvent(List<Unit> _);
         public delegate void PhaseEvent(PlayerTurnState _);
         public delegate void BattleOutcomeEvent(UnitAllegiance _, int numTurns);
+        public delegate void BattleAnimationEvent(bool canExtendTurn, HashSet<Unit> additionalDeadUnits);
         public static VoidEvent BattleInitializedEvent;
         public static FloatEvent BattleTimeTickEvent;
         public static UnitEvent UnitDefeatedEvent;
@@ -32,7 +33,7 @@ public static class GlobalEvents
         public static UnitEvent PreviewUnitEvent;
         public static UnitEvent PreviewCurrentUnitEvent;
         public static VoidEvent AttackAnimationEvent; 
-        public static VoidEvent CompleteAttackAnimationEvent;
+        public static BattleAnimationEvent CompleteAttackAnimationEvent;
 
         public static void ClearEvents()
         {

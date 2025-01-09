@@ -83,6 +83,11 @@ namespace Game.UI
             Hide();
         }
 
+        private void Show(bool _, HashSet<Unit> _2)
+        {
+            Show();
+        }
+
         private void Show()
         {
             uiAnimator.Show();

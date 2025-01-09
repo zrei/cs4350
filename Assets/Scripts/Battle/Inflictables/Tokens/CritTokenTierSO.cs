@@ -4,10 +4,11 @@ using UnityEngine;
 public class CritTokenTierSO : TokenTierSO
 {
     public override TokenType TokenType => TokenType.CRIT;
+    public override bool m_ResetConditionMet => true;
 
     public float GetFinalDamageModifier(int tier)
     {
-        if (TryRetreiveTier(tier, out TokenSO tokenSO))
+        if (TryRetrieveTier(tier, out TokenSO tokenSO))
         {
             return tokenSO.m_Amount;
         }

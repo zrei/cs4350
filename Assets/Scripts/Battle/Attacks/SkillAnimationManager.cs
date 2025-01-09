@@ -40,6 +40,9 @@ public class SkillAnimationManager : Singleton<SkillAnimationManager>
         var isSkillHitInvoked = false; // ensure OnSkillHit is invoked exactly once
         var isSkillComplete = false;
 
+        bool canExtendTurn = false;
+        HashSet<Unit> additionalDeadUnits = new();
+
         void OnSkillRelease()
         {
             attacker.AnimationEventHandler.onSkillRelease -= OnSkillRelease;
@@ -68,7 +71,7 @@ public class SkillAnimationManager : Singleton<SkillAnimationManager>
 
             attacker.AnimationEventHandler.onSkillHit -= OnSkillHit;
 
-            attacker.ApplySkillEffects(activeSkill, targets);
+            additionalDeadUnits = attacker.ApplySkillEffects(activeSkill, targets, out canExtendTurn);
 
             if (activeSkill.m_TargetWillPlayHurtAnimation)
             {
@@ -124,7 +127,7 @@ public class SkillAnimationManager : Singleton<SkillAnimationManager>
             yield return HandleMoveSkillAnimation(activeSkill.m_TeleportSelf ? attacker : targets[0], targetMovePosition.Value);
         }
 
-        GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke();
+        GlobalEvents.Battle.CompleteAttackAnimationEvent?.Invoke(canExtendTurn, additionalDeadUnits);
     }
 
     IEnumerator HandleCamAnimTransitIn(Unit attacker, List<Unit> targets, bool isAttack, bool isRanged)

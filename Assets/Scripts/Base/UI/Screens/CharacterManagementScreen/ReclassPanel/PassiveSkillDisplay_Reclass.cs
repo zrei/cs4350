@@ -32,7 +32,7 @@ namespace Game.UI
 
         protected override void HoverSkill(int index)
         {
-            ClassPassiveEffect classPassiveEffect = m_CurrClass.m_PassiveEffects[(m_CurrPage - 1) * m_NumSkillButtons + index];
+            PassiveEffect classPassiveEffect = m_CurrClass.m_PassiveEffects[(m_CurrPage - 1) * m_NumSkillButtons + index];
 
             m_SkillTitle.gameObject.SetActive(true);
             m_SkillTitle?.SetValue(classPassiveEffect.m_Name);

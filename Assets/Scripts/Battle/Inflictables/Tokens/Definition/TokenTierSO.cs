@@ -27,9 +27,23 @@ public abstract class TokenTierSO : ScriptableObject
     [Header("Tiers")]
     [Tooltip("Tokens in order of their tiers: Start from tier 1 and go up")]
     public List<TokenSO> m_TieredTokens;
-    public int NumTiers => m_TieredTokens.Count;
+    public virtual int NumTiers => m_TieredTokens.Count;
 
-    public bool TryRetreiveTier(int tier, out TokenSO token)
+    [Header("Conditions")]
+    [Tooltip("Conditions, that if not met, the token will not be consumed")]
+    public List<ActionConditionSO> m_ActivationConditions;
+    [Tooltip("Conditions that should be used for attacks specifically")]
+    public List<AttackInfoConditionSO> m_AttackInfoConditions;
+    [Tooltip("Tick this if the effect will always remain once activated. If so, the effect will not deactivate even if the conditions are no longer met")]
+    public bool m_CannotBeDeactivated = true;
+
+    // not sure if this can be handled under the activation conditions, but I think not, so here it lays for now
+    [Tooltip("Whether this skill can only activate for a limited number of times")]
+    public bool m_LimitedActivation = false;
+    [Tooltip("Number of times this token can be activated. Will be ignored if limited activation is not true")]
+    public int m_MaxActivations = 1;
+
+    protected bool TryRetrieveTier(int tier, out TokenSO token)
     {
         if (tier > NumTiers)
         {
@@ -42,9 +56,19 @@ public abstract class TokenTierSO : ScriptableObject
         return true;
     }
 
+    /// <summary>
+    /// For static conditions, limited activation check will have to be done by the runtime wrapper as no state is stored here
+    /// </summary>
+    /// <returns></returns>
+    public bool IsConditionsMet(Unit unit, MapLogic mapLogic, AttackInfo attackInfo = null)
+    {
+        return m_ActivationConditions.All(x => x.IsConditionMet(unit, mapLogic)) && (m_AttackInfoConditions.Count == 0 || (attackInfo != null && m_AttackInfoConditions.All(x => x.IsConditionMet(attackInfo))));
+    }
+
     [Header("Consumption")]
     [Tooltip("When to consume this token")]
     public TokenConsumptionType[] m_Consumption;
+    public virtual bool m_ResetConditionMet => false;
     public bool ContainsConsumptionType(TokenConsumptionType consumeType) => m_Consumption.Contains(consumeType);
 
     public override string ToString()

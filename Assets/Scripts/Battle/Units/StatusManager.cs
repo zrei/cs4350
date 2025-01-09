@@ -2,19 +2,30 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class StatusManager :
+    /*
     IFlatStatChange,
     IMultStatChange,
+    */
     IStatusManager
 {
     private readonly Dictionary<int, StatusEffect> m_StatusEffects = new();
-    private readonly Dictionary<int, TokenStack> m_ConsumableTokenStacks = new();
+    private TokenManager m_TokenManager = new(false);
 
     #region IStatusManager
-    public IEnumerable<TokenStack> TokenStacks => m_ConsumableTokenStacks.Values;
+    public IEnumerable<TokenStack> TokenStacks => m_TokenManager.TokenStacks;
     public IEnumerable<StatusEffect> StatusEffects => m_StatusEffects.Values;
     public event StatusEvent OnAdd;
     public event StatusEvent OnChange;
     public event StatusEvent OnRemove;
+    #endregion
+
+    #region Initialisation
+    public StatusManager()
+    {
+        m_TokenManager.OnAdd += OnAdd;
+        m_TokenManager.OnChange += OnChange;
+        m_TokenManager.OnRemove += OnRemove;
+    }
     #endregion
 
     #region Add Inflictable
@@ -35,47 +46,12 @@ public class StatusManager :
 
     public void AddToken(InflictedToken inflictedToken, Unit inflicter)
     {
-        // special handling for taunt
-        if (inflictedToken.TokenType == TokenType.TAUNT)
-        {
-            AddTauntToken(inflictedToken.m_TokenTierData, inflicter, inflictedToken.m_Number);
-            return;
-        }
-
-        Logger.Log(this.GetType().Name, $"Add token: {inflictedToken.m_TokenTierData.name} of tier: {inflictedToken.m_Tier}", LogLevel.LOG);
-
-        if (m_ConsumableTokenStacks.ContainsKey(inflictedToken.Id))
-        {
-            m_ConsumableTokenStacks[inflictedToken.Id].AddToken(inflictedToken.m_Tier, inflictedToken.m_Number);
-            OnChange?.Invoke(m_ConsumableTokenStacks[inflictedToken.Id]);
-        }
-        else
-        {
-            m_ConsumableTokenStacks[inflictedToken.Id] = new TokenStack(inflictedToken.m_TokenTierData, inflictedToken.m_Tier, inflictedToken.m_Number);
-            OnAdd?.Invoke(m_ConsumableTokenStacks[inflictedToken.Id]);
-        }
-    }
-
-    // special case for now
-    public void AddTauntToken(TokenTierSO tokenData, Unit forceTarget, int number = 1)
-    {
-        if (m_ConsumableTokenStacks.ContainsKey(tokenData.m_Id))
-        {
-            return;
-        }
-        else
-        {
-            Logger.Log(this.GetType().Name, $"Add taunt token, force target: {forceTarget.name}", LogLevel.LOG);
-            m_ConsumableTokenStacks[tokenData.m_Id] = new TauntTokenStack(forceTarget, tokenData, number);
-        }
+        m_TokenManager.AddToken(inflictedToken, inflicter);
     }
 
     public void TryClearTauntToken(Unit deadUnit)
     {
-        if (TryGetTauntedUnit(out Unit tauntedUnit) && tauntedUnit.Equals(deadUnit))
-        {
-            ConsumeTokens(TokenType.TAUNT);
-        }
+        m_TokenManager.TryClearTauntToken(deadUnit);
     }
     #endregion
 
@@ -129,47 +105,44 @@ public class StatusManager :
     #region Getters
     public bool HasTokenType(TokenType tokenType)
     {
-        return m_ConsumableTokenStacks.Any(x => x.Value.TokenType == tokenType);
-    }
-    /*
-    public IEnumerable<Token> GetTokens(TokenType tokenType)
-    {
-        return m_Tokens.Where(x => x.TokenType == tokenType);
+        return m_TokenManager.HasTokenType(tokenType);
     }
 
-    public IEnumerable<Token> GetTokens(TokenConsumptionType consumeType)
+    public List<TargetBundle<StatusEffect>> GetInflictedStatusEffects(TokenConsumptionType consumeType, Unit unit, List<Unit> filteredUnits = null)
     {
-        return m_Tokens.Where(x => x.ContainsConsumptionType(consumeType));
+        return m_TokenManager.GetInflictedStatusEffects(consumeType, unit, filteredUnits);
     }
 
-    public IEnumerable<Token> GetTokens(TokenConsumptionType consumeType, TokenType tokenType)
+    public List<TargetBundle<InflictedToken>> GetInflictedTokens(TokenConsumptionType consumeType, Unit unit, List<Unit> filteredUnits = null)
     {
-        return m_Tokens.Where(x => x.ContainsConsumptionType(consumeType) && x.TokenType == tokenType);
+        return m_TokenManager.GetInflictedTokens(consumeType, unit, filteredUnits);
     }
-    */
 
-    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
+    public List<TargetBundle<PassiveChangeBundle>> GetFlatPassiveChange(TokenConsumptionType consumeType, Unit unit, List<Unit> filteredUnits = null)
     {
-        List<StatusEffect> statusEffects = new();
+        return m_TokenManager.GetFlatPassiveChange(consumeType, unit, filteredUnits);
+    }
 
-        foreach (TokenStack tokenStack in TokenStacks)
-        {
-            if (tokenStack.TryGetInflictedStatusEffect(out StatusEffect statusEffect))
-            {
-                statusEffects.Add(statusEffect);
-            }
-        }
+    public List<TargetBundle<InflictedTileEffect>> GetInflictedTileEffects(TokenConsumptionType consumeType, Unit unit, List<Unit> filteredUnits = null)
+    {
+        return m_TokenManager.GetInflictedTileEffects(consumeType, unit, filteredUnits);
+    }
 
-        return statusEffects;
+    public List<TargetBundle<PassiveChangeBundle>> GetMultPassiveChange(TokenConsumptionType consumeType, Unit unit, List<Unit> filteredUnits = null)
+    {
+        return m_TokenManager.GetMultPassiveChange(consumeType, unit, filteredUnits);
+    }
+
+    public List<SummonWrapper> GetSummonWrappers(TokenConsumptionType consumeType, Unit unit)
+    {
+        return m_TokenManager.GetSummonWrappers(consumeType, unit);
     }
     #endregion
 
     #region Clear Tokens
     public void ClearTokens()
     {
-        var tokens = new List<TokenStack>(m_ConsumableTokenStacks.Values);
-        m_ConsumableTokenStacks.Clear();
-        tokens.ForEach(x => OnRemove?.Invoke(x));
+        m_TokenManager.ClearTokens();
     }
 
     public void CleanseStatusTypes(List<StatusType> statusTypes)
@@ -186,10 +159,10 @@ public class StatusManager :
                 ClearStatusEffects();
                 break;
             case StatusType.BUFF_TOKEN:
-                ClearTokens(true);
+                m_TokenManager.ClearTokens(true);
                 break;
             case StatusType.DEBUFF_TOKEN:
-                ClearTokens(false);
+                m_TokenManager.ClearTokens(false);
                 break;
         }
     }
@@ -204,162 +177,60 @@ public class StatusManager :
         m_StatusEffects.Clear();
     }
 
-    private void ClearTokens(bool isBuff)
-    {
-        IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();
-
-        foreach (TokenStack tokenStack in tokenStacks)
-        {
-            if (tokenStack.IsBuff == isBuff)
-            {
-                m_ConsumableTokenStacks.Remove(tokenStack.Id);
-                OnRemove?.Invoke(tokenStack);
-            }
-        }
-    }
-
     public void ConsumeTokens(TokenConsumptionType consumeType)
     {
-        IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();
-
-        foreach (TokenStack tokenStack in tokenStacks)
-        {
-            if (tokenStack.ContainsConsumptionType(consumeType))
-            {
-                tokenStack.ConsumeToken();
-                OnChange?.Invoke(tokenStack);
-                if (tokenStack.IsEmpty)
-                {
-                    m_ConsumableTokenStacks.Remove(tokenStack.Id);
-                    OnRemove?.Invoke(tokenStack);
-                }
-            }
-        }
+        m_TokenManager.ConsumeTokens(consumeType);
     }
 
     public void ConsumeTokens(TokenType tokenType)
     {
-        IEnumerable<TokenStack> tokenStacks = m_ConsumableTokenStacks.Values.ToList();
-
-        foreach (TokenStack tokenStack in tokenStacks)
-        {
-            if (tokenStack.TokenType == tokenType)
-            {
-                tokenStack.ConsumeToken();
-                OnChange?.Invoke(tokenStack);
-                if (tokenStack.IsEmpty)
-                {
-                    m_ConsumableTokenStacks.Remove(tokenStack.Id);
-                    OnRemove?.Invoke(tokenStack);
-                }
-            }
-        }
+        m_TokenManager.ConsumeTokens(tokenType);
     }
     #endregion
 
     #region Stat Change
-    public float GetFlatStatChange(StatType statType)
+    public float GetFlatStatChange(StatType statType, Unit unit)
     {
-        float totalFlatStatChange = 0;
-
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            totalFlatStatChange += tokenStack.GetFlatStatChange(statType);
-        }
-
-        return totalFlatStatChange;
+        return m_TokenManager.GetFlatStatChange(statType, unit);
     }
 
-    public float GetMultStatChange(StatType statType)
+    public float GetMultStatChange(StatType statType, Unit unit)
     {
-        float totalFlatStatChange = 1;
-
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            totalFlatStatChange *= tokenStack.GetMultStatChange(statType);
-        }
-
-        return totalFlatStatChange;
+        return m_TokenManager.GetMultStatChange(statType, unit);
     }
     #endregion
 
     #region Special Handle
+    public bool CanExtendTurn(Unit unit, AttackInfo attackInfo = null)
+    {
+        return m_TokenManager.CanExtendTurn(unit, attackInfo);
+    }
+
     public bool IsTaunted(out Unit forceTarget)
     {
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            if (tokenStack.TokenType == TokenType.TAUNT)
-            {
-                forceTarget = ((TauntTokenStack)tokenStack).TauntedUnit;
-                if (forceTarget == null || forceTarget.IsDead)
-                    return false;
-                Logger.Log(this.GetType().Name, $"Is being taunted by {forceTarget.name}", LogLevel.LOG);
-                return true;
-            }
-        }
-        forceTarget = null;
-        return false;
+        return m_TokenManager.IsTaunted(out forceTarget);
     }
 
-    /// <summary>
-    /// Disregards if unit is dead
-    /// </summary>
-    /// <param name="forceTarget"></param>
-    /// <returns></returns>
-    private bool TryGetTauntedUnit(out Unit forceTarget)
+    public float GetCritAmount(Unit unit)
     {
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            if (tokenStack.TokenType == TokenType.TAUNT)
-            {
-                forceTarget = ((TauntTokenStack)tokenStack).TauntedUnit;
-                return true;
-            }
-        }
-        forceTarget = null;
-        return false;
+        return m_TokenManager.GetCritAmount(unit);
     }
 
-    public float GetCritAmount()
+    public float GetLifestealProportion(Unit unit)
     {
-        float finalCritProportion = 1f;
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            finalCritProportion *= tokenStack.GetFinalCritProportion();
-        }
-        return finalCritProportion;
+        return m_TokenManager.GetLifestealProportion(unit);
     }
 
-    public float GetLifestealProportion()
+    public float GetReflectProportion(Unit unit)
     {
-        float finalLifestealProportion = 0f;
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            finalLifestealProportion += tokenStack.GetLifestealProportion();
-        }
-        return finalLifestealProportion;
+        return m_TokenManager.GetReflectProportion(unit);
     }
+    #endregion
 
-    public float GetReflectProportion()
+    #region Condition Check
+    public void PreConsumptionConditionCheck(Unit unit, TokenConsumptionType tokenConsumptionType, TokenType tokenType)
     {
-        float finalReflectProportion = 0f;
-        foreach (TokenStack tokenStack in m_ConsumableTokenStacks.Values)
-        {
-            finalReflectProportion += tokenStack.GetReflectProportion();
-        }
-        return finalReflectProportion;
+        m_TokenManager.PreConsumptionConditionCheck(unit, tokenConsumptionType, tokenType);
     }
-
-    /*
-    public float GetLifestealAmount(float dealtDamageThisTurn)
-    {
-
-    }
-
-    public float GetReflectDamage(float damageReceived)
-    {
-        
-    }
-    */
     #endregion
 }

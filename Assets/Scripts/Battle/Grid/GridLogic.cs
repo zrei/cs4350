@@ -603,25 +603,30 @@ public class GridLogic : MonoBehaviour
     /// </summary>
     /// <param name="attackPoints"></param>
     /// <param name="damage"></param>
-    public void PerformSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, VoidEvent completeSkillEvent)
+    public void PerformSkill(Unit attacker, ActiveSkillSO activeSkill, CoordPair targetTile, BoolEvent completeSkillEvent)
     {
         PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill, null);
 
-        void CompleteSkill(List<IHealth> targets)
+        void CompleteSkill(List<IHealth> targets, bool canExtendTurn, HashSet<Unit> additionalDeadUnits)
         {
             attacker.PostSkillEvent = null;
 
             TryApplySkillTileEffects(activeSkill, targetTile);
 
             // TODO: Clean this up further?
-            List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
+            IEnumerable<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x);
+            foreach (Unit unit in deadUnits)
+                additionalDeadUnits.Add(unit);
 
-            float volumeModifier = 1f / deadUnits.Count + (attacker.IsDead ? 1 : 0);
+            float volumeModifier = 1f / (additionalDeadUnits.Count + (additionalDeadUnits.Contains(attacker) ? 0 : attacker.IsDead ? 1 : 0));
 
-            foreach (Unit deadUnit in deadUnits)
+            foreach (Unit deadUnit in additionalDeadUnits)
             {
-                deadUnit.PlayDeathSound(volumeModifier);
-                deadUnit.Die();
+                if (deadUnit != attacker)
+                {
+                    deadUnit.PlayDeathSound(volumeModifier);
+                    deadUnit.Die();
+                }
             }
 
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
@@ -631,7 +636,7 @@ public class GridLogic : MonoBehaviour
                 attacker.Die();
             }
 
-            completeSkillEvent?.Invoke();
+            completeSkillEvent?.Invoke(canExtendTurn);
         }
         
     }
@@ -642,29 +647,43 @@ public class GridLogic : MonoBehaviour
         CoordPair targetTile, 
         CoordPair teleportTile, 
         Vector3 teleportTargetPosition,
-        VoidEvent completeSkillEvent)
+        BoolEvent completeSkillEvent)
     {
         PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill, teleportTargetPosition);
 
-        void CompleteSkill(List<IHealth> targets)
+        void CompleteSkill(List<IHealth> targets, bool canExtendTurn, HashSet<Unit> additionalDeadUnits)
         {
             attacker.PostSkillEvent = null;
 
             TryApplySkillTileEffects(activeSkill, targetTile);
 
-            float volumeModifier = 1f / (1 + (attacker.IsDead ? 1 : 0));
+            
             foreach (IHealth target in targets)
             {
                 if (target.IsDead)
                 {
                     Unit unit = (Unit) target;
+                    additionalDeadUnits.Add(unit);
+                    /*
                     unit.PlayDeathSound(volumeModifier);
                     unit.Die();
+                    */
                 }
                 
                 if (!activeSkill.m_TeleportSelf && !target.IsDead)
                 {
                     OnTeleportUnit?.Invoke(activeSkill.TeleportTargetGrid(attacker), activeSkill.TeleportStartTile(attacker, targetTile), teleportTile);
+                }
+            }
+
+            float volumeModifier = 1f / (additionalDeadUnits.Count + (additionalDeadUnits.Contains(attacker) ? 0 : attacker.IsDead ? 1 : 0));
+
+            foreach (Unit deadUnit in additionalDeadUnits)
+            {
+                if (deadUnit != attacker)
+                {
+                    deadUnit.PlayDeathSound(volumeModifier);
+                    deadUnit.Die();
                 }
             }
 
@@ -680,7 +699,7 @@ public class GridLogic : MonoBehaviour
                 attacker.Die();
             }
 
-            completeSkillEvent?.Invoke();
+            completeSkillEvent?.Invoke(canExtendTurn);
         }
     }
 
@@ -688,7 +707,7 @@ public class GridLogic : MonoBehaviour
         Unit attacker, 
         ActiveSkillSO activeSkill, 
         CoordPair targetTile, 
-        Action<List<IHealth>> postSkillEvent, 
+        Action<List<IHealth>, bool, HashSet<Unit>> postSkillEvent, 
         Vector3? targetMovePosition)
     {
         List<IHealth> targets = new();
@@ -700,19 +719,24 @@ public class GridLogic : MonoBehaviour
             }
         }
 
-        attacker.PostSkillEvent += () => postSkillEvent(targets);
+        attacker.PostSkillEvent += (bool canExtendTurn, HashSet<Unit> additionalDeadUnits) => postSkillEvent(targets, canExtendTurn, additionalDeadUnits);
         attacker.PerformSkill(activeSkill, targets, targetMovePosition);
 
         if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))
         {
-            foreach (SummonWrapper summon in activeSkill.m_Summons)
+            SummonUnits(activeSkill.m_Summons);
+        }
+    }
+
+    public void SummonUnits(List<SummonWrapper> summonWrappers)
+    {
+        foreach (SummonWrapper summon in summonWrappers)
+        {
+            List<CoordPair> summonPositions = GetSummonPositions(summon.m_PrioritsePositions, summon.m_PrioritisedRows, summon.m_PrioritisedCols, summon.m_Adds.Count);
+            for (int i = 0; i < summonPositions.Count; ++i)
             {
-                List<CoordPair> summonPositions = GetSummonPositions(summon.m_PrioritsePositions, summon.m_PrioritisedRows, summon.m_PrioritisedCols, summon.m_Adds.Count);
-                for (int i = 0; i < summonPositions.Count; ++i)
-                {
-                    // TODO: Possible animation delay
-                    BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments});
-                }
+                // TODO: Possible animation delay
+                BattleManager.Instance.InstantiateEnemyUnit(new() {m_Coordinates = summonPositions[i], m_EnemyCharacterData = summon.m_Adds[i].m_EnemyCharacterSO, m_StatAugments = summon.m_Adds[i].m_StatAugments});
             }
         }
     }
@@ -801,6 +825,104 @@ public class GridLogic : MonoBehaviour
         {
             if (m_TileData[coordPair.m_Row, coordPair.m_Col].TryApplyEffect(inflictedTileEffect))
                 m_TileVisuals[coordPair.m_Row, coordPair.m_Col].SpawnTileEffects(inflictedTileEffect.TileEffectObjs);
+        }
+    }
+    #endregion
+
+    #region Token Handler
+    public void ApplyStatusEffects(List<TargetBundle<StatusEffect>> statusEffects)
+    {
+        foreach (TargetBundle<StatusEffect> statusEffect in statusEffects)
+        {
+            foreach ((CoordPair coordinates, GridType gridType) in statusEffect.m_Positions)
+            {
+                if (gridType != m_GridType)
+                    continue;
+                Unit unit = GetUnitAtTile(coordinates);
+                if (!unit.IsDead)
+                    unit.InflictStatus(statusEffect.m_Effect);
+            }
+        }
+    }
+
+    public void InflictTokenBundles(List<TargetBundle<InflictedToken>> inflictedTokens, Unit inflicter)
+    {
+        foreach (TargetBundle<InflictedToken> inflictedToken in inflictedTokens)
+        {
+            foreach ((CoordPair coordinates, GridType gridType) in inflictedToken.m_Positions)
+            {
+                if (gridType != m_GridType)
+                    continue;
+                Unit unit = GetUnitAtTile(coordinates);
+                if (!unit.IsDead)
+                    unit.InflictToken(inflictedToken.m_Effect, inflicter);
+            }
+        }
+    }
+
+    public void InflictTileEffectBundles(List<TargetBundle<InflictedTileEffect>> inflictedTileEffects)
+    {
+        foreach (TargetBundle<InflictedTileEffect> inflictedTileEffect in inflictedTileEffects)
+        {
+            List<CoordPair> coordinateGroup = new();
+            foreach ((CoordPair coordinates, GridType gridType) in inflictedTileEffect.m_Positions)
+            {
+                if (gridType != m_GridType)
+                    continue;
+                coordinateGroup.Add(coordinates);
+            }
+            TryApplyEffectOnTiles(coordinateGroup, inflictedTileEffect.m_Effect);
+        }
+    }
+
+    public void ApplyPassiveChangeBundles(List<TargetBundle<PassiveChangeBundle>> flatChanges, List<TargetBundle<PassiveChangeBundle>> multChanges)
+    {
+        Dictionary<Unit, PassiveChangeBundle> passiveChangeAmounts = new();
+
+        foreach (TargetBundle<PassiveChangeBundle> flatChange in flatChanges)
+        {
+            foreach ((CoordPair coordinates, GridType gridType) in flatChange.m_Positions)
+            {
+                if (gridType != m_GridType)
+                    continue;
+                Unit unit = GetUnitAtTile(coordinates);
+                if (!passiveChangeAmounts.ContainsKey(unit))
+                    passiveChangeAmounts[unit] = new PassiveChangeBundle(0f, 0f);
+                passiveChangeAmounts[unit].AddBundle(flatChange.m_Effect);
+            }
+        }
+
+        foreach (TargetBundle<PassiveChangeBundle> multChange in multChanges)
+        {
+            foreach ((CoordPair coordinates, GridType gridType) in multChange.m_Positions)
+            {
+                if (gridType != m_GridType)
+                    continue;
+                Unit unit = GetUnitAtTile(coordinates);
+                if (!passiveChangeAmounts.ContainsKey(unit))
+                    passiveChangeAmounts[unit] = new PassiveChangeBundle(0f, 0f);
+                float actualHealthChangeAmount = multChange.m_Effect.m_HealthAmount * unit.GetTotalStat(StatType.HEALTH);
+                float actualManaChangeAmount = multChange.m_Effect.m_ManaAmount * unit.GetTotalStat(StatType.MANA);
+                PassiveChangeBundle actualPassiveChangeAmount = new PassiveChangeBundle(actualHealthChangeAmount, actualManaChangeAmount);
+                passiveChangeAmounts[unit].AddBundle(actualPassiveChangeAmount);
+            }
+        }
+
+        foreach (KeyValuePair<Unit, PassiveChangeBundle> pair in passiveChangeAmounts)
+        {
+            if (pair.Key.IsDead)
+                continue;
+            PassiveChangeBundle passiveChangeBundle = pair.Value;
+            if (passiveChangeBundle.m_HealthAmount > 0)
+            {
+                pair.Key.Heal(passiveChangeBundle.m_HealthAmount);
+            }
+            else if (passiveChangeBundle.m_HealthAmount < 0)
+            {
+                pair.Key.TakeDamage(Mathf.Abs(passiveChangeBundle.m_HealthAmount));
+            }
+
+            pair.Key.AlterMana(passiveChangeBundle.m_ManaAmount);
         }
     }
     #endregion

@@ -8,9 +8,9 @@ public class EnemyPassActionWrapper : EnemyActionWrapper
         return false;
     }
 
-    public override void Run(EnemyUnit enemyUnit, MapLogic mapLogic, VoidEvent completeActionEvent)
+    public override void Run(EnemyUnit enemyUnit, MapLogic mapLogic, BoolEvent completeActionEvent)
     {
-        completeActionEvent?.Invoke();
+        completeActionEvent?.Invoke(false);
     }
 
     public override HashSet<ActiveSkillSO> GetNestedActiveSkills()
