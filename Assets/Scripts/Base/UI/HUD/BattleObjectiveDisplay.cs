@@ -58,7 +58,7 @@ namespace Game.UI
                 display.TrackedObjective = objective;
             }
 
-            Show(false);
+            Show();
 
             GlobalEvents.Battle.BattleEndEvent += OnBattleEnd;
             GlobalEvents.Battle.AttackAnimationEvent += OnAttackAnimation;
@@ -83,7 +83,12 @@ namespace Game.UI
             Hide();
         }
 
-        private void Show(bool _)
+        private void Show(bool _, HashSet<Unit> _2)
+        {
+            Show();
+        }
+
+        private void Show()
         {
             uiAnimator.Show();
         }

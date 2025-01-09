@@ -69,7 +69,7 @@ namespace Game.UI
             Hide();
         }
 
-        private void OnCompleteAttackAnimation(bool _)
+        private void OnCompleteAttackAnimation(bool _, HashSet<Unit> _2)
         {
             Show();
         }

@@ -607,21 +607,26 @@ public class GridLogic : MonoBehaviour
     {
         PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill, null);
 
-        void CompleteSkill(List<IHealth> targets, bool canExtendTurn)
+        void CompleteSkill(List<IHealth> targets, bool canExtendTurn, HashSet<Unit> additionalDeadUnits)
         {
             attacker.PostSkillEvent = null;
 
             TryApplySkillTileEffects(activeSkill, targetTile);
 
             // TODO: Clean this up further?
-            List<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x).ToList();
+            IEnumerable<Unit> deadUnits = targets.Where(x => x.IsDead).Select(x => (Unit) x);
+            foreach (Unit unit in deadUnits)
+                additionalDeadUnits.Add(unit);
 
-            float volumeModifier = 1f / deadUnits.Count + (attacker.IsDead ? 1 : 0);
+            float volumeModifier = 1f / (additionalDeadUnits.Count + (additionalDeadUnits.Contains(attacker) ? 0 : attacker.IsDead ? 1 : 0));
 
-            foreach (Unit deadUnit in deadUnits)
+            foreach (Unit deadUnit in additionalDeadUnits)
             {
-                deadUnit.PlayDeathSound(volumeModifier);
-                deadUnit.Die();
+                if (deadUnit != attacker)
+                {
+                    deadUnit.PlayDeathSound(volumeModifier);
+                    deadUnit.Die();
+                }
             }
 
             // Note: Attacker is killed after targets to ensure attacker's side still gets priority at victory
@@ -646,25 +651,39 @@ public class GridLogic : MonoBehaviour
     {
         PerformSkill_Shared(attacker, activeSkill, targetTile, CompleteSkill, teleportTargetPosition);
 
-        void CompleteSkill(List<IHealth> targets, bool canExtendTurn)
+        void CompleteSkill(List<IHealth> targets, bool canExtendTurn, HashSet<Unit> additionalDeadUnits)
         {
             attacker.PostSkillEvent = null;
 
             TryApplySkillTileEffects(activeSkill, targetTile);
 
-            float volumeModifier = 1f / (1 + (attacker.IsDead ? 1 : 0));
+            
             foreach (IHealth target in targets)
             {
                 if (target.IsDead)
                 {
                     Unit unit = (Unit) target;
+                    additionalDeadUnits.Add(unit);
+                    /*
                     unit.PlayDeathSound(volumeModifier);
                     unit.Die();
+                    */
                 }
                 
                 if (!activeSkill.m_TeleportSelf && !target.IsDead)
                 {
                     OnTeleportUnit?.Invoke(activeSkill.TeleportTargetGrid(attacker), activeSkill.TeleportStartTile(attacker, targetTile), teleportTile);
+                }
+            }
+
+            float volumeModifier = 1f / (additionalDeadUnits.Count + (additionalDeadUnits.Contains(attacker) ? 0 : attacker.IsDead ? 1 : 0));
+
+            foreach (Unit deadUnit in additionalDeadUnits)
+            {
+                if (deadUnit != attacker)
+                {
+                    deadUnit.PlayDeathSound(volumeModifier);
+                    deadUnit.Die();
                 }
             }
 
@@ -688,7 +707,7 @@ public class GridLogic : MonoBehaviour
         Unit attacker, 
         ActiveSkillSO activeSkill, 
         CoordPair targetTile, 
-        Action<List<IHealth>, bool> postSkillEvent, 
+        Action<List<IHealth>, bool, HashSet<Unit>> postSkillEvent, 
         Vector3? targetMovePosition)
     {
         List<IHealth> targets = new();
@@ -700,7 +719,7 @@ public class GridLogic : MonoBehaviour
             }
         }
 
-        attacker.PostSkillEvent += (bool canExtendTurn) => postSkillEvent(targets, canExtendTurn);
+        attacker.PostSkillEvent += (bool canExtendTurn, HashSet<Unit> additionalDeadUnits) => postSkillEvent(targets, canExtendTurn, additionalDeadUnits);
         attacker.PerformSkill(activeSkill, targets, targetMovePosition);
 
         if (activeSkill.ContainsSkillType(SkillEffectType.SUMMON))

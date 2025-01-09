@@ -63,6 +63,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     protected SkillCooldownTracker m_SkillCooldownTracker = new();
 
     public int CurrTurnCount {get; private set;}
+
+    private bool m_HasRunDeathFunction = false;
     #endregion
 
     #region Static Data
@@ -278,8 +280,16 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public void StartTurn()
     {
-        HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_START_TURN, BattleManager.Instance.MapLogic);
+        HashSet<Unit> additionalDeadUnits = HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_START_TURN, BattleManager.Instance.MapLogic);
         ConsumeTokens(TokenConsumptionType.CONSUME_ON_START_TURN);
+
+        float volumeModifier = 1f / additionalDeadUnits.Count;
+
+        foreach (Unit deadUnit in additionalDeadUnits)
+        {
+            deadUnit.PlayDeathSound(volumeModifier);
+            deadUnit.Die();
+        }
     }
 
     /// <summary>
@@ -288,8 +298,17 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     public void PostTick()
     {
         m_SkillCooldownTracker.Tick();
-        HandleSpecialTokens(TokenConsumptionType.CONSUME_POST_TURN, BattleManager.Instance.MapLogic);
+        HashSet<Unit> additionalDeadUnits = HandleSpecialTokens(TokenConsumptionType.CONSUME_POST_TURN, BattleManager.Instance.MapLogic);
         ConsumeTokens(TokenConsumptionType.CONSUME_POST_TURN);
+
+        float volumeModifier = 1f / additionalDeadUnits.Count;
+
+        foreach (Unit deadUnit in additionalDeadUnits)
+        {
+            deadUnit.PlayDeathSound(volumeModifier);
+            deadUnit.Die();
+        }
+
         ++CurrTurnCount;
     }
     #endregion
@@ -494,7 +513,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
     /// Run this BEFORE consuming tokens
     /// </summary>
     /// <param name="mapLogic"></param>
-    private void HandleSpecialTokens(TokenConsumptionType tokenConsumptionType, MapLogic mapLogic, List<Unit> filteredUnits = null)
+    /// <returns> Additional list of units that are dead in this iteration
+    private HashSet<Unit> HandleSpecialTokens(TokenConsumptionType tokenConsumptionType, MapLogic mapLogic, List<Unit> filteredUnits = null)
     {
         // do a check of all conditions first to ensure consistency in behaviour
         PreConsumptionCheck(tokenConsumptionType, TokenType.INFLICT_STATUS, TokenType.APPLY_TOKEN, TokenType.FLAT_PASSIVE_CHANGE, TokenType.MULT_PASSIVE_CHANGE, TokenType.SPAWN_TILE_EFFECT, TokenType.SUMMON);
@@ -509,13 +529,36 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         inflictedTokens.AddRange(m_PermanentTokenManager.GetInflictedTokens(tokenConsumptionType, this, filteredUnits));
         mapLogic.ApplyTokens(inflictedTokens, this);
 
+        HashSet<Unit> additionalDamagedUnits = new();
+
         // flat passive changes
         List<TargetBundle<PassiveChangeBundle>> flatPassiveChanges = m_TempStatusManager.GetFlatPassiveChange(tokenConsumptionType, this, filteredUnits);
         flatPassiveChanges.AddRange(m_PermanentTokenManager.GetFlatPassiveChange(tokenConsumptionType, this, filteredUnits));
 
+        foreach (TargetBundle<PassiveChangeBundle> targetBundle in flatPassiveChanges)
+        {
+            foreach ((CoordPair position, GridType gridType) in targetBundle.m_Positions)
+            {
+                Unit unitAtTile = mapLogic.GetUnitAtTile(gridType, position);
+                if (unitAtTile != null)
+                    additionalDamagedUnits.Add(unitAtTile);
+            }
+        }
+
         // mult passive changes
         List<TargetBundle<PassiveChangeBundle>> multPassiveChanges = m_TempStatusManager.GetMultPassiveChange(tokenConsumptionType, this, filteredUnits);
         multPassiveChanges.AddRange(m_PermanentTokenManager.GetMultPassiveChange(tokenConsumptionType, this, filteredUnits));
+
+        foreach (TargetBundle<PassiveChangeBundle> targetBundle in multPassiveChanges)
+        {
+            foreach ((CoordPair position, GridType gridType) in targetBundle.m_Positions)
+            {
+                Unit unitAtTile = mapLogic.GetUnitAtTile(gridType, position);
+                if (unitAtTile != null)
+                    additionalDamagedUnits.Add(unitAtTile);
+            }
+            
+        }
 
         mapLogic.ApplyPassiveChanges(flatPassiveChanges, multPassiveChanges);
 
@@ -528,6 +571,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         List<SummonWrapper> summonWrappers = m_TempStatusManager.GetSummonWrappers(tokenConsumptionType, this);
         summonWrappers.AddRange(m_PermanentTokenManager.GetSummonWrappers(tokenConsumptionType, this));
         mapLogic.SummonUnits(summonWrappers);
+
+        return additionalDamagedUnits.Where(x => x.IsDead).ToHashSet();
     }
     #endregion
 
@@ -560,6 +605,10 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
     public void Die()
     {
+        if (m_HasRunDeathFunction)
+            return;
+
+        m_HasRunDeathFunction = true;
         OnDeath?.Invoke();
         m_ArmorVisual.Die(null);
         m_UnitMarker.SetActive(false);
@@ -599,18 +648,18 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
 
         m_SkillCooldownTracker.UtiliseSkill(attackSO);
 
-        void CompleteAttackAnimationEvent(bool canExtendTurn)
+        void CompleteAttackAnimationEvent(bool canExtendTurn, HashSet<Unit> additionalDeadUnits)
         {
             GlobalEvents.Battle.CompleteAttackAnimationEvent -= CompleteAttackAnimationEvent;
-            PostSkillEvent?.Invoke(canExtendTurn);
+            PostSkillEvent?.Invoke(canExtendTurn, additionalDeadUnits);
         }
     }
 
-    public void ApplySkillEffects(ActiveSkillSO skill, List<Unit> targets, out bool canExtendTurn)
+    public HashSet<Unit> ApplySkillEffects(ActiveSkillSO skill, List<Unit> targets, out bool canExtendTurn)
     {
         float dealtDamage = 0f;
 
-        HandleSpecialTokens(TokenConsumptionType.CONSUME_PRE_ATTACK, BattleManager.Instance.MapLogic, targets);
+        HashSet<Unit> additionalDeadUnits = HandleSpecialTokens(TokenConsumptionType.CONSUME_PRE_ATTACK, BattleManager.Instance.MapLogic, targets);
         ConsumeTokens(TokenConsumptionType.CONSUME_PRE_ATTACK);
 
         List<StatusEffect> inflictedStatusEffects = new();
@@ -649,7 +698,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                     TakeDamage(damage * target.GetReflectProportion());
                 }
 
-                target.HandleSpecialTokens(skill.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND, BattleManager.Instance.MapLogic, new() {this});
+                additionalDeadUnits.UnionWith(target.HandleSpecialTokens(skill.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND, BattleManager.Instance.MapLogic, new() {this}));
                 target.ConsumeTokens(skill.IsMagic ? TokenConsumptionType.CONSUME_ON_MAG_DEFEND : TokenConsumptionType.CONSUME_ON_PHYS_DEFEND);
             }
 
@@ -687,9 +736,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         AttackInfo attackInfo = new(this, dealtDamage, targets);
 
         if (skill.IsPhysicalAttack)
-            HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK, BattleManager.Instance.MapLogic, targets);
+            additionalDeadUnits.UnionWith(HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_PHYS_ATTACK, BattleManager.Instance.MapLogic, targets));
         else
-            HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK, BattleManager.Instance.MapLogic, targets);
+            additionalDeadUnits.UnionWith(HandleSpecialTokens(TokenConsumptionType.CONSUME_ON_MAG_ATTACK, BattleManager.Instance.MapLogic, targets));
 
         if (!IsDead)
         {
@@ -741,6 +790,8 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
                 ConsumeTokens(TokenConsumptionType.CONSUME_ON_ALLY_TARGET);
             }
         }
+
+        return additionalDeadUnits;
     }
 
     public bool CanPerformSkill(ActiveSkillSO activeSkillSO)
@@ -758,7 +809,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         return m_SkillCooldownTracker.GetCooldownProportion(activeSkillSO);
     }
 
-    public BoolEvent PostSkillEvent;
+    public GlobalEvents.Battle.BattleAnimationEvent PostSkillEvent;
     #endregion
 
     #region SFX

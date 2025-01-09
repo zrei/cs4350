@@ -113,6 +113,13 @@ public class PlayerTurnManager : TurnManager
 
         m_CurrUnit.StartTurn();
 
+        if (m_CurrUnit.IsDead)
+        {
+            m_CurrUnit.Die();
+            EndTurn();
+            return;
+        }
+
         Logger.Log(this.GetType().Name, "Tile unit is on: " + m_CurrUnit.CurrPosition, LogLevel.LOG);
 
         m_TotalMovementRange = (int)m_CurrUnit.GetTotalStat(StatType.MOVEMENT_RANGE);

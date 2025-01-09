@@ -25,6 +25,16 @@ public class EnemyTurnManager : TurnManager
 
         m_CurrUnit.StartTurn();
 
+        if (m_CurrUnit.IsDead)
+        {
+            m_CurrUnit.Die();
+            EndTurn();
+            return;
+        }
+
+        // need to re-evaluate for this specific enemy unit as the map situation may have changed
+        enemyUnit.GetActionToBePerformed(BattleManager.Instance.MapLogic);
+
         GlobalEvents.Battle.EnemyTurnStartEvent?.Invoke();
 
         ChooseAction();
