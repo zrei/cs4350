@@ -19,6 +19,7 @@ public class EnemyCharacterSO : CharacterSO
     {
         List<InflictedToken> inflictedTokens = new();
         inflictedTokens.AddRange(m_EnemyClass.GetInflictedTokens(maxLevel));
+        inflictedTokens.AddRange(m_EquippedWeapon.GetInflictedTokens(maxLevel));
         return inflictedTokens;
     }
 

@@ -95,7 +95,10 @@ public class PlayerCharacterData : ICanAttack
 
     public PlayerCharacterBattleData GetBattleData()
     {
-        return new PlayerCharacterBattleData(m_BaseData, TotalBaseStats, CurrClass, GetWeaponInstanceSO(), IsLord, CurrClass.GetInflictedTokens(this.m_CurrLevel));
+        List<InflictedToken> inflictedTokens = new();
+        inflictedTokens.AddRange(CurrClass.GetInflictedTokens(m_CurrLevel));
+        inflictedTokens.AddRange(GetWeaponInstanceSO().GetInflictedTokens(m_CurrLevel));
+        return new PlayerCharacterBattleData(m_BaseData, TotalBaseStats, CurrClass, GetWeaponInstanceSO(), IsLord, inflictedTokens);
     }
 
     public WeaponInstanceSO GetWeaponInstanceSO()
@@ -153,7 +156,7 @@ public struct PlayerCharacterBattleData
 
     public WeaponInstanceSO m_CurrEquippedWeapon;
 
-    private List<InflictedToken> m_ClassInflictedTokens;
+    private List<InflictedToken> m_InflictedTokens;
 
     /// <summary>
     /// Whether this player unit should be tracked in battle. Once this unit dies, the battle is considered lost.
@@ -164,7 +167,7 @@ public struct PlayerCharacterBattleData
     public List<InflictedToken> GetInflictedTokens(float currMoralityPercentage)
     {
         List<InflictedToken> inflictedTokens = new();
-        inflictedTokens.AddRange(m_ClassInflictedTokens);
+        inflictedTokens.AddRange(m_InflictedTokens);
         inflictedTokens.AddRange(m_BaseData.GetInflictedMoralityTokens(currMoralityPercentage));
         return inflictedTokens;
     }
@@ -176,7 +179,7 @@ public struct PlayerCharacterBattleData
         m_ClassSO = classSO;
         m_CurrEquippedWeapon = currEquippedWeapon;
         m_CannotDieWithoutLosingBattle = cannotDieWithoutLosingBattle;
-        m_ClassInflictedTokens = inflictedTokens;
+        m_InflictedTokens = inflictedTokens;
     }
 
     public UnitModelData GetUnitModelData()
@@ -208,6 +211,9 @@ public class TutorialCharacterData
 
     public PlayerCharacterBattleData GetBattleData()
     {
-        return new PlayerCharacterBattleData(m_BaseData, m_OverrideStats ? m_OverridenStats : LevellingManager.Instance.LevelUpStats(m_BaseData.m_StartingStats, new StatProgress(), m_BaseData.m_GrowthRates.FlatAugment(m_ClassSO.m_GrowthRateAugments), m_CurrCharaLevel - 1).FlatAugment(m_ClassSO.m_StatAugments), m_ClassSO, m_CurrEquippedWeapon, m_CannotDieWithoutLosingBattle, m_ClassSO.GetInflictedTokens(m_CurrCharaLevel));
+        List<InflictedToken> inflictedTokens = new();
+        inflictedTokens.AddRange(m_ClassSO.GetInflictedTokens(m_CurrCharaLevel));
+        inflictedTokens.AddRange(m_CurrEquippedWeapon.GetInflictedTokens(m_CurrCharaLevel));
+        return new PlayerCharacterBattleData(m_BaseData, m_OverrideStats ? m_OverridenStats : LevellingManager.Instance.LevelUpStats(m_BaseData.m_StartingStats, new StatProgress(), m_BaseData.m_GrowthRates.FlatAugment(m_ClassSO.m_GrowthRateAugments), m_CurrCharaLevel - 1).FlatAugment(m_ClassSO.m_StatAugments), m_ClassSO, m_CurrEquippedWeapon, m_CannotDieWithoutLosingBattle, inflictedTokens);
     }
 } 

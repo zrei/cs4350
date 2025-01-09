@@ -117,6 +117,16 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_TempStatusManager.TryClearTauntToken(defeatedUnit);
     }
 
+    /// <summary>
+    /// Initialise the unit
+    /// </summary>
+    /// <param name="stats"></param>
+    /// <param name="raceSO"></param>
+    /// <param name="classSo"></param>
+    /// <param name="sprite"></param>
+    /// <param name="unitModelData"></param>
+    /// <param name="weaponInstanceSO"></param>
+    /// <param name="permanentTokens">This should have all permanent tokens from every source already inserted</param>
     protected void Initialise(Stats stats, RaceSO raceSO, ClassSO classSo, Sprite sprite, UnitModelData unitModelData, WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
     {
         m_ArmorVisual.InstantiateModel(unitModelData, weaponInstanceSO, classSo);
@@ -125,7 +135,7 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         GridYOffset = new Vector3(0f, unitModelData.m_GridYOffset, 0f);
 
         // initialise permanent tokens first just in case there's something that affects max mana or max health
-        InitialisePermanentTokens(weaponInstanceSO, permanentTokens);
+        InitialisePermanentTokens(permanentTokens);
 
         Sprite = sprite;
         m_Stats = stats;
@@ -137,13 +147,9 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_DeathSFX = raceSO.m_DeathSound;
     }
 
-    private void InitialisePermanentTokens(WeaponInstanceSO weaponInstanceSO, List<InflictedToken> permanentTokens)
+    private void InitialisePermanentTokens(List<InflictedToken> permanentTokens)
     {
         m_PermanentTokenManager.ClearTokens();
-        foreach (InflictedToken inflictedToken in weaponInstanceSO.m_PassiveTokens)
-        {
-            m_PermanentTokenManager.AddToken(inflictedToken, null);
-        }
         foreach (InflictedToken inflictedToken in permanentTokens)
         {
             m_PermanentTokenManager.AddToken(inflictedToken, null);
@@ -336,20 +342,6 @@ public abstract class Unit : MonoBehaviour, IHealth, ICanAttack, IFlatStatChange
         m_TempStatusManager.ConsumeTokens(tokenType);
         m_PermanentTokenManager.ConsumeTokens(tokenType);
     }
-
-    /*
-    public List<StatusEffect> GetInflictedStatusEffects(TokenConsumptionType consumeType)
-    {
-        List<TargetBundle<StatusEffect>> inflictedStatusEffects = m_TempStatusManager.GetInflictedStatusEffects(consumeType, this);
-        inflictedStatusEffects.AddRange()
-        foreach (TokenStack token in m_PermanentTokens)
-        {
-            if (token.TryGetInflictedStatusEffect(this, out StatusEffect statusEffect))
-                inflictedStatusEffects.Add(statusEffect);
-        }
-        return inflictedStatusEffects;
-    }
-    */
     #endregion
 
     #region Stats

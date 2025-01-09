@@ -19,7 +19,17 @@ public class WeaponInstanceSO : ScriptableObject
     public List<WeaponModel> m_WeaponModels;
 
     [Tooltip("Always applies, will not expire - the number of tokens will be ignored")] 
-    public List<InflictedToken> m_PassiveTokens;
+    public List<PassiveEffect> m_PassiveEffects;
+
+    public List<InflictedToken> GetInflictedTokens(int characterlevel)
+    {
+        List<InflictedToken> inflictedTokens = new();
+        foreach (PassiveEffect passiveEffect in m_PassiveEffects)
+        {
+            inflictedTokens.AddRange(passiveEffect.GetInflictedTokens(characterlevel));
+        }
+        return inflictedTokens;
+    }
 
     /// <summary>
     /// How much this weapon affects base attack stat

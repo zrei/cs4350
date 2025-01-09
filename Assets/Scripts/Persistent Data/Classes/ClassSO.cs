@@ -25,7 +25,7 @@ public abstract class ClassSO : ScriptableObject
     public MovementType m_MovementType = MovementType.CARDINAL;
 
     [Header("Passive Effects")]
-    public List<ClassPassiveEffect> m_PassiveEffects;
+    public List<PassiveEffect> m_PassiveEffects;
 
     /// <summary>
     /// Character level for player classes is the level of the current character.
@@ -36,16 +36,16 @@ public abstract class ClassSO : ScriptableObject
     public List<InflictedToken> GetInflictedTokens(int characterlevel)
     {
         List<InflictedToken> inflictedTokens = new();
-        foreach (ClassPassiveEffect classEffect in m_PassiveEffects)
+        foreach (PassiveEffect passiveEffect in m_PassiveEffects)
         {
-            inflictedTokens.AddRange(classEffect.GetInflictedTokens(characterlevel));
+            inflictedTokens.AddRange(passiveEffect.GetInflictedTokens(characterlevel));
         }
         return inflictedTokens;
     }
 }
 
 [System.Serializable]
-public struct ClassPassiveEffect
+public struct PassiveEffect
 {
     [Tooltip("Conditions that must be met for this set of tokens to be applied - leave untouched if there are no conditions")]
     public UnlockCondition m_UnlockCondition;
