@@ -6007,13 +6007,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf3d3d0c15b6a4740a61da6bfc3fb51f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TestData:
+  m_TestCharacterData:
   - m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
-    m_CurrClassIndex: 0
-    m_CurrUnlockedClasses: 
     m_CurrLevel: 20
-    m_CurrExp: 0
-    m_CurrStats:
+    m_OverrideWeapon: 0
+    m_OverriddenWeaponInstance: {fileID: 0}
+    m_OverrideStartingStats: 0
+    m_OverriddenStartingStats:
       m_Health: 0
       m_Mana: 0
       m_PhysicalAttack: 0
@@ -6022,20 +6022,8 @@ MonoBehaviour:
       m_MagicDefence: 0
       m_Speed: 0
       m_MovementRange: 0
-    m_CurrStatsProgress:
-      m_HealthProgress: 0
-      m_ManaProgress: 0
-      m_PhysicalAttackProgress: 0
-      m_MagicAttackProgress: 0
-      m_PhysicalDefenceProgress: 0
-      m_MagicDefenceProgress: 0
-      m_SpeedProgress: 0
-  - m_BaseData: {fileID: 11400000, guid: ce0f14bc27742264fbcc405e9b6baca0, type: 2}
-    m_CurrClassIndex: 0
-    m_CurrUnlockedClasses: 
-    m_CurrLevel: 20
-    m_CurrExp: 0
-    m_CurrStats:
+    m_OverrideFinalStats: 0
+    m_OverriddenFinalStats:
       m_Health: 0
       m_Mana: 0
       m_PhysicalAttack: 0
@@ -6044,7 +6032,8 @@ MonoBehaviour:
       m_MagicDefence: 0
       m_Speed: 0
       m_MovementRange: 0
-    m_CurrStatsProgress:
+    m_OverrideStatsProgress: 0
+    m_OverriddenStatsProgress:
       m_HealthProgress: 0
       m_ManaProgress: 0
       m_PhysicalAttackProgress: 0
@@ -6052,6 +6041,10 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
+    m_OverrideClass: 0
+    m_OverriddenClassIndex: 0
+    m_OverrideUnlockedClasses: 0
+    m_OverriddenUnlockedClasses: 
   m_TestBattle: {fileID: 11400000, guid: 57c731adc7b3b47b78d56e5556f17014, type: 2}
   m_FatigueToken:
     m_TokenTierData: {fileID: 11400000, guid: 089243ea1ceb14b88a5821e9c72cfc8d, type: 2}

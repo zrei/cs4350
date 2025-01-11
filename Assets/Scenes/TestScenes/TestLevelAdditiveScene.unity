@@ -1413,7 +1413,7 @@ PrefabInstance:
     - target: {fileID: 2110395223111513238, guid: 7137796433489754ab6d24b513a8ffb1,
         type: 3}
       propertyPath: field of view
-      value: 30
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 2110395223111513238, guid: 7137796433489754ab6d24b513a8ffb1,
         type: 3}
@@ -2668,17 +2668,17 @@ PrefabInstance:
     - target: {fileID: 4066374536226177316, guid: 7137796433489754ab6d24b513a8ffb1,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.48
+      value: -12.73
       objectReference: {fileID: 0}
     - target: {fileID: 4066374536226177316, guid: 7137796433489754ab6d24b513a8ffb1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 509.6511
+      value: 507.42108
       objectReference: {fileID: 0}
     - target: {fileID: 4066374536226177316, guid: 7137796433489754ab6d24b513a8ffb1,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.6010714
+      value: -8.381055
       objectReference: {fileID: 0}
     - target: {fileID: 4066374536226177316, guid: 7137796433489754ab6d24b513a8ffb1,
         type: 3}
@@ -5982,6 +5982,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bd728000844293977289fa7b50a76b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_MoralityPercentage: 0
   m_TestCharacterData:
   - m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
     m_CurrClassIndex: 0
@@ -6049,6 +6050,121 @@ MonoBehaviour:
       m_PhysicalDefenceProgress: 0
       m_MagicDefenceProgress: 0
       m_SpeedProgress: 0
+  m_Test:
+  - m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
+    m_CurrLevel: 20
+    m_OverrideWeapon: 0
+    m_OverriddenWeaponInstance: {fileID: 11400000, guid: 73708942088154b99abf90b7091f8ec3,
+      type: 2}
+    m_OverrideStartingStats: 0
+    m_OverriddenStartingStats:
+      m_Health: 5
+      m_Mana: 5
+      m_PhysicalAttack: 5
+      m_MagicAttack: 5
+      m_PhysicalDefence: 5
+      m_MagicDefence: 5
+      m_Speed: 5
+      m_MovementRange: 1
+    m_OverrideFinalStats: 0
+    m_OverriddenFinalStats:
+      m_Health: 5
+      m_Mana: 5
+      m_PhysicalAttack: 5
+      m_MagicAttack: 5
+      m_PhysicalDefence: 5
+      m_MagicDefence: 5
+      m_Speed: 5
+      m_MovementRange: 1
+    m_OverrideStatsProgress: 0
+    m_OverriddenStatsProgress:
+      m_HealthProgress: 0
+      m_ManaProgress: 0
+      m_PhysicalAttackProgress: 0
+      m_MagicAttackProgress: 0
+      m_PhysicalDefenceProgress: 0
+      m_MagicDefenceProgress: 0
+      m_SpeedProgress: 0
+    m_OverrideClass: 0
+    m_OverriddenClassIndex: 0
+    m_OverrideUnlockedClasses: 0
+    m_OverriddenUnlockedClasses: 
+  - m_BaseData: {fileID: 11400000, guid: ce0f14bc27742264fbcc405e9b6baca0, type: 2}
+    m_CurrLevel: 20
+    m_OverrideWeapon: 0
+    m_OverriddenWeaponInstance: {fileID: 11400000, guid: 73708942088154b99abf90b7091f8ec3,
+      type: 2}
+    m_OverrideStartingStats: 0
+    m_OverriddenStartingStats:
+      m_Health: 5
+      m_Mana: 5
+      m_PhysicalAttack: 5
+      m_MagicAttack: 5
+      m_PhysicalDefence: 5
+      m_MagicDefence: 5
+      m_Speed: 5
+      m_MovementRange: 1
+    m_OverrideFinalStats: 0
+    m_OverriddenFinalStats:
+      m_Health: 5
+      m_Mana: 5
+      m_PhysicalAttack: 5
+      m_MagicAttack: 5
+      m_PhysicalDefence: 5
+      m_MagicDefence: 5
+      m_Speed: 5
+      m_MovementRange: 1
+    m_OverrideStatsProgress: 0
+    m_OverriddenStatsProgress:
+      m_HealthProgress: 0
+      m_ManaProgress: 0
+      m_PhysicalAttackProgress: 0
+      m_MagicAttackProgress: 0
+      m_PhysicalDefenceProgress: 0
+      m_MagicDefenceProgress: 0
+      m_SpeedProgress: 0
+    m_OverrideClass: 0
+    m_OverriddenClassIndex: 0
+    m_OverrideUnlockedClasses: 0
+    m_OverriddenUnlockedClasses: 
+  - m_BaseData: {fileID: 11400000, guid: 2541a19dc80e4469fb97bcf9977abc8c, type: 2}
+    m_CurrLevel: 20
+    m_OverrideWeapon: 0
+    m_OverriddenWeaponInstance: {fileID: 11400000, guid: 73708942088154b99abf90b7091f8ec3,
+      type: 2}
+    m_OverrideStartingStats: 0
+    m_OverriddenStartingStats:
+      m_Health: 5
+      m_Mana: 5
+      m_PhysicalAttack: 5
+      m_MagicAttack: 5
+      m_PhysicalDefence: 5
+      m_MagicDefence: 5
+      m_Speed: 5
+      m_MovementRange: 1
+    m_OverrideFinalStats: 0
+    m_OverriddenFinalStats:
+      m_Health: 5
+      m_Mana: 5
+      m_PhysicalAttack: 5
+      m_MagicAttack: 5
+      m_PhysicalDefence: 5
+      m_MagicDefence: 5
+      m_Speed: 5
+      m_MovementRange: 1
+    m_OverrideStatsProgress: 0
+    m_OverriddenStatsProgress:
+      m_HealthProgress: 0
+      m_ManaProgress: 0
+      m_PhysicalAttackProgress: 0
+      m_MagicAttackProgress: 0
+      m_PhysicalDefenceProgress: 0
+      m_MagicDefenceProgress: 0
+      m_SpeedProgress: 0
+    m_OverrideClass: 0
+    m_OverriddenClassIndex: 0
+    m_OverrideUnlockedClasses: 0
+    m_OverriddenUnlockedClasses: 
 --- !u!4 &1234867472
 Transform:
   m_ObjectHideFlags: 0
