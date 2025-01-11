@@ -21,7 +21,24 @@ public class MoralityManager : Singleton<MoralityManager>
 
         SaveManager.OnSaveEvent += SaveMorality;
         
-        if (!TryLoadMoralitySave())
+        HandleDependencies();
+    }
+
+    private void HandleDependencies()
+    {
+        if (!GlobalSettings.IsReady)
+        {
+            GlobalSettings.OnReady += HandleDependencies;
+            return;
+        }
+
+        GlobalSettings.OnReady -= HandleDependencies;
+
+        if (GlobalSettings.TestScene)
+        {
+            SetMorality(Mathf.FloorToInt(GlobalSettings.TestMorality * m_MoralitySetting.m_MaxMorality));
+        }
+        else if (!TryLoadMoralitySave())
         {
             SetMorality(Mathf.FloorToInt(m_StartingMoralityPercentage * m_MoralitySetting.m_MaxMorality));
         }

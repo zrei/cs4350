@@ -5953,6 +5953,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4486285349251287626, guid: 47a865f5ac87248489b05be166729f13,
+        type: 3}
+      propertyPath: m_IsTestScene
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486285349251287626, guid: 47a865f5ac87248489b05be166729f13,
+        type: 3}
+      propertyPath: m_TestMorality
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7429788505490137080, guid: 47a865f5ac87248489b05be166729f13,
         type: 3}
       propertyPath: m_Name
@@ -5963,6 +5973,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47a865f5ac87248489b05be166729f13, type: 3}
+--- !u!114 &673485795 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4486285349251287626, guid: 47a865f5ac87248489b05be166729f13,
+    type: 3}
+  m_PrefabInstance: {fileID: 673485794}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7768c419001151a4d8e1618fb00dbcbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1234867470
 GameObject:
   m_ObjectHideFlags: 0
@@ -6007,6 +6029,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf3d3d0c15b6a4740a61da6bfc3fb51f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_GlobalSettings: {fileID: 673485795}
+  m_OverriddenMoralityPercentage: 0.5
   m_TestCharacterData:
   - m_BaseData: {fileID: 11400000, guid: d493733cd0b3f4af59fc5794075cbaf5, type: 2}
     m_CurrLevel: 20

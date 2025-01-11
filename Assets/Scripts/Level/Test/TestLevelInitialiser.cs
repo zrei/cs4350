@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [System.Serializable]
@@ -63,15 +64,12 @@ public class TestCharacterData
     }
 }
 
-/// <summary>
-/// Test script to initialise a standalone level without loading from world map.
-/// </summary>
-public class TestLevelInitialiser : MonoBehaviour
+public abstract class TestSceneInitialiser : MonoBehaviour
 {
     [Header("Test Data")]
-    [Tooltip("Override current morality percentage")]
-    [SerializeField] private float m_MoralityPercentage = 0;
-    [SerializeField] private List<TestCharacterData> m_TestCharacterData;
+    [SerializeField] private GlobalSettings m_GlobalSettings;
+    [SerializeField] private float m_OverriddenMoralityPercentage = 0;
+    [SerializeField] protected List<TestCharacterData> m_TestCharacterData;
     
     private void Start()
     {
@@ -98,7 +96,23 @@ public class TestLevelInitialiser : MonoBehaviour
         Initialise();
     }
 
-    private void Initialise()
+    protected abstract void Initialise();
+
+    #if UNITY_EDITOR
+    public void SetTestValues()
+    {
+        m_GlobalSettings.ToggleTestScene(true);
+        m_GlobalSettings.SetTestMorality(m_OverriddenMoralityPercentage);
+    }
+    #endif
+}
+
+/// <summary>
+/// Test script to initialise a standalone level without loading from world map.
+/// </summary>
+public class TestLevelInitialiser : TestSceneInitialiser
+{
+    protected override void Initialise()
     {
         List<PlayerCharacterData> finalData = new();
         foreach (TestCharacterData testCharacterData in m_TestCharacterData)
@@ -119,3 +133,26 @@ public class TestLevelInitialiser : MonoBehaviour
         GlobalEvents.Scene.OnSceneTransitionCompleteEvent?.Invoke(SceneEnum.WORLD_MAP, SceneEnum.LEVEL);
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(TestSceneInitialiser), true)]
+public class TestSceneInitialiserEditor : Editor
+{
+    private TestSceneInitialiser m_TestLevelInitialiser;
+
+    private void OnEnable()
+    {
+        m_TestLevelInitialiser = (TestSceneInitialiser) target;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        if (GUILayout.Button("Set Test Values"))
+        {
+            m_TestLevelInitialiser.SetTestValues();
+        }
+    }
+}
+#endif

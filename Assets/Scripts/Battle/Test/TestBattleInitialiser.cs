@@ -6,42 +6,16 @@ using UnityEngine;
 /// <summary>
 /// Test script to initialise a once-off battle in place of the level manager when testing.
 /// </summary>
-public class TestBattleInitialiser : MonoBehaviour
+public class TestBattleInitialiser : TestSceneInitialiser
 {
-    [Header("Battle Data")]
-    [SerializeField] private List<TestCharacterData> m_TestCharacterData;
+    [Header("Additional Battle Data")]
     [SerializeField] private BattleSO m_TestBattle;
 
     [Header("Fatigue Tokens")]
     [SerializeField] private InflictedToken m_FatigueToken;
     [SerializeField] private bool m_ApplyFatigueTokens = false;
 
-    private void Start()
-    {
-        HandleDependencies();
-    }
-
-    private void HandleDependencies()
-    {
-        if (!InventoryManager.IsReady)
-        {
-            InventoryManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        if (!LevellingManager.IsReady)
-        {
-            LevellingManager.OnReady += HandleDependencies;
-            return;
-        }
-
-        InventoryManager.OnReady -= HandleDependencies;
-        LevellingManager.OnReady -= HandleDependencies;
-
-        Initialise();
-    }
-
-    private void Initialise()
+    protected override void Initialise()
     {
         List<PlayerCharacterBattleData> finalData = new();
         foreach (TestCharacterData testCharacterData in m_TestCharacterData)
