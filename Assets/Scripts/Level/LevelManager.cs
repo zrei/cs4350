@@ -346,6 +346,7 @@ public class LevelManager : Singleton<LevelManager>
         
         GameSceneManager.Instance.LoadBattleScene(m_CurrBattleSO, 
             m_CurrBattleSO.m_OverrideCharacters ? m_CurrBattleSO.m_TutorialCharacters.Select(x => x.GetBattleData()).ToList() : m_CurrParty.Select(x => x.GetBattleData()).ToList(),
+            Mathf.Max((m_CurrBattleSO.m_OverrideCharacters ? m_CurrBattleSO.m_TutorialCharacters.Select(x => x.m_CurrCharaLevel) : m_CurrParty.Select(x => x.m_CurrLevel)).ToArray()),
             m_CurrBattleSO.m_OverrideBattleMap ? m_CurrBattleSO.m_OverriddenBattleMapType : m_LevelSO.m_BiomeName, 
             m_LevelRationsManager.GetInflictedTokens());
     }

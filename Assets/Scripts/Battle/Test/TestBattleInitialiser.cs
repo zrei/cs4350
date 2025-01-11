@@ -6,22 +6,26 @@ using UnityEngine;
 /// <summary>
 /// Test script to initialise a once-off battle in place of the level manager when testing.
 /// </summary>
-public class TestBattleInitialiser : MonoBehaviour
+public class TestBattleInitialiser : TestSceneInitialiser
 {
-    [Header("Battle Data")]
-    [SerializeField] private List<PlayerCharacterData> m_TestData;
+    [Header("Additional Battle Data")]
     [SerializeField] private BattleSO m_TestBattle;
 
     [Header("Fatigue Tokens")]
     [SerializeField] private InflictedToken m_FatigueToken;
     [SerializeField] private bool m_ApplyFatigueTokens = false;
 
-    private void Start()
+    protected override void Initialise()
     {
-        for (int i = 0; i < m_TestData.Count; i++)
+        List<PlayerCharacterBattleData> finalData = new();
+        foreach (TestCharacterData testCharacterData in m_TestCharacterData)
         {
-            m_TestData[i].m_CurrStats = m_TestData[i].m_BaseData.m_StartingStats;
-            m_TestData[i].m_CurrClassIndex = m_TestData[i].m_BaseData.m_PathGroup.GetDefaultClassIndex();
+            int? weaponId = null;
+            if (testCharacterData.m_OverrideWeapon)
+            {
+                weaponId = InventoryManager.Instance.ObtainWeapon(testCharacterData.m_OverriddenWeaponInstance);
+            }
+            finalData.Add(testCharacterData.GetPlayerCharacterBattleData(weaponId));
         }
 
         List<InflictedToken> inflictedTokens = new();
@@ -30,10 +34,12 @@ public class TestBattleInitialiser : MonoBehaviour
             inflictedTokens.Add(m_FatigueToken);
         }
 
+        int maxLevel = Mathf.Max(m_TestCharacterData.Select(x => x.m_CurrLevel).ToArray());
+
         if (BattleManager.IsReady)
-            BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), new());
+            BattleManager.Instance.InitialiseBattle(m_TestBattle, finalData, maxLevel, inflictedTokens);
         else 
-            LevelManager.OnReady += () => BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), new());
+            BattleManager.OnReady += () => BattleManager.Instance.InitialiseBattle(m_TestBattle, finalData, maxLevel, inflictedTokens);
 
         if (CameraManager.IsReady)
             CameraManager.Instance.SetUpBattleCamera();

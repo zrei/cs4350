@@ -154,10 +154,12 @@ public class InventoryManager : Singleton<InventoryManager>
         m_Inventory[weaponInstanceId].ChangeEquipStatus(isEquipped);
     }
 
-    public void ObtainWeapon(WeaponInstanceSO weaponInstanceSO)
+    public int ObtainWeapon(WeaponInstanceSO weaponInstanceSO)
     {
         m_Inventory.Add(m_CurrNextId, new() {m_InstanceId = m_CurrNextId, m_IsEquipped = false, m_WeaponInstanceSO = weaponInstanceSO});
+        int id = m_CurrNextId;
         ++m_CurrNextId;
+        return id;
     }
     #endregion
 

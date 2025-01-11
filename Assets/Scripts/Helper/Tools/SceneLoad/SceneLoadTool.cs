@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class SceneLoadTool : EditorWindow
 {
@@ -65,7 +66,7 @@ public class SceneLoadTool : EditorWindow
             m_CurrentScenePath = EditorSceneManager.GetActiveScene().path;
             var m_LevelScenePath = string.Format(SCENE_PATH_FORMAT, string.Format(m_LevelPath, m_LevelNumber));
             var m_TestLevelAdditiveScenePath = string.Format(SCENE_PATH_FORMAT, m_TestLevelAdditivePath);
-            LoadScene(m_LevelScenePath, (() => LoadScene(m_TestLevelAdditiveScenePath, PlayScene, OpenSceneMode.Additive)));
+            LoadScene(m_LevelScenePath, () => LoadTestScene(m_TestLevelAdditiveScenePath, PlayScene, OpenSceneMode.Additive));
         }
 
         GUILayout.Space(10f);
@@ -95,7 +96,7 @@ public class SceneLoadTool : EditorWindow
             m_CurrentScenePath = EditorSceneManager.GetActiveScene().path;
             var m_BattleScenePath = string.Format(SCENE_PATH_FORMAT, string.Format(m_BattlePath, finalBiome));
             var m_TestBattleAdditiveScenePath = string.Format(SCENE_PATH_FORMAT, m_TestBattleAdditivePath);
-            LoadScene(m_BattleScenePath, (() => LoadScene(m_TestBattleAdditiveScenePath, PlayScene, OpenSceneMode.Additive)));
+            LoadScene(m_BattleScenePath, () => LoadTestScene(m_TestBattleAdditiveScenePath, PlayScene, OpenSceneMode.Additive));
         }
 
         GUILayout.Space(30f);
@@ -116,6 +117,18 @@ public class SceneLoadTool : EditorWindow
         if (GUILayout.Button("Stop at Current Scene\nThis doesn't work super well with async scenes"))
         {
             StopAtCurrentScene();
+        }
+    }
+
+    private void LoadTestScene(string scenePath, VoidEvent postEvent = null, OpenSceneMode mode = OpenSceneMode.Single)
+    {
+        LoadScene(scenePath, PostLoad, mode);
+
+        void PostLoad()
+        {
+            TestSceneInitialiser testSceneInitialiser = UnityEngine.Object.FindObjectsOfType(typeof(TestSceneInitialiser))[0].GetComponent<TestSceneInitialiser>();
+            testSceneInitialiser.SetTestValues();
+            postEvent?.Invoke();
         }
     }
 

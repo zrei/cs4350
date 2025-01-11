@@ -151,7 +151,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
         UnloadAdditiveSceneWithTransition(sceneIndex);
     }
 
-    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, BattleMapType mapBiome, List<InflictedToken> fatigueTokens)
+    public void LoadBattleScene(BattleSO battleSo, List<PlayerCharacterBattleData> unitBattleData, int maxLevel, BattleMapType mapBiome, List<InflictedToken> fatigueTokens)
     {
         GlobalEvents.Scene.OnBeginSceneChange?.Invoke(m_CurrScene, SceneEnum.BATTLE);
         m_CurrBiome = mapBiome;
@@ -174,7 +174,7 @@ public class GameSceneManager : Singleton<GameSceneManager>
             BattleManager.OnReady -= OnBattleSceneLoaded;
         
             Debug.Log("Battle scene loaded. Initialising battle.");
-            BattleManager.Instance.InitialiseBattle(battleSo, unitBattleData, fatigueTokens);
+            BattleManager.Instance.InitialiseBattle(battleSo, unitBattleData, maxLevel, fatigueTokens);
         }
     }
     

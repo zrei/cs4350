@@ -1,11 +1,30 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class GlobalSettings : Singleton<GlobalSettings>
 {
-    [Header("Debug")]
-    [SerializeField] private bool m_DoDebug = false;
-    public static bool DoDebug => Instance.m_DoDebug;
+    [Header("Testing")]
+    [SerializeField] private bool m_IsTestScene = false;
+    public static bool TestScene => Instance.m_IsTestScene;
+    [SerializeField] private float m_TestMorality = 0;
+    public static float TestMorality => Instance.m_TestMorality;
+
+    #if UNITY_EDITOR
+    public void ToggleTestScene(bool testScene)
+    {
+        m_IsTestScene = true;
+        Undo.RecordObject(this, "Updated Global Settings");
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this);
+    }
+
+    public void SetTestMorality(float testMorality)
+    {
+        m_TestMorality = testMorality;
+        Undo.RecordObject(this, "Updated Global Settings");
+        PrefabUtility.RecordPrefabInstancePropertyModifications(this);
+    }
+    #endif
 
     [Header("Demo")]
     [SerializeField] private bool m_IsDemo = true;

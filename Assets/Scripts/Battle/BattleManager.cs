@@ -138,7 +138,7 @@ public class BattleManager : Singleton<BattleManager>
     /// </summary>
     /// <param name="battleSO"></param>
     /// <param name="playerUnitData"></param>
-    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, List<InflictedToken> fatigueTokens)
+    public void InitialiseBattle(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, int maxLevel, List<InflictedToken> fatigueTokens)
     {
         m_CurrBattleSO = battleSO;
         m_TurnQueue.Clear();
@@ -151,17 +151,17 @@ public class BattleManager : Singleton<BattleManager>
         m_PermanentFatigueTokens = fatigueTokens;
 
         m_BattleBGM = SoundManager.Instance.PlayWithFadeIn(battleSO.m_BattleBGM);
-        StartCoroutine(BattleInitialise(battleSO, playerUnitData));
+        StartCoroutine(BattleInitialise(battleSO, playerUnitData, maxLevel));
     }
 
     // fixing race condition
-    public IEnumerator BattleInitialise(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData)
+    private IEnumerator BattleInitialise(BattleSO battleSO, List<PlayerCharacterBattleData> playerUnitData, int maxLevel)
     {
         yield return new WaitForEndOfFrame();
 
         m_MapLogic.ResetMap();
 
-        MaxPlayerLevel = Mathf.Max(CharacterDataManager.Instance.RetrieveCharacterData(playerUnitData.Select(x => x.m_BaseData.m_Id)).Select(x => x.m_CurrLevel).ToArray());
+        MaxPlayerLevel = maxLevel;
 
         foreach (EnemyUnitPlacement unitPlacement in battleSO.m_EnemyUnitsToSpawn)
         {
