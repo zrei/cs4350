@@ -30,10 +30,12 @@ public class TestBattleInitialiser : MonoBehaviour
             inflictedTokens.Add(m_FatigueToken);
         }
 
+        int maxLevel = Mathf.Max(m_TestData.Select(x => x.m_CurrLevel).ToArray());
+
         if (BattleManager.IsReady)
-            BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), new());
+            BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), maxLevel, inflictedTokens);
         else 
-            LevelManager.OnReady += () => BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), new());
+            LevelManager.OnReady += () => BattleManager.Instance.InitialiseBattle(m_TestBattle, m_TestData.Select(x => x.GetBattleData()).ToList(), maxLevel, inflictedTokens);
 
         if (CameraManager.IsReady)
             CameraManager.Instance.SetUpBattleCamera();
